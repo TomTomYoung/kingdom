@@ -1,0 +1,981 @@
+%%html
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.55.2/phaser.min.js"></script>
+    <style>
+        #event-window {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 150px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            display: none;
+        }
+        #event-text {
+            height: 100px;
+            overflow-y: auto;
+        }
+        #event-controls {
+            text-align: center;
+            margin-top: 10px;
+        }
+        #event-controls button {
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container"></div>
+    <div id="event-window">
+        <div id="event-text"></div>
+        <div id="event-controls">
+            <button id="prev-page">前のページ</button>
+            <button id="next-page">次のページ</button>
+            <button id="close-event">閉じる</button>
+        </div>
+    </div>
+    <script>
+        const skipOpening = true;
+
+        class SceneManager {
+            constructor(game) {
+                this.game = game;
+            }
+
+            switchTo(sceneName, data = {}) {
+                this.game.scene.start(sceneName, data);
+            }
+        }
+
+        class EventManager {
+            constructor() {
+                this.eventEmitter = new Phaser.Events.EventEmitter();
+            }
+
+            on(event, callback, context) {
+                this.eventEmitter.on(event, callback, context);
+            }
+
+            emit(event, ...args) {
+                this.eventEmitter.emit(event, ...args);
+            }
+        }
+
+        class GUIManager {
+            constructor(scene) {
+                this.scene = scene;
+                this.elements = {};
+            }
+
+            addElement(key, element) {
+                this.elements[key] = element;
+            }
+
+            updateElement(key, props) {
+                if (this.elements[key]) {
+                    Object.assign(this.elements[key], props);
+                }
+            }
+
+            removeElement(key) {
+                if (this.elements[key]) {
+                    this.elements[key].destroy();
+                    delete this.elements[key];
+                }
+            }
+        }
+
+        class Hex {
+            constructor(q, r, s) {
+                this.q = q;
+                this.r = r;
+                this.s = s;
+                if (Math.round(q + r + s) !== 0) {
+                    console.warn("Warning: q + r + s is not 0. Adjusting s to ensure q + r + s = 0.");
+                    this.s = -q - r;  // sを調整して q + r + s = 0 を保証する
+                }
+            }
+
+            add(b) {
+                return new Hex(this.q + b.q, this.r + b.r, this.s + b.s);
+            }
+
+            subtract(b) {
+                return new Hex(this.q - b.q, this.r - b.r, this.s - b.s);
+            }
+
+            equals(other) {
+                return this.q === other.q && this.r === other.r && this.s === other.s;
+            }
+        }
+        
+        class Layout {
+            constructor(orientation, size, origin) {
+                this.orientation = orientation;
+                this.size = size;
+                this.origin = origin;
+            }
+
+            hexToPixel(h) {
+                let M = this.orientation;
+                let size = this.size;
+                let origin = this.origin;
+                let x = (M.f0 * h.q + M.f1 * h.r) * size.x;
+                let y = (M.f2 * h.q + M.f3 * h.r) * size.y;
+                return {x: x + origin.x, y: y + origin.y};
+            }
+
+            pixelToHex(p) {
+                let M = this.orientation;
+                let size = this.size;
+                let origin = this.origin;
+                let pt = {x: (p.x - origin.x) / size.x, y: (p.y - origin.y) / size.y};
+                let q = M.b0 * pt.x + M.b1 * pt.y;
+                let r = M.b2 * pt.x + M.b3 * pt.y;
+                return new Hex(q, r, -q-r);
+            }
+        }
+
+        const layout_pointy = {
+            f0: Math.sqrt(3.0), f1: Math.sqrt(3.0) / 2.0, f2: 0.0, f3: 3.0 / 2.0,
+            b0: Math.sqrt(3.0) / 3.0, b1: -1.0 / 3.0, b2: 0.0, b3: 2.0 / 3.0,
+            start_angle: 0.5
+        };
+
+        class Layer {
+            constructor(scene, width, height) {
+                this.scene = scene;
+                this.width = width;
+                this.height = height;
+                this.graphics = scene.add.graphics();
+            }
+
+            clear() {
+                this.graphics.clear();
+            }
+        }
+
+        class TileLayer extends Layer {
+            constructor(scene, width, height, hexSize, dataManager) {
+                super(scene, width, height);
+                this.hexSize = hexSize;
+                this.layout = new Layout(layout_pointy, {x: hexSize, y: hexSize}, {x: width/2, y: height/2});
+                this.grid = {};
+                this.dataManager = dataManager;
+                this.createGrid();
+            }
+
+            createGrid() {
+                const tileData = this.dataManager.get('tiles').tiles;
+                for (let q = -5; q <= 5; q++) {
+                    for (let r = Math.max(-5, -q-5); r <= Math.min(5, -q+5); r++) {
+                        let s = -q-r;
+                        if (Math.abs(s) <= 5) {
+                            let hex = new Hex(q, r, s);
+                            let type = Phaser.Math.RND.pick(['草原', '森林', '山', '海']);
+                            let key = `${q},${r},${s}`;
+                            this.grid[key] = new Tile(q, r, s, type, tileData);
+                        }
+                    }
+                }
+            }
+
+            draw() {
+                this.clear();
+                for (let key in this.grid) {
+                    let tile = this.grid[key];
+                    let center = this.layout.hexToPixel(tile.hex);
+                    this.drawHexagon(center.x, center.y, this.hexSize, this.getColorForTile(tile));
+                    this.drawText(center.x, center.y, tile.type);
+                }
+            }
+
+            getColorForTile(tile) {
+                switch(tile.type) {
+                    case '草原': return 0x7CFC00;
+                    case '森林': return 0x228B22;
+                    case '山': return 0x8B4513;
+                    case '海': return 0x1E90FF;
+                    default: return 0xCCCCCC;
+                }
+            }
+
+            drawHexagon(x, y, size, color) {
+                this.graphics.lineStyle(2, 0x000000, 1);
+                this.graphics.fillStyle(color, 1);
+                this.graphics.beginPath();
+                for (let i = 0; i < 6; i++) {
+                    const angle = 2 * Math.PI / 6 * (i + 0.5);
+                    const hx = x + size * Math.cos(angle);
+                    const hy = y + size * Math.sin(angle);
+                    if (i === 0) {
+                        this.graphics.moveTo(hx, hy);
+                    } else {
+                        this.graphics.lineTo(hx, hy);
+                    }
+                }
+                this.graphics.closePath();
+                this.graphics.fillPath();
+                this.graphics.strokePath();
+            }
+
+            drawText(x, y, text) {
+                this.scene.add.text(x, y, text, { fontSize: '16px', fill: '#000' }).setOrigin(0.5);
+            }
+
+            getHexAt(x, y) {
+                let hex = this.layout.pixelToHex({x: x, y: y});
+                hex.q = Math.round(hex.q);
+                hex.r = Math.round(hex.r);
+                hex.s = Math.round(hex.s);
+                let key = `${hex.q},${hex.r},${hex.s}`;
+                return this.grid[key];
+            }
+        }
+
+        class BuildingLayer extends Layer {
+            constructor(scene, width, height, hexSize) {
+                super(scene, width, height);
+                this.hexSize = hexSize;
+                this.layout = new Layout(layout_pointy, {x: hexSize, y: hexSize}, {x: width/2, y: height/2});
+                this.buildings = [];
+            }
+
+            addBuilding(hex, buildingType) {
+                let center = this.layout.hexToPixel(hex);
+                this.buildings.push({
+                    hex: hex,
+                    x: center.x,
+                    y: center.y,
+                    type: buildingType
+                });
+            }
+
+            draw() {
+                this.clear();
+                this.buildings.forEach(building => {
+                    this.scene.add.text(building.x, building.y, building.type[0], { fontSize: '20px', fill: '#00ff00' }).setOrigin(0.5);
+                });
+            }
+        }
+
+
+        class CharacterLayer extends Layer {
+            constructor(scene, width, height, hexSize) {
+                super(scene, width, height);
+                this.hexSize = hexSize;
+                this.layout = new Layout(layout_pointy, {x: hexSize, y: hexSize}, {x: width/2, y: height/2});
+                this.characters = [];
+                this.characterSprites = []; // キャラクターのスプライトを保持する配列
+                this.createCharacters();
+            }
+
+            createCharacters() {
+                for (let i = 0; i < 3; i++) {
+                    let q = Phaser.Math.Between(-5, 5);
+                    let r = Phaser.Math.Between(-5, 5);
+                    let s = -q - r;
+                    let hex = new Hex(q, r, s);
+                    let center = this.layout.hexToPixel(hex);
+                    this.characters.push({
+                        hex: hex,
+                        x: center.x,
+                        y: center.y,
+                        type: 'P' // Player character
+                    });
+                }
+            }
+
+            draw() {
+                // 既存のスプライトをすべて削除
+                this.characterSprites.forEach(sprite => sprite.destroy());
+                this.characterSprites = [];
+
+                // キャラクターを再描画
+                this.characters.forEach(char => {
+                    let sprite = this.scene.add.text(char.x, char.y, char.type, { fontSize: '24px', fill: '#ff0000' }).setOrigin(0.5);
+                    this.characterSprites.push(sprite);
+                });
+            }
+
+            getCharacterAt(x, y) {
+                let hex = this.layout.pixelToHex({x: x, y: y});
+                hex.q = Math.round(hex.q);
+                hex.r = Math.round(hex.r);
+                hex.s = Math.round(hex.s);
+                return this.characters.find(char => 
+                    char.hex.q === hex.q && char.hex.r === hex.r && char.hex.s === hex.s
+                );
+            }
+
+            moveCharacter(character, hex) {
+                character.hex = hex;
+                let center = this.layout.hexToPixel(hex);
+                character.x = center.x;
+                character.y = center.y;
+                this.draw(); // キャラクターを移動した後、レイヤーを再描画
+            }
+        }
+
+        class DataManager {
+            constructor() {
+                this.data = {};
+            }
+
+            loadJSON(key, jsonString) {
+                try {
+                    this.data[key] = JSON.parse(jsonString);
+                } catch (error) {
+                    console.error(`Error parsing JSON for key ${key}:`, error);
+                }
+            }
+
+            get(key) {
+                return this.data[key];
+            }
+        }
+
+        class Tile {
+            constructor(q, r, s, type, tileData) {
+                this.hex = new Hex(q, r, s);
+                this.type = type;
+                this.resources = this.generateResources(tileData);
+                this.owner = null;
+            }
+
+            generateResources(tileData) {
+                const tileInfo = tileData.find(t => t.name === this.type);
+                if (!tileInfo) return {};
+
+                return tileInfo.resources.reduce((acc, resource) => {
+                    acc[resource] = 1;  // 基本的には各資源を1として設定
+                    return acc;
+                }, {});
+            }
+        }
+
+
+        class Player {
+            constructor(id, startingHex, dataManager) {
+                this.id = id;
+                this.capital = startingHex;
+                this.territory = [startingHex];
+                this.resources = {
+                    食糧: 0,
+                    生産: 0,
+                    金: 0,
+                    科学: 0
+                };
+                this.population = 1;
+                this.units = [];
+                this.buildings = [];
+                this.technologies = [];
+                this.dataManager = dataManager;
+            }
+
+            collectResources(tiles) {
+                for (const hex of this.territory) {
+                    const tile = tiles[`${hex.q},${hex.r},${hex.s}`];
+                    for (const [resource, amount] of Object.entries(tile.resources)) {
+                        this.resources[resource] += amount;
+                    }
+                }
+                // 人口から科学資源を追加
+                this.resources.科学 += Math.floor(this.population / 2);
+            }
+
+            expandTerritory(newHex, tiles) {
+                if (!this.territory.some(hex => hex.equals(newHex))) {
+                    this.territory.push(newHex);
+                    const key = `${newHex.q},${newHex.r},${newHex.s}`;
+                    if (tiles[key]) {
+                        tiles[key].owner = this.id;
+                    } else {
+                        console.warn(`Tile at ${key} does not exist in the grid.`);
+                    }
+                }
+            }
+
+            createUnit(type, hex) {
+                if (this.resources.production >= 10) {
+                    this.resources.production -= 10;
+                    this.units.push(new Unit(type, hex));
+                    return true;
+                }
+                return false;
+            }
+
+            constructBuilding(type, hex) {
+                if (this.resources.production >= 20) {
+                    this.resources.production -= 20;
+                    this.buildings.push(new Building(type, hex));
+                    return true;
+                }
+                return false;
+            }
+
+            research(technology) {
+                if (this.resources.science >= technology.cost) {
+                    this.resources.science -= technology.cost;
+                    this.technologies.push(technology);
+                    return true;
+                }
+                return false;
+            }
+
+            growPopulation() {
+                if (this.resources.food >= this.population * 2) {
+                    this.resources.food -= this.population * 2;
+                    this.population++;
+                    return true;
+                }
+                return false;
+            }
+        }
+
+
+        class Unit {
+            constructor(type, hex) {
+                this.type = type;
+                this.hex = hex;
+                // Add more properties and methods as needed
+            }
+        }
+
+        class Building {
+            constructor(type, hex) {
+                this.type = type;
+                this.hex = hex;
+                // Add more properties and methods as needed
+            }
+        }
+
+        class Technology {
+            constructor(name, cost, effects) {
+                this.name = name;
+                this.cost = cost;
+                this.effects = effects;
+            }
+        }        
+
+        class GameScene extends Phaser.Scene {
+            constructor() {
+                super({ key: 'GameScene' });
+                this.dataManager = new DataManager();
+                this.players = [];
+                this.currentPlayerIndex = 0;
+                this.currentTurn = 1;
+            }
+
+            preload() {
+                // サンプルJSONデータ（実際のゲームでは外部ファイルから読み込むことが多い）
+                const resourcesJSON = `{
+                    "resources": [
+                        {"name": "金", "value": 10},
+                        {"name": "食糧", "value": 5},
+                        {"name": "科学", "value": 0},
+                        {"name": "宗教", "value": 0}
+                    ]
+                }`;
+
+                const tilesJSON = `{
+                    "tiles": [
+                        {
+                            "name": "平原",
+                            "class": "草原",
+                            "resources": ["食糧"],
+                            "height": 1,
+                            "movementCost": 1
+                        },
+                        {
+                            "name": "丘陵",
+                            "class": "丘陵",
+                            "resources": ["金"],
+                            "height": 2,
+                            "movementCost": 2
+                        },
+                        {
+                            "name": "草原",
+                            "class": "草原",
+                            "resources": ["食糧"],
+                            "height": 1,
+                            "movementCost": 1
+                        },
+                        {
+                            "name": "森林",
+                            "class": "森林",
+                            "resources": ["木材"],
+                            "height": 1,
+                            "movementCost": 2
+                        }                       
+                    ]
+                }`;
+
+                const charactersJSON = `{
+                    "characters": [
+                        {
+                            "name": "戦士A",
+                            "class": "戦士",
+                            "player": "プレイヤー",
+                            "hp": 100,
+                            "attack": 10,
+                            "movement": 2,
+                            "actionPoints": 1,
+                            "actions": ["攻撃", "待機"]
+                        },
+                        {
+                            "name": "労働者B",
+                            "class": "労働者",
+                            "player": "プレイヤー",
+                            "hp": 50,
+                            "attack": 1,
+                            "movement": 2,
+                            "actionPoints": 1,
+                            "actions": ["建設", "待機"]
+                        }
+                    ]
+                }`;
+
+                const actionsJSON = `{
+                    "actions": [
+                        {
+                            "name": "攻撃",
+                            "functionName": "attack",
+                            "args": {"range": 1}
+                        },
+                        {
+                            "name": "待機",
+                            "functionName": "wait",
+                            "args": {}
+                        },
+                        {
+                            "name": "建設",
+                            "functionName": "build",
+                            "args": {"range": 0}
+                        }
+                    ]
+                }`;
+
+                const eventsJSON = `{
+                    "events": [
+                        {
+                            "id": "ancient-ruins",
+                            "title": "古代遺跡の発見",
+                            "pages": [
+                                "あなたの探検隊は古代の遺跡を発見しました。",
+                                "遺跡の中には貴重な遺物や古代の知識が眠っているかもしれません。",
+                                "探索を進めますか？"
+                            ]
+                        }
+                    ]
+                }`;
+
+                
+
+                // JSONデータを読み込む
+                this.dataManager.loadJSON('resources', resourcesJSON);
+                this.dataManager.loadJSON('tiles', tilesJSON);
+                this.dataManager.loadJSON('characters', charactersJSON);
+                this.dataManager.loadJSON('actions', actionsJSON);
+                this.dataManager.loadJSON('events', eventsJSON);
+            }
+
+
+
+            createGameObjects() {
+                const resources = this.dataManager.get('resources').resources;
+                const tiles = this.dataManager.get('tiles').tiles;
+                const characters = this.dataManager.get('characters').characters;
+                const actions = this.dataManager.get('actions').actions;
+
+                console.log('Loaded Resources:', resources);
+                console.log('Loaded Tiles:', tiles);
+                console.log('Loaded Characters:', characters);
+                console.log('Loaded Actions:', actions);
+
+                // ここでリソース、タイル、キャラクター、アクションを使ってゲームオブジェクトを作成
+                // 例: キャラクターの作成
+                characters.forEach(charData => {
+                    let q = Phaser.Math.Between(-5, 5);
+                    let r = Phaser.Math.Between(-5, 5);
+                    let s = -q - r;
+                    let hex = new Hex(q, r, s);
+                    let center = this.characterLayer.layout.hexToPixel(hex);
+                    
+                    this.characterLayer.characters.push({
+                        hex: hex,
+                        x: center.x,
+                        y: center.y,
+                        ...charData
+                    });
+                });
+
+                // キャラクターを描画
+                this.characterLayer.draw();
+
+                // アクション関数の定義
+                this.actions = {
+                    attack: (subject, target, args) => {
+                        console.log(`${subject.name} attacks ${target.name} with range ${args.range}`);
+                        target.hp -= subject.attack;
+                    },
+                    wait: (subject) => {
+                        console.log(`${subject.name} waits`);
+                    },
+                    build: (subject, target, args) => {
+                        console.log(`${subject.name} builds on ${target.name}`);
+                    }
+                };
+
+                // 敵プレイヤーと蛮族の配置
+                this.createCharacter('敵プレイヤー', 'E');
+                this.createCharacter('蛮族', 'B');
+
+                // 建築物の配置
+                this.buildingLayer.addBuilding(new Hex(0, 0, 0), '都市');
+                this.buildingLayer.draw();                
+            }
+
+            create() {
+                // ゲームの設定
+                this.gameWidth = this.sys.game.config.width;
+                this.gameHeight = this.sys.game.config.height;
+                this.hexSize = 30;
+
+                // 背景の設定
+                this.add.rectangle(0, 0, this.gameWidth, this.gameHeight, 0x87CEEB).setOrigin(0);
+
+                // レイヤーの初期化
+                this.initializeLayers();
+
+                // プレイヤーの作成
+                this.createPlayers();
+
+                // 領土の初期化
+                this.createTerritories();
+
+                // UIの設定
+                this.setupUI();
+
+                // イベントリスナーの設定
+                this.setupEventListeners();
+
+                // イベントウィンドウの設定
+                this.setupEventWindow();
+
+                // デバッグ情報の表示
+                this.setupDebugInfo();
+
+                // カメラの設定
+                this.setupCamera();
+
+                console.log('Game created and initialized');
+            }
+
+
+            initializeLayers() {
+                this.tileLayer = new TileLayer(this, this.gameWidth, this.gameHeight, this.hexSize, this.dataManager);
+                this.buildingLayer = new BuildingLayer(this, this.gameWidth, this.gameHeight, this.hexSize);
+                this.characterLayer = new CharacterLayer(this, this.gameWidth, this.gameHeight, this.hexSize);
+
+                // レイヤーの描画
+                this.tileLayer.draw();
+                this.buildingLayer.draw();
+                this.characterLayer.draw();
+            }
+            createPlayers() {
+                const startingPositions = [
+                    new Hex(0, 0, 0),
+                    new Hex(5, -5, 0),
+                    new Hex(-5, 5, 0)
+                ];
+
+                for (let i = 0; i < 3; i++) {
+                    this.players.push(new Player(i, startingPositions[i], this.dataManager));
+                }
+            }
+
+            createTerritories() {
+                for (const player of this.players) {
+                    const territorySize = 2; // 首都を中心とした周囲のリング数
+                    for (let q = -territorySize; q <= territorySize; q++) {
+                        for (let r = Math.max(-territorySize, -q - territorySize); r <= Math.min(territorySize, -q + territorySize); r++) {
+                            const s = -q - r;
+                            const hex = player.capital.add(new Hex(q, r, s));
+                            player.expandTerritory(hex, this.tileLayer.grid);
+                        }
+                    }
+                }
+                this.tileLayer.draw(); // 領土を表示するために再描画
+            }
+
+            setupUI() {
+                // ターン終了ボタン
+                this.endTurnButton = this.add.text(this.gameWidth - 100, 50, 'ターン終了', { fill: '#0f0' })
+                    .setInteractive()
+                    .on('pointerdown', () => this.endTurn());
+
+                // 現在のターン表示
+                this.turnText = this.add.text(10, 10, `ターン: ${this.currentTurn}`, { fill: '#fff' });
+
+                // 現在のプレイヤー表示
+                this.playerText = this.add.text(10, 40, `プレイヤー: ${this.currentPlayer}`, { fill: '#fff' });
+
+                // 資源表示の追加
+                this.resourceText = this.add.text(10, 70, '', { fill: '#fff' });
+                this.updateResourceDisplay();    
+                
+                this.expandButton = this.add.text(10, 100, '領土拡張', { fill: '#0f0' })
+                    .setInteractive()
+                    .on('pointerdown', () => this.selectedAction = 'expand');
+
+                this.createUnitButton = this.add.text(10, 130, 'ユニット作成', { fill: '#0f0' })
+                    .setInteractive()
+                    .on('pointerdown', () => this.selectedAction = 'unit');
+
+                this.buildButton = this.add.text(10, 160, '建物建設', { fill: '#0f0' })
+                    .setInteractive()
+                    .on('pointerdown', () => this.selectedAction = 'building');                
+            }
+
+            updateResourceDisplay() {
+                const currentPlayer = this.players[this.currentPlayerIndex];
+                const resourceText = Object.entries(currentPlayer.resources)
+                    .map(([resource, amount]) => `${resource}: ${amount}`)
+                    .join(' | ');
+                this.resourceText.setText(`プレイヤー ${currentPlayer.id} | ${resourceText} | 人口: ${currentPlayer.population}`);
+            }
+
+            endTurn() {
+                this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
+                if (this.currentPlayerIndex === 0) {
+                    this.currentTurn++;
+                    this.turnText.setText(`ターン: ${this.currentTurn}`);
+                    this.collectResources();
+                }
+                this.playerText.setText(`プレイヤー: ${this.currentPlayerIndex}`);
+                this.updateResourceDisplay();
+
+                // 敵と蛮族のターンを実行
+                if (this.currentPlayerIndex === 1) {
+                    this.enemyTurn();
+                } else if (this.currentPlayerIndex === 2) {
+                    this.barbarianTurn();
+                }
+            }
+
+            collectResources() {
+                for (const player of this.players) {
+                    player.collectResources(this.tileLayer.grid);
+                }
+            }            
+
+            setupEventListeners() {
+                this.input.on('pointerdown', this.handleClick, this);
+                this.input.keyboard.on('keydown-SPACE', () => this.endTurn());
+            }
+
+            setupDebugInfo() {
+                this.debugText = this.add.text(10, this.gameHeight - 20, '', { fill: '#fff', fontSize: '12px' });
+                this.input.on('pointermove', (pointer) => {
+                    const hex = this.tileLayer.getHexAt(pointer.x, pointer.y);
+                    if (hex) {
+                        this.debugText.setText(`Hex: q=${hex.hex.q}, r=${hex.hex.r}, s=${hex.hex.s}`);
+                    }
+                });
+            }
+            setupCamera() {
+                this.cameras.main.setBounds(0, 0, this.gameWidth, this.gameHeight);
+                this.cameras.main.setZoom(1);
+                this.cameras.main.centerOn(this.gameWidth / 2, this.gameHeight / 2);
+
+                // カメラのドラッグ移動を有効にする
+                this.input.on('pointermove', (pointer) => {
+                    if (pointer.isDown) {
+                        this.cameras.main.scrollX -= (pointer.x - pointer.prevPosition.x) / this.cameras.main.zoom;
+                        this.cameras.main.scrollY -= (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom;
+                    }
+                });
+
+                // マウスホイールでズーム
+                this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
+                    const zoom = this.cameras.main.zoom;
+                    this.cameras.main.setZoom(zoom - deltaY * 0.001);
+                });
+            }
+
+            createCharacter(type, symbol, player) {
+                let q, r, s;
+                do {
+                    q = Phaser.Math.Between(-5, 5);
+                    r = Phaser.Math.Between(-5, 5);
+                    s = -q - r;
+                } while (Math.abs(s) > 5);  // Ensure the hex is within the map
+
+                let hex = new Hex(q, r, s);
+                let center = this.characterLayer.layout.hexToPixel(hex);
+                
+                this.characterLayer.characters.push({
+                    hex: hex,
+                    x: center.x,
+                    y: center.y,
+                    type: type,
+                    symbol: symbol,
+                    player: player
+                });
+            }            
+
+            enemyTurn() {
+                console.log('敵のターン');
+                // 簡単なAI: ランダムに移動
+                this.characterLayer.characters.forEach(char => {
+                    if (char.type === '敵プレイヤー') {
+                        let newHex = this.getRandomAdjacentHex(char.hex);
+                        this.characterLayer.moveCharacter(char, newHex);
+                    }
+                });
+                this.endTurn();
+            }
+
+            barbarianTurn() {
+                console.log('蛮族のターン');
+                // 簡単なAI: ランダムに移動
+                this.characterLayer.characters.forEach(char => {
+                    if (char.type === '蛮族') {
+                        let newHex = this.getRandomAdjacentHex(char.hex);
+                        this.characterLayer.moveCharacter(char, newHex);
+                    }
+                });
+                this.endTurn();
+            }
+
+            playerTurn() {
+                console.log('プレイヤーのターン');
+                // ランダムにイベントを発生させる
+                if (Math.random() < 0.3) {  // 30%の確率でイベント発生
+                    this.triggerEvent('ancient-ruins');
+                }
+            }
+
+            getRandomAdjacentHex(hex) {
+                const directions = [
+                    new Hex(1, -1, 0), new Hex(1, 0, -1), new Hex(0, 1, -1),
+                    new Hex(-1, 1, 0), new Hex(-1, 0, 1), new Hex(0, -1, 1)
+                ];
+                const direction = Phaser.Math.RND.pick(directions);
+                return hex.add(direction);
+            }
+
+            setupEventWindow() {
+                this.eventWindow = document.getElementById('event-window');
+                document.getElementById('prev-page').addEventListener('click', () => this.prevEventPage());
+                document.getElementById('next-page').addEventListener('click', () => this.nextEventPage());
+                document.getElementById('close-event').addEventListener('click', () => this.closeEvent());
+            }
+
+            triggerEvent(eventId) {
+                const eventData = this.dataManager.get('events').events.find(e => e.id === eventId);
+                if (eventData) {
+                    this.eventPages = eventData.pages;
+                    this.currentEventPage = 0;
+                    this.updateEventWindow();
+                    this.eventWindow.style.display = 'block';
+                }
+            }
+
+            updateEventWindow() {
+                document.getElementById('event-text').innerText = this.eventPages[this.currentEventPage];
+                document.getElementById('prev-page').disabled = this.currentEventPage === 0;
+                document.getElementById('next-page').disabled = this.currentEventPage === this.eventPages.length - 1;
+            }
+
+            prevEventPage() {
+                if (this.currentEventPage > 0) {
+                    this.currentEventPage--;
+                    this.updateEventWindow();
+                }
+            }
+
+            nextEventPage() {
+                if (this.currentEventPage < this.eventPages.length - 1) {
+                    this.currentEventPage++;
+                    this.updateEventWindow();
+                }
+            }
+
+            closeEvent() {
+                this.eventWindow.style.display = 'none';
+            }
+
+            handleClick(pointer) {
+                const hex = this.tileLayer.layout.pixelToHex({x: pointer.x, y: pointer.y});
+                const roundedHex = new Hex(Math.round(hex.q), Math.round(hex.r), Math.round(hex.s));
+                const tile = this.tileLayer.grid[`${roundedHex.q},${roundedHex.r},${roundedHex.s}`];
+
+                if (tile) {
+                    const currentPlayer = this.players[this.currentPlayerIndex];
+                    if (this.selectedAction === 'expand' && this.canExpandTo(currentPlayer, roundedHex)) {
+                        currentPlayer.expandTerritory(roundedHex, this.tileLayer.grid);
+                        this.tileLayer.draw();
+                        this.updateResourceDisplay();
+                    } else if (this.selectedAction === 'unit' && this.canCreateUnitAt(currentPlayer, roundedHex)) {
+                        if (currentPlayer.createUnit('開拓者', roundedHex)) {
+                            this.characterLayer.addCharacter(roundedHex, 'S');
+                            this.characterLayer.draw();
+                            this.updateResourceDisplay();
+                        }
+                    } else if (this.selectedAction === 'building' && this.canConstructBuildingAt(currentPlayer, roundedHex)) {
+                        if (currentPlayer.constructBuilding('都市', roundedHex)) {
+                            this.buildingLayer.addBuilding(roundedHex, 'C');
+                            this.buildingLayer.draw();
+                            this.updateResourceDisplay();
+                        }
+                    }
+                    this.selectedAction = null;
+                }
+            }
+            canExpandTo(player, hex) {
+                return !player.territory.some(h => h.equals(hex)) &&
+                      player.territory.some(h => this.getDistance(h, hex) === 1) &&
+                      player.resources.金 >= 10;
+            }
+
+            canCreateUnitAt(player, hex) {
+                return player.territory.some(h => h.equals(hex)) &&
+                      !this.characterLayer.characters.some(c => c.hex.equals(hex));
+            }
+
+            canConstructBuildingAt(player, hex) {
+                return player.territory.some(h => h.equals(hex)) &&
+                      !this.buildingLayer.buildings.some(b => b.hex.equals(hex));
+            }
+
+            getDistance(a, b) {
+                return Math.max(Math.abs(a.q - b.q), Math.abs(a.r - b.r), Math.abs(a.s - b.s));
+            }
+
+            showMessage(message) {
+                if (this.messageText) {
+                    this.messageText.destroy();
+                }
+                this.messageText = this.add.text(400, 550, message, { fontSize: '18px', fill: '#fff' }).setOrigin(0.5);
+            }
+        }
+
+        const config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            parent: 'game-container',
+            scene: [GameScene]
+        };
+
+        const game = new Phaser.Game(config);
+    </script>
+</body>
+</html>
