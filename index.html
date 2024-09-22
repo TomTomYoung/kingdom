@@ -1043,27 +1043,6 @@
                 // プレイヤーのアクションが完了したら endPlayerPhase() を呼び出す
             }            
 
-            // endPlayerPhase() {
-            //     this.currentPlayerIndex++;
-            //     if (this.currentPlayerIndex < this.players.length - 1) {
-            //         this.gameState = 'OTHER_PLAYERS_PHASE';
-            //     } else {
-            //         this.gameState = 'CPU_PHASE';
-            //     }
-            //     this.updateGameState();
-            // }
-
-            // endPlayerPhase() {
-            //     this.currentPlayerIndex++;
-            //     if (this.currentPlayerIndex < this.players.length) {
-            //         this.gameState = 'PLAYER_PHASE';
-            //     } else {
-            //         this.currentPlayerIndex = 0;
-            //         this.gameState = 'TURN_END';
-            //     }
-            //     this.updateGameState();
-            // }
-
             endPlayerPhase() {
                 this.currentPlayerIndex++;
                 if (this.currentPlayerIndex >= this.players.length) {
@@ -1101,14 +1080,6 @@
                 this.gameState = 'TURN_END';
                 this.updateGameState();
             }
-
-            // handleTurnEnd() {
-            //     console.log(`ターン ${this.currentTurn} 終了`);
-            //     this.currentTurn++;
-            //     this.currentPlayerIndex = 0;
-            //     this.gameState = 'TURN_START';
-            //     this.updateGameState();
-            // }
 
             handleTurnEnd() {
                 console.log(`ターン ${this.currentTurn} 終了`);
