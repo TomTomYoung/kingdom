@@ -42,6 +42,9 @@
     <script>
         const skipOpening = true;
 
+
+        //#region Manager
+
         class SceneManager {
             constructor(game) {
                 this.game = game;
@@ -89,6 +92,57 @@
                 }
             }
         }
+
+        class DataManager {
+            constructor() {
+                this.data = {};
+                this.resourceNameMap = {}; // リソース名のマッピング（英語名から日本語名）
+            }
+
+            loadJSON(key, jsonString) {
+                try {
+                    this.data[key] = JSON.parse(jsonString);
+
+                    // リソースデータの場合、マッピングを作成
+                    if (key === 'resources') {
+                        this.data[key].resources.forEach(resource => {
+                            this.resourceNameMap[resource.name] = resource.japaneseName;
+                        });
+                    }
+                } catch (error) {
+                    console.error(`Error parsing JSON for key ${key}:`, error);
+                }
+            }
+
+            get(key) {
+                return this.data[key];
+            }
+
+            getResourceJapaneseName(englishName) {
+                return this.resourceNameMap[englishName] || englishName;
+            }
+        }
+
+        // class DataManager {
+        //     constructor() {
+        //         this.data = {};
+        //     }
+
+        //     loadJSON(key, jsonString) {
+        //         try {
+        //             this.data[key] = JSON.parse(jsonString);
+        //         } catch (error) {
+        //             console.error(`Error parsing JSON for key ${key}:`, error);
+        //         }
+        //     }
+
+        //     get(key) {
+        //         return this.data[key];
+        //     }
+        // }
+
+        //#endregion Manager
+
 
         class Hex {
             constructor(q, r, s) {
@@ -164,7 +218,7 @@
             constructor(scene, width, height, hexSize, dataManager) {
                 super(scene, width, height);
                 this.hexSize = hexSize;
-                this.layout = new Layout(layout_pointy, {x: hexSize, y: hexSize}, {x: width/2, y: height/2});
+                this.layout = new Layout(layout_pointy, { x: hexSize, y: hexSize }, { x: width / 2, y: height / 2 });
                 this.grid = {};
                 this.dataManager = dataManager;
                 this.createGrid();
@@ -172,14 +226,15 @@
 
             createGrid() {
                 const tileData = this.dataManager.get('tiles').tiles;
+                const tileTypes = tileData.map(tile => tile.name); // 英語名のリスト
                 for (let q = -5; q <= 5; q++) {
-                    for (let r = Math.max(-5, -q-5); r <= Math.min(5, -q+5); r++) {
-                        let s = -q-r;
+                    for (let r = Math.max(-5, -q - 5); r <= Math.min(5, -q + 5); r++) {
+                        let s = -q - r;
                         if (Math.abs(s) <= 5) {
                             let hex = new Hex(q, r, s);
-                            let type = Phaser.Math.RND.pick(['草原', '森林', '山', '海']);
+                            let type = Phaser.Math.RND.pick(tileTypes);
                             let key = `${q},${r},${s}`;
-                            this.grid[key] = new Tile(q, r, s, type, tileData);
+                            this.grid[key] = new Tile(q, r, s, type, tileData, this.dataManager);
                         }
                     }
                 }
@@ -191,16 +246,15 @@
                     let tile = this.grid[key];
                     let center = this.layout.hexToPixel(tile.hex);
                     this.drawHexagon(center.x, center.y, this.hexSize, this.getColorForTile(tile));
-                    this.drawText(center.x, center.y, tile.type);
+                    this.drawText(center.x, center.y, tile.getJapaneseType());
                 }
             }
-
             getColorForTile(tile) {
                 switch(tile.type) {
-                    case '草原': return 0x7CFC00;
-                    case '森林': return 0x228B22;
-                    case '山': return 0x8B4513;
-                    case '海': return 0x1E90FF;
+                    case 'Grassland': return 0x7CFC00;
+                    case 'Forest': return 0x228B22;
+                    case 'Hill': return 0x8B4513;
+                    case 'Sea': return 0x1E90FF;
                     default: return 0xCCCCCC;
                 }
             }
@@ -321,28 +375,11 @@
             }
         }
 
-        class DataManager {
-            constructor() {
-                this.data = {};
-            }
-
-            loadJSON(key, jsonString) {
-                try {
-                    this.data[key] = JSON.parse(jsonString);
-                } catch (error) {
-                    console.error(`Error parsing JSON for key ${key}:`, error);
-                }
-            }
-
-            get(key) {
-                return this.data[key];
-            }
-        }
-
         class Tile {
-            constructor(q, r, s, type, tileData) {
+            constructor(q, r, s, type, tileData, dataManager) {
                 this.hex = new Hex(q, r, s);
-                this.type = type;
+                this.type = type; // 英語名
+                this.dataManager = dataManager;
                 this.resources = this.generateResources(tileData);
                 this.owner = null;
             }
@@ -352,11 +389,36 @@
                 if (!tileInfo) return {};
 
                 return tileInfo.resources.reduce((acc, resource) => {
-                    acc[resource] = 1;  // 基本的には各資源を1として設定
+                    acc[resource] = 1;  // リソースキーは英語名
                     return acc;
                 }, {});
             }
+
+            getJapaneseType() {
+                const tileData = this.dataManager.get('tiles').tiles;
+                const tileInfo = tileData.find(t => t.name === this.type);
+                return tileInfo ? tileInfo.japaneseName : this.type;
+            }
         }
+
+        // class Tile {
+        //     constructor(q, r, s, type, tileData) {
+        //         this.hex = new Hex(q, r, s);
+        //         this.type = type;
+        //         this.resources = this.generateResources(tileData);
+        //         this.owner = null;
+        //     }
+
+        //     generateResources(tileData) {
+        //         const tileInfo = tileData.find(t => t.name === this.type);
+        //         if (!tileInfo) return {};
+
+        //         return tileInfo.resources.reduce((acc, resource) => {
+        //             acc[resource] = 1;  // 基本的には各資源を1として設定
+        //             return acc;
+        //         }, {});
+        //     }
+        // }
 
         class Player {
             constructor(id, startingHex, dataManager) {
@@ -364,10 +426,10 @@
                 this.capital = startingHex;
                 this.territory = [startingHex];
                 this.resources = {
-                    食糧: 0,
-                    生産: 0,
-                    金: 0,
-                    科学: 0
+                    food: 0,
+                    production: 0,
+                    gold: 0,
+                    science: 0
                 };
                 this.population = 1;
                 this.units = [];
@@ -379,24 +441,18 @@
             collectResources(tiles) {
                 for (const hex of this.territory) {
                     const tile = tiles[`${hex.q},${hex.r},${hex.s}`];
-                    for (const [resource, amount] of Object.entries(tile.resources)) {
-                        this.resources[resource] += amount;
+                    if (tile) {
+                        for (const [resource, amount] of Object.entries(tile.resources)) {
+                            if (this.resources.hasOwnProperty(resource)) {
+                                this.resources[resource] += amount;
+                            } else {
+                                this.resources[resource] = amount;
+                            }
+                        }
                     }
                 }
                 // 人口から科学資源を追加
-                this.resources.科学 += Math.floor(this.population / 2);
-            }
-
-            expandTerritory(newHex, tiles) {
-                if (!this.territory.some(hex => hex.equals(newHex))) {
-                    this.territory.push(newHex);
-                    const key = `${newHex.q},${newHex.r},${newHex.s}`;
-                    if (tiles[key]) {
-                        tiles[key].owner = this.id;
-                    } else {
-                        console.warn(`Tile at ${key} does not exist in the grid.`);
-                    }
-                }
+                this.resources.science += Math.floor(this.population / 2);
             }
 
             createUnit(type, hex) {
@@ -424,7 +480,7 @@
                     return true;
                 }
                 return false;
-            }
+            }            
 
             growPopulation() {
                 if (this.resources.food >= this.population * 2) {
@@ -434,7 +490,100 @@
                 }
                 return false;
             }
+            expandTerritory(newHex, tiles) {
+                if (!this.territory.some(hex => hex.equals(newHex))) {
+                    this.territory.push(newHex);
+                    const key = `${newHex.q},${newHex.r},${newHex.s}`;
+                    if (tiles[key]) {
+                        tiles[key].owner = this.id;
+                    } else {
+                        console.warn(`Tile at ${key} does not exist in the grid.`);
+                    }
+                }
+            }
+
         }
+
+
+        // class Player {
+        //     constructor(id, startingHex, dataManager) {
+        //         this.id = id;
+        //         this.capital = startingHex;
+        //         this.territory = [startingHex];
+        //         this.resources = {
+        //             食糧: 0,
+        //             生産: 0,
+        //             金: 0,
+        //             科学: 0
+        //         };
+        //         this.population = 1;
+        //         this.units = [];
+        //         this.buildings = [];
+        //         this.technologies = [];
+        //         this.dataManager = dataManager;
+        //     }
+
+        //     collectResources(tiles) {
+        //         for (const hex of this.territory) {
+        //             const tile = tiles[`${hex.q},${hex.r},${hex.s}`];
+        //             if(tile){
+        //                 for (const [resource, amount] of Object.entries(tile.resources)) {
+        //                     this.resources[resource] += amount;
+        //                 }
+        //             }
+        //         }
+        //         // 人口から科学資源を追加
+        //         this.resources.科学 += Math.floor(this.population / 2);
+        //     }
+
+        //     expandTerritory(newHex, tiles) {
+        //         if (!this.territory.some(hex => hex.equals(newHex))) {
+        //             this.territory.push(newHex);
+        //             const key = `${newHex.q},${newHex.r},${newHex.s}`;
+        //             if (tiles[key]) {
+        //                 tiles[key].owner = this.id;
+        //             } else {
+        //                 console.warn(`Tile at ${key} does not exist in the grid.`);
+        //             }
+        //         }
+        //     }
+
+        //     createUnit(type, hex) {
+        //         if (this.resources.production >= 10) {
+        //             this.resources.production -= 10;
+        //             this.units.push(new Unit(type, hex));
+        //             return true;
+        //         }
+        //         return false;
+        //     }
+
+        //     constructBuilding(type, hex) {
+        //         if (this.resources.production >= 20) {
+        //             this.resources.production -= 20;
+        //             this.buildings.push(new Building(type, hex));
+        //             return true;
+        //         }
+        //         return false;
+        //     }
+
+        //     research(technology) {
+        //         if (this.resources.science >= technology.cost) {
+        //             this.resources.science -= technology.cost;
+        //             this.technologies.push(technology);
+        //             return true;
+        //         }
+        //         return false;
+        //     }
+
+        //     growPopulation() {
+        //         if (this.resources.food >= this.population * 2) {
+        //             this.resources.food -= this.population * 2;
+        //             this.population++;
+        //             return true;
+        //         }
+        //         return false;
+        //     }
+        // }
 
         class Unit {
             constructor(type, hex) {
@@ -467,49 +616,59 @@
                 this.players = [];
                 this.currentPlayerIndex = 0;
                 this.currentTurn = 1;
+                this.gameState = 'TURN_START';
             }
 
             preload() {
                 // サンプルJSONデータ（実際のゲームでは外部ファイルから読み込むことが多い）
                 const resourcesJSON = `{
                     "resources": [
-                        {"name": "金", "value": 10},
-                        {"name": "食糧", "value": 5},
-                        {"name": "科学", "value": 0},
-                        {"name": "宗教", "value": 0}
+                        {"name": "gold", "japaneseName": "金", "value": 10},
+                        {"name": "food", "japaneseName": "食糧", "value": 5},
+                        {"name": "science", "japaneseName": "科学", "value": 0},
+                        {"name": "religion", "japaneseName": "宗教", "value": 0},
+                        {"name": "production", "japaneseName": "生産", "value": 0}
                     ]
                 }`;
 
                 const tilesJSON = `{
                     "tiles": [
                         {
-                            "name": "平原",
-                            "class": "草原",
-                            "resources": ["食糧"],
+                            "name": "Plain",
+                            "japaneseName": "平原",
+                            "class": "Grassland",
+                            "japaneseClass": "草原",
+                            "resources": ["food"],
                             "height": 1,
                             "movementCost": 1
                         },
                         {
-                            "name": "丘陵",
-                            "class": "丘陵",
-                            "resources": ["金"],
+                            "name": "Hill",
+                            "japaneseName": "丘陵",
+                            "class": "Hill",
+                            "japaneseClass": "丘陵",
+                            "resources": ["gold"],
                             "height": 2,
                             "movementCost": 2
                         },
                         {
-                            "name": "草原",
-                            "class": "草原",
-                            "resources": ["食糧"],
+                            "name": "Grassland",
+                            "japaneseName": "草原",
+                            "class": "Grassland",
+                            "japaneseClass": "草原",
+                            "resources": ["food"],
                             "height": 1,
                             "movementCost": 1
                         },
                         {
-                            "name": "森林",
-                            "class": "森林",
-                            "resources": ["木材"],
+                            "name": "Forest",
+                            "japaneseName": "森林",
+                            "class": "Forest",
+                            "japaneseClass": "森林",
+                            "resources": ["wood"],
                             "height": 1,
                             "movementCost": 2
-                        }                       
+                        }
                     ]
                 }`;
 
@@ -582,7 +741,45 @@
                 this.dataManager.loadJSON('events', eventsJSON);
             }
 
+            create() {
+                // ゲームの設定
+                this.gameWidth = this.sys.game.config.width;
+                this.gameHeight = this.sys.game.config.height;
+                this.hexSize = 30;
 
+                // 背景の設定
+                this.add.rectangle(0, 0, this.gameWidth, this.gameHeight, 0x87CEEB).setOrigin(0);
+
+                // レイヤーの初期化
+                this.initializeLayers();
+
+                // プレイヤーの作成
+                this.createPlayers();
+
+                // 領土の初期化
+                this.createTerritories();
+
+                this.createGameObjects();
+
+                // UIの設定
+                this.setupUI();
+
+                // イベントリスナーの設定
+                this.setupEventListeners();
+
+                // イベントウィンドウの設定
+                this.setupEventWindow();
+
+                // デバッグ情報の表示
+                this.setupDebugInfo();
+
+                // カメラの設定
+                this.setupCamera();
+
+                this.updateGameState();
+
+                console.log('Game created and initialized');
+            }
 
             createGameObjects() {
                 const resources = this.dataManager.get('resources').resources;
@@ -638,43 +835,101 @@
                 this.buildingLayer.draw();                
             }
 
-            create() {
-                // ゲームの設定
-                this.gameWidth = this.sys.game.config.width;
-                this.gameHeight = this.sys.game.config.height;
-                this.hexSize = 30;
 
-                // 背景の設定
-                this.add.rectangle(0, 0, this.gameWidth, this.gameHeight, 0x87CEEB).setOrigin(0);
 
-                // レイヤーの初期化
-                this.initializeLayers();
+            //#region State
+            updateGameState() {
+                switch (this.gameState) {
+                    case 'TURN_START':
+                        this.handleTurnStart();
+                        break;
+                    case 'PLAYER_PHASE':
+                        this.handlePlayerPhase();
+                        break;
+                    case 'OTHER_PLAYERS_PHASE':
+                        this.handleOtherPlayersPhase();
+                        break;
+                    case 'CPU_PHASE':
+                        this.handleCPUPhase();
+                        break;
+                    case 'TURN_END':
+                        this.handleTurnEnd();
+                        break;
+                }
+            }         
+            
 
-                // プレイヤーの作成
-                this.createPlayers();
 
-                // 領土の初期化
-                this.createTerritories();
+            handleTurnStart() {
+                console.log(`ターン ${this.currentTurn} 開始`);
+                this.turnText.setText(`ターン: ${this.currentTurn}`);
+                this.collectResources();
+                
+                // 人口成長を追加
+                for (const player of this.players) {
+                    player.growPopulation();
+                }
 
-                // UIの設定
-                this.setupUI();
+                this.updateResourceDisplay();
+                this.gameState = 'PLAYER_PHASE';
+                this.updateGameState();
+            }            
 
-                // イベントリスナーの設定
-                this.setupEventListeners();
+            handlePlayerPhase() {
+                console.log(`プレイヤー ${this.currentPlayerIndex} のフェーズ`);
+                this.playerText.setText(`プレイヤー: ${this.currentPlayerIndex}`);
 
-                // イベントウィンドウの設定
-                this.setupEventWindow();
+                // プレイヤーのターン処理を追加
+                this.playerTurn();
+                
+                // プレイヤーの入力待ち
+                // プレイヤーのアクションが完了したら endPlayerPhase() を呼び出す
+            }            
 
-                // デバッグ情報の表示
-                this.setupDebugInfo();
-
-                // カメラの設定
-                this.setupCamera();
-
-                console.log('Game created and initialized');
+            endPlayerPhase() {
+                this.currentPlayerIndex++;
+                if (this.currentPlayerIndex < this.players.length - 1) {
+                    this.gameState = 'OTHER_PLAYERS_PHASE';
+                } else {
+                    this.gameState = 'CPU_PHASE';
+                }
+                this.updateGameState();
             }
 
+            handleOtherPlayersPhase() {
+                console.log(`プレイヤー ${this.currentPlayerIndex} のフェーズ`);
+                this.playerText.setText(`プレイヤー: ${this.currentPlayerIndex}`);
+                // 他のプレイヤーのターン処理
+                this.enemyTurn(); // ここで呼び出す
+                // 処理が完了したら自動的に次のフェーズへ
+                this.currentPlayerIndex++;
+                if (this.currentPlayerIndex < this.players.length - 1) {
+                    this.updateGameState(); // 次のプレイヤーへ
+                } else {
+                    this.gameState = 'CPU_PHASE';
+                    this.updateGameState();
+                }
+            }
 
+            handleCPUPhase() {
+                console.log('CPU のフェーズ');
+                // CPU（蛮族）の処理
+                this.barbarianTurn();
+                this.gameState = 'TURN_END';
+                this.updateGameState();
+            }
+
+            handleTurnEnd() {
+                console.log(`ターン ${this.currentTurn} 終了`);
+                this.currentTurn++;
+                this.currentPlayerIndex = 0;
+                this.gameState = 'TURN_START';
+                this.updateGameState();
+            }
+            //#endregion State
+
+
+            //#region Create
             initializeLayers() {
                 this.tileLayer = new TileLayer(this, this.gameWidth, this.gameHeight, this.hexSize, this.dataManager);
                 this.buildingLayer = new BuildingLayer(this, this.gameWidth, this.gameHeight, this.hexSize);
@@ -685,6 +940,7 @@
                 this.buildingLayer.draw();
                 this.characterLayer.draw();
             }
+            
             createPlayers() {
                 const startingPositions = [
                     new Hex(0, 0, 0),
@@ -713,9 +969,13 @@
 
             setupUI() {
                 // ターン終了ボタン
+                // this.endTurnButton = this.add.text(this.gameWidth - 100, 50, 'ターン終了', { fill: '#0f0' })
+                //     .setInteractive()
+                //     .on('pointerdown', () => this.endTurn());
+
                 this.endTurnButton = this.add.text(this.gameWidth - 100, 50, 'ターン終了', { fill: '#0f0' })
                     .setInteractive()
-                    .on('pointerdown', () => this.endTurn());
+                    .on('pointerdown', () => this.onEndTurnButtonClick());                    
 
                 // 現在のターン表示
                 this.turnText = this.add.text(10, 10, `ターン: ${this.currentTurn}`, { fill: '#fff' });
@@ -742,29 +1002,45 @@
 
             updateResourceDisplay() {
                 const currentPlayer = this.players[this.currentPlayerIndex];
-                const resourceText = Object.entries(currentPlayer.resources)
-                    .map(([resource, amount]) => `${resource}: ${amount}`)
-                    .join(' | ');
+                const resourceNames = this.dataManager.get('resources').resources;
+
+                const resourceText = resourceNames.map(resource => {
+                    const englishName = resource.name;
+                    const japaneseName = resource.japaneseName;
+                    const amount = currentPlayer.resources[englishName] || 0;
+                    return `${japaneseName}: ${amount}`;
+                }).join(' | ');
+
                 this.resourceText.setText(`プレイヤー ${currentPlayer.id} | ${resourceText} | 人口: ${currentPlayer.population}`);
-            }
+            }            
 
-            endTurn() {
-                this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
-                if (this.currentPlayerIndex === 0) {
-                    this.currentTurn++;
-                    this.turnText.setText(`ターン: ${this.currentTurn}`);
-                    this.collectResources();
-                }
-                this.playerText.setText(`プレイヤー: ${this.currentPlayerIndex}`);
-                this.updateResourceDisplay();
+            // updateResourceDisplay() {
+            //     const currentPlayer = this.players[this.currentPlayerIndex];
+            //     const resourceText = Object.entries(currentPlayer.resources)
+            //         .map(([resource, amount]) => `${resource}: ${amount}`)
+            //         .join(' | ');
+            //     this.resourceText.setText(`プレイヤー ${currentPlayer.id} | ${resourceText} | 人口: ${currentPlayer.population}`);
+            // }
 
-                // 敵と蛮族のターンを実行
-                if (this.currentPlayerIndex === 1) {
-                    this.enemyTurn();
-                } else if (this.currentPlayerIndex === 2) {
-                    this.barbarianTurn();
-                }
-            }
+
+
+            // endTurn() {
+            //     this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
+            //     if (this.currentPlayerIndex === 0) {
+            //         this.currentTurn++;
+            //         this.turnText.setText(`ターン: ${this.currentTurn}`);
+            //         this.collectResources();
+            //     }
+            //     this.playerText.setText(`プレイヤー: ${this.currentPlayerIndex}`);
+            //     this.updateResourceDisplay();
+
+            //     // 敵と蛮族のターンを実行
+            //     if (this.currentPlayerIndex === 1) {
+            //         this.enemyTurn();
+            //     } else if (this.currentPlayerIndex === 2) {
+            //         this.barbarianTurn();
+            //     }
+            // }
 
             collectResources() {
                 for (const player of this.players) {
@@ -772,9 +1048,18 @@
                 }
             }            
 
+            // setupEventListeners() {
+            //     this.input.on('pointerdown', this.handleClick, this);
+            //     this.input.keyboard.on('keydown-SPACE', () => this.endTurn());
+            // }
+
             setupEventListeners() {
                 this.input.on('pointerdown', this.handleClick, this);
-                this.input.keyboard.on('keydown-SPACE', () => this.endTurn());
+                this.input.keyboard.on('keydown-SPACE', () => {
+                    if (this.gameState === 'PLAYER_PHASE') {
+                        this.endPlayerPhase();
+                    }
+                });
             }
 
             setupDebugInfo() {
@@ -786,6 +1071,7 @@
                     }
                 });
             }
+            
             setupCamera() {
                 this.cameras.main.setBounds(0, 0, this.gameWidth, this.gameHeight);
                 this.cameras.main.setZoom(1);
@@ -836,7 +1122,7 @@
                         this.characterLayer.moveCharacter(char, newHex);
                     }
                 });
-                this.endTurn();
+                //this.endTurn();
             }
 
             barbarianTurn() {
@@ -848,7 +1134,7 @@
                         this.characterLayer.moveCharacter(char, newHex);
                     }
                 });
-                this.endTurn();
+                //this.endTurn();
             }
 
             playerTurn() {
@@ -910,6 +1196,7 @@
             }
 
             handleClick(pointer) {
+                if (this.gameState !== 'PLAYER_PHASE') return;
                 const hex = this.tileLayer.layout.pixelToHex({x: pointer.x, y: pointer.y});
                 const roundedHex = new Hex(Math.round(hex.q), Math.round(hex.r), Math.round(hex.s));
                 const tile = this.tileLayer.grid[`${roundedHex.q},${roundedHex.r},${roundedHex.s}`];
@@ -935,7 +1222,9 @@
                     }
                     this.selectedAction = null;
                 }
+                this.endPlayerPhase();
             }
+            
             canExpandTo(player, hex) {
                 return !player.territory.some(h => h.equals(hex)) &&
                       player.territory.some(h => this.getDistance(h, hex) === 1) &&
@@ -962,7 +1251,16 @@
                 }
                 this.messageText = this.add.text(400, 550, message, { fontSize: '18px', fill: '#fff' }).setOrigin(0.5);
             }
-        }
+
+            // ターン終了ボタンのハンドラ
+            onEndTurnButtonClick() {
+                if (this.gameState === 'PLAYER_PHASE') {
+                    this.endPlayerPhase();
+                }
+            }                    
+        }//GameScene
+
+
 
         const config = {
             type: Phaser.AUTO,
