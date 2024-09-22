@@ -1253,69 +1253,179 @@
                 return allUnitsActed && allBuildingsProduced && allActionsUsed && !excessResources;
             }
 
+
+            //#region handleClick
+
             handleClick(pointer) {
                 if (this.gameState !== 'PLAYER_PHASE') return;
 
-                const hex = this.tileLayer.layout.pixelToHex({x: pointer.x, y: pointer.y});
-                const roundedHex = new Hex(Math.round(hex.q), Math.round(hex.r), Math.round(hex.s));
-                const tile = this.tileLayer.grid[`${roundedHex.q},${roundedHex.r},${roundedHex.s}`];
+                const hex = this.tileLayer.layout.pixelToHex({ x: pointer.x, y: pointer.y });
+                const roundedHex = new Hex(
+                    Math.round(hex.q),
+                    Math.round(hex.r),
+                    Math.round(hex.s)
+                );
+                const tileKey = `${roundedHex.q},${roundedHex.r},${roundedHex.s}`;
+                const tile = this.tileLayer.grid[tileKey];
 
-                if (tile) {
-                    const unit = this.getUnitAt(roundedHex);
-                    if (unit) {
-                        this.showUnitInfo(unit);
-                        if (unit.player === this.currentPlayerIndex) {
-                            const movementRange = this.calculateMovementRange(unit);
-                            this.guiLayer.highlightHexes(movementRange);
-                            this.selectedUnit = unit;
-                        }
-                    } else if (this.selectedUnit && this.guiLayer.highlightedHexes.some(h => h.equals(roundedHex))) {
-                        this.moveUnit(this.selectedUnit, roundedHex);
-                        this.guiLayer.clearHighlight();
-                        this.selectedUnit = null;
-                    } else {
-                        const currentPlayer = this.players[this.currentPlayerIndex];
-                        if (this.selectedAction === 'expand' && this.canExpandTo(currentPlayer, roundedHex)) {
+                if (!tile) {
+                    console.log('ゲームグリッドの外をクリックしました');
+                    return;
+                }
+
+                const unit = this.getUnitAt(roundedHex);
+                const currentPlayer = this.players[this.currentPlayerIndex];
+
+                // 右クリックの処理
+                if (pointer.rightButtonDown()) {
+                    this.handleRightClick(roundedHex);
+                    return;
+                }
+
+                // ユニットをクリックした場合の処理
+                if (unit) {
+                    this.handleUnitClick(unit, roundedHex);
+                    return;
+                }
+
+                // 選択したユニットを移動させる場合の処理
+                if (
+                    this.selectedUnit &&
+                    this.guiLayer.highlightedHexes.some((h) => h.equals(roundedHex))
+                ) {
+                    this.moveSelectedUnitTo(roundedHex);
+                    return;
+                }
+
+                // 選択したアクションの処理
+                if (this.selectedAction) {
+                    this.handleSelectedAction(roundedHex, currentPlayer);
+                    return;
+                }
+
+                console.log(`空のタイルをクリックしました: ${roundedHex.q},${roundedHex.r},${roundedHex.s}`);
+            }
+
+            handleRightClick(roundedHex) {
+                if (
+                    this.selectedUnit &&
+                    this.guiLayer.highlightedHexes.some((h) => h.equals(roundedHex))
+                ) {
+                    this.moveUnit(this.selectedUnit, roundedHex);
+                    this.guiLayer.clearHighlight();
+                    this.selectedUnit = null;
+                }
+            }
+
+            handleUnitClick(unit, roundedHex) {
+                this.showUnitInfo(unit);
+                if (unit.player === this.currentPlayerIndex) {
+                    const movementRange = this.calculateMovementRange(unit);
+                    this.guiLayer.highlightHexes(movementRange);
+                    this.selectedUnit = unit;
+                }
+            }
+
+            moveSelectedUnitTo(roundedHex) {
+                this.moveUnit(this.selectedUnit, roundedHex);
+                this.guiLayer.clearHighlight();
+                this.selectedUnit = null;
+            }
+
+            handleSelectedAction(roundedHex, currentPlayer) {
+                switch (this.selectedAction) {
+                    case 'expand':
+                        if (this.canExpandTo(currentPlayer, roundedHex)) {
                             currentPlayer.expandTerritory(roundedHex, this.tileLayer.grid);
                             this.tileLayer.draw();
                             this.updateResourceDisplay();
-                            this.selectedAction = null;
-                        } else if (this.selectedAction === 'unit' && this.canCreateUnitAt(currentPlayer, roundedHex)) {
+                        }
+                        break;
+                    case 'unit':
+                        if (this.canCreateUnitAt(currentPlayer, roundedHex)) {
                             if (currentPlayer.createUnit('開拓者', roundedHex)) {
                                 this.characterLayer.addCharacter(roundedHex, 'S');
                                 this.characterLayer.draw();
                                 this.updateResourceDisplay();
                             }
-                            this.selectedAction = null;
-                        } else if (this.selectedAction === 'building' && this.canConstructBuildingAt(currentPlayer, roundedHex)) {
+                        }
+                        break;
+                    case 'building':
+                        if (this.canConstructBuildingAt(currentPlayer, roundedHex)) {
                             if (currentPlayer.constructBuilding('都市', roundedHex)) {
                                 this.buildingLayer.addBuilding(roundedHex, 'C');
                                 this.buildingLayer.draw();
                                 this.updateResourceDisplay();
                             }
-                            this.selectedAction = null;
-                        } else {
-                            console.log(`Clicked on empty tile at ${roundedHex.q},${roundedHex.r},${roundedHex.s}`);
                         }
-                    }
-                } else {
-                    console.log('Clicked outside the game grid');
+                        break;
                 }
-
-                // 右クリックの処理
-                if (pointer.rightButtonDown()) {
-                    if (this.selectedUnit && this.guiLayer.highlightedHexes.some(h => h.equals(roundedHex))) {
-                        this.moveUnit(this.selectedUnit, roundedHex);
-                        this.guiLayer.clearHighlight();
-                        this.selectedUnit = null;
-                    }
-                }
-
-                // プレイヤーのアクションが完了したかどうかをチェック
-                // if (this.isPlayerActionComplete()) {
-                //     this.endPlayerPhase();
-                // }
+                this.selectedAction = null;
             }
+
+            // handleClick(pointer) {
+            //     if (this.gameState !== 'PLAYER_PHASE') return;
+
+            //     const hex = this.tileLayer.layout.pixelToHex({x: pointer.x, y: pointer.y});
+            //     const roundedHex = new Hex(Math.round(hex.q), Math.round(hex.r), Math.round(hex.s));
+            //     const tile = this.tileLayer.grid[`${roundedHex.q},${roundedHex.r},${roundedHex.s}`];
+
+            //     if (tile) {
+            //         const unit = this.getUnitAt(roundedHex);
+            //         if (unit) {
+            //             this.showUnitInfo(unit);
+            //             if (unit.player === this.currentPlayerIndex) {
+            //                 const movementRange = this.calculateMovementRange(unit);
+            //                 this.guiLayer.highlightHexes(movementRange);
+            //                 this.selectedUnit = unit;
+            //             }
+            //         } else if (this.selectedUnit && this.guiLayer.highlightedHexes.some(h => h.equals(roundedHex))) {
+            //             this.moveUnit(this.selectedUnit, roundedHex);
+            //             this.guiLayer.clearHighlight();
+            //             this.selectedUnit = null;
+            //         } else {
+            //             const currentPlayer = this.players[this.currentPlayerIndex];
+            //             if (this.selectedAction === 'expand' && this.canExpandTo(currentPlayer, roundedHex)) {
+            //                 currentPlayer.expandTerritory(roundedHex, this.tileLayer.grid);
+            //                 this.tileLayer.draw();
+            //                 this.updateResourceDisplay();
+            //                 this.selectedAction = null;
+            //             } else if (this.selectedAction === 'unit' && this.canCreateUnitAt(currentPlayer, roundedHex)) {
+            //                 if (currentPlayer.createUnit('開拓者', roundedHex)) {
+            //                     this.characterLayer.addCharacter(roundedHex, 'S');
+            //                     this.characterLayer.draw();
+            //                     this.updateResourceDisplay();
+            //                 }
+            //                 this.selectedAction = null;
+            //             } else if (this.selectedAction === 'building' && this.canConstructBuildingAt(currentPlayer, roundedHex)) {
+            //                 if (currentPlayer.constructBuilding('都市', roundedHex)) {
+            //                     this.buildingLayer.addBuilding(roundedHex, 'C');
+            //                     this.buildingLayer.draw();
+            //                     this.updateResourceDisplay();
+            //                 }
+            //                 this.selectedAction = null;
+            //             } else {
+            //                 console.log(`Clicked on empty tile at ${roundedHex.q},${roundedHex.r},${roundedHex.s}`);
+            //             }
+            //         }
+            //     } else {
+            //         console.log('Clicked outside the game grid');
+            //     }
+
+            //     // 右クリックの処理
+            //     if (pointer.rightButtonDown()) {
+            //         if (this.selectedUnit && this.guiLayer.highlightedHexes.some(h => h.equals(roundedHex))) {
+            //             this.moveUnit(this.selectedUnit, roundedHex);
+            //             this.guiLayer.clearHighlight();
+            //             this.selectedUnit = null;
+            //         }
+            //     }
+
+            //     // プレイヤーのアクションが完了したかどうかをチェック
+            //     // if (this.isPlayerActionComplete()) {
+            //     //     this.endPlayerPhase();
+            //     // }
+            // }
 
             // handleClick(pointer) {
             //     if (this.gameState !== 'PLAYER_PHASE') return;
@@ -1351,6 +1461,8 @@
             //     this.endPlayerPhase();
             // }
             
+            //#endregion handleClick
+
             getUnitAt(hex) {
                 return this.characterLayer.characters.find(char => char.hex.equals(hex));
             }
