@@ -767,9 +767,7 @@
                         }
                     ]
                 }`;
-
-                
-
+   
                 // JSONデータを読み込む
                 this.dataManager.loadJSON('resources', resourcesJSON);
                 this.dataManager.loadJSON('tiles', tilesJSON);
@@ -1289,6 +1287,9 @@
             }
 
             handleUnitClick(unit, roundedHex) {
+
+                console.log('handleUnitClick');
+
                 this.showUnitInfo(unit);
                 if (unit.player === this.currentPlayerIndex) {
                     const movementRange = this.calculateMovementRange(unit);
