@@ -10,7 +10,7 @@ Partyは最大5名のUnitを束ねて移動、補給、探索、戦闘する永�
 
 1. Unit
 
-   人物、小隊、兵器、魔物などの最小運用単位です。
+   人物、小隊、兵器、魔物などの最小運用単位です。Individual、Detachment、Construct、Monster、SwarmのscaleClassを持ちます。
 
 2. Party
 
@@ -67,7 +67,7 @@ PartyはUnitごとのgold upkeep、Supplies、必要に応じてmanaと人心維
 
 ## 9. 戦闘
 
-地上戦ではParty対Partyを基本とし、Partyを単一CombatUnitとして解決します。PartyParameterは構成員の能力を集約した後、Leader、軍師、charisma、Formation、役割充足、相性、士気、loyalty、補給、mana支援のModifierを適用します。このため、算出結果は構成Unitパラメータの単純合計を上回ることも下回ることもあります。Dungeon戦では同じPartyをSlotへ展開し、UnitごとのSkill、対象、位置、状態を詳細に扱います。
+地上戦ではParty対Partyを基本とし、Partyを単一CombatUnitとして解決します。戦闘規則の正本は COMBAT_SYSTEM.md です。PartyParameterは構成員の能力を集約した後、Leader、軍師、charisma、Formation、役割充足、相性、士気、loyalty、補給、mana支援のModifierを適用します。このため、算出結果は構成Unitパラメータの単純合計を上回ることも下回ることもあります。Dungeon戦では同じPartyをSlotへ展開し、UnitごとのSkill、対象、位置、状態を詳細に扱います。
 
 地上用とDungeon用に同じUnitを複製してはいけません。行動規則は ACTION_SYSTEM.md を参照してください。
 
