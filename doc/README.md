@@ -12,10 +12,11 @@
 4. [POPULAR_SUPPORT.md](./POPULAR_SUPPORT.md): 人心、加入、忠誠、維持
 5. [ACTION_SYSTEM.md](./ACTION_SYSTEM.md): Civ6準拠の移動、攻撃、チャージ、特殊行動
 6. [DAMAGE_GRID.md](./DAMAGE_GRID.md): Party内9グリッドとダメージ配分
-7. [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md): 現行コード調査
-8. [STATUS.md](./STATUS.md): 進捗と差分
-9. [HANDOFF.md](./HANDOFF.md): 次作業
-10. [CIV6_REFERENCE.md](./CIV6_REFERENCE.md): Civ6準拠点と独自分岐
+7. [COMBAT_SYSTEM.md](./COMBAT_SYSTEM.md): 戦闘力、ダメージ、反撃、負傷、士気、回復
+8. [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md): 現行コード調査
+9. [STATUS.md](./STATUS.md): 進捗と差分
+10. [HANDOFF.md](./HANDOFF.md): 次作業
+11. [CIV6_REFERENCE.md](./CIV6_REFERENCE.md): Civ6準拠点と独自分岐
 
 ## 確定した方向
 
@@ -39,3 +40,5 @@
 18. WorldMapではPartyを行動主体とし、内部Unitを個別移動させません。
 19. 通常攻撃は一ターン一回で行動終了とし、追加攻撃や攻撃後移動はAbilityで例外化します。
 20. Party最大5Unitを3×3 Gridへ配置し、Gridは対象選択、庇護、狙撃、範囲、Damage配分にだけ使います。
+21. UnitはIndividual、Detachment、Construct、Monster、Swarmの尺度を持ちます。
+22. 通常攻撃は原則命中し、近接攻撃は相互Damage、Named CharacterはHP0で原則Downedになります。
