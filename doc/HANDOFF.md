@@ -24,6 +24,8 @@ Phaser object、CharacterLayer.characters、BuildingLayer.buildingsをゲーム�
 6. WorldMapの基本移動単位はPartyです。
 7. FormationはParty内部の配置であり、別Unitではありません。
 8. AIとHumanは同じParty、Formation、Resource Ruleを使います。
+9. 人心は加入と維持に使うKingdomStockpile、loyaltyは人物・Party個別状態です。
+10. Partyは最大5名で、PartyParameterに基づく一つのCombatUnitとして扱います。
 
 詳細は RESOURCE_MODEL.md と PARTY_FORMATION.md を参照してください。
 
@@ -34,7 +36,7 @@ M1で実装するのは次です。
 1. 固定seedの小型六角形マップ
 2. 人間王国一つ
 3. 都市一つ
-4. food、production、gold、science、mana、religion、cultureと人的資源Pool
+4. food、production、gold、science、mana、religion、culture、popularSupportと人的資源Pool
 5. Warrior一種類
 6. Monument一種類
 7. MilitaryPowerとGovernanceCapacityの派生計算
@@ -188,6 +190,7 @@ M1ではHumanControllerだけ実装しますが、GameStateにHuman専用プロ�
 11. currentTurnが一周につき一回だけ増える。
 12. GameStateをJSONへ保存し、同じ状態へ復元できる。
 13. coreのテストがPhaserなしで実行できる。
+14. popularSupportがターン開始時に収入・維持費を一度だけ解決する。
 
 ## 7. M2 地上4X
 
