@@ -11,10 +11,11 @@
 3. [PARTY_FORMATION.md](./PARTY_FORMATION.md): PartyとFormation
 4. [POPULAR_SUPPORT.md](./POPULAR_SUPPORT.md): 人心、加入、忠誠、維持
 5. [ACTION_SYSTEM.md](./ACTION_SYSTEM.md): Civ6準拠の移動、攻撃、チャージ、特殊行動
-6. [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md): 現行コード調査
-7. [STATUS.md](./STATUS.md): 進捗と差分
-8. [HANDOFF.md](./HANDOFF.md): 次作業
-9. [CIV6_REFERENCE.md](./CIV6_REFERENCE.md): Civ6準拠点と独自分岐
+6. [DAMAGE_GRID.md](./DAMAGE_GRID.md): Party内9グリッドとダメージ配分
+7. [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md): 現行コード調査
+8. [STATUS.md](./STATUS.md): 進捗と差分
+9. [HANDOFF.md](./HANDOFF.md): 次作業
+10. [CIV6_REFERENCE.md](./CIV6_REFERENCE.md): Civ6準拠点と独自分岐
 
 ## 確定した方向
 
@@ -37,3 +38,4 @@
 17. 人心不足は個別の忠誠を段階的に悪化させ、命令拒否、離脱、離反を引き起こします。
 18. WorldMapではPartyを行動主体とし、内部Unitを個別移動させません。
 19. 通常攻撃は一ターン一回で行動終了とし、追加攻撃や攻撃後移動はAbilityで例外化します。
+20. Party最大5Unitを3×3 Gridへ配置し、Gridは対象選択、庇護、狙撃、範囲、Damage配分にだけ使います。
