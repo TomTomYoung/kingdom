@@ -28,6 +28,7 @@
 11. 現行実装仕様を別文書へ退避
 12. 最大5名Partyと集約Parameterを定義
 13. 人心による加入・維持と個別loyaltyを定義
+14. Civ6準拠の移動、攻撃、Charge、Ability行動モデルを定義
 
 ### M1 単一都市のCiv型ループ
 
@@ -48,6 +49,7 @@
 1. 複数都市
 2. SettlerとBuilder
 3. 戦士、探索、戦闘
+4. movementRemaining、attacksRemaining、Charge、AbilityDefinition
 4. Party作成とFormation
 5. 技術研究とmana
 6. GovernanceCapacityと人的資源
