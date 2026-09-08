@@ -4,7 +4,7 @@
 
 ## 1. 定義
 
-Partyは最大5名のUnitを束ねて移動、補給、探索、戦闘する永続的な運用単位であり、それ自体を一つのUnitとして扱います。FormationはParty内部のUnit配置、役割、指揮関係です。
+Partyは最大5名のUnitを束ねて移動、補給、探索、戦闘する永続的な運用単位であり、それ自体を一つのUnitとして扱います。FormationはParty内部のUnit配置、役割、指揮関係です。最大5Unitを3×3 Gridへ置き、対象選択とDamage配分に使用します。
 
 ## 2. 階層
 
@@ -18,7 +18,7 @@ Partyは最大5名のUnitを束ねて移動、補給、探索、戦闘する永�
 
 3. Formation
 
-   構成員をFront、Center、Rear、Support、Reserveへ割り当てます。
+   構成員をFront、Middle、RearとLeft、Center、Rightからなる9Slotへ割り当てます。GridはDamage配分専用です。
 
 WorldMapではPartyを一つのTokenとして扱い、戦闘またはDungeonでFormationを展開します。
 
@@ -43,17 +43,19 @@ CreateParty、DisbandParty、AddUnitToParty、RemoveUnitFromParty、SplitParty�
 
 ## 6. Formation
 
-FormationDefinitionはformationId、slotLayout、allowedRoles、requiredRoles、minMembers、maxMembers、statModifiers、targetingRules、damageDistribution、movementModifier、retreatModifier、supplyModifier、manaCost、commandCost、prerequisitesを持ちます。
+FormationDefinitionはformationId、gridSlots、allowedRoles、requiredRoles、minMembers、maxMembers、statModifiers、targetingRules、damagePatterns、guardRules、movementModifier、retreatModifier、supplyModifier、manaCost、commandCost、prerequisitesを持ちます。
 
-## 7. Slot
+3×3 GridはDamage解決だけに使用します。Grid内距離をWorldMap Movement、Dungeon Movement、射程、行動順として扱いません。
 
-1. Front
-2. Center
-3. Rear
-4. Support
-5. Reserve
+## 7. Damage Grid
 
-Formationによって後列保護、遠距離攻撃、魔法増幅、罠発見、運搬、攻城、撤退、被害分配が変わります。
+GridはFrontLeft、FrontCenter、FrontRight、MiddleLeft、MiddleCenter、MiddleRight、RearLeft、RearCenter、RearRightの9Slotです。最大5Unitを任意に配置します。
+
+Frontは通常攻撃を優先して受けます。GuardはDamageの一部を肩代わりし、InterceptはPrimary Targetを自分へ変更し、Tauntは対象未指定攻撃を引きつけます。
+
+攻撃側はAttack Definitionが許可する場合、Unit、Slot、Roleを指定できます。後列を直接狙う場合もCover、Guard、Accuracy、Evasion、Stealthを解決します。
+
+Row、Column、Cross、Adjacent、All、Pierce、ChainのDamage Patternを同じGrid上で処理します。詳細は DAMAGE_GRID.md を参照してください。
 
 ## 8. 移動と維持
 
