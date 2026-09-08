@@ -2,174 +2,234 @@
 
 更新日: 2026-09-08
 
-対象: main ブランチ、HEAD 297199396d27a88392dbe9423e96fb7388f30593
+目標: Civilization VI 型帝国運営とダンジョン探索
 
-## 1. 引継ぎ時点の結論
+次の作業: M1 単一都市のCiv型ループ
 
-現状は、Phaser上に六角形マップ、資源、ターン、イベント、移動探索などの部品を配置した技術試作です。主要操作は互いに接続されておらず、このまま新しい地形、ユニット、戦闘を追加すると不整合が増えます。
+## 1. 最重要方針
 
-次のマイルストーンは「1人の人間プレイヤーと簡易AIが、資源獲得、領土拡張、ユニット作成、移動、ターン終了を一巡できる状態」としてください。先にゲーム状態と表示状態を一本化する必要があります。
+現行コードへ機能を継ぎ足す前に、GameStateを正本とする構造へ移します。
 
-## 2. 最初に決めること
+Phaser object、CharacterLayer.characters、BuildingLayer.buildingsをゲーム状態の正本にしてはいけません。人間入力、AI、将来のマルチプレイは、同じCommandとRuleSystemを使います。
 
-ターン方式について、次のどちらかを明示的に選んでください。
+最初からCiv6全機能を実装しません。単一都市、単一人間王国、固定マップで生産と購入を一巡させ、その後に地上4X、ダンジョン、マルチプレイを順に載せます。
 
-1. 1人用方式
+## 2. M1の範囲
 
-   player 0 を人間、player 1 を敵国、蛮族を中立CPUとし、PLAYER_PHASE、OTHER_PLAYERS_PHASE、CPU_PHASE、TURN_END を順に使います。既存の enemyTurn と barbarianTurn を活かすならこちらが自然です。
+M1で実装するのは次です。
 
-2. 3人ホットシート方式
+1. 固定seedの小型六角形マップ
+2. 人間王国一つ
+3. 都市一つ
+4. food、production、gold、science、culture
+5. Warrior一種類
+6. Monument一種類
+7. Productionによる複数ターン生産
+8. Goldによる即時購入
+9. Cultureによる自然領土拡張
+10. Goldによる指定タイル購入
+11. ターン開始時処理
+12. セーブ可能なGameState
+13. 最低限の単体テスト
 
-   player 0、1、2 をすべて人間として順番に操作します。この場合は OTHER_PLAYERS_PHASE と CPU_PHASE を削除または別用途へ変更し、敵プレイヤーと蛮族を別モデルにします。
+ダンジョン、戦闘AI、オンライン通信、District、宗教、外交はM1へ入れません。
 
-現行コードは両方式が混在しています。仕様決定なしに状態遷移だけを直すと再び競合します。特段の企画指定がなければ、最初の動作確認は1人用方式を推奨します。
+## 3. 実装順序
 
-## 3. P0 作業順序
+### 3.1 最小のテスト環境
 
-### 3.1 再現可能な起動とスモークテストを作る
+index.html一枚のまま作業を続けず、ES Modulesとテストを導入します。大規模なUI刷新は後回しにします。
 
-1. README に推奨ブラウザと起動方法を記載します。
-2. ローカルHTTPサーバー経由で index.html を開きます。
-3. DevTools Console の初期例外を0件にします。
-4. 最低限の手動試験項目を本書末尾に沿って記録します。
-5. 可能なら Playwright の小さなスモークテストを追加し、起動、ターン表示、ターン終了だけを自動化します。
+推奨構成は次です。
 
-### 3.2 ゲームモデルを一本化する
+1. src/core/game-state.js
+2. src/core/ruleset.js
+3. src/core/commands.js
+4. src/core/turn-engine.js
+5. src/core/rng.js
+6. src/models/kingdom.js
+7. src/models/city.js
+8. src/models/unit.js
+9. src/world/hex.js
+10. src/world/world-map.js
+11. src/systems/yield-system.js
+12. src/systems/production-system.js
+13. src/systems/territory-system.js
+14. src/ui/game-scene.js
+15. tests
 
-Player.units をユニットの正本とし、CharacterLayer.characters を廃止するか、正本を参照する描画キャッシュに限定してください。Unit に最低限 id、type、ownerId、hex、movement、remainingMovement、hasActed を持たせます。
+ビルドツールはVite、テストはVitest程度で十分です。依存を増やしたくない場合も、coreはDOMとPhaserから独立したES Moduleにしてください。
 
-Player.buildings と BuildingLayer.buildings も同様に一本化します。Building に id、type、ownerId、hex、hasProduced を持たせます。
+### 3.2 Hexを先に固定
 
-サンプルJSONの player は文字列ではなく ownerId の数値に統一します。敵、蛮族、開拓者を同じ Unit 構造へ載せます。CharacterLayer.addCharacter を場当たり的に追加するだけでは、Player.units との二重管理が残るため避けてください。
+1. Hexをimmutableなvalue objectにします。
+2. key生成を一箇所にします。
+3. cubeRoundを実装します。
+4. neighbor、distance、rangeをテストします。
+5. river edgeは正規化された共有EdgeKeyで管理します。
+6. 固定seed RNGを追加します。
 
-### 3.3 資源系を成立させる
+### 3.3 GameStateとCommand
 
-1. resourcesJSON の value をプレイヤー初期資源として使うか、value を削除して Player 側へ初期値を明示します。
-2. wood と religion を正式資源にするか、当面削除します。
-3. production の産出元を追加します。例として Hill または都市から毎ターン得る形にします。
-4. 領土拡張条件を resources.gold >= 10 に直します。
-5. expandTerritory 成功時だけ gold を10消費します。
-6. 資源不足、対象不正、成功を画面上のメッセージで返します。
+最低限、次のCommandを作ります。
 
-最初の検証を簡単にするなら、player 0 に gold 20、production 30 を初期付与し、地形産出の調整は次段階に回しても構いません。
+1. StartTurn
+2. SetCityProduction
+3. PurchaseCityItem
+4. PurchaseTile
+5. EndTurn
 
-### 3.4 領土と初期配置を正す
+RuleSystemはCommandを検証し、成功時だけGameStateを更新してGameEventを返します。UIは成功可否をRuleSystemへ問い合わせ、理由を表示します。
 
-初期領土の重複を禁止してください。候補タイルの owner が null の場合だけ取得するか、開始地点を十分に離します。territory と Tile.owner は常に一致させます。
+### 3.4 都市Yield
 
-所有領土は色付きオーバーレイまたは境界線で表示します。領土拡張の候補を選択時にハイライトし、Void、他プレイヤー所有地、非隣接地を拒否します。
+Cityへ workedTiles と yieldSummary を持たせます。M1では市民配置を自動化します。
 
-### 3.5 座標変換と移動を正す
+ターン開始時に次を固定順で処理します。
 
-1. 画面座標からヘックスへ変換した後、q、r、s の最大丸め誤差を補正する標準 cube round を使います。
-2. 到達範囲探索と A* を純粋関数に分離します。
-3. reconstructPath の結果から開始地点を除くか、移動処理側で先頭を読み飛ばします。
-4. 各歩の fromHex を直前のヘックスへ更新してコストを計算します。
-5. remainingMovement をユニットへ保存し、1ターン内の再移動を制御します。
-6. Void、マップ外、占有タイルへの進入規則を決めて検証します。
+1. タイルYield集計
+2. foodStorage更新と人口成長
+3. productionProgress更新
+4. gold備蓄更新
+5. scienceとculture進捗更新
+6. 領土文化進捗更新
+7. 完成イベント処理
 
-### 3.6 ターン状態を一本化する
+表示値と内部値に差が出ないよう、YieldBreakdownを返してください。
 
-1人用方式の場合、次の順序を一箇所に定義してください。
+### 3.5 Production
 
-1. TURN_START: 全プレイヤーの資源収集、人口処理、行動状態リセット
-2. PLAYER_PHASE: player 0 の入力待ち
-3. OTHER_PLAYERS_PHASE: 敵国AIを一回実行
-4. CPU_PHASE: 蛮族AIを一回実行
-5. TURN_END: currentTurn を一回だけ増加
-6. TURN_START へ戻る
+ProductionItemDefinitionへ次を持たせます。
 
-再帰的な updateGameState 呼出しは小規模なら動きますが、イベントやアニメーション追加時に扱いにくくなります。同期処理を明確にした後、必要なら Phaser のイベントまたは async な進行制御へ移してください。
+1. itemId
+2. category
+3. productionCost
+4. purchaseOptions
+5. prerequisites
+6. placementRule
+7. onComplete
 
-## 4. P1 作業
+CityProductionStateへ currentItemId、queue、progressByItem を持たせます。
 
-P0 の受入条件を満たした後、次を進めます。
+必要なテストは次です。
 
-1. 辺情報を Tile または Map の共有エッジとして保存し、隣接両側から同じ川、壁を参照できるようにします。
-2. 攻撃、待機、建設を選択UIと行動点へ接続します。
-3. 都市の production 産出、建物効果、ユニット生産位置を定義します。
-4. 敵AIに境界判定、目標選択、衝突回避を追加します。
-5. イベントに発生条件、選択肢、効果、再発条件を追加します。
-6. 勝利条件と敗北条件を最低一種類ずつ追加します。
-7. シード付きマップ生成、セーブ、ロードを追加します。
+1. Production不足なら未完成
+2. Cost到達で一回だけ完成
+3. Overflowが次項目へ入る
+4. Queueが空ならOverflowを保持しない
+5. 項目切替でprogressを保持
+6. Gold購入で即時完成
+7. Gold不足なら状態不変
+8. 即時購入で既存progressを返金しない
+9. 購入不可対象を拒否
 
-## 5. P2 リファクタリング
+### 3.6 Territory
 
-主要ループが動いてから、index.html を分割してください。先に大規模分割すると、現行不具合と移動による不具合を区別しにくくなります。
+Cultureによる自動拡張とGold購入を別Commandにします。
 
-分割例は次のとおりです。
+自動拡張候補は次の条件を満たします。
 
-1. src/hex.js
-2. src/data.js
-3. src/models.js
-4. src/layers.js
-5. src/pathfinding.js
-6. src/game-scene.js
-7. data/resources.json
-8. data/tiles.json
-9. data/units.json
-10. data/events.json
+1. 都市領土に隣接
+2. ownerIdがnull
+3. Voidではない
+4. 飛び地にならない
+5. 他都市の占有規則に違反しない
 
-コメントアウトされた旧実装、GameScene 内の重複 createGrid、getMovementCost、drawHexagon、未使用の Manager 群は、動作確認後に削除してください。
+候補評価は資源、Yield、都市からの距離を使い、同点はseed付きRNGで決めます。Gold購入時は候補と価格をUIに表示します。
 
-描画オブジェクトはレイヤーごとに保持し、再描画前に破棄または再利用します。UIは setScrollFactor(0) などでカメラから独立させ、ズーム下限と上限も設けます。
+## 4. Controller設計
 
-## 6. 最初の完了条件
+KingdomとControllerを分離します。
 
-次をすべて満たした時点を、最初のプレイ可能版とします。
+1. HumanController
 
-1. ページを開いた直後の Console に例外がない。
-2. プレイヤー0の領土とユニットが見た目で判別できる。
-3. ターン開始時に資源が意図した量だけ増える。
-4. gold 10 を消費して隣接地を一つ取得できる。
-5. production 10 を消費して開拓者を一体作成できる。
-6. 開拓者を選択すると正しい到達範囲が出る。
-7. 移動後の座標と残移動力が正しい。
-8. ターン終了後に敵と蛮族が各一回だけ行動する。
-9. 一周につき currentTurn が一回だけ増える。
-10. Void とマップ外へ移動できない。
-11. 既存の地形名や建物文字が再描画で増殖しない。
-12. 古代遺跡イベントを閉じた後、通常操作へ戻れる。
+   UI入力からCommandを生成します。
 
-## 7. 手動スモークテスト
+2. AIController
 
-1. 初期表示
+   GameStateから合法Command一覧を取得し、評価して選びます。
 
-   地形、ターン1、プレイヤー0、資源、人口、領土色、自軍ユニットが表示されることを確認します。
+3. RemoteController
 
-2. 資源
+   将来のマルチプレイ入力をCommandとして受けます。
 
-   ターン開始前後の各資源を記録し、所有タイルと都市の産出合計に一致することを確認します。
+4. ReplayController
 
-3. 領土拡張
+   CommandLogを再生します。
 
-   隣接する未所有タイルだけを選べること、gold が10減ること、owner と territory が一致することを確認します。
+M1ではHumanControllerだけ実装しますが、GameStateにHuman専用プロパティを埋め込まないでください。
 
-4. ユニット作成
+## 5. M1受入条件
 
-   自領内の空きタイルにだけ作れること、production が10減ること、Player.units と画面表示が一体だけ増えることを確認します。
+1. 同じseedで同じマップを生成できる。
+2. ページ読込時にConsole errorがない。
+3. ターン開始時に都市Yieldが一回だけ集計される。
+4. City production 5、Warrior cost 12なら3回目のターン開始時に完成する。
+5. 完成時の余剰Productionが次のQueue項目へ入る。
+6. Gold全額を払うと対象を即時取得できる。
+7. Gold購入が途中Productionを値引きしない。
+8. Culture進捗到達時に合法タイルを一つ自動取得する。
+9. Goldで合法タイルを一つ指定購入できる。
+10. 他国領、Void、非隣接タイルを購入できない。
+11. currentTurnが一周につき一回だけ増える。
+12. GameStateをJSONへ保存し、同じ状態へ復元できる。
+13. coreのテストがPhaserなしで実行できる。
 
-5. 移動
+## 6. M2 地上4X
 
-   平地、丘陵、森林、Void 境界を含む経路で、表示範囲、選択経路、消費移動力が一致することを確認します。
+M1完了後に次を追加します。
 
-6. ターン
+1. 複数王国とPlayerSlot
+2. AIController
+3. Unit移動力と行動回数
+4. Warrior戦闘
+5. Settlerによる都市建設
+6. Builder chargeによる改善
+7. Scienceによる技術
+8. 蛮族
+9. Domination仮勝利
 
-   player 0、敵、蛮族の順に一回ずつ行動し、ターン数が一だけ増えることを確認します。
+ソロでは敵王国スロットをAIへ割り当てます。ローカルマルチでは同じスロットをHumanへ変更します。
 
-7. 再描画
+## 7. M3 ダンジョン
 
-   領土拡張、建物追加、移動を繰り返しても、地形名、都市、ユニットが重複しないことを確認します。
+地上4XのターンとUnit Commandが安定してから、次を追加します。
 
-8. イベント
+1. WorldMap上のDungeon Site
+2. EnterDungeon Command
+3. DungeonStateとExpeditionState
+4. 地上Hexを再利用した一階層
+5. MoveInDungeon、AttackInDungeon、OpenChest、Retreat
+6. dungeonActionsのターン開始リセット
+7. carried loot
+8. ExitDungeonによるsecured loot化
+9. 全滅時の損失
+10. 王国のdungeonMaterialsへ還元
 
-   前後ページの無効化、全ページ表示、閉じる操作、閉じた後の入力復帰を確認します。
+地上とダンジョンで別のUnitコピーを作らず、同じunitIdのmodeとlocationを切り替えます。
 
-## 8. 作業上の注意
+## 8. マルチプレイへの備え
 
-1. main の最終更新は古く、自動テストもないため、一度に広範囲を直さず、小さなコミットごとにスモークテストしてください。
-2. 現行動作と将来仕様を同じコミットで変更しないでください。
-3. ランダム生成を扱うテストではシードを固定してください。
-4. owner、player、playerId、ownerId の語を混在させず、ownerId に統一してください。
-5. 資源キーは内部では英語、表示時だけ日本語へ変換してください。
-6. 仕様変更後は SPECIFICATION.md、実装変更後は STATUS.md、次作業変更後は本書を同じPull Requestで更新してください。
+1. 乱数は必ずseed付きRNGから取得します。
+2. Date.now、Math.randomをゲームルール内で使いません。
+3. CommandへcommandId、playerId、turn、phaseを持たせます。
+4. GameEventをログへ保存します。
+5. UI座標ではなくHex keyとentityIdをCommandへ入れます。
+6. 同じ初期状態とCommand列から同じ結果を再現できるようにします。
+7. AIもCommandLogへ残します。
+
+## 9. 現行コードからの移行
+
+再利用候補は Hex、Layout、カメラ操作、イベント窓、描画方法の試作です。
+
+置換対象は Player.resources、CharacterLayer.characters、Player.units、BuildingLayer.buildings、再帰的updateGameState、Math.random依存です。
+
+移行中は旧 index.html を legacy/index.html へ退避するか、main上で動作比較できる状態を保ってください。旧コードを削除するコミットと新しいcore導入を同時に行わないでください。
+
+## 10. 文書更新規則
+
+1. ゲーム規則を変えたら SPECIFICATION.md を更新します。
+2. Civ6との差を変えたら CIV6_REFERENCE.md を更新します。
+3. 実装段階が変わったら STATUS.md を更新します。
+4. 次作業と受入条件が変わったら HANDOFF.md を更新します。
+5. 未確定事項を確定したら、決定日と理由をコミットメッセージまたはDecision Logへ残します。
