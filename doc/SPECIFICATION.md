@@ -306,9 +306,11 @@ Partyは作成、解散、分割、合流、Unit加入、Unit離脱ができま�
 
 FormationはParty内部の配置、役割、指揮関係を定義する戦闘構造であり、別Unitではありません。
 
-基本SlotはFront、Center、Rear、Support、Reserveです。FormationDefinitionは必要Slot、許可Role、人数上限、Modifier、TargetingRule、CommandCostを持ちます。
+Party最大5UnitをFront、Middle、RearとLeft、Center、Rightからなる3×3 Gridへ配置します。GridはDamage配分専用であり、WorldMapまたはDungeonの移動盤面、行動順、射程距離を表しません。
 
-Formationによって防御、攻撃範囲、護衛、魔法増幅、移動、撤退、被害分配が変わります。戦闘中の変更はactionまたはCommand Pointを消費します。
+正面通常攻撃はFrontを優先し、空いた列から後列が露出します。Guard、Intercept、Tauntを持つ前衛は味方へのDamageを率先して引き受けられます。攻撃側はAbilityが許可する場合、Unit、Slot、Roleを指定して後衛、Leader、Healer等を狙えますが、Cover、Guard、Accuracy、Stealthの判定を受けます。
+
+Row、Column、Area、Pierce等のAttack Patternも同じGridで解決します。詳細は DAMAGE_GRID.md を正本とします。
 
 ### 8.4 Party分類
 
