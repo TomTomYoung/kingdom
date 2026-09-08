@@ -24,7 +24,7 @@ WorldMapではPartyを一つのTokenとして扱い、戦闘またはDungeonでF
 
 ## 3. Partyデータ
 
-partyId、ownerId、partyType、leaderUnitId、memberUnitIds、formationId、location、mode、movementRemaining、actionsRemaining、commandCapacity、supplies、inventory、carriedLoot、morale、loyalty、supportUpkeep、statusEffects、expeditionIdを持ちます。memberUnitIdsは0から5件とし、6件目の加入を拒否します。
+partyId、ownerId、partyType、leaderUnitId、memberUnitIds、formationId、location、mode、movementMax、movementRemaining、attacksMax、attacksRemaining、abilityStates、buildCharges、reactionCharges、activationState、commandCapacity、supplies、inventory、carriedLoot、morale、loyalty、supportUpkeep、statusEffects、expeditionIdを持ちます。memberUnitIdsは0から5件とし、6件目の加入を拒否します。
 
 ## 4. Party操作
 
@@ -59,13 +59,15 @@ Formationによって後列保護、遠距離攻撃、魔法増幅、罠発見�
 
 WorldMapのParty movementは構成Unit、Formation、地形、道路、輸送、Suppliesから算出します。初期規則では最も遅い必須Unitを基準にします。
 
+全Party共通のactionsRemainingは持たせません。通常攻撃は一ターン一回、移動はmovementRemainingの範囲、建設と特殊能力は個別ChargeとAbilityDefinitionに従います。通常攻撃後は行動終了とし、追加攻撃や攻撃後移動は専用Abilityで許可します。
+
 PartyはUnitごとのgold upkeep、Supplies、必要に応じてmanaと人心維持費を消費します。人心維持費は所属人物の野心、希少性、価値観、遠征環境、Leaderとの相性から算出します。Leaderのcharisma、戦勝、十分な補給、約束履行は維持費またはloyalty低下を軽減します。大規模Partyと高度FormationはCommand CapacityとGovernanceCapacityを要求します。
 
 ## 9. 戦闘
 
 地上戦ではParty対Partyを基本とし、Partyを単一CombatUnitとして解決します。PartyParameterは構成員の能力を集約した後、Leader、軍師、charisma、Formation、役割充足、相性、士気、loyalty、補給、mana支援のModifierを適用します。このため、算出結果は構成Unitパラメータの単純合計を上回ることも下回ることもあります。Dungeon戦では同じPartyをSlotへ展開し、UnitごとのSkill、対象、位置、状態を詳細に扱います。
 
-地上用とDungeon用に同じUnitを複製してはいけません。
+地上用とDungeon用に同じUnitを複製してはいけません。行動規則は ACTION_SYSTEM.md を参照してください。
 
 ## 10. 未確定事項
 
