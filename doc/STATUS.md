@@ -29,6 +29,7 @@
 12. 最大5名Partyと集約Parameterを定義
 13. 人心による加入・維持と個別loyaltyを定義
 14. Civ6準拠の移動、攻撃、Charge、Ability行動モデルを定義
+15. 最大5Unitの3×3 Damage Grid、Guard、狙撃、範囲配分を定義
 
 ### M1 単一都市のCiv型ループ
 
