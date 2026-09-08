@@ -27,6 +27,7 @@ Phaser object、CharacterLayer.characters、BuildingLayer.buildingsをゲーム�
 9. 人心は加入と維持に使うKingdomStockpile、loyaltyは人物・Party個別状態です。
 10. Partyは最大5名で、PartyParameterに基づく一つのCombatUnitとして扱います。
 11. Civ6準拠として単一actionsRemainingを使わず、移動、攻撃、Charge、Abilityを分離します。
+12. Party内部の3×3 GridはDamage配分専用とし、Guardと攻撃側Targetingを解決します。
 
 詳細は RESOURCE_MODEL.md と PARTY_FORMATION.md を参照してください。
 
@@ -202,7 +203,9 @@ M1完了後に次を追加します。
 3. Unit・PartyのmovementRemaining、attacksRemaining、Charge、AbilityDefinition
 4. Civ6準拠のMove、Attack、Pillage、Fortify、Build、Promote
 5. Partyの作成、分割、合流
-6. Formation Slotと編成Modifier
+6. 最大5Unitを置く3×3 Damage Grid
+7. Guard、Intercept、Taunt、Targeted Attack、範囲・貫通Damage
+8. Formation Slotと編成Modifier
 6. Warrior Partyによる地上戦闘
 5. Settlerによる都市建設
 6. Builder chargeによる改善
