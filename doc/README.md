@@ -9,10 +9,11 @@
 1. [SPECIFICATION.md](./SPECIFICATION.md): 正規仕様
 2. [RESOURCE_MODEL.md](./RESOURCE_MODEL.md): 軍事力、統治力、mana、人的資源
 3. [PARTY_FORMATION.md](./PARTY_FORMATION.md): PartyとFormation
-4. [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md): 現行コード調査
-5. [STATUS.md](./STATUS.md): 進捗と差分
-6. [HANDOFF.md](./HANDOFF.md): 次作業
-7. [CIV6_REFERENCE.md](./CIV6_REFERENCE.md): Civ6準拠点と独自分岐
+4. [POPULAR_SUPPORT.md](./POPULAR_SUPPORT.md): 人心、加入、忠誠、維持
+5. [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md): 現行コード調査
+6. [STATUS.md](./STATUS.md): 進捗と差分
+7. [HANDOFF.md](./HANDOFF.md): 次作業
+8. [CIV6_REFERENCE.md](./CIV6_REFERENCE.md): Civ6準拠点と独自分岐
 
 ## 確定した方向
 
@@ -30,3 +31,6 @@
 12. religionとcultureは国外Affiliate、移民、専門家、英雄候補を獲得できます。
 13. Religion、Culture、Scienceの独立勝利は設けません。
 14. 全システムは軍事力、統治力、国家間競争、Dungeon攻略へ収束します。
+15. Partyは最大5名で、それ自体を一つの戦闘Unitとして扱います。
+16. 人心は人物やPartyの加入時に支払い、毎ターン維持にも使う王国資源です。
+17. 人心不足は個別の忠誠を段階的に悪化させ、命令拒否、離脱、離反を引き起こします。
