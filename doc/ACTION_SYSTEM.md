@@ -208,7 +208,7 @@ Party内部UnitのAbilityを使う場合、そのUnitが気絶、死亡、離脱
 
 ## 9. Dungeonへの適用
 
-DungeonでもPartyを一つのCombatUnitとして扱い、同じmovementRemaining、attacksRemaining、AbilityDefinitionを使用します。
+DungeonでもPartyを一つのCombatUnitとして扱い、同じmovementRemaining、attacksRemaining、AbilityDefinitionを使用します。Party内部の3×3 GridはDamage配分だけに使い、Grid内位置をDungeon Movementや追加行動回数へ変換しません。
 
 WorldMapとの差は次です。
 
