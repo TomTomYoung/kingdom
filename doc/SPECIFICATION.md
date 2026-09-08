@@ -292,13 +292,13 @@ Gold購入は文化進捗を消費またはリセットしません。他国領�
 
 ### 8.1 Unit
 
-Unitは人物、小隊、兵器、魔物など、Partyへ加入できる最小運用単位です。unitId、ownerId、unitTypeId、hp、movement、actions、combatStats、role、charges、upkeep、statusEffectsを持ちます。移動力、行動回数、固有行動はUnit定義、装備、昇進、状態によって異なります。
+Unitは人物、小隊、兵器、魔物など、Partyへ加入できる最小運用単位です。unitId、ownerId、unitTypeId、hp、movement、combatStats、role、abilityStates、charges、upkeep、statusEffectsを持ちます。全Unit共通の単一行動回数は持たせず、移動力、攻撃回数、有限チャージ、Ability固有コストを分離します。
 
 ### 8.2 Party
 
 Partyは最大5名のUnitをまとめる永続的な運用集団です。地上移動、Dungeon探索、補給、Inventory、経験、指揮系統を共有します。
 
-WorldMapでは原則としてPartyを一つのTokenとして表示します。Partyのmovementは構成員、Formation、地形、輸送手段、補給状態から算出し、標準では最も遅い必須構成員を基準にします。
+WorldMapでは原則としてPartyを一つのTokenかつMapUnitとして扱います。Partyのmovementは構成員、Formation、地形、輸送手段、補給状態から算出し、標準では最も遅い必須構成員を基準にします。Party内部Unitは個別にWorldMapを移動しません。
 
 Partyは作成、解散、分割、合流、Unit加入、Unit離脱ができます。敵隣接中、戦闘中、Dungeon内など、変更できない状態をRulesetで定義します。
 
@@ -328,6 +328,19 @@ PartyはUnitごとのgold upkeep、supplies、必要に応じてmanaと人心維
 GovernanceCapacity、MilitaryOrganization、指揮官能力が、保有可能Party数、最大規模、高度Formationを制約します。
 
 WorldMapの一タイル占有単位はUnitではなくPartyです。Dungeon内では同じPartyをFormation Slotへ展開します。地上用とDungeon用にUnitを複製しません。
+
+### 8.6 Civ6準拠の行動
+
+行動仕様の正本は ACTION_SYSTEM.md とします。
+
+1. TURN_STARTでmovementRemaining、attacksRemaining、ターン回復Abilityをリセットします。
+2. 移動は進入先のTerrain、Feature、River、Road、Zone of Control等のMovement Costを消費します。
+3. 通常攻撃はattacksRemainingを一消費し、標準ではPartyの行動を終了します。
+4. 一ターン複数回攻撃、攻撃後移動、移動後攻撃禁止等はAbilityで明示します。
+5. Builder相当の建設、Great Person相当の能力は有限Chargeを使い、毎ターン自動回復しません。
+6. Pillageは標準3 Movement、または残り全Movementを消費します。
+7. FoundCityは都市を即時成立させ、Settler相当Entityを消費します。
+8. City Production、即時購入、研究、政策、外交はParty行動を消費しません。
 ## 9. 戦闘
 
 地上戦とDungeon戦は同じCombatResolverとUnit statsを基礎にし、解像度を変えます。
