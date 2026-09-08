@@ -71,14 +71,13 @@ PartyはUnitごとのgold upkeep、Supplies、必要に応じてmanaと人心維
 
 地上用とDungeon用に同じUnitを複製してはいけません。行動規則は ACTION_SYSTEM.md を参照してください。
 
-## 10. 未確定事項
+## 10. 後続バランス調整
 
-2. ArmyとExpeditionの最大人数差
-3. Unitが個人か小隊か
-4. Slotの二次元配置
-5. 戦闘中のFormation変更コスト
-6. Leader死亡時の処理
-7. 複数Partyによる共同戦闘
-8. 同一タイルのParty上限
-9. 捕虜、負傷者、予備兵
-10. Formation習得条件
+構造上の未確定事項は解消済みです。次は実装テスト後に次の数値を調整します。
+
+1. scaleClass混成時のcommandCost
+2. Formationごとの具体的Modifier
+3. 戦闘中RepositionのAbility Cost
+4. Formation解禁に必要なscience、culture、institution、訓練値
+5. 援軍参加時の次ターンPenalty
+6. CriticalからDeadへ至る確率と救命難度
