@@ -104,3 +104,31 @@ Kingdomでは王国と操作主体を分離し、Kingdom.controllerType に Huma
 6. foodからnativeHumanResourcesを生みます。
 7. religionとcultureにより国外Affiliate、移民、専門家、英雄候補を獲得できます。
 8. 成長経路は最終的に軍事力、統治力、Dungeon攻略へ接続します。
+
+
+## 8. 行動システムの準拠内容
+
+Civ6では移動可能Unitが毎ターン固有のMovement Pointsを持ち、タイル進入、攻撃、略奪等に使用します。Terrainが進入コストを決めます。
+
+Kingdomでも全Unit共通の一行動制を採用せず、movementRemaining、attacksRemaining、有限Charge、Ability固有コストを分離します。
+
+通常攻撃は一ターン一回かつ攻撃後終了を標準とします。移動後攻撃は可能です。追加攻撃、攻撃後移動、移動後射撃禁止等はUnitまたはParty Abilityで明示します。
+
+Civ6のPillageは3 Movement、または保有Movementが3未満なら残り全量を消費します。Kingdomもこれを標準値にします。
+
+Builder相当Unitは有限buildChargesを持ち、改善建設で一Chargeを消費します。改善は都市Productionを待たず即時完成します。修理は標準でChargeを消費しません。
+
+都市Production、GoldによるUnit・Building購入、Tile購入はUnit行動と別系統です。Kingdomもこの分離を維持します。
+
+Civ6のFormationは護衛、Corps、Armyを含みますが、KingdomのFormationはParty内部のFront、Center、Rear、Support、Reserve配置を意味します。この名称差は意図的な独自分岐です。
+
+詳細な採用規則は ACTION_SYSTEM.md を正本とします。
+
+参照:
+
+1. https://www.civilopedia.net/en-US/gathering-storm/concepts/movement_1/
+2. https://www.civilopedia.net/en-US/gathering-storm/concepts/combat_5/
+3. https://www.civilopedia.net/en-US/gathering-storm/concepts/combat_12/
+4. https://www.civilopedia.net/en-US/gathering-storm/concepts/combat_13/
+5. https://www.civilopedia.net/en-US/gathering-storm/units/unit_builder/
+6. https://www.civilopedia.net/en-US/gathering-storm/concepts/gold_3/
