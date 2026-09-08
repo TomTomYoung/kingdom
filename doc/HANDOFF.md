@@ -28,6 +28,7 @@ Phaser object、CharacterLayer.characters、BuildingLayer.buildingsをゲーム�
 10. Partyは最大5名で、PartyParameterに基づく一つのCombatUnitとして扱います。
 11. Civ6準拠として単一actionsRemainingを使わず、移動、攻撃、Charge、Abilityを分離します。
 12. Party内部の3×3 GridはDamage配分専用とし、Guardと攻撃側Targetingを解決します。
+13. 戦闘力差Damage、近接反撃、Downed、morale、cohesion、Leader継承を共通Combat Resolverで処理します。
 
 詳細は RESOURCE_MODEL.md と PARTY_FORMATION.md を参照してください。
 
@@ -206,12 +207,16 @@ M1完了後に次を追加します。
 6. 最大5Unitを置く3×3 Damage Grid
 7. Guard、Intercept、Taunt、Targeted Attack、範囲・貫通Damage
 8. Formation Slotと編成Modifier
+9. Unit scaleClassとPartyParameter集約
+10. 戦闘力差Damage、近接反撃、HP0状態遷移
+11. morale、cohesion、Leader継承、撤退
+12. 複数Party援軍と戦闘後Loot
 6. Warrior Partyによる地上戦闘
 5. Settlerによる都市建設
 6. Builder chargeによる改善
 7. Scienceによる技術
 8. 蛮族
-9. Domination仮勝利
+13. Domination仮勝利
 
 ソロでは敵王国スロットをAIへ割り当てます。ローカルマルチでは同じスロットをHumanへ変更します。
 
