@@ -12,7 +12,7 @@
 
 現行コードにあるのは、Phaser起動、六角形マップ、3プレイヤー、簡易領土、王国単位の資源、人口、文字ユニット、文字建物、ターン送り、文章イベント、移動範囲、A*形式探索の骨格です。
 
-都市単位生産、Production queue、Gold purchase、Culture border growth、mana、GovernanceCapacity、人的資源Pool、統一Unitモデル、Party、Formation、Controller分離、AI意思決定、Dungeon、Expedition、セーブ、マルチプレイは未実装です。
+都市単位生産、Production queue、Gold purchase、Culture border growth、mana、popularSupport、個別loyalty、GovernanceCapacity、人的資源Pool、統一Unitモデル、Party、Formation、Controller分離、AI意思決定、Dungeon、Expedition、セーブ、マルチプレイは未実装です。
 
 ## 2. マイルストーン
 
@@ -26,6 +26,8 @@
 4. ユニット別行動回数を定義
 10. 地上とダンジョンのターン同期を定義
 11. 現行実装仕様を別文書へ退避
+12. 最大5名Partyと集約Parameterを定義
+13. 人心による加入・維持と個別loyaltyを定義
 
 ### M1 単一都市のCiv型ループ
 
@@ -49,7 +51,8 @@
 4. Party作成とFormation
 5. 技術研究とmana
 6. GovernanceCapacityと人的資源
-7. 敵王国AI
+7. 人心、NPC加入、loyalty、維持不足
+8. 敵王国AI
 6. 蛮族
 7. Domination仮勝利
 
