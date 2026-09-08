@@ -59,13 +59,23 @@ cultureは制度、言語、教育、威信、生活様式への求心力です�
 
 他国居住のまま信徒や文化的支持者となる場合と、自国へ移住する場合を分けます。相手国は政策、文化、宗教、国境、諜報、融和によって抵抗できます。
 
-## 9. mana
+## 9. 人心
+
+人心の内部キーは popularSupport とし、KingdomStockpileとして保持します。人物やPartyの加入時にjoinSupportCostを一括消費し、所属後はTURN_STARTごとにsupportUpkeepを支払います。
+
+人心とGovernanceCapacityは統合しません。GovernanceCapacityは管理可能量、人心は自発的な加入・随従意思です。また、人物ごとのloyaltyは資源ではなく状態値として分離します。
+
+基本収支は popularSupportNext = clamp(popularSupportCurrent + supportIncome - supportUpkeepPaid, 0, popularSupportCap) です。supportIncomeはculture、religion、正統性、繁栄、戦勝、Quest、約束履行、Leaderのcharismaから得ます。敗北、残虐行為、未払い、契約違反、過剰徴募、圧政は負のModifierです。
+
+国外人材はExposure、Affiliation、Availabilityまでをreligion、culture、諜報、接触で進め、Recruitment時に人心を支払います。文化・宗教だけでも、人心だけでも引き抜きは完結しません。詳細は POPULAR_SUPPORT.md を参照してください。
+
+## 10. mana
 
 manaは魔力地形、Dungeon、魔石、魔法施設、Unit能力、Relic、儀式から得ます。
 
 Spell、魔法Unitの生産と維持、魔導装備、召喚、Dungeon封印、転移、探知、魔法研究、Formation支援へ使います。初期段階ではKingdomStockpileとします。
 
-## 10. 実装原則
+## 11. 実装原則
 
 1. 資源キーは英語名に統一します。
 2. CapacityとLoadの内訳をUIへ表示します。
@@ -74,3 +84,5 @@ Spell、魔法Unitの生産と維持、魔導装備、召喚、Dungeon封印、�
 5. 難易度補正は明示的Modifierにします。
 6. religion、culture、scienceを勝利ゲージにしません。
 7. 数式と係数はRulesetへ置きます。
+8. popularSupportと個別loyaltyを同じ値として扱いません。
+9. 人心維持費不足は即時削除ではなく段階状態として処理します。
