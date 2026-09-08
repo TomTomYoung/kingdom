@@ -345,15 +345,24 @@ WorldMapの一タイル占有単位はUnitではなくPartyです。Dungeon内�
 8. City Production、即時購入、研究、政策、外交はParty行動を消費しません。
 ## 9. 戦闘
 
-地上戦とDungeon戦は同じCombatResolverとUnit statsを基礎にし、解像度を変えます。
+戦闘仕様の正本は COMBAT_SYSTEM.md、構成UnitへのDamage配分は DAMAGE_GRID.md とします。
 
-地上戦はParty対Partyとして解決します。Partyそれ自体を一つのCombatUnitとして扱い、構成員の単純合計ではなく、Formation、地形、兵站、士気、指揮官、Leaderのcharisma、軍師能力、Science解禁、Mana支援、相乗効果を含むPartyParameterから解決します。
+UnitはIndividual、Detachment、Construct、Monster、SwarmのscaleClassを持ちます。Expedition Partyは個人中心、Army Partyは部隊中心ですが、同じUnit、Party、Combat Resolverを使います。
 
-Dungeon戦は同じPartyを個別Slotへ展開し、対象選択、Skill、状態異常、罠、位置交換、撤退を詳細に扱います。
+地上戦とDungeon戦はParty対Partyとして解決します。PartyPowerは構成Unitを集約した後、Formation、指揮、cohesion、補給、地形、Abilityを適用します。
 
-勝敗はUnit損耗だけでなく、士気崩壊、撤退、捕虜、Formation破壊、補給喪失でも発生します。
+標準Damageは戦闘力差による指数倍率で算出し、同戦闘力なら平均約30Damageです。通常攻撃は原則命中します。Melee Attackでは防御側が行動可能なら同じ解決内で反撃し、Ranged Attackと通常Spellには標準反撃がありません。
 
-MilitaryPowerは攻撃力合計ではなく、編成可能数、装備水準、補充能力、維持可能期間、Mana運用、指揮、兵站を含めて評価します。
+Party内部では3×3 Gridを使い、Front優先、Guard、Intercept、Taunt、Cover、狙撃、範囲、貫通を解決します。前衛が倒れても後列を自動で前へ詰めません。
+
+HP0のNamed Characterは原則Downedとなり、専用Tag、救命失敗、Critical EventでDeadになります。DetachmentとSwarmはShatteredとなり、生存者、捕虜、再編可能人員へ分解できます。
+
+moraleは戦闘継続意思、cohesionはParty連携、loyaltyは長期的な随従意思として別々に保持します。全員戦闘不能、morale崩壊、指揮崩壊、撤退または降伏によりParty敗北を判定します。敗北はParty消滅と同義ではありません。
+
+複数Partyは独立したGridのまま共同戦闘へ参加します。MVPでは側面・背面攻撃をAmbush、Surround、Flank Ability等の特殊条件に限定します。
+
+攻撃ごとにHP、空Slot、Guard、Formation、morale、Leader継承、PartyParameter、勝敗を再計算します。
+
 ## 10. AI
 
 AIは Human と同じ GameState を読み、同じ合法Commandを発行します。AI専用の直接資源付与や規則無視は行いません。
