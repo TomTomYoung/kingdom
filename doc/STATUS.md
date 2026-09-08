@@ -8,11 +8,11 @@
 
 ## 1. 現在地
 
-仕様文書は目標形へ更新されましたが、ゲームコードは以前の技術試作のままです。目標仕様に対する実装段階は M0「仕様再編完了」です。
+M1「単一都市のCiv型ループ」を実装しました。GameStateを正本とするDOM・Phaser非依存のES Module、固定seedマップ、Command/RuleSystem、都市Yield、生産・購入、領土拡張、セーブを備えています。旧技術試作は `legacy/index.html` に保存しました。
 
-現行コードにあるのは、Phaser起動、六角形マップ、3プレイヤー、簡易領土、王国単位の資源、人口、文字ユニット、文字建物、ターン送り、文章イベント、移動範囲、A*形式探索の骨格です。
+現行コードには、固定seed六角形マップ、人間王国と単一都市、都市単位Yield、Production queue、Gold purchase、Culture border growth、mana、popularSupport、GovernanceCapacity、人的資源Pool、統一Unitモデル、HumanController、Command log、JSONセーブがあります。
 
-都市単位生産、Production queue、Gold purchase、Culture border growth、mana、popularSupport、個別loyalty、GovernanceCapacity、人的資源Pool、統一Unitモデル、Party、Formation、Controller分離、AI意思決定、Dungeon、Expedition、セーブ、マルチプレイは未実装です。
+個別loyaltyのターン効果、Party、Formation、AI意思決定、Dungeon、Expedition、オンラインマルチプレイはM2以降の範囲として未実装です。
 
 ## 2. マイルストーン
 
@@ -34,7 +34,7 @@
 
 ### M1 単一都市のCiv型ループ
 
-状態: 未着手
+状態: 完了
 
 1. GameStateを正本化
 2. Kingdom、City、Unitのモデル統一
@@ -46,14 +46,14 @@
 
 ### M2 地上4X垂直スライス
 
-状態: 未着手
+状態: 進行中（Party移動と基本Combat Resolverを実装）
 
 1. 複数都市
 2. SettlerとBuilder
-3. 戦士、探索、戦闘
-4. movementRemaining、attacksRemaining、Charge、AbilityDefinition
-5. 共通Combat Resolver、Damage配分、反撃、状態遷移
-4. Party作成とFormation
+3. 戦士、探索、戦闘（Party移動まで完了）
+4. movementRemaining、attacksRemaining、Charge、AbilityDefinition（移動・攻撃回数の基盤完了）
+5. 共通Combat Resolver、Damage配分、反撃、状態遷移（単体Damage・反撃・Downed/Shattered・Leader継承まで完了）
+4. Party作成とFormation（基盤完了）
 5. 技術研究とmana
 6. GovernanceCapacityと人的資源
 7. 人心、NPC加入、loyalty、維持不足
@@ -126,9 +126,9 @@
 
 ## 5. テスト状況
 
-自動テスト、CI、固定seed、再現用セーブはありません。ブラウザ実行の正式な確認環境も記録されていません。
+Node.js標準テストランナーによるcoreテストを追加し、Phaserなしで実行できます。固定seedとJSONセーブによる再現性も検証します。
 
-M1開始時に次を追加します。
+実装済みのテストは次です。
 
 1. Hex cube roundの単体テスト
 2. Yield集計の単体テスト
@@ -140,6 +140,6 @@ M1開始時に次を追加します。
 
 ## 6. リポジトリ状況
 
-コードは index.html 一ファイルです。Issue、Pull Request、CIはありません。実装コミットは2024-09-21から2024-09-23に集中しています。
+画面はES Moduleを読み込む小さな `index.html` と `src/ui`、ゲーム規則は `src/core`、`src/models`、`src/world`、`src/systems` に分離しました。旧一枚HTMLは `legacy/index.html` に保存しています。
 
 現行コードの詳細は CURRENT_IMPLEMENTATION.md、今後の規範は SPECIFICATION.md、戦闘詳細は COMBAT_SYSTEM.md、次作業は HANDOFF.md を参照してください。

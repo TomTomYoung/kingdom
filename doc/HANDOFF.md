@@ -4,7 +4,7 @@
 
 目標: Civilization VI 型帝国運営とダンジョン探索
 
-次の作業: M1 単一都市のCiv型ループ
+次の作業: M2 Guard・Damage Grid配分と戦闘UI
 
 ## 1. 最重要方針
 
@@ -32,9 +32,18 @@ Phaser object、CharacterLayer.characters、BuildingLayer.buildingsをゲーム�
 
 詳細は RESOURCE_MODEL.md、PARTY_FORMATION.md、ACTION_SYSTEM.md、DAMAGE_GRID.md、COMBAT_SYSTEM.md を参照してください。
 
-## 3. M1の範囲
+## 3. M2進捗（2026-09-08）
 
-M1で実装するのは次です。
+1. 複数王国のPlayer turn順序と、一巡時だけ増えるcurrentTurnを実装しました。
+2. 最大5UnitのParty作成と3×3 Formation検証を実装しました。
+3. PartyをWorldMap上の唯一の移動主体とし、地形移動Cost、経路、占有、Void、movementRemainingを検証します。
+4. Unitのmovement、attacksRemaining、charges、abilityStatesと、ターン開始時のParty行動回復を追加しました。
+5. 共通Combat Resolver、戦闘seed乱数、近接反撃、HP0状態遷移、Leader継承を実装しました。
+6. 次はGuard、Intercept、範囲・貫通Damageと戦闘UIを実装します。
+
+## 3. M1の範囲（2026-09-08 完了）
+
+M1で実装済みの範囲は次です。
 
 1. 固定seedの小型六角形マップ
 2. 人間王国一つ
