@@ -142,4 +142,4 @@ M1開始時に次を追加します。
 
 コードは index.html 一ファイルです。Issue、Pull Request、CIはありません。実装コミットは2024-09-21から2024-09-23に集中しています。
 
-現行コードの詳細は CURRENT_IMPLEMENTATION.md、今後の規範は SPECIFICATION.md、次作業は HANDOFF.md を参照してください。
+現行コードの詳細は CURRENT_IMPLEMENTATION.md、今後の規範は SPECIFICATION.md、戦闘詳細は COMBAT_SYSTEM.md、次作業は HANDOFF.md を参照してください。
