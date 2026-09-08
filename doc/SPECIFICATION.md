@@ -99,7 +99,7 @@ GameState は最低限、次を保持します。
 
 標準順は次です。
 
-1. 維持費と前ターン効果
+1. Gold、mana、人心等の維持費と前ターン効果
 2. タイルと建物の産出集計
 3. 都市の食料、成長
 4. 都市の生産進捗
@@ -199,11 +199,23 @@ religionとcultureは次の経路で国外人的資源へ作用します。
 
 国外人材は無条件に相手国人口から即時取得しません。Exposure、Affiliation、Availability、Recruitment、Integrationを段階状態として処理し、相手国は融和、対抗文化、宗教政策、国境管理などで抵抗できます。
 
-### 5.5 宗教と文化の最終用途
+### 5.5 人心、加入、忠誠
+
+人心は、王国、指導者、理念へ人物が自発的に付き従う意思を表すKingdomStockpileです。内部キーは popularSupport とします。GovernanceCapacityが領土や組織を管理できる量であるのに対し、人心は人物、冒険者、英雄、協力者、Partyを仲間に迎え、関係を維持するための資源です。
+
+加入時は対象固有の前提条件を満たし、joinSupportCost以上の人心を一括消費します。その後はTURN_STARTごとにsupportUpkeepを支払います。ただし、人心だけで誰でも獲得できるわけではなく、接触、募集可能状態、宗教・文化・価値観、評判、契約、Quest、敵対関係を別に判定します。
+
+人物やPartyは個別のloyaltyを持ちます。人心は共通通貨、loyaltyは個別状態です。維持費不足で即座に消滅させず、不満、任意命令の拒否、離脱準備、離脱または離反の順に悪化させます。
+
+人心の主な収入源はculture、religion、正統性、繁栄、勝利、Quest達成、約束履行、英雄的行為、Leaderのcharismaです。敗北、残虐行為、契約不履行、未払い、過剰徴募、価値観に反する命令は収入またはloyaltyを低下させます。
+
+Goldは役務を買い、人心は随従意思を得る資源として区別します。傭兵はGold寄り、英雄や盟友は人心寄りの加入・維持費を持ちます。詳細は POPULAR_SUPPORT.md を参照してください。
+
+### 5.6 宗教と文化の最終用途
 
 religionとcultureは独立勝利を生みません。領土と施設の維持、占領地統合、人材獲得、士気、忠誠、PartyとFormationの編成上限、軍事施設と補給網の維持を通じて、最終的に軍事力と国家存続へ寄与します。
 
-### 5.6 保存形態
+### 5.7 保存形態
 
 1. CityLocal
 
@@ -211,7 +223,7 @@ religionとcultureは独立勝利を生みません。領土と施設の維持�
 
 2. KingdomStockpile
 
-   gold、mana、strategicResources、dungeonMaterialsなどです。
+   gold、mana、popularSupport、strategicResources、dungeonMaterialsなどです。
 
 3. Progress
 
@@ -284,7 +296,7 @@ Unitは人物、小隊、兵器、魔物など、Partyへ加入できる最小�
 
 ### 8.2 Party
 
-Partyは複数Unitをまとめる永続的な運用集団です。地上移動、Dungeon探索、補給、Inventory、経験、指揮系統を共有します。
+Partyは最大5名のUnitをまとめる永続的な運用集団です。地上移動、Dungeon探索、補給、Inventory、経験、指揮系統を共有します。
 
 WorldMapでは原則としてPartyを一つのTokenとして表示します。Partyのmovementは構成員、Formation、地形、輸送手段、補給状態から算出し、標準では最も遅い必須構成員を基準にします。
 
@@ -311,7 +323,7 @@ Party分類は別実装ではなく、許可Unit、行動、維持、Formation�
 
 ### 8.5 維持と占有
 
-PartyはUnitごとのgold upkeep、supplies、必要に応じてmanaを消費します。指揮官、Formationの複雑さ、Party規模はCommand Capacityを要求します。
+PartyはUnitごとのgold upkeep、supplies、必要に応じてmanaと人心維持費を消費します。指揮官、Formationの複雑さ、Party規模はCommand Capacityを要求します。
 
 GovernanceCapacity、MilitaryOrganization、指揮官能力が、保有可能Party数、最大規模、高度Formationを制約します。
 
@@ -320,7 +332,7 @@ WorldMapの一タイル占有単位はUnitではなくPartyです。Dungeon内�
 
 地上戦とDungeon戦は同じCombatResolverとUnit statsを基礎にし、解像度を変えます。
 
-地上戦はParty対Partyとして解決し、Formation、地形、兵站、士気、指揮官、Science解禁、Mana支援をModifierとして適用します。
+地上戦はParty対Partyとして解決します。Partyそれ自体を一つのCombatUnitとして扱い、構成員の単純合計ではなく、Formation、地形、兵站、士気、指揮官、Leaderのcharisma、軍師能力、Science解禁、Mana支援、相乗効果を含むPartyParameterから解決します。
 
 Dungeon戦は同じPartyを個別Slotへ展開し、対象選択、Skill、状態異常、罠、位置交換、撤退を詳細に扱います。
 
