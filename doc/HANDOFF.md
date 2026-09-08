@@ -30,7 +30,7 @@ Phaser object、CharacterLayer.characters、BuildingLayer.buildingsをゲーム�
 12. Party内部の3×3 GridはDamage配分専用とし、Guardと攻撃側Targetingを解決します。
 13. 戦闘力差Damage、近接反撃、Downed、morale、cohesion、Leader継承を共通Combat Resolverで処理します。
 
-詳細は RESOURCE_MODEL.md と PARTY_FORMATION.md を参照してください。
+詳細は RESOURCE_MODEL.md、PARTY_FORMATION.md、ACTION_SYSTEM.md、DAMAGE_GRID.md、COMBAT_SYSTEM.md を参照してください。
 
 ## 3. M1の範囲
 
