@@ -2,7 +2,7 @@
 
 更新日: 2026-09-08
 
-仕様状態: 基本構造確定、数値係数は暫定
+仕様状態: 基本構造確定、数値係数はCOMBAT_SYSTEM.mdに従う
 
 ## 1. 目的
 
@@ -138,6 +138,8 @@ Guard可能条件は次です。
 3. Guardを無視するAttack Tagを持たない。
 4. damageShareLimitを超えていない。
 5. Stun、Break、Fear等でGuard不能になっていない。
+
+Guard Capacity、一回の肩代わり上限、反撃、HP0以後の処理は COMBAT_SYSTEM.md に従います。
 
 Damage配分の基本形は次です。
 
@@ -306,4 +308,6 @@ Dungeon戦闘では同じGridを詳細表示し、対象Slot、Guard対象、範
 11. Row、Column、Area、Pierceを同じGridで解決できる。
 12. Damage後に空SlotとFormation Bonusが再計算される。
 13. WorldMapとDungeonで同じDamage Resolverを使用する。
+14. Guard Capacityを超えて肩代わりできない。
+15. 前衛がDownedしても後列を自動で前へ詰めない。
 14. 同じGameState、Command、RNG状態から同じ配分結果になる。
