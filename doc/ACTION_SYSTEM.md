@@ -10,7 +10,7 @@ Kingdomの行動システムはCivilization VIの方式に準拠します。
 
 全Unitへ共通の「一ターン一行動」を与える方式にはしません。移動力、攻撃回数、チャージ、個別Ability、行動後終了規則を別々に管理します。
 
-WorldMapではPartyが行動主体です。Party内部のUnitが持つSkillやSpellを選択できますが、結果はPartyの行動として処理します。
+WorldMapではPartyが行動主体です。Party内部のUnitが持つSkillやSpellを選択できますが、結果はPartyの行動として処理します。攻撃後のDamage、反撃、状態、敗北は COMBAT_SYSTEM.md に従います。
 
 ## 2. Civ6から採用する構造
 
