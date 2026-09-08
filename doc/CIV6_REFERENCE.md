@@ -92,3 +92,15 @@ Kingdomでは王国と操作主体を分離し、Kingdom.controllerType に Huma
 ## 6. 実装時の注意
 
 「Civ6と同じ」とだけコメントして挙動を省略しないでください。採用する挙動は SPECIFICATION.md と Ruleset に明記します。Civ6の更新差、DLC差、例外的能力をそのまま一般規則として扱わず、Kingdomとして必要な規則だけを定義します。
+
+
+## 7. Civ6からの重要な分岐
+
+1. Religion、Culture、Scienceの独立勝利を設けません。
+2. religionとcultureはGovernanceCapacity、領土維持、人材獲得、占領統合へ使います。
+3. manaを王国資源として追加します。
+4. PartyをWorldMapの運用単位とします。
+5. FormationでParty内部の配置、役割、被害分配を扱います。
+6. foodからnativeHumanResourcesを生みます。
+7. religionとcultureにより国外Affiliate、移民、専門家、英雄候補を獲得できます。
+8. 成長経路は最終的に軍事力、統治力、Dungeon攻略へ接続します。

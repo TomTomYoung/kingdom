@@ -2,43 +2,31 @@
 
 更新日: 2026-09-08
 
-目標: Civilization VI 型の帝国運営と、ダンジョン探索を統合したターン制ストラテジー
+目標: Civilization VI 型の帝国運営、Party・Formation、Dungeon探索を統合したターン制ストラテジー
 
-## 文書構成
+## 文書
 
-1. [SPECIFICATION.md](./SPECIFICATION.md)
+1. [SPECIFICATION.md](./SPECIFICATION.md): 正規仕様
+2. [RESOURCE_MODEL.md](./RESOURCE_MODEL.md): 軍事力、統治力、mana、人的資源
+3. [PARTY_FORMATION.md](./PARTY_FORMATION.md): PartyとFormation
+4. [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md): 現行コード調査
+5. [STATUS.md](./STATUS.md): 進捗と差分
+6. [HANDOFF.md](./HANDOFF.md): 次作業
+7. [CIV6_REFERENCE.md](./CIV6_REFERENCE.md): Civ6準拠点と独自分岐
 
-   これから実装する正規仕様です。帝国運営、都市生産、ユニット行動、ソロとマルチ、ダンジョン探索を定義します。
+## 確定した方向
 
-2. [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md)
-
-   仕様再編前の main、HEAD 2971993 をコードから復元した現行実装仕様です。
-
-3. [STATUS.md](./STATUS.md)
-
-   現行コードが目標仕様のどこまで到達しているか、既知不具合、マイルストーンを記録します。
-
-4. [HANDOFF.md](./HANDOFF.md)
-
-   次の担当者が実装を継続する順序、設計境界、受入条件を記録します。
-
-5. [CIV6_REFERENCE.md](./CIV6_REFERENCE.md)
-
-   Civilization VI の調査結果と、Kingdomへ採用する仕組み、簡略化する仕組みを記録します。
-
-## 企画上の確定事項
-
-1. 基本コンセプトは Civilization VI 型の帝国運営とダンジョン探索の融合です。
-2. 資源収集と各種ターン開始処理はターン開始時に解決します。
-3. ユニットの移動力、行動回数、固有行動はユニット定義によって変わります。
-4. 都市生産は都市ごとの生産力を毎ターン蓄積して完成させます。
-5. 対応通貨を全額支払える対象は即時購入できます。
-6. ソロでは敵対王国をAIが操作します。
-7. マルチでは各王国スロットを人間またはAIへ割り当てられます。
-8. イベントはターン制の解決事項であり、リアルタイムの時間進行はありません。
-
-## 現状
-
-現行コードは六角形マップ、資源、プレイヤー、ターン、イベント、移動探索の技術試作です。都市単位の生産、統一されたユニットモデル、AIコントローラー、ダンジョン、マルチプレイはまだありません。
-
-次の実装目標は HANDOFF.md の M1「単一都市でCiv型の生産ループを一巡させる」です。
+1. ソロでは敵対王国をAIが操作します。
+2. マルチでは各王国をHumanまたはAIへ割り当てます。
+3. 資源処理はターン開始時です。
+4. 都市Productionはターン進捗、Gold等は全額即時購入です。
+5. Unitの移動力と行動回数はUnit定義によります。
+6. WorldMapの運用単位としてPartyを持ちます。
+7. Party内部の配置としてFormationを持ちます。
+8. manaを正式資源とします。
+9. science、production、gold、mana、人的資源がMilitaryPowerを形成します。
+10. religion、culture、制度、統治人材がGovernanceCapacityを形成します。
+11. foodは国内人口とnativeHumanResourcesを生みます。
+12. religionとcultureは国外Affiliate、移民、専門家、英雄候補を獲得できます。
+13. Religion、Culture、Scienceの独立勝利は設けません。
+14. 全システムは軍事力、統治力、国家間競争、Dungeon攻略へ収束します。

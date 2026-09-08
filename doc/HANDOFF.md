@@ -14,17 +14,31 @@ Phaser object、CharacterLayer.characters、BuildingLayer.buildingsをゲーム�
 
 最初からCiv6全機能を実装しません。単一都市、単一人間王国、固定マップで生産と購入を一巡させ、その後に地上4X、ダンジョン、マルチプレイを順に載せます。
 
-## 2. M1の範囲
+## 2. 今回追加された設計境界
+
+1. MilitaryPowerはscience、production、gold、mana、Unit、Party、兵站から算出します。
+2. GovernanceCapacityはreligion、culture、制度、統治人材から算出します。
+3. foodは都市人口とnativeHumanResourcesを生みます。
+4. religionとcultureは国外Affiliate、移民、専門家、英雄候補を引き寄せます。
+5. Religion、Culture、Scienceの独立勝利はありません。
+6. WorldMapの基本移動単位はPartyです。
+7. FormationはParty内部の配置であり、別Unitではありません。
+8. AIとHumanは同じParty、Formation、Resource Ruleを使います。
+
+詳細は RESOURCE_MODEL.md と PARTY_FORMATION.md を参照してください。
+
+## 3. M1の範囲
 
 M1で実装するのは次です。
 
 1. 固定seedの小型六角形マップ
 2. 人間王国一つ
 3. 都市一つ
-4. food、production、gold、science、culture
+4. food、production、gold、science、mana、religion、cultureと人的資源Pool
 5. Warrior一種類
 6. Monument一種類
-7. Productionによる複数ターン生産
+7. MilitaryPowerとGovernanceCapacityの派生計算
+8. Productionによる複数ターン生産
 8. Goldによる即時購入
 9. Cultureによる自然領土拡張
 10. Goldによる指定タイル購入
@@ -34,7 +48,7 @@ M1で実装するのは次です。
 
 ダンジョン、戦闘AI、オンライン通信、District、宗教、外交はM1へ入れません。
 
-## 3. 実装順序
+## 4. 実装順序
 
 ### 3.1 最小のテスト環境
 
@@ -137,7 +151,7 @@ Cultureによる自動拡張とGold購入を別Commandにします。
 
 候補評価は資源、Yield、都市からの距離を使い、同点はseed付きRNGで決めます。Gold購入時は候補と価格をUIに表示します。
 
-## 4. Controller設計
+## 5. Controller設計
 
 KingdomとControllerを分離します。
 
@@ -159,7 +173,7 @@ KingdomとControllerを分離します。
 
 M1ではHumanControllerだけ実装しますが、GameStateにHuman専用プロパティを埋め込まないでください。
 
-## 5. M1受入条件
+## 6. M1受入条件
 
 1. 同じseedで同じマップを生成できる。
 2. ページ読込時にConsole errorがない。
@@ -175,14 +189,16 @@ M1ではHumanControllerだけ実装しますが、GameStateにHuman専用プロ�
 12. GameStateをJSONへ保存し、同じ状態へ復元できる。
 13. coreのテストがPhaserなしで実行できる。
 
-## 6. M2 地上4X
+## 7. M2 地上4X
 
 M1完了後に次を追加します。
 
 1. 複数王国とPlayerSlot
 2. AIController
 3. Unit移動力と行動回数
-4. Warrior戦闘
+4. Partyの作成、分割、合流
+5. Formation Slotと編成Modifier
+6. Warrior Partyによる地上戦闘
 5. Settlerによる都市建設
 6. Builder chargeによる改善
 7. Scienceによる技術
@@ -191,7 +207,7 @@ M1完了後に次を追加します。
 
 ソロでは敵王国スロットをAIへ割り当てます。ローカルマルチでは同じスロットをHumanへ変更します。
 
-## 7. M3 ダンジョン
+## 8. M3 ダンジョン
 
 地上4XのターンとUnit Commandが安定してから、次を追加します。
 
@@ -204,11 +220,11 @@ M1完了後に次を追加します。
 7. carried loot
 8. ExitDungeonによるsecured loot化
 9. 全滅時の損失
-10. 王国のdungeonMaterialsへ還元
+10. 王国のdungeonMaterials、mana、人材へ還元
 
 地上とダンジョンで別のUnitコピーを作らず、同じunitIdのmodeとlocationを切り替えます。
 
-## 8. マルチプレイへの備え
+## 9. マルチプレイへの備え
 
 1. 乱数は必ずseed付きRNGから取得します。
 2. Date.now、Math.randomをゲームルール内で使いません。
@@ -218,7 +234,7 @@ M1完了後に次を追加します。
 6. 同じ初期状態とCommand列から同じ結果を再現できるようにします。
 7. AIもCommandLogへ残します。
 
-## 9. 現行コードからの移行
+## 10. 現行コードからの移行
 
 再利用候補は Hex、Layout、カメラ操作、イベント窓、描画方法の試作です。
 
@@ -226,7 +242,7 @@ M1完了後に次を追加します。
 
 移行中は旧 index.html を legacy/index.html へ退避するか、main上で動作比較できる状態を保ってください。旧コードを削除するコミットと新しいcore導入を同時に行わないでください。
 
-## 10. 文書更新規則
+## 11. 文書更新規則
 
 1. ゲーム規則を変えたら SPECIFICATION.md を更新します。
 2. Civ6との差を変えたら CIV6_REFERENCE.md を更新します。

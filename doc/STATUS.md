@@ -12,7 +12,7 @@
 
 現行コードにあるのは、Phaser起動、六角形マップ、3プレイヤー、簡易領土、王国単位の資源、人口、文字ユニット、文字建物、ターン送り、文章イベント、移動範囲、A*形式探索の骨格です。
 
-都市単位生産、Production queue、Gold purchase、Culture border growth、統一Unitモデル、Controller分離、AI意思決定、Dungeon、Expedition、セーブ、マルチプレイは未実装です。
+都市単位生産、Production queue、Gold purchase、Culture border growth、mana、GovernanceCapacity、人的資源Pool、統一Unitモデル、Party、Formation、Controller分離、AI意思決定、Dungeon、Expedition、セーブ、マルチプレイは未実装です。
 
 ## 2. マイルストーン
 
@@ -24,8 +24,8 @@
 2. ソロとマルチのController仕様を定義
 3. ターン開始時の資源解決を定義
 4. ユニット別行動回数を定義
-5. 地上とダンジョンのターン同期を定義
-6. 現行実装仕様を別文書へ退避
+10. 地上とダンジョンのターン同期を定義
+11. 現行実装仕様を別文書へ退避
 
 ### M1 単一都市のCiv型ループ
 
@@ -46,8 +46,10 @@
 1. 複数都市
 2. SettlerとBuilder
 3. 戦士、探索、戦闘
-4. 技術研究
-5. 敵王国AI
+4. Party作成とFormation
+5. 技術研究とmana
+6. GovernanceCapacityと人的資源
+7. 敵王国AI
 6. 蛮族
 7. Domination仮勝利
 
@@ -56,11 +58,12 @@
 状態: 未着手
 
 1. Dungeon Site
-2. Expedition
-3. 一階層の生成
+2. Expedition Party
+3. Dungeon用Formation
+4. 一階層の生成
 4. 探索、戦闘、宝箱、撤退
 5. carriedとsecuredの戦利品
-6. 帝国への資源還元
+6. 帝国への資源、mana、人材の還元
 
 ### M4 統合ゲーム
 

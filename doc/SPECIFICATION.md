@@ -111,54 +111,119 @@ GameState は最低限、次を保持します。
 
 同じターン開始処理内で発生した解禁を、そのターンから使用可能にします。
 
-## 5. 資源モデル
+## 5. 資源と能力軸
 
-Civ型の Yield と Stockpile と Progress を区別します。
+Kingdomでは個別の資源と、資源から派生する能力を区別します。MilitaryPowerとGovernanceCapacityは、直接支払う単一通貨ではなく、複数の資源、施設、人員、制度から算出される能力です。詳細は RESOURCE_MODEL.md を参照してください。
 
-### 5.1 都市ローカル
+### 5.1 軍事力
 
-1. food
-
-   都市ごとに蓄積し、人口成長へ使います。
-
-2. production
-
-   国庫へ貯めず、その都市が選択している生産対象の productionProgress へ毎ターン投入します。
-
-3. localCulture
-
-   都市文化圏の自然拡張へ使います。
-
-### 5.2 王国共通備蓄
-
-1. gold
-
-   ユニット、建物、タイルその他の即時購入、維持費、外交へ使います。
-
-2. faith
-
-   宗教系対象、特定ユニット、固有対象の即時購入へ使います。初期MVPでは無効でもデータ構造は予約します。
-
-3. strategicResources
-
-   鉄などの戦略資源です。対象の生産条件、購入条件、維持費に使います。
-
-4. dungeonMaterials
-
-   魔石、遺物片など、ダンジョン由来の帝国資源です。装備、生産、研究、封印解除へ使います。
-
-### 5.3 王国共通進捗
+MilitaryPowerは次から形成されます。
 
 1. science
 
-   選択中の技術へ毎ターン加算します。
+   Unit、装備、魔法、戦術、兵站を解禁する開発力です。Science勝利には使いません。
+
+2. production
+
+   Unit、Party装備、Building、District、補給物資を製造する都市ローカル能力です。
+
+3. gold
+
+   UnitとPartyの維持、雇用、即時購入、補給、開発加速に使う王国備蓄です。
+
+4. mana
+
+   魔法Unit、Spell、魔導装備、召喚、Dungeon機構、魔法施設に使う王国備蓄です。
+
+5. militaryHumanResources
+
+   兵員、指揮官、英雄、技術者など、編成へ投入可能な人的資源です。
+
+scienceによる解禁、productionによる実体化、goldによる維持と加速、manaによる魔法的能力、人的資源による運用が揃って軍事力になります。
+
+### 5.2 統治力
+
+GovernanceCapacityは、領土、District、Building、都市人口、占領地、多民族集団を維持し、命令を通す能力です。
+
+主な源泉は次です。
+
+1. religion
+
+   信仰共同体、正統性、結束、奉仕組織、他国に存在する信徒ネットワークを表します。Religion勝利には使いません。
 
 2. culture
 
-   選択中の社会制度へ毎ターン加算します。
+   言語、制度、教育、威信、生活様式、行政規範への求心力を表します。Culture勝利には使いません。
 
-ScienceとCultureは通常の国庫通貨のように任意対象を即時購入する資源ではありません。対象進捗として扱います。
+3. institutions
 
+   法、官僚制、自治制度、交通、記録、徴税などの統治機構です。
+
+4. governanceHumanResources
+
+   官僚、司祭、教師、職人、専門家、地域指導者などです。
+
+GovernanceLoadは領土、都市、District、Building、人口、Party、占領地、未統合人口から発生します。LoadがCapacityを超えると、維持費増加、Yield低下、命令遅延、離反、反乱が段階的に発生します。
+
+### 5.3 食料と人的資源
+
+foodは都市ごとに産出、蓄積して人口を増やします。人口はただちに兵員になる数値ではなく、国内で生まれるnativeHumanResourcesの母体です。
+
+人口から、政策、教育、職業、徴募、施設に応じてmanpower、officers、specialists、administrators、clergy、artisans、adventurersを供給します。徴兵や過剰動員は生産、食料、統治、忠誠、将来人口へ代償を与えます。
+
+### 5.4 宗教と文化による国外人材
+
+人物は居住国、出身文化、宗教、忠誠、職能を別々に持ち得ます。他国居住のまま自国の宗教共同体または文化圏へ属する状態を表現します。
+
+religionとcultureは次の経路で国外人的資源へ作用します。
+
+1. Attraction
+
+   移民、留学生、職人、冒険者、学者を引き寄せます。
+
+2. Affiliation
+
+   他国居住の信徒、文化的支持者、協力者からexternalAffiliatePoolを形成します。
+
+3. Recruitment
+
+   条件を満たしたAffiliateを宣教師、案内人、密偵、傭兵、専門家、英雄候補として別枠登用します。
+
+4. Integration
+
+   移住者、占領地住民、異文化人材をGovernanceCapacityの範囲で正規人材へ統合します。
+
+5. Defection
+
+   戦争、圧政、魅力差、宗教対立などにより、他国人材が離反または亡命します。
+
+国外人材は無条件に相手国人口から即時取得しません。Exposure、Affiliation、Availability、Recruitment、Integrationを段階状態として処理し、相手国は融和、対抗文化、宗教政策、国境管理などで抵抗できます。
+
+### 5.5 宗教と文化の最終用途
+
+religionとcultureは独立勝利を生みません。領土と施設の維持、占領地統合、人材獲得、士気、忠誠、PartyとFormationの編成上限、軍事施設と補給網の維持を通じて、最終的に軍事力と国家存続へ寄与します。
+
+### 5.6 保存形態
+
+1. CityLocal
+
+   food、production、localCultureなどです。
+
+2. KingdomStockpile
+
+   gold、mana、strategicResources、dungeonMaterialsなどです。
+
+3. Progress
+
+   science研究、制度開発、生産Projectなどです。
+
+4. HumanPool
+
+   native、affiliate、specialist、military、governanceなどの人的資源です。
+
+5. DerivedCapacity
+
+   MilitaryPower、GovernanceCapacity、LogisticsCapacityなどです。
 ## 6. 都市生産
 
 ### 6.1 標準生産
@@ -173,7 +238,7 @@ ScienceとCultureは通常の国庫通貨のように任意対象を即時購入
 
 ### 6.2 即時購入
 
-purchaseCurrency と purchaseCost が定義された対象は、王国が必要額を全額保有していれば即時完成できます。標準通貨は gold または faith です。ダンジョン固有対象は dungeonMaterials を要求できます。
+purchaseCurrency と purchaseCost が定義された対象は、王国が必要額を全額保有していれば即時完成できます。標準通貨は gold です。魔法対象は mana、Dungeon固有対象は dungeonMaterials を要求できます。religionとcultureは通常の即時購入通貨ではなく、統治、人材獲得、制度条件へ使用します。
 
 即時購入は、残りproductionだけを通貨で埋める処理ではありません。対象の全purchaseCostを支払う独立した取得経路です。途中まで蓄積した productionProgress は返金または通貨換算しません。
 
@@ -209,68 +274,59 @@ Settler が合法な地上タイルで FoundCity を実行すると、新しい�
 
 Gold購入は文化進捗を消費またはリセットしません。他国領は通常購入できず、戦争、外交、イベントなど別ルールで移転します。飛び地取得は原則禁止します。
 
-## 8. ユニット
+## 8. Unit、Party、Formation
 
-### 8.1 共通データ
+個別Unitを直接運用するだけでなく、PartyとFormationを第一級のゲーム要素として持ちます。詳細は PARTY_FORMATION.md を参照してください。
 
-Unit は最低限、次を持ちます。
+### 8.1 Unit
 
-1. unitId
-2. ownerId
-3. unitTypeId
-4. location
-5. domain
-6. hp と maxHp
-7. movementMax と movementRemaining
-8. actionsMax と actionsRemaining
-9. combatStrength
-10. rangedStrength と range
-11. charges
-12. promotions
-13. statusEffects
-14. mode
-15. expeditionId
+Unitは人物、小隊、兵器、魔物など、Partyへ加入できる最小運用単位です。unitId、ownerId、unitTypeId、hp、movement、actions、combatStats、role、charges、upkeep、statusEffectsを持ちます。移動力、行動回数、固有行動はUnit定義、装備、昇進、状態によって異なります。
 
-### 8.2 行動回数
+### 8.2 Party
 
-移動力と行動回数は別に管理します。値はユニット種別、昇進、状態、装備によって変わります。
+Partyは複数Unitをまとめる永続的な運用集団です。地上移動、Dungeon探索、補給、Inventory、経験、指揮系統を共有します。
 
-タイル進入は地形、道路、河川、状態に応じた movement を消費します。攻撃、略奪、改善、ダンジョン進入などは Command 定義に従って movement、action、charge のいずれかまたは複数を消費します。
+WorldMapでは原則としてPartyを一つのTokenとして表示します。Partyのmovementは構成員、Formation、地形、輸送手段、補給状態から算出し、標準では最も遅い必須構成員を基準にします。
 
-ユニット種別ごとの例は次です。
+Partyは作成、解散、分割、合流、Unit加入、Unit離脱ができます。敵隣接中、戦闘中、Dungeon内など、変更できない状態をRulesetで定義します。
 
-1. Warrior
+### 8.3 Formation
 
-   movement 2、attack action 1
+FormationはParty内部の配置、役割、指揮関係を定義する戦闘構造であり、別Unitではありません。
 
-2. Scout
+基本SlotはFront、Center、Rear、Support、Reserveです。FormationDefinitionは必要Slot、許可Role、人数上限、Modifier、TargetingRule、CommandCostを持ちます。
 
-   movement 3、explore action 1、地形軽減を持ち得ます。
+Formationによって防御、攻撃範囲、護衛、魔法増幅、移動、撤退、被害分配が変わります。戦闘中の変更はactionまたはCommand Pointを消費します。
 
-3. Builder
+### 8.4 Party分類
 
-   movement 2、build charge 3。改善実行時にchargeを1消費し、0で消滅します。
+1. Army Party
+2. Expedition Party
+3. Scout Party
+4. Convoy Party
+5. Religious Mission
+6. Cultural Mission
 
-4. Settler
+Party分類は別実装ではなく、許可Unit、行動、維持、Formation、目的をRulesetで変えます。
 
-   movement 2、FoundCity action 1。都市建設後に消滅します。
+### 8.5 維持と占有
 
-5. Expedition Party
+PartyはUnitごとのgold upkeep、supplies、必要に応じてmanaを消費します。指揮官、Formationの複雑さ、Party規模はCommand Capacityを要求します。
 
-   地上movementとダンジョン用actionを持ち、編成、装備、負傷を管理します。
+GovernanceCapacity、MilitaryOrganization、指揮官能力が、保有可能Party数、最大規模、高度Formationを制約します。
 
-数値は暫定です。ActionDefinition のデータとして変更可能にします。
-
+WorldMapの一タイル占有単位はUnitではなくPartyです。Dungeon内では同じPartyをFormation Slotへ展開します。地上用とDungeon用にUnitを複製しません。
 ## 9. 戦闘
 
-地上戦とダンジョン戦は同じ CombatResolver を使い、地形、装備、状態、陣営関係による Modifier を追加します。
+地上戦とDungeon戦は同じCombatResolverとUnit statsを基礎にし、解像度を変えます。
 
-初期仕様は、攻撃側戦闘力と防御側戦闘力の差から相互ダメージを計算する方式です。近接攻撃は原則反撃あり、遠距離攻撃は原則反撃なしとします。
+地上戦はParty対Partyとして解決し、Formation、地形、兵站、士気、指揮官、Science解禁、Mana支援をModifierとして適用します。
 
-一タイルには各陣営につき、軍事ユニット一体と支援または民間ユニット一体までを基本とします。詳細なスタック規則は Ruleset 化します。
+Dungeon戦は同じPartyを個別Slotへ展開し、対象選択、Skill、状態異常、罠、位置交換、撤退を詳細に扱います。
 
-都市占領、敗走、包囲、経験値、昇進は段階導入します。
+勝敗はUnit損耗だけでなく、士気崩壊、撤退、捕虜、Formation破壊、補給喪失でも発生します。
 
+MilitaryPowerは攻撃力合計ではなく、編成可能数、装備水準、補充能力、維持可能期間、Mana運用、指揮、兵站を含めて評価します。
 ## 10. AI
 
 AIは Human と同じ GameState を読み、同じ合法Commandを発行します。AI専用の直接資源付与や規則無視は行いません。
@@ -378,38 +434,36 @@ Expedition は partyUnits、inventory、supplies、position、visibility、retre
 
 イベント定義は trigger、conditions、target、pages、choices、effects、once、cooldown、visibility を持ちます。
 
-## 13. 研究と社会制度
+## 13. 研究、宗教、文化、制度
 
-王国は同時に技術一件と社会制度一件を選択できます。ターン開始時に science と culture のYieldをそれぞれ進捗へ加算します。
+scienceは技術と軍事開発を進め、Unit、装備、魔法、施設、Formation、兵站を解禁します。Science自体による勝利はありません。
 
-技術、社会制度はユニット、建物、District、改善、政策、ダンジョン攻略能力を解禁します。特定条件の達成でEurekaまたはInspiration相当の進捗ボーナスを得られます。
+religionとcultureはGovernanceCapacityを生み、領土、District、Building、人口集団の維持と統合へ使います。また、国外のAffiliate、移民、専門家、英雄候補を獲得する経路になります。
 
+制度開発はculture、religion、統治経験、特定条件から進み、政策、行政方式、動員方式、宗教組織、教育、Party編制上限などを解禁します。
+
+Eureka相当の条件達成ボーナスはscienceだけでなく、religion、culture、governance制度にも適用できます。
 ## 14. 勝敗
 
-Civ型の複数勝利条件とダンジョン固有勝利を併存させます。実装候補は次です。
+Religion勝利、Culture勝利、Science勝利は設けません。これらは統治、人材、軍事開発を経由して、最終的な国家間競争とDungeon攻略へ収束します。
 
 1. Domination
 
-   全敵王国の首都を支配します。
+   敵対王国の首都、継戦能力、または政治的主権を失わせ、全主要敵対勢力を降伏させます。
 
-2. Science
+2. Dungeon Conquest
 
-   最終技術と大規模Projectを完成させます。
+   複数の大Dungeonから重要遺物を確保し、最終Dungeonを開き、その軍事的脅威を撃破して必要な国家Projectを完成させます。
 
-3. Culture
+3. Scenario Objective
 
-   文化的影響力の条件を満たします。
+   防衛、脱出、討伐、期限内確保などの軍事目標です。
 
-4. Dungeon
+4. Score
 
-   最深層ボスを倒し、指定された重要遺物を確保し、王国Projectを完成させます。
+   最大ターン到達時に、領土、人口、統治余力、軍事力、Dungeon成果、継戦能力から総合判定します。
 
-5. Score
-
-   最大ターン到達時に総合得点を比較します。
-
-初期プレイ可能版は Domination と Dungeon の二条件を優先します。具体的な最終条件とゲーム長は未確定です。
-
+religion、culture、scienceを高めるだけでは勝利できません。強い統治で軍事・生産基盤を保持し、人材を集め、軍事開発と遠征成功へ変換する必要があります。
 ## 15. マップ
 
 地上はポイントトップ型六角形マップです。地形は連続性のある生成器で作り、独立一様ランダム配置は使用しません。
@@ -440,17 +494,20 @@ WorldMap は次を扱います。
 
 ## 17. 未確定事項
 
-次は実装前または該当マイルストーン開始前に確定します。
+1. Partyの標準人数とArmy、Expeditionの上限差
+2. Formation Slot数と配置
+3. CharacterとUnitの粒度
+4. GovernanceCapacityとGovernanceLoadの算出式
+5. religionとcultureが国外Affiliateを生む式
+6. 外国人材のRecruitment条件、相手国への影響、対抗手段
+7. manaの産出、回復、備蓄上限、地域依存
+8. Party upkeepと補給切れの罰則
+9. 時代区分と標準ターン数
+10. DominationとDungeon Conquestの具体条件
+11. 同時ターンの競合規則
+12. Dungeonの大きさと標準深度
+13. 全滅、撤退時の損失
+14. 同一Dungeonへの複数勢力侵入
+15. 地上戦とDungeon戦で共有する戦闘式の範囲
 
-1. 時代区分とゲーム全体の標準ターン数
-2. 勝利条件の具体値
-3. 技術、社会制度、宗教、外交の初期収録範囲
-4. 同時ターンでの競合優先規則
-5. ダンジョンの一階あたりの大きさと標準深度
-6. 遠征隊の編成人数
-7. 補給切れ、全滅、撤退時の損失
-8. 同一ダンジョンへの複数勢力侵入
-9. 世界マップとダンジョンの戦闘式を完全共通化する範囲
-10. Civ型の時代発展をそのまま採用するか、ファンタジー独自段階に置換するか
-
-未確定事項は Ruleset で変更可能な構造にし、コード内へ固定値として埋め込まないでください。
+未確定事項はRulesetで変更可能な構造にし、コードへ固定値として埋め込まないでください。
