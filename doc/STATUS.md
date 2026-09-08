@@ -30,6 +30,7 @@
 13. 人心による加入・維持と個別loyaltyを定義
 14. Civ6準拠の移動、攻撃、Charge、Ability行動モデルを定義
 15. 最大5Unitの3×3 Damage Grid、Guard、狙撃、範囲配分を定義
+16. Unit尺度、Damage式、反撃、Downed、士気、回復、Lootを定義
 
 ### M1 単一都市のCiv型ループ
 
@@ -51,6 +52,7 @@
 2. SettlerとBuilder
 3. 戦士、探索、戦闘
 4. movementRemaining、attacksRemaining、Charge、AbilityDefinition
+5. 共通Combat Resolver、Damage配分、反撃、状態遷移
 4. Party作成とFormation
 5. 技術研究とmana
 6. GovernanceCapacityと人的資源
