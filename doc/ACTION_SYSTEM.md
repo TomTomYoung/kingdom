@@ -1,8 +1,18 @@
 # Kingdom 行動システム仕様
 
-更新日: 2026-09-08
+更新日: 2026-09-13（実装状況と文書整合性を再確認）
 
 仕様状態: Civ6準拠部分確定、特殊Abilityの個別数値は暫定
+
+## 0. 現行実装との区分
+
+本文は目標の行動規則であり、全Commandが使用可能という意味ではありません。実装一覧は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md)、課題は [STATUS.md](./STATUS.md) を参照してください。コード確認基準はmain / e0dcb3fc2e6162547d7499fdd913aaaa0b9f10c7です。
+
+MovePartyとAttackParty、Partyのターン開始回復は実装済みです。現行の攻撃Command名はMeleeAttack／RangedAttackではなく、AttackPartyにattackType: melee／rangedを指定します。移動はUI公開済み、攻撃はcore APIのみです。
+
+Partyの実キーはmovementMaximum、attacksMaximumで初期値は2と1、activationStateはready／endedです。最遅構成員からの算出、道路・河川・ZoC、Ability、Charge消費、Pillage、Fortify、Wait／Skip／Sleep、FoundCity、Build、Promote、Upgradeは未実装です。UnitのchargesやabilityStatesは保存欄です。
+
+移動検証にはParty状態、攻撃検証には遠隔能力の有無等の不足があります。仕様の合法性判定が完全実装済みとは扱わず、STATUSのK-01〜K-04を先に修正します。
 
 ## 1. 基本方針
 

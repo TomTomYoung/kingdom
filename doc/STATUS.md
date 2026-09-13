@@ -1,145 +1,103 @@
-# Kingdom 進捗
+# Kingdom 進捗と既知の課題
 
-更新日: 2026-09-08
+確認・更新日: 2026-09-13
 
-目標仕様: Civilization VI 型帝国運営とダンジョン探索
-
-現行コード基準: index.html、コミット 297199396d27a88392dbe9423e96fb7388f30593
+コード基準: main / e0dcb3fc2e6162547d7499fdd913aaaa0b9f10c7（2026-09-08、PR #1マージ）。調査時点のopen PRは0件です。
 
 ## 1. 現在地
 
-M1「単一都市のCiv型ループ」を実装しました。GameStateを正本とするDOM・Phaser非依存のES Module、固定seedマップ、Command/RuleSystem、都市Yield、生産・購入、領土拡張、セーブを備えています。旧技術試作は `legacy/index.html` に保存しました。
+M1の単一都市運営ループは実装済み、M2はParty・移動・基本戦闘の途中です。PartyとFormationを一律に未実装とは扱いません。
 
-現行コードには、固定seed六角形マップ、人間王国と単一都市、都市単位Yield、Production queue、Gold purchase、Culture border growth、mana、popularSupport、GovernanceCapacity、人的資源Pool、統一Unitモデル、HumanController、Command log、JSONセーブがあります。
+UIからは都市生産・購入、自然領土拡張・タイル購入、Party作成・選択・1歩移動、ターン終了、localStorageセーブ・ロードを操作できます。
 
-個別loyaltyのターン効果、Party、Formation、AI意思決定、Dungeon、Expedition、オンラインマルチプレイはM2以降の範囲として未実装です。
+内部APIには複数王国の順次ターン、任意経路移動、SetFormation、AttackPartyがあります。複数王国設定・切替、配置編集、戦闘のUIはありません。
+
+現行の詳細は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md)、次作業は [HANDOFF.md](./HANDOFF.md) です。旧Phaser版のP0不具合と再利用候補は [LEGACY_IMPLEMENTATION.md](./LEGACY_IMPLEMENTATION.md) に移しました。
 
 ## 2. マイルストーン
 
 ### M0 仕様再編
 
-状態: 完了
-
-1. Civ6型の生産と購入を区別
-2. ソロとマルチのController仕様を定義
-3. ターン開始時の資源解決を定義
-4. ユニット別行動回数を定義
-10. 地上とダンジョンのターン同期を定義
-11. 現行実装仕様を別文書へ退避
-12. 最大5名Partyと集約Parameterを定義
-13. 人心による加入・維持と個別loyaltyを定義
-14. Civ6準拠の移動、攻撃、Charge、Ability行動モデルを定義
-15. 最大5Unitの3×3 Damage Grid、Guard、狙撃、範囲配分を定義
-16. Unit尺度、Damage式、反撃、Downed、士気、回復、Lootを定義
+設計文書を整備済みです。最大5Unit、3×3 Damage Grid、Partyを一つの戦闘単位とすること、移動・攻撃・有限Chargeの分離は決定済みです。目標文書の受入条件は実装完了の宣言ではありません。
 
 ### M1 単一都市のCiv型ループ
 
-状態: 完了
+基本機能は実装済みです。GameState／Command化、固定seed、都市Yield、人口成長、生産キュー、全額Gold購入、文化・Goldの二経路領土取得、派生能力、保存があります。
 
-1. GameStateを正本化
-2. Kingdom、City、Unitのモデル統一
-3. ターン開始時Yield解決
-4. 都市Production progress
-5. Gold即時購入
-6. Culture自然拡張とGoldタイル購入
-7. 人間一人で複数ターン進行
+未完の品質課題は本書の既知課題に残します。ブラウザQA、キュー編集UI、購入価格の事前表示、セーブ破損対応まで完了した意味ではありません。
 
 ### M2 地上4X垂直スライス
 
-状態: 進行中（Party移動と基本Combat Resolverを実装）
+部分実装です。
 
-1. 複数都市
-2. SettlerとBuilder
-3. 戦士、探索、戦闘（Party移動まで完了）
-4. movementRemaining、attacksRemaining、Charge、AbilityDefinition（移動・攻撃回数の基盤完了）
-5. 共通Combat Resolver、Damage配分、反撃、状態遷移（単体Damage・反撃・Downed/Shattered・Leader継承まで完了）
-4. Party作成とFormation（基盤完了）
-5. 技術研究とmana
-6. GovernanceCapacityと人的資源
-7. 人心、NPC加入、loyalty、維持不足
-8. 敵王国AI
-6. 蛮族
-7. Domination仮勝利
+1. 複数王国: addKingdomと順次手番処理を実装。設定・切替UI、AIは未実装。
+2. 複数都市: City辞書とcityIdsは存在。同一王国内の都市別市民配置・領土管理、FoundCityは未実装。
+3. Unit: warrior一種類のみ。Settler、Builder、蛮族、技術解禁は未実装。
+4. Party: 最大5Unitの作成、3×3配置検証、地形移動と占有検証を実装。分割・合流・解散・自由なメンバー編集は未実装。
+5. 戦闘: 単体Damage、近接反撃、遠隔反撃なし、HP0、Leader継承、全員戦闘不能時の敗北を実装。戦闘UI、Guard、狙撃、範囲・貫通、撤退・回復・Lootは未実装。
+6. 行動: Party移動力・攻撃回数・ターン回復を実装。有限ChargeとAbilityは保存欄のみで、実行基盤は未実装。
+7. 資源: mana備蓄、science・culture進捗、軍事力・統治力・負荷の暫定計算あり。宗教Yieldの統治力接続、mana消費、研究解禁、負荷Penaltyは未実装。
+8. 人心: 王国単位の固定収入・維持費処理あり。NPC募集、個別維持費・債務、loyalty変動、国外人材は未実装。
+9. 勝利判定: Dominationを含め未実装。
 
 ### M3 ダンジョン垂直スライス
 
-状態: 未着手
-
-1. Dungeon Site
-2. Expedition Party
-3. Dungeon用Formation
-4. 一階層の生成
-4. 探索、戦闘、宝箱、撤退
-5. carriedとsecuredの戦利品
-6. 帝国への資源、mana、人材の還元
+未着手です。Site、DungeonState、Expedition、階層生成、罠・宝箱・撤退、carried／secured loot、王国への還元はありません。行動はACTION_SYSTEMの共有モデルを使う方針です。
 
 ### M4 統合ゲーム
 
-状態: 未着手
-
-1. 複数階層とボス
-2. Dungeon勝利
-3. 地上AIの遠征判断
-4. 装備、生産、研究の相互接続
-5. イベントデータ化
-6. セーブとロード
+未着手です。複数階層、ボス、装備・研究との接続、選択式イベント、Dungeon勝利を扱います。M1の基本セーブは既にあるため、ここでの保存課題は追加システムを含む保存・移行・復元です。
 
 ### M5 マルチプレイ
 
-状態: 未着手
+未着手です。coreの順次手番は存在しますが、ローカル複数人UI、権威状態・通信、RemoteController、切断時AI引継ぎ、同時ターン競合解決はありません。
 
-1. HumanとAIのスロット割当
-2. Sequentialマルチ
-3. 権威GameStateとCommand同期
-4. 切断時AI引継ぎ
-5. Simultaneous競合解決
+## 3. 現行の未修正課題
 
-## 3. 現行コードの再利用可能部分
+優先度は次作業の目安です。P1はゲーム状態・ルールの整合性、P2は操作性・拡張時の制約を示します。ここに列挙した問題は今回修正していません。
 
-1. Hex、Layoutの基本座標表現
-2. Phaserによる地図描画の試作
-3. Tileデータの基本形
-4. DataManagerによるデータ読込の発想
-5. 到達範囲探索とA*のたたき台
-6. イベントウィンドウのページ送り
-7. カメラ移動とズーム
-8. turn stateという概念
+### 追加診断で再現した課題
 
-いずれもそのまま完成部品ではなく、GameStateとCommandを正本にした上で修正して使います。
+2026-09-13に、取得したcoreへローカルの一時診断を実行しました。既存23テストへ追加したわけではありません。
 
-## 4. P0 不具合
+1. K-01 / P1: 全滅Partyが次ターンに移動できる。敵をHP0でdefeatedにし、一巡後にMovePartyすると成功しました。turn-engineが敗北Partyの行動値も回復し、movement-systemがstatus・戦闘可能構成員を検証しません。
+2. K-02 / P1: 同じHexに複数Partyを作れる。同じ都市中心の別UnitからCreatePartyを続けて発行すると両方成功しました。移動時には占有を拒否しますが、作成時の占有検証がありません。
+3. K-03 / P1: 遠隔能力0のwarriorが遠隔攻撃できる。seed 77で隣接敵へrangedを発行し、HP100→88を確認しました。rangedStrengthや攻撃方式の所持を検証せず、反撃を回避できます。
+4. K-04 / P1: PurchaseCityItemはPLAYER_ACTION以外でも成功し、cityId省略ではTypeErrorが発生します。全Commandのphase・必須payload検証を統一する必要があります。
+5. K-05 / P2: 同一王国にCityを二つ置くと同じworkedTilesを両都市が選びます。都市別管理でなく王国全領土から選ぶためです。複数都市を実装済みとして扱わないでください。
 
-1. resources.金 と resources.gold の不一致で領土拡張できません。
-2. production の供給源がなく、UnitとBuildingを作れません。
-3. CharacterLayer.addCharacter が未定義です。
-4. ownerが数値、文字列、undefinedで混在し、自軍判定が成立しません。
-5. CharacterLayer.characters と Player.units が二重管理です。
-6. BuildingLayer.buildings と Player.buildings も二重管理です。
-7. 現行 endPlayerPhase から OTHER_PLAYERS_PHASE と CPU_PHASEへ到達しません。
-8. 川と壁の辺情報を生成直後に破棄しています。
-9. 移動経路が開始地点のコストを余計に消費します。
-10. cube coordinateの丸めが不正確です。
-11. タイルと建物の再描画でText objectが増殖します。
-12. 初期領土が重複し、Tile.ownerとPlayer.territoryが矛盾します。
+### コード上で確認した制約・要対応箇所
 
-これらを個別に延命修正するのではなく、M1でモデル統一とCommand化を行う中で解消します。ただしHex丸め、描画リークなど独立修正可能なものは小さなコミットに分けます。
+1. K-06 / P2: Party選択解除がなく、選択後はクリックが移動に固定され領土購入へ戻れません。ロード・新規開始でもselectedPartyIdを初期化していません。src/ui/main.jsの静的確認で、ブラウザ実操作は未検証です。
+2. K-07 / P2: UIとHumanControllerがkingdom-1／city-1固定で、別王国へ手番が移るとその王国を操作できません。
+3. K-08 / P2: 建設済み建物の生産選択・再キュー投入を拒否しません。建物は重複登録されなくてもProduction消費と完了イベントが起こり得ます。
+4. K-09 / P2: JSONセーブの検証はバージョン確認と一部既定値補完のみです。必須フィールド・参照整合性・破損入力・旧中間版の移行保証が不足しています。
+5. K-10 / P2: 敗北Partyが盤上に残り、移動の占有判定がstatusを区別しません。死傷者・捕虜・撤退・片付けと撃破後進入の規則に接続が必要です。
 
-## 5. テスト状況
+## 4. テストと確認範囲
 
-Node.js標準テストランナーによるcoreテストを追加し、Phaserなしで実行できます。固定seedとJSONセーブによる再現性も検証します。
+2026-09-13、Node.js v24.19.0／npm 11.9.0で実行しました。
 
-実装済みのテストは次です。
+```sh
+npm test
+npm run check
+```
 
-1. Hex cube roundの単体テスト
-2. Yield集計の単体テスト
-3. Production完成とoverflowの単体テスト
-4. Gold purchaseの単体テスト
-5. Territory取得の単体テスト
-6. Turn incrementの単体テスト
-7. 固定seedのスモークテスト
+npm testは23件成功、失敗0件でした。
 
-## 6. リポジトリ状況
+1. tests/game.test.js: 12件。seed、ターン、Productionとoverflow、購入、領土、人心、セーブ、複数王国の手番、M1セーブ補完。
+2. tests/hex.test.js: 2件。cube round、neighbor、distance、range、共通Edge key。
+3. tests/party.test.js: 4件。最大人数・所属、3×3配置、移動、拒否時の状態保持。
+4. tests/combat.test.js: 5件。近接・遠隔、射程等の拒否、HP0と行動回復、Leader継承。
 
-画面はES Moduleを読み込む小さな `index.html` と `src/ui`、ゲーム規則は `src/core`、`src/models`、`src/world`、`src/systems` に分離しました。旧一枚HTMLは `legacy/index.html` に保存しています。
+npm run checkはsrc/ui/main.jsの構文チェックに成功しました。srcとtests内の全JavaScriptファイルにもnode --checkを実行し、すべて成功しました。
 
-現行コードの詳細は CURRENT_IMPLEMENTATION.md、今後の規範は SPECIFICATION.md、戦闘詳細は COMBAT_SYSTEM.md、次作業は HANDOFF.md を参照してください。
+専用Yield単体テスト、全受入条件、全scaleClass、Guard、loyalty、AI、Dungeon、UI E2Eの網羅はありません。テスト名が示す内容と実際のassert範囲も区別します。GitHub Actionsの設定はリポジトリ内にありません。
+
+今回はブラウザでの実操作・描画確認を実施していません。テスト成功は既知課題の解消やM2完了を意味しません。
+
+## 5. 文書更新で整理したこと
+
+旧調査を保存したままCURRENT_IMPLEMENTATIONを現行ES Modules版へ書き換え、実装状況・UI到達範囲・未実装を分離しました。STATUSとHANDOFFのM1再導入指示、Party未実装扱い、旧版P0の混在を解消しました。
+
+目標仕様は実装の簡略化へ合わせて縮小しません。目標文書には現行との差を明記し、既に確定した5Unit・9Slot等を未確定事項から外しました。

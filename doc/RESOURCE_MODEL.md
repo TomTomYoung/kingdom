@@ -1,6 +1,14 @@
 # Kingdom 資源・軍事力・統治力仕様
 
-更新日: 2026-09-08
+更新日: 2026-09-13（実装状況と文書整合性を再確認）
+
+## 0. 現行実装との区分
+
+本文は目標資源モデルです。現行の正確な式と保存キーは [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md)、未実装項目は [STATUS.md](./STATUS.md) を参照してください。コード確認基準はmain / e0dcb3fc2e6162547d7499fdd913aaaa0b9f10c7です。
+
+現在は都市food／production、王国gold／mana／popularSupport、science／culture進捗、人的資源欄、軍事力・統治力・負荷の簡略計算を実装しています。人口成長はnativeを増加させますが、他の人的資源への徴募・訓練・登用はありません。
+
+religionは地形Yieldとして集計されるだけで、現行GovernanceCapacityには入りません。manaの消費、技術解禁、国外人材、物流・補給、統治負荷Penalty、個別loyaltyは未実装です。MilitaryPowerとGovernanceCapacityは完成した実効制約ではなく、現状は暫定的な表示指標です。係数の一部はsrc/models/kingdom.js等に直書きされています。
 
 ## 1. 三層構造
 

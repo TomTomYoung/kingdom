@@ -1,6 +1,12 @@
 # Civilization VI 準拠点の調査記録
 
-更新日: 2026-09-08
+更新日: 2026-09-13（実装状況と文書整合性を再確認）
+
+## 0. 現行実装との区分
+
+この文書は2026-09-08の参照調査とKingdomとして採用する方針を保存したものです。2026-09-13の更新ではリポジトリ内の名称・規範・実装区分を照合しました。外部参照ページの再検証や、Civ6の全例外の検証は実施していません。
+
+現行コード確認基準はmain / e0dcb3fc2e6162547d7499fdd913aaaa0b9f10c7です。都市生産、Gold購入、文化領土取得、Party移動、基本攻撃は基盤があります。District、Builder、Settler、AI、Dungeon、オンラインマルチプレイは未実装です。詳細は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md) と [STATUS.md](./STATUS.md) を参照してください。
 
 ## 1. 目的
 
@@ -16,7 +22,7 @@ Kingdomでは次のように採用します。
 
 1. Productionは都市ローカルの毎ターン産出です。
 2. Productionは選択中Projectのprogressへ投入します。
-3. Gold、Faith等による購入は全purchaseCostを払う即時取得です。
+3. KingdomではGoldを標準、mana等を対象定義で許可する購入通貨とし、全purchaseCostを払う即時取得にします。Civ6のFaithをそのままKingdomの宗教備蓄へ導入しません。
 4. 通貨で残Productionだけを埋める標準機能にはしません。
 5. 途中までのProductionは返金やGold換算をしません。
 
@@ -36,7 +42,7 @@ Kingdomでは localCultureProgress による自動取得と、Goldによる選�
 
 Civilopediaでは、移動可能ユニットは毎ターンMovement pointsを受け取り、タイル進入、攻撃、略奪などで消費し、地形が進入コストを決めると説明されています。
 
-Kingdomでは movementRemaining、actionsRemaining、charges を分離します。ユニットごとに値と消費規則を変えます。
+Kingdomでは movementRemaining、attacksRemaining、有限Charge、Ability固有コストを分離します。単一のactionsRemainingは採用せず、Unit／Party定義ごとに値と消費規則を変えます。
 
 ### 2.5 Districtによる都市の非スタック化
 
@@ -120,7 +126,7 @@ Builder相当Unitは有限buildChargesを持ち、改善建設で一Chargeを消
 
 都市Production、GoldによるUnit・Building購入、Tile購入はUnit行動と別系統です。Kingdomもこの分離を維持します。
 
-Civ6のFormationは護衛、Corps、Armyを含みますが、KingdomのFormationはParty内部のFront、Center、Rear、Support、Reserve配置を意味します。この名称差は意図的な独自分岐です。
+Civ6のFormationは護衛、Corps、Armyを含みますが、KingdomのFormationはParty内部のFront／Middle／RearとLeft／Center／Rightからなる3×3配置を意味します。この名称差は意図的な独自分岐です。
 
 詳細な採用規則は ACTION_SYSTEM.md を正本とします。
 

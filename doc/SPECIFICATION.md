@@ -1,8 +1,16 @@
 # Kingdom 目標仕様
 
-更新日: 2026-09-08
+更新日: 2026-09-13（実装状況と文書整合性を再確認）
 
 仕様状態: 基本構造確定、数値バランスと一部マルチプレイ規則は暫定
+
+## 0. 現行実装との区分
+
+この文書は目標仕様です。実装済みの判定は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md) と [STATUS.md](./STATUS.md) を正本とします。コード確認基準はmain / e0dcb3fc2e6162547d7499fdd913aaaa0b9f10c7です。
+
+現行はM1都市運営とM2のParty作成・移動・基本単体戦闘までです。Canvas 2D／DOMで表示し、複数王国の手番・配置変更・攻撃はcoreにありますが、複数王国・配置編集・戦闘UIはありません。AI、Dungeon、職業・Ability実行、加入・個別loyalty、Guard・範囲配分、勝利、オンライン通信は未実装です。
+
+以下のGameStateフィールドは目標モデルです。実装の実キー・省略項目・暫定式はCURRENT_IMPLEMENTATIONを参照してください。現行の独立ランダム地形、平均戦闘力、固定移動力、簡略HP0を目標仕様へ逆輸入しません。
 
 ## 1. ゲームの定義
 
@@ -42,7 +50,7 @@ Civilization VI を完全複製するのではなく、都市生産、領土、�
 
 ## 3. ゲーム状態の正本
 
-ゲームの全状態は GameState を正本とします。Phaserの表示オブジェクトは GameState の投影であり、ゲームルールを保持しません。
+ゲームの全状態は GameState を正本とします。描画方式にかかわらず、Canvas・DOM等の表示は GameState の投影であり、ゲームルールを保持しません。
 
 GameState は最低限、次を保持します。
 
@@ -103,7 +111,7 @@ GameState は最低限、次を保持します。
 2. タイルと建物の産出集計
 3. 都市の食料、成長
 4. 都市の生産進捗
-5. 王国の gold、faith 等の備蓄
+5. 王国の gold、mana 等の備蓄
 6. science、culture の研究進捗
 7. 領土文化進捗
 8. 完成、解禁、成長イベント
@@ -399,7 +407,7 @@ AIは次の層に分けます。
 
 ### 11.2 ターン同期
 
-ダンジョン探索は世界ターンと同期します。一つの世界ターンにつき、各遠征隊は unit 定義に基づく dungeonActions を得ます。
+ダンジョン探索は世界ターンと同期します。各遠征隊はPartyのmovementRemaining、attacksRemaining、AbilityDefinitionを共用し、世界ターン開始時に規定の回復を行います。独立した一律dungeonActionsは設けず、距離や地形の差はDungeon固有のModifierで扱います。詳細は ACTION_SYSTEM.md を正本とします。
 
 Human は自王国のフェーズ中に地上とダンジョンの双方を操作し、必要な遠征行動を終えてからターンを終了します。AI王国は同じ遠征CommandをAIが選びます。
 
@@ -528,22 +536,24 @@ WorldMap は次を扱います。
 
 切断プレイヤーを一時的にAIへ引き継ぐ Controller 交換を可能にします。
 
-## 17. 未確定事項
+## 17. 確定済み事項と残る調整
 
-1. Partyの標準人数とArmy、Expeditionの上限差
-2. Formation Slot数と配置
-3. CharacterとUnitの粒度
-4. GovernanceCapacityとGovernanceLoadの算出式
-5. religionとcultureが国外Affiliateを生む式
-6. 外国人材のRecruitment条件、相手国への影響、対抗手段
-7. manaの産出、回復、備蓄上限、地域依存
-8. Party upkeepと補給切れの罰則
-9. 時代区分と標準ターン数
-10. DominationとDungeon Conquestの具体条件
-11. 同時ターンの競合規則
-12. Dungeonの大きさと標準深度
-13. 全滅、撤退時の損失
-14. 同一Dungeonへの複数勢力侵入
-15. 地上戦とDungeon戦で共有する戦闘式の範囲
+### 17.1 確定済みの設計境界
 
-未確定事項はRulesetで変更可能な構造にし、コードへ固定値として埋め込まないでください。
+PartyはArmy／Expeditionとも最大5Unit、配置は3×3の9Slotです。UnitはIndividual、Detachment、Construct、Monster、Swarmの尺度を持ちます。地上・DungeonでUnit、Party、行動・Combat Resolverを共有し、GridはDamage配分専用です。
+
+国外人材はExposure、Affiliation、Availability、Recruitment、Integrationを経ます。加入時に人心等を支払い、相手国の対抗策を設ける構造は確定しています。初期Dungeonは一入口一遠征隊で、複数勢力同時侵入は後続です。これらを未確定の構造として再提案しません。
+
+### 17.2 未確定・調整が必要なもの
+
+1. PartyPowerのBaseAggregation、尺度混成時のcommandCost、Formation・指揮・補給Modifierの具体係数。
+2. GovernanceCapacity／Loadの本番算出式、宗教の寄与、負荷超過Penalty。現行の暫定式とは区別します。
+3. 国外候補の発生率、affinity・加入費・統合期間・防御側効果の具体係数。
+4. manaの産出・消費・備蓄上限・地域依存と各用途のバランス。
+5. Party upkeep、補給切れ、人心不足・loyaltyの猶予とPenalty係数。
+6. 時代区分・標準ターン数、Domination／Dungeon Conquest／Scenario／Scoreの具体条件。
+7. 同時ターンの競合規則、切断・再接続、複数勢力同一Dungeonの後続ルール。
+8. Dungeonの大きさ・深度、撤退・全滅・救命・戦利品喪失の具体係数。
+9. Construct／Monsterを含むHP0後の固有処理、Critical・回復・運搬・捕虜・Lootの詳細定義。
+
+未確定事項はRulesetで変更可能な構造にし、決定時は理由と確認日を残します。実装済み／未実装の区分はSTATUS、着手順はHANDOFFを更新してください。

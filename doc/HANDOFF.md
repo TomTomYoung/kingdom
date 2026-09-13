@@ -1,273 +1,102 @@
 # Kingdom 開発ハンドオフ
 
-更新日: 2026-09-08
+確認・更新日: 2026-09-13
 
-目標: Civilization VI 型帝国運営とダンジョン探索
+コード基準: main / e0dcb3fc2e6162547d7499fdd913aaaa0b9f10c7
 
-次の作業: M2 Guard・Damage Grid配分と戦闘UI
-
-## 1. 最重要方針
+次作業: 現行の状態・行動検証の不具合を回帰テスト付きで修正し、M2 Guard・Damage Grid配分と戦闘UIへ進む。
 
-現行コードへ機能を継ぎ足す前に、GameStateを正本とする構造へ移します。
+## 1. 最初に読むもの
 
-Phaser object、CharacterLayer.characters、BuildingLayer.buildingsをゲーム状態の正本にしてはいけません。人間入力、AI、将来のマルチプレイは、同じCommandとRuleSystemを使います。
+[CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md) が現在動く処理、[STATUS.md](./STATUS.md) が進捗と既知課題、[SPECIFICATION.md](./SPECIFICATION.md) が目標です。旧Phaser版は [LEGACY_IMPLEMENTATION.md](./LEGACY_IMPLEMENTATION.md) の保存資料として扱います。
 
-最初からCiv6全機能を実装しません。単一都市、単一人間王国、固定マップで生産と購入を一巡させ、その後に地上4X、ダンジョン、マルチプレイを順に載せます。
+GameState、ES Modules、Command／RuleSystem、Node.js標準テストは導入済みです。M1導入やPhaser依存除去を最初からやり直す必要はありません。描画はCanvas 2D／DOMです。現在の構成にVite／Vitestはありません。
 
-## 2. 今回追加された設計境界
+## 2. 維持する設計境界
 
-1. MilitaryPowerはscience、production、gold、mana、Unit、Party、兵站から算出します。
-2. GovernanceCapacityはreligion、culture、制度、統治人材から算出します。
-3. foodは都市人口とnativeHumanResourcesを生みます。
-4. religionとcultureは国外Affiliate、移民、専門家、英雄候補を引き寄せます。
-5. Religion、Culture、Scienceの独立勝利はありません。
-6. WorldMapの基本移動単位はPartyです。
-7. FormationはParty内部の配置であり、別Unitではありません。
-8. AIとHumanは同じParty、Formation、Resource Ruleを使います。
-9. 人心は加入と維持に使うKingdomStockpile、loyaltyは人物・Party個別状態です。
-10. Partyは最大5名で、PartyParameterに基づく一つのCombatUnitとして扱います。
-11. Civ6準拠として単一actionsRemainingを使わず、移動、攻撃、Charge、Abilityを分離します。
-12. Party内部の3×3 GridはDamage配分専用とし、Guardと攻撃側Targetingを解決します。
-13. 戦闘力差Damage、近接反撃、Downed、morale、cohesion、Leader継承を共通Combat Resolverで処理します。
+1. GameStateを正本とし、UI・AI・Remoteは同じCommandとRuleSystemを使います。描画オブジェクトやControllerへルールを分散させません。
+2. WorldMapの移動・戦闘主体はPartyです。最大5Unit、3×3配置を維持し、同じUnitを地上とDungeonへ複製しません。
+3. Gridは対象選択とDamage配分に使い、移動盤面・行動順・追加行動回数へ転用しません。
+4. 移動力、攻撃回数、有限Charge、Ability固有コストを分けます。単一actionsRemainingや独立dungeonActionsへ戻しません。
+5. 都市Productionと全額即時購入、Party行動は別です。
+6. 軍事力・統治力は派生能力、人心は備蓄、loyaltyは個別状態です。Religion・Culture・Science独立勝利は設けません。
+7. 戦闘・領土等の乱数は分離したseed付きRNGを使います。同じGameState・Command列で再現できることを守ります。
+8. 目標仕様と現在の暫定実装を区別し、平均能力・固定移動力等を完成仕様として固定しません。
 
-詳細は RESOURCE_MODEL.md、PARTY_FORMATION.md、ACTION_SYSTEM.md、DAMAGE_GRID.md、COMBAT_SYSTEM.md を参照してください。
+## 3. 現在あるもの
 
-## 3. M2進捗（2026-09-08）
+M1の都市Yield・生産キュー・購入・領土・人心の基礎収支・派生計算・JSON保存があります。UIは一王国一都市を操作します。
 
-1. 複数王国のPlayer turn順序と、一巡時だけ増えるcurrentTurnを実装しました。
-2. 最大5UnitのParty作成と3×3 Formation検証を実装しました。
-3. PartyをWorldMap上の唯一の移動主体とし、地形移動Cost、経路、占有、Void、movementRemainingを検証します。
-4. Unitのmovement、attacksRemaining、charges、abilityStatesと、ターン開始時のParty行動回復を追加しました。
-5. 共通Combat Resolver、戦闘seed乱数、近接反撃、HP0状態遷移、Leader継承を実装しました。
-6. 次はGuard、Intercept、範囲・貫通Damageと戦闘UIを実装します。
+M2には複数王国の順次手番、Party作成、3×3配置検証、経路移動、melee／rangedの単体Damage、近接反撃、HP0、Leader継承があります。
 
-## 3. M1の範囲（2026-09-08 完了）
+SetFormationとAttackPartyはHumanControllerから生成できますが、画面に配置編集・攻撃操作はありません。Guard容量、charges、abilityStates、loyalty等の保存欄を、対応システム完成と誤認しないでください。
 
-M1で実装済みの範囲は次です。
+## 4. 優先する修正と受入条件
 
-1. 固定seedの小型六角形マップ
-2. 人間王国一つ
-3. 都市一つ
-4. food、production、gold、science、mana、religion、culture、popularSupportと人的資源Pool
-5. Warrior一種類
-6. Monument一種類
-7. MilitaryPowerとGovernanceCapacityの派生計算
-8. Productionによる複数ターン生産
-8. Goldによる即時購入
-9. Cultureによる自然領土拡張
-10. Goldによる指定タイル購入
-11. ターン開始時処理
-12. セーブ可能なGameState
-13. 最低限の単体テスト
+詳細と再現結果はSTATUSのK-01〜K-10にあります。今回の文書更新ではゲームコードは修正していません。
 
-ダンジョン、戦闘AI、オンライン通信、District、宗教、外交はM1へ入れません。
+### 4.1 状態・行動の検証
 
-## 4. 実装順序
+1. K-01／K-10: defeated Partyや戦闘可能構成員のないPartyの通常移動を拒否し、次ターン回復でも復活させない。敗北後の盤上占有は死傷者・撤退規則と分けて整理する。
+2. K-02: Party作成時にも場所・占有・Unit生存状態を検証する。都市で待機する未編成Unitと主戦闘Party一体の区別を保つ。
+3. K-03: 遠隔攻撃能力のないUnitだけのPartyでrangedを発行しても、HP・RNG・行動回数を変えず拒否する。合法な遠隔攻撃は反撃なしを維持する。
+4. K-04: 全Commandの必須payload、phase、所有者、参照先を検証する。cityId欠落等で例外を外へ漏らさず、拒否時に元stateを保持する。
+5. K-09: 保存データの必須構造と参照整合性、現行版への移行を検証し、失敗時に現在の対局を壊さない。
 
-### 3.1 最小のテスト環境
+まず問題ごとの回帰テストを追加し、小さな修正単位で既存23件を維持します。Party戦闘状態、行動終了、Guard回復、占有が独立に矛盾しないことを確認してください。
 
-index.html一枚のまま作業を続けず、ES Modulesとテストを導入します。大規模なUI刷新は後回しにします。
+### 4.2 UIと都市運営
 
-推奨構成は次です。
+1. K-06: Party選択解除を用意し、領土購入へ戻れること。ロード・新規開始時は選択IDを消すか現stateへ検証する。
+2. K-07: 複数王国の設定・切替UIを入れるまで「複数人で遊べる」と表示しない。UIの固定kingdom-1／city-1参照を整理する。
+3. K-05: 同一王国内の複数都市を扱う前に、都市別作業タイルと領土帰属・取得候補を定義する。同じタイルの二重産出を防ぐ。
+4. K-08: 重複建物の生産選択と、進行中の同建物を即時購入した後のキュー・progress処理を整理しテストする。
+5. 購入価格を支払い前に表示する。内部キューを編集できるUIを作る場合もCommandを通す。
 
-1. src/core/game-state.js
-2. src/core/ruleset.js
-3. src/core/commands.js
-4. src/core/turn-engine.js
-5. src/core/rng.js
-6. src/models/kingdom.js
-7. src/models/city.js
-8. src/models/unit.js
-9. src/world/hex.js
-10. src/world/world-map.js
-11. src/systems/yield-system.js
-12. src/systems/production-system.js
-13. src/systems/territory-system.js
-14. src/ui/game-scene.js
-15. tests
+## 5. 次のM2機能: Guard・Damage Grid・戦闘UI
 
-ビルドツールはVite、テストはVitest程度で十分です。依存を増やしたくない場合も、coreはDOMとPhaserから独立したES Moduleにしてください。
+規範は [COMBAT_SYSTEM.md](./COMBAT_SYSTEM.md)、[DAMAGE_GRID.md](./DAMAGE_GRID.md)、[PARTY_FORMATION.md](./PARTY_FORMATION.md)、[ACTION_SYSTEM.md](./ACTION_SYSTEM.md) です。
 
-### 3.2 Hexを先に固定
+1. 現行のFront優先単体選択を基礎に、列の露出・攻撃方向・Targeting情報を追加する。
+2. Guard Shareと容量上限、InterceptとreactionCharges、複数候補の決定論的優先順位を実装する。
+3. Taunt、Cover、Unit／Slot狙い撃ち、Row／Column／Area／Pierceを同じResolverへ接続する。
+4. HP0・継承・morale・空Slotを攻撃ごとに更新し、次の攻撃に反映する。後列は自動で詰めない。
+5. 3×3配置編集、敵Party選択、攻撃種別、予測Damage・反撃・Guard・戦闘ログをUIへ接続する。
 
-1. Hexをimmutableなvalue objectにします。
-2. key生成を一箇所にします。
-3. cubeRoundを実装します。
-4. neighbor、distance、rangeをテストします。
-5. river edgeは正規化された共有EdgeKeyで管理します。
-6. 固定seed RNGを追加します。
+受入条件は、5Unitの一意配置、Guard容量超過禁止、単体・範囲・貫通で配分規則が明確なこと、対象非公開情報を漏らさないこと、同じ入力・RNGによる再現、失敗Commandで状態を変えないことです。保存・復元後もHP、配置、容量、行動値、戦闘RNGが一致するようテストします。
 
-### 3.3 GameStateとCommand
+PartyParameterの本来の集約、構成員依存移動力、Ability実行基盤、撤退・回復・死傷・Lootは別途実装します。現行の平均×cohesion、移動力固定2、non-individual一律shatteredを完全実装扱いにしません。
 
-最低限、次のCommandを作ります。
+## 6. M2の残り
 
-1. StartTurn
-2. SetCityProduction
-3. PurchaseCityItem
-4. PurchaseTile
-5. EndTurn
+Settler／Builder、FoundCity／改善、技術解禁、mana用途、宗教の統治力接続、Capacity不足Penalty、NPC加入・人心・個別loyalty、敵AI、蛮族、Dominationへ進みます。
 
-RuleSystemはCommandを検証し、成功時だけGameStateを更新してGameEventを返します。UIは成功可否をRuleSystemへ問い合わせ、理由を表示します。
+AIController、RemoteController、ReplayControllerは未実装です。合法手取得と実行はRuleSystemと共有し、AIだけ別ルールでstateを書き換えません。addKingdomは現状セットアップ補助であり、ゲーム内FoundCityの代替にしません。
 
-### 3.4 都市Yield
+## 7. M3以降
 
-Cityへ workedTiles と yieldSummary を持たせます。M1では市民配置を自動化します。
+地上の状態・行動が安定してからDungeon Site、EnterDungeon、DungeonState、Expedition、階層、宝箱・撤退・帰還・戦利品確保を追加します。行動はPartyのmovementRemaining、attacksRemaining、AbilityDefinitionを共用し、Dungeonの距離・地形補正として扱います。
 
-ターン開始時に次を固定順で処理します。
+carriedとsecured lootを分け、帰還時に王国の資源・装備・人材へ確定します。初期は一Dungeon一遠征隊です。オンライン・同時ターン競合はM5で扱います。
 
-1. タイルYield集計
-2. foodStorage更新と人口成長
-3. productionProgress更新
-4. gold備蓄更新
-5. scienceとculture進捗更新
-6. 領土文化進捗更新
-7. 完成イベント処理
+## 8. 検証と引継ぎの完了条件
 
-表示値と内部値に差が出ないよう、YieldBreakdownを返してください。
+```sh
+npm test
+npm run check
+npm run dev
+```
 
-### 3.5 Production
+2026-09-13の基準は23テスト成功です。npm run checkはUI一ファイルの構文確認であり、ブラウザQAではありません。今回、ブラウザ実操作は未実施です。
 
-ProductionItemDefinitionへ次を持たせます。
+変更後は該当回帰テスト、既存テスト、変更JSの構文、必要なUI実操作を確認します。UIでは新規開始→生産・購入→Party作成→移動→選択解除→領土購入→保存・復元を確認し、戦闘UI追加後は攻撃・反撃・HP0・継承も含めます。
 
-1. itemId
-2. category
-3. productionCost
-4. purchaseOptions
-5. prerequisites
-6. placementRule
-7. onComplete
+## 9. 文書更新規則
 
-CityProductionStateへ currentItemId、queue、progressByItem を持たせます。
-
-必要なテストは次です。
-
-1. Production不足なら未完成
-2. Cost到達で一回だけ完成
-3. Overflowが次項目へ入る
-4. Queueが空ならOverflowを保持しない
-5. 項目切替でprogressを保持
-6. Gold購入で即時完成
-7. Gold不足なら状態不変
-8. 即時購入で既存progressを返金しない
-9. 購入不可対象を拒否
-
-### 3.6 Territory
-
-Cultureによる自動拡張とGold購入を別Commandにします。
-
-自動拡張候補は次の条件を満たします。
-
-1. 都市領土に隣接
-2. ownerIdがnull
-3. Voidではない
-4. 飛び地にならない
-5. 他都市の占有規則に違反しない
-
-候補評価は資源、Yield、都市からの距離を使い、同点はseed付きRNGで決めます。Gold購入時は候補と価格をUIに表示します。
-
-## 5. Controller設計
-
-KingdomとControllerを分離します。
-
-1. HumanController
-
-   UI入力からCommandを生成します。
-
-2. AIController
-
-   GameStateから合法Command一覧を取得し、評価して選びます。
-
-3. RemoteController
-
-   将来のマルチプレイ入力をCommandとして受けます。
-
-4. ReplayController
-
-   CommandLogを再生します。
-
-M1ではHumanControllerだけ実装しますが、GameStateにHuman専用プロパティを埋め込まないでください。
-
-## 6. M1受入条件
-
-1. 同じseedで同じマップを生成できる。
-2. ページ読込時にConsole errorがない。
-3. ターン開始時に都市Yieldが一回だけ集計される。
-4. City production 5、Warrior cost 12なら3回目のターン開始時に完成する。
-5. 完成時の余剰Productionが次のQueue項目へ入る。
-6. Gold全額を払うと対象を即時取得できる。
-7. Gold購入が途中Productionを値引きしない。
-8. Culture進捗到達時に合法タイルを一つ自動取得する。
-9. Goldで合法タイルを一つ指定購入できる。
-10. 他国領、Void、非隣接タイルを購入できない。
-11. currentTurnが一周につき一回だけ増える。
-12. GameStateをJSONへ保存し、同じ状態へ復元できる。
-13. coreのテストがPhaserなしで実行できる。
-14. popularSupportがターン開始時に収入・維持費を一度だけ解決する。
-
-## 7. M2 地上4X
-
-M1完了後に次を追加します。
-
-1. 複数王国とPlayerSlot
-2. AIController
-3. Unit・PartyのmovementRemaining、attacksRemaining、Charge、AbilityDefinition
-4. Civ6準拠のMove、Attack、Pillage、Fortify、Build、Promote
-5. Partyの作成、分割、合流
-6. 最大5Unitを置く3×3 Damage Grid
-7. Guard、Intercept、Taunt、Targeted Attack、範囲・貫通Damage
-8. Formation Slotと編成Modifier
-9. Unit scaleClassとPartyParameter集約
-10. 戦闘力差Damage、近接反撃、HP0状態遷移
-11. morale、cohesion、Leader継承、撤退
-12. 複数Party援軍と戦闘後Loot
-6. Warrior Partyによる地上戦闘
-5. Settlerによる都市建設
-6. Builder chargeによる改善
-7. Scienceによる技術
-8. 蛮族
-13. Domination仮勝利
-
-ソロでは敵王国スロットをAIへ割り当てます。ローカルマルチでは同じスロットをHumanへ変更します。
-
-## 8. M3 ダンジョン
-
-地上4XのターンとUnit Commandが安定してから、次を追加します。
-
-1. WorldMap上のDungeon Site
-2. EnterDungeon Command
-3. DungeonStateとExpeditionState
-4. 地上Hexを再利用した一階層
-5. MoveInDungeon、AttackInDungeon、OpenChest、Retreat
-6. dungeonActionsのターン開始リセット
-7. carried loot
-8. ExitDungeonによるsecured loot化
-9. 全滅時の損失
-10. 王国のdungeonMaterials、mana、人材へ還元
-
-地上とダンジョンで別のUnitコピーを作らず、同じunitIdのmodeとlocationを切り替えます。
-
-## 9. マルチプレイへの備え
-
-1. 乱数は必ずseed付きRNGから取得します。
-2. Date.now、Math.randomをゲームルール内で使いません。
-3. CommandへcommandId、playerId、turn、phaseを持たせます。
-4. GameEventをログへ保存します。
-5. UI座標ではなくHex keyとentityIdをCommandへ入れます。
-6. 同じ初期状態とCommand列から同じ結果を再現できるようにします。
-7. AIもCommandLogへ残します。
-
-## 10. 現行コードからの移行
-
-再利用候補は Hex、Layout、カメラ操作、イベント窓、描画方法の試作です。
-
-置換対象は Player.resources、CharacterLayer.characters、Player.units、BuildingLayer.buildings、再帰的updateGameState、Math.random依存です。
-
-移行中は旧 index.html を legacy/index.html へ退避するか、main上で動作比較できる状態を保ってください。旧コードを削除するコミットと新しいcore導入を同時に行わないでください。
-
-## 11. 文書更新規則
-
-1. ゲーム規則を変えたら SPECIFICATION.md を更新します。
-2. Civ6との差を変えたら CIV6_REFERENCE.md を更新します。
-3. 実装段階が変わったら STATUS.md を更新します。
-4. 次作業と受入条件が変わったら HANDOFF.md を更新します。
-5. 未確定事項を確定したら、決定日と理由をコミットメッセージまたはDecision Logへ残します。
+1. コードの実挙動・UI公開範囲が変わったらCURRENT_IMPLEMENTATIONを更新する。
+2. 進捗・未修正課題・検証結果が変わったらSTATUSを更新する。
+3. 次作業と受入条件が変わったらHANDOFFを更新する。
+4. ゲーム規則の決定を変える場合は対応する目標仕様とSPECIFICATIONを更新し、決定日と理由を残す。
+5. READMEの案内と目標文書冒頭の実装状況も同時にそろえる。
+6. LEGACY_IMPLEMENTATIONは旧版の保存資料として維持し、現在の課題を書き足さない。
+7. コード確認の基準SHA、確認日、テスト実施範囲、未検証項目を記録する。

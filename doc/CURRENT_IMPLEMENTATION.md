@@ -1,135 +1,169 @@
 # Kingdom 現行実装仕様
 
-この文書は、目標仕様を「Civilization VI 型帝国運営＋ダンジョン探索」へ再編する前の実装調査を保存したものです。
+確認・更新日: 2026-09-13
 
-調査対象: index.html、コミット 297199396d27a88392dbe9423e96fb7388f30593
+コード基準: main / e0dcb3fc2e6162547d7499fdd913aaaa0b9f10c7（2026-09-08、PR #1マージ）。これは調査対象のコードコミットであり、この文書を更新したコミットではありません。
 
-今後の規範仕様は SPECIFICATION.md を参照してください。
+## 1. 範囲と現在地
 
-更新日: 2026-09-08
+現在の実装はM1の都市運営ループと、M2のParty作成・移動・基本戦闘です。画面から使える範囲とcore APIだけの範囲を分けて記録します。「内部実装済み」は目標仕様の全受入条件を満たした意味ではありません。
 
-対象: main ブランチ、HEAD 297199396d27a88392dbe9423e96fb7388f30593
+目標仕様は [SPECIFICATION.md](./SPECIFICATION.md)、未修正課題と検証結果は [STATUS.md](./STATUS.md)、次作業は [HANDOFF.md](./HANDOFF.md) を参照してください。旧Phaser版は [LEGACY_IMPLEMENTATION.md](./LEGACY_IMPLEMENTATION.md) に保存しています。
 
-## 1. この文書の範囲
+## 2. 実行環境と構成
 
-この文書は、index.html に実装されている現行プロトタイプを仕様として記録したものです。将来構想を確定する企画書ではありません。コード上に型や処理の骨格だけがある機能も含むため、実際に操作可能かどうかは STATUS.md を参照してください。
+エントリーは [index.html](../index.html) です。標準Canvas 2DとDOMを使い、PhaserやCDNを読み込みません。外部npm依存、ビルド工程、バックエンドはありません。
 
-## 2. プロジェクト概要
+リポジトリルートで次を実行し、http://localhost:4173/ を開きます。
 
-ブラウザで動作する、ポイントトップ型六角形グリッドのターン制ストラテジーです。地形から資源を得て人口を増やし、領土、ユニット、建物を拡張する方向の試作になっています。外部ビルド工程はなく、HTML、CSS、JavaScript が index.html 一枚に収録されています。
+```sh
+npm run dev
+```
 
-## 3. 実行環境
+このコマンドはPython 3のHTTPサーバーを使います。代替の静的HTTPサーバーでも構いません。ES Modulesと /src/... の絶対パスを使うため、HTMLファイルの直接オープンやサブディレクトリ配信を標準起動手順にしません。
 
-1. ブラウザで index.html を開きます。
-2. Phaser 3.55.2 を cdnjs から読み込みます。
-3. ゲーム描画領域は 800 × 600 ピクセルです。
-4. Phaser.AUTO により WebGL または Canvas が選択されます。
-5. サーバー、データベース、保存機能、ビルドツール、パッケージ管理はありません。
-6. CDNへ接続できない環境では起動しません。
+検証用コマンドは次です。
 
-## 4. 画面と操作
+```sh
+npm test
+npm run check
+```
 
-画面中央に六角形マップを表示し、左上にターン、プレイヤー、資源、人口を表示します。左側に領土拡張、ユニット作成、建物建設の選択肢があり、右上付近にターン終了があります。
+テストはNode.js標準のnode:testです。Vite、Vitestは導入されていません。確認環境はNode.js v24.19.0、npm 11.9.0、Python 3.12.14です。最低対応バージョンの宣言はまだありません。
 
-操作として実装されている入口は次のとおりです。
+1. src/core: GameState、Ruleset、Command、RuleSystem、ターン、HumanController、RNG
+2. src/models: Kingdom、City、Unit、Party
+3. src/world: Hex座標、共通Edge key、固定seedマップ
+4. src/systems: Yield、生産、領土、移動、戦闘
+5. src/ui: Canvas描画とDOM入力
+6. tests: game、hex、party、combatの4ファイル
+7. legacy/index.html: 旧Phaser版。現行起動経路では使いません。
 
-1. 左クリックでタイルまたはユニットを選択します。
-2. 右クリックまたは選択後の左クリックで、到達可能範囲内への移動を試みます。
-3. マウスドラッグでカメラをスクロールします。
-4. マウスホイールでズームします。
-5. Space キーまたはターン終了表示でプレイヤーフェーズを終了します。
-6. マウス位置の q、r、s 座標を画面下部に表示します。
-7. ランダムイベント発生時は HTML のイベント窓を表示し、前ページ、次ページ、閉じるを操作できます。
+## 3. UIから使える機能
 
-ズーム値には上下限が設定されていません。ブラウザの右クリックメニュー抑止も実装されていません。
+固定seed 117で、一王国kingdom-1、一都市city-1を生成します。初期人口は2、開始時備蓄はGold 100、人心30、mana 0です。画面初期化時にStartTurnを実行するため、表示される備蓄は第1ターンの収支反映後です。初期UnitとPartyはありません。
 
-## 5. マップ仕様
+画面には王領地図、国庫と研究・文化進捗、軍事力・統治力と負荷、都市人口とYield、食料と領土文化、都市生産、Party、ターン終了、セーブ・ロード・新規開始があります。
 
-座標はキューブ座標 q、r、s を使い、原則として q + r + s = 0 を保ちます。ポイントトップ型レイアウトです。
+戦士とモニュメントの生産・Gold購入、未所有の合法タイル購入、首都にいる未編成Unit最大5体のParty化、Party選択と隣接Hexへの1歩移動を操作できます。
 
-mapSize は 11、実プレイ領域の最大絶対座標は 5です。外周一層は Void タイルとして生成されます。地形は Plain、Hill、Grassland、Forest から一様ランダムに選ばれます。シード固定はありません。
+Party選択中のタイルクリックは移動として処理されます。選択解除の操作はなく、そのままでは領土購入へ戻れません。複数王国切替、戦闘、3×3配置編集、生産キュー編集、JSONファイル入出力のUIはありません。カメラ移動、ズーム、旧版の文章イベント窓も移植されていません。
 
-地形の現行データは次のとおりです。
+## 4. GameStateとCommand
 
-1. Plain: 表示名は平原、food 1、移動コスト 1
-2. Hill: 表示名は丘陵、gold 1、移動コスト 2
-3. Grassland: 表示名は草原、food 1、移動コスト 1
-4. Forest: 表示名は森林、wood 1、移動コスト 2
-5. Void: 外周用、移動コスト Infinity
+GameStateはschemaVersion 1、rulesetVersion m1.0です。主な実キーはphase、world、turnOrder、activePlayerId、activePlayerIndex、kingdoms、cities、units、parties、rng、nextIds、commandLog、eventLogです。目標文書のcurrentPhase、worldMap、playerSlots等と同名とは限りません。
 
-地形色は Grassland が黄緑、Forest が緑、Hill が茶、その他が灰色です。Plain は専用分岐がないため灰色になります。Sea 用の青色分岐はありますが、Sea データはありません。
+RuleSystem.execute(original, command)は成功時に複製したstateとeventsを返し、検証で拒否した場合は元stateを返します。commandIdの重複、playerId、手番、turnを共通検証します。全payloadのスキーマ検証や全Command共通のphase検証は未完成です。
 
-川または壁を各辺10%で生成しようとする処理があります。川は移動コスト +2、壁は +1000 の想定です。ただし現行実装では生成した辺情報がタイルに保存されず、実ゲームには反映されません。
+現在のCommandは9種類です。
 
-## 6. プレイヤーと領土
+1. StartTurn
+2. SetCityProduction
+3. PurchaseCityItem
+4. PurchaseTile
+5. EndTurn
+6. CreateParty
+7. SetFormation
+8. MoveParty
+9. AttackParty（attackTypeはmeleeまたはranged）
 
-プレイヤーは3人作られ、IDは 0、1、2 です。開始地点は次の3座標です。
+HumanControllerは上記のCommandを生成します。AIController、RemoteController、ReplayController、合法手一覧APIはありません。
 
-1. 0, 0, 0
-2. 5, -5, 0
-3. -5, 5, 0
+addKingdomは別王国とその都市を追加できるセットアップ用関数です。Command経由のFoundCityや同一王国内の複数都市運営、プレイヤー設定画面ではありません。
 
-各プレイヤーは首都を中心とする半径2相当の領土を初期取得します。領土取得時に Tile.owner へプレイヤーIDを記録します。領土の所有色や境界線は描画されません。また、開始地点同士の距離に対して初期領土が大きく、重複タイルは後に処理されたプレイヤーの owner で上書きされる一方、各プレイヤーの territory 配列には残ります。
+## 5. ターン
 
-## 7. 資源と人口
+全王国がturnOrderに従って順次行動します。EndTurnで次の王国へ移り、一巡したときだけcurrentTurnを1増やして全王国の開始処理を実行します。lastProcessedTurnで収支の重複処理を防ぎます。
 
-プレイヤーの基本資源は food、production、gold、science で、初期値はいずれも0です。地形データに現れる wood は、収集時に動的にプレイヤー資源へ追加されます。resourcesJSON に religion と初期 value がありますが、Player 初期化には反映されません。
+processTurnStartの現行順序は次です。
 
-ターン開始時、全プレイヤーが所有領土の全タイルから資源を得ます。人口の半分を切り捨てた値が science に加算されます。
+1. 王国人心の維持費支払いと収入加算
+2. 都市Yieldの計算
+3. foodStorage加算と最大1回の人口成長
+4. 都市Production投入と完成・overflow処理
+5. Gold・mana備蓄、science・culture進捗への加算
+6. localCultureProgress加算と自然領土取得
+7. Partyの移動力、攻撃回数、reactionCharges、行動状態とUnitのGuard容量の回復
+8. 軍事力・統治力・統治負荷の再計算
 
-人口成長は food が population × 2 以上の場合に自動実行され、必要量を消費して人口が1増えます。各ターンにつき各プレイヤー最大1回です。
+Dungeon・World Resolution、勝利判定、オートセーブ、自然HP回復、継続Status Effectの解決はありません。敗北Partyにも行動値が回復する問題はSTATUSのK-01を参照してください。
 
-現行の消費予定は次のとおりです。
+## 6. マップ・領土
 
-1. ユニット作成: production 10
-2. 建物建設: production 20
-3. 技術研究: Technology.cost 相当の science
-4. 領土拡張: gold 10 を要求する意図が読み取れますが、現行コードでは日本語キーを参照し、消費処理もありません。
+半径3のpointy-top Hexマップで、全37タイルです。平原、草原、森林、丘陵、霊脈からseed付きで地形を選び、外周には確率でVoidを置きます。連続地形生成はまだなく、目標の連続性ある地形とは異なります。
 
-production を産出する地形または建物効果は未実装です。
+初期領土は中心と隣接6タイルです。所有者はTile.ownerIdを正本とします。文化取得・Gold購入の候補は自国領のいずれかに隣接する未所有・非VoidのHexです。都市別の所属範囲や最大取得半径はありません。
 
-## 8. ユニット、建物、技術
+文化取得コストは1タイル10です。候補評価は地形Yield合計×3－都市中心からの距離で、同点は領土用RNGで選びます。蓄積が十分なら同じ開始処理で複数取得します。候補がなければ文化進捗を残します。
 
-Unit は type と hex、Building は type と hex、Technology は name、cost、effects を保持する最小クラスです。
+Gold価格は20＋中心からの距離×5＋地形Yield合計×2です。Gold購入はlocalCultureProgressを消費しません。購入前の価格プレビューは未実装です。
 
-サンプルキャラクターとして戦士Aと労働者BがJSONにあります。戦士Aは hp 100、attack 10、movement 2、労働者Bは hp 50、attack 1、movement 2です。攻撃、待機、建設のアクション定義と関数がありますが、画面操作やターン処理には接続されていません。
+Hex.round、neighbor、distance、range、正規化Edge keyがあります。riverEdgesは空配列で、河川・道路・ZoCの効果はありません。経路はCommandへ渡す形で、現行版にA*や到達範囲探索はありません。
 
-CharacterLayer は起動時に P 表示のキャラクターを3体ランダム配置します。その後、サンプルキャラクター2体、敵プレイヤー1体、蛮族1体も追加します。BuildingLayer は開始時に中央へ都市を1件表示します。
+## 7. Yield・人口・生産
 
-ユニットとキャラクターに別の管理配列があり、現時点では統一されていません。建物も Player.buildings と BuildingLayer.buildings の二重管理です。
+Yieldはfood、production、gold、science、mana、religion、cultureです。市民配置は自国の全非Void所有タイルを評価して人口数だけ選びます。都市中心にfood 2、production 1、gold 2、science 1、culture 1を固定加算し、モニュメントはculture 2を加算します。
 
-## 9. ターン進行
+都市のlastYieldBreakdownにタイル・建物・中心・合計を保存します。UIは合計Yieldを表示し、完全な内訳表示はありません。食料成長閾値は12＋現在人口×6で、成長時にpopulationとhumanResources.nativeを1増やします。
 
-状態名として TURN_START、PLAYER_PHASE、OTHER_PLAYERS_PHASE、CPU_PHASE、TURN_END があります。
+Productionは都市ローカルです。currentItemId、queue、progressByItemを持ち、費用到達時に完成、余剰を次キューへ投入し、キューが空なら余剰を捨てます。対象切替で途中進捗を保持します。
 
-現在実際に使われる流れは、TURN_START から PLAYER_PHASE へ入り、ターン終了操作のたびに currentPlayerIndex を進め、3人全員の PLAYER_PHASE が終わると currentTurn を増やして TURN_START に戻る形です。
+生産可能な定義はwarrior（Production 12／Gold 48）とmonument（Production 20／Gold 80）のみです。Unitは都市中心へ生成されます。Gold購入は全額即時払いで、生産進捗を減額・返金しません。
 
-OTHER_PLAYERS_PHASE、CPU_PHASE、TURN_END の処理は存在しますが、現在の endPlayerPhase からは到達しません。そのため enemyTurn と barbarianTurn は通常の進行では呼ばれません。
+建設済み建物の重複購入は拒否しますが、生産キュー側の重複建設や、進行中の同建物を購入した後のキュー整理はありません。建物配列は重複させずとも、生産力を使って完了イベントを出し得ます。
 
-PLAYER_PHASE に入るたび30%の確率で ancient-ruins イベントが発生します。内容は3ページの文章表示だけで、選択肢や報酬、ゲーム状態への効果はありません。
+## 8. 人心・派生能力・人的資源
 
-## 10. 移動と経路探索
+Kingdom.stockpilesはgold、mana、popularSupport、progressはscience、cultureです。宗教Yieldは集計されますが備蓄も進捗もなく、現在の統治力計算へ接続されていません。manaの消費先や技術の解禁処理もありません。
 
-到達範囲探索は残移動力を持つ幅優先探索です。経路探索は独自 PriorityQueue を使った A* 形式で、ヒューリスティックはキューブ座標距離です。Void は通行不能相当です。
+人心は王国の固定supportIncome（初期1）とsupportUpkeep（初期0）だけを処理します。支払額は収入加算前の保有量と維持費の小さい方で、その後に収入を加えて上限100へ制限します。人物別維持費集計、supportDebt、loyalty変化、募集はありません。
 
-ただし、現行キャラクターの所有者表現が数値プレイヤーIDと一致せず、通常操作では自軍ユニットとして選択できません。さらに経路復元結果に開始地点が含まれ、その地点のコストまで消費するため、移動可能量の計算が不正確です。
+派生計算はsrc/models/kingdom.jsにあります。現行式は次です。
 
-## 11. イベント
+```text
+militaryPower =
+  floor(scienceProgress / 5) + totalCityProduction
+  + floor(gold / 25) + floor(mana / 5)
+  + militaryHumanResources * 2 + ownedUnitCount * 4
 
-イベント定義は DataManager にJSONとして読み込まれます。現行イベントは ancient-ruins 一件です。ページ送り、戻る、閉じるができます。イベント表示中も Phaser 側の入力やターン終了を止める状態管理はありません。
+governanceCapacity =
+  floor(cultureProgress / 5) + institutions * 3
+  + governanceHumanResources * 2 + buildingCount
 
-## 12. 内部構造
+governanceLoad =
+  ownedTileCount + cityCount * 2 + totalPopulation + buildingCount
+```
 
-主な責務は次のように分かれています。
+Capacity不足のPenaltyやUnitの徴募・登用はありません。人的資源はnative、military、governance、specialists、heroes、affiliates、migrantsのフィールドを持ちますが、現在自動増加するのは人口成長時のnativeだけです。数値係数の一部はRulesetでなくコードに固定されています。
 
-1. SceneManager: シーン切替の薄いラッパー。現状未使用
-2. EventManager: Phaser EventEmitter のラッパー。現状未使用
-3. GUIManager: GUI要素管理。現状未使用
-4. DataManager: 埋め込みJSONの読込と資源名変換
-5. Hex、Layout、PriorityQueue: 座標変換と探索
-6. TileLayer、BuildingLayer、CharacterLayer、GUILayer: 描画と画面上のオブジェクト管理
-7. Tile、Player、Unit、Building、Technology: ゲームデータ
-8. GameScene: 初期化、入力、UI、ターン、イベント、AI、移動を集中管理
+## 9. Party・Formation・移動
 
-同じ目的の旧コードが大量にコメントアウトされ、GameScene 内には TileLayer と重複する createGrid、getMovementCost、drawHexagon も残っています。現行の保守単位は index.html 一ファイルです。
+CreatePartyは同じ場所の自国未所属Unitを1〜5体まとめます。実キーはid、unitIds、formation、movementMaximum、attacksMaximumです。formationはfront/middle/rearとleft/center/rightを組み合わせたSlotIdからunitIdへの辞書です。初期配置はfront-left、front-center、front-right、middle-left、middle-centerの順です。
 
+SetFormationは9Slotへの全構成Unitの一度ずつの配置を検証します。編成時の占有・生存検証、解散・分割・合流、Leader手動変更、敵隣接時の編成制限、配置編集UIはありません。
+
+Partyは移動力2、攻撃回数1で初期化されます。最も遅い構成員から移動力を計算する処理はありません。移動コストは平原・草原・霊脈1、森林・丘陵2です。指定経路の全段階で隣接性・非Void・他Party占有・必要移動力を検証し、成功時に所属Unitのlocationも更新します。
+
+Unitにはcharges、abilityStates、loyalty、supportUpkeep、statusEffects等の保存欄がありますが、対応するAbilityや忠誠システムが使えるわけではありません。
+
+## 10. 基本戦闘（core APIのみ）
+
+AttackPartyは敵Partyへのmelee／rangedを扱います。通常UIに敵王国や攻撃操作はなく、テスト・API用の基盤です。
+
+Party戦闘力は戦闘可能Unitの対象能力の算術平均×(0.5＋cohesion/200)です。Leader、Formation、補給、地形等を含む目標PartyParameterの完全な集約ではありません。
+
+基礎Damageは30×exp(0.04×戦闘力差)×seed乱数0.85〜1.15を1〜90へ制限して丸め、対象Unitのarmorを引き、最低1を適用します。選択順はfront→middle→rear、各行内はcenter→left→rightで、最初の戦闘可能Unit一体へ適用します。空いた列だけの後方露出や複数UnitへのDamage配分はありません。
+
+攻撃側は攻撃回数1を消費し、移動力0・activationState endedになります。近接では生き残った防御Partyが反撃し、遠隔には標準反撃がありません。射線・攻撃能力の所持・撃破後前進の検証は未完成です。
+
+HP0ではscaleClassがindividualならdowned、それ以外は一律shatteredです。現行定義はdetachmentのwarriorだけで、他scaleClassの完全な状態遷移は未実装です。
+
+Damageに応じてmoraleを下げ、Leader喪失時は生存UnitのcommandContribution降順・ID昇順で継承者を選び、追加でmoraleを10下げます。継承者がいなければPartyをdefeatedにします。morale 0の撤退、Command Check、回復、捕虜、Lootはありません。
+
+Guard容量の保存・ターン回復はありますが、Guard／Intercept／Taunt／Targeted Attack／範囲・貫通の解決はありません。
+
+## 11. セーブと検証範囲
+
+serializeGameState／restoreGameStateでJSON化・復元します。UIはlocalStorageのkingdom-m1-save一枠を使用します。旧M1セーブへのParty・turnOrder・戦闘フィールド等の補完がありますが、任意の破損セーブへの網羅的検証ではありません。
+
+2026-09-13にnpm testで23件成功、npm run check成功を確認しました。今回のブラウザ実操作・描画検証は未実施です。既存テストの成功で未実装項目や既知不具合まで解決済みとは扱いません。

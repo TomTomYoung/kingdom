@@ -1,24 +1,35 @@
 # Kingdom 開発資料
 
-更新日: 2026-09-08
+確認・更新日: 2026-09-13
 
 目標: Civilization VI 型の帝国運営、Party・Formation、Dungeon探索を統合したターン制ストラテジー
 
+## 現在地と読み方
+
+mainのコード確認基準は e0dcb3fc2e6162547d7499fdd913aaaa0b9f10c7 です。M1都市運営は実装済み、M2はParty・移動・基本戦闘の途中です。23テスト成功を確認しましたが、現行不具合と未実装項目が残っています。今回のブラウザ実操作確認は未実施です。
+
+まずCURRENT_IMPLEMENTATIONで現行の実挙動、STATUSで実装段階と未修正課題、HANDOFFで次作業を確認してください。画面から使える機能とcore APIだけの機能を区別します。
+
+SPECIFICATIONと各システム仕様は目標です。記載された機能・受入条件がすべて実装済みとは限りません。旧一枚HTMLの調査と旧P0はLEGACY_IMPLEMENTATIONへ保存しました。
+
+起動はリポジトリルートで `npm run dev`、確認は `npm test` と `npm run check` です。現行はCanvas 2D／DOMとES Modulesで、Phaser／Vite／Vitestは使っていません。
+
 ## 文書
 
-1. [SPECIFICATION.md](./SPECIFICATION.md): 正規仕様
+1. [SPECIFICATION.md](./SPECIFICATION.md): 目標となる規範仕様
 2. [RESOURCE_MODEL.md](./RESOURCE_MODEL.md): 軍事力、統治力、mana、人的資源
 3. [PARTY_FORMATION.md](./PARTY_FORMATION.md): PartyとFormation
 4. [POPULAR_SUPPORT.md](./POPULAR_SUPPORT.md): 人心、加入、忠誠、維持
 5. [ACTION_SYSTEM.md](./ACTION_SYSTEM.md): Civ6準拠の移動、攻撃、チャージ、特殊行動
 6. [DAMAGE_GRID.md](./DAMAGE_GRID.md): Party内9グリッドとダメージ配分
 7. [COMBAT_SYSTEM.md](./COMBAT_SYSTEM.md): 戦闘力、ダメージ、反撃、負傷、士気、回復
-8. [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md): 現行コード調査
-9. [STATUS.md](./STATUS.md): 進捗と差分
-10. [HANDOFF.md](./HANDOFF.md): 次作業
-11. [CIV6_REFERENCE.md](./CIV6_REFERENCE.md): Civ6準拠点と独自分岐
+8. [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md): 現行ES Modules版の挙動・API・UI・制約
+9. [STATUS.md](./STATUS.md): 実装段階・現行の既知課題・テスト結果
+10. [HANDOFF.md](./HANDOFF.md): 次作業・修正優先度・受入条件
+11. [CIV6_REFERENCE.md](./CIV6_REFERENCE.md): Civ6準拠点と独自分岐の調査記録
+12. [LEGACY_IMPLEMENTATION.md](./LEGACY_IMPLEMENTATION.md): 旧Phaser版の調査・旧不具合（保存資料）
 
-## 確定した方向
+## 確定した目標方針（実装完了を意味しません）
 
 1. ソロでは敵対王国をAIが操作します。
 2. マルチでは各王国をHumanまたはAIへ割り当てます。

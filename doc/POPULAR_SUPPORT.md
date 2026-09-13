@@ -1,8 +1,16 @@
 # Kingdom 人心・加入・忠誠仕様
 
-更新日: 2026-09-08
+更新日: 2026-09-13（実装状況と文書整合性を再確認）
 
 仕様状態: 基本構造確定、数値係数と離反猶予ターンは暫定
+
+## 0. 現行実装との区分
+
+本文は目標の加入・維持・忠誠モデルです。現行詳細は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md)、進捗は [STATUS.md](./STATUS.md) を参照してください。コード確認基準はmain / e0dcb3fc2e6162547d7499fdd913aaaa0b9f10c7です。
+
+現在はKingdom.stockpiles.popularSupport（初期30）、固定supportIncome（初期1）、supportUpkeep（初期0）、上限100だけを処理します。支払いは収入加算前の保有量と維持費の小さい方で、その後に収入を加算します。イベント名はPopularSupportResolvedです。
+
+Unitにloyalty: 100とsupportUpkeep: 0がありますが、王国維持費への構成員別集計、忠誠変動、supportDebt、優先度、NPC加入、候補・契約・affinity、国外引き抜きは未実装です。Partyのloyalty・人心維持フィールドもまだありません。以下のCommand・Event・受入条件を現在利用可能なAPI一覧と誤認しないでください。
 
 ## 1. 目的
 

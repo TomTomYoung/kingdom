@@ -1,8 +1,18 @@
 # Kingdom 9グリッド・ダメージ配分仕様
 
-更新日: 2026-09-08
+更新日: 2026-09-13（実装状況と文書整合性を再確認）
 
 仕様状態: 基本構造確定、数値係数はCOMBAT_SYSTEM.mdに従う
+
+## 0. 現行実装との区分
+
+本文は目標のDamage配分規則です。現行は最大5Unitの3×3配置検証とFront優先の単体選択までです。コード確認基準はmain / e0dcb3fc2e6162547d7499fdd913aaaa0b9f10c7です。
+
+実装のformationはSlotIdからunitIdへの辞書で、SlotIdはfront-left、front-center、front-right、middle-left、middle-center、middle-right、rear-left、rear-center、rear-rightです。本文のgridSlots等を含むFormation状態全体はまだありません。
+
+対象選択はfront→middle→rear、各行center→left→rightの固定順です。Front全体を優先する簡略処理で、空いた列からの露出、attackVector、Guard、Intercept、Taunt、狙い撃ち、範囲・貫通の配分は未実装です。配置編集UIもありません。
+
+実装状況は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md)、次作業は [HANDOFF.md](./HANDOFF.md) を参照してください。以下の受入条件は完成条件であり、現在のテストがすべて保証するものではありません。
 
 ## 1. 目的
 
@@ -310,4 +320,4 @@ Dungeon戦闘では同じGridを詳細表示し、対象Slot、Guard対象、範
 13. WorldMapとDungeonで同じDamage Resolverを使用する。
 14. Guard Capacityを超えて肩代わりできない。
 15. 前衛がDownedしても後列を自動で前へ詰めない。
-14. 同じGameState、Command、RNG状態から同じ配分結果になる。
+16. 同じGameState、Command、RNG状態から同じ配分結果になる。
