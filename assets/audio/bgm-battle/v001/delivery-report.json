@@ -1,0 +1,27 @@
+{
+  "assetId": "bgm-battle",
+  "sourceTool": "AIMusic",
+  "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
+  "sampleRate": 44100,
+  "channels": 2,
+  "seconds": 13.333333333333334,
+  "derivation": {
+    "operation": "WAV to Ogg Vorbis",
+    "encoder": "ffmpeg libvorbis q3",
+    "ffmpegVersion": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
+    "loopStartFrame": 0,
+    "loopEndFrame": 588000,
+    "originalWAV": {
+      "file": "song.wav",
+      "bytes": 2352044,
+      "sha256": "683593ee077091fdda9b5ac82e645bf8b68414d14ddf1a7ef781bd5ba388f765"
+    }
+  },
+  "listeningReviewed": false,
+  "integrated": false,
+  "delivery": {
+    "path": "assets/audio/bgm-battle/v001/audio.ogg",
+    "bytes": 139830,
+    "sha256": "504bdf5fe7328daa4c507abc7d3626d23c796a83fdbf2b44dfab0eed472b63ad"
+  }
+}

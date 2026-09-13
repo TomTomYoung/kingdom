@@ -1,0 +1,749 @@
+{
+  "schemaVersion": "paint-job/1",
+  "jobId": "unit-warrior-v001",
+  "idempotencyKey": "unit-warrior-v001",
+  "rendererProfile": "pixel-v0.1",
+  "source": {
+    "kind": "blank",
+    "documentId": "unit-warrior-v001",
+    "width": 48,
+    "height": 48,
+    "mode": "pixel",
+    "background": "transparent",
+    "colorSpace": "srgb"
+  },
+  "batches": [
+    {
+      "batchId": "draw-0",
+      "expectedRevision": 0,
+      "commands": [
+        {
+          "type": "layer.add",
+          "id": "base",
+          "name": "地面・下地"
+        },
+        {
+          "type": "shape.ellipse",
+          "layerId": "base",
+          "x": 8,
+          "y": 39,
+          "width": 32,
+          "height": 6,
+          "fill": "#213932ff"
+        },
+        {
+          "type": "layer.add",
+          "id": "body",
+          "name": "戦士の装備"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 17,
+          "y": 19,
+          "width": 13,
+          "height": 1,
+          "fill": "#713f45ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 17,
+          "y": 20,
+          "width": 13,
+          "height": 1,
+          "fill": "#713f45ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 17,
+          "y": 21,
+          "width": 14,
+          "height": 1,
+          "fill": "#713f45ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 16,
+          "y": 22,
+          "width": 15,
+          "height": 1,
+          "fill": "#713f45ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 16,
+          "y": 23,
+          "width": 15,
+          "height": 1,
+          "fill": "#713f45ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 16,
+          "y": 24,
+          "width": 16,
+          "height": 1,
+          "fill": "#713f45ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 16,
+          "y": 25,
+          "width": 16,
+          "height": 1,
+          "fill": "#713f45ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 16,
+          "y": 26,
+          "width": 16,
+          "height": 1,
+          "fill": "#713f45ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 16,
+          "y": 27,
+          "width": 16,
+          "height": 1,
+          "fill": "#713f45ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 15,
+          "y": 28,
+          "width": 18,
+          "height": 1,
+          "fill": "#713f45ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 15,
+          "y": 29,
+          "width": 18,
+          "height": 1,
+          "fill": "#713f45ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 15,
+          "y": 30,
+          "width": 18,
+          "height": 1,
+          "fill": "#713f45ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 15,
+          "y": 31,
+          "width": 18,
+          "height": 1,
+          "fill": "#713f45ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 15,
+          "y": 32,
+          "width": 19,
+          "height": 1,
+          "fill": "#713f45ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 15,
+          "y": 33,
+          "width": 19,
+          "height": 1,
+          "fill": "#713f45ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 15,
+          "y": 34,
+          "width": 19,
+          "height": 1,
+          "fill": "#713f45ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 14,
+          "y": 35,
+          "width": 21,
+          "height": 1,
+          "fill": "#713f45ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 14,
+          "y": 36,
+          "width": 21,
+          "height": 1,
+          "fill": "#713f45ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 14,
+          "y": 37,
+          "width": 10,
+          "height": 1,
+          "fill": "#713f45ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 18,
+          "y": 29,
+          "width": 7,
+          "height": 11,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 26,
+          "y": 29,
+          "width": 7,
+          "height": 11,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 16,
+          "y": 39,
+          "width": 9,
+          "height": 4,
+          "fill": "#433d36ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 27,
+          "y": 39,
+          "width": 9,
+          "height": 4,
+          "fill": "#433d36ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 18,
+          "y": 18,
+          "width": 15,
+          "height": 14,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 20,
+          "y": 19,
+          "width": 10,
+          "height": 11,
+          "fill": "#8a9b98ff"
+        },
+        {
+          "type": "shape.line",
+          "layerId": "body",
+          "x": 21,
+          "y": 20,
+          "x2": 27,
+          "y2": 20,
+          "color": "#d9d9b5ff",
+          "size": 1
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 20,
+          "y": 30,
+          "width": 10,
+          "height": 3,
+          "fill": "#785942ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 24,
+          "y": 30,
+          "width": 3,
+          "height": 2,
+          "fill": "#d5b363ff"
+        },
+        {
+          "type": "shape.ellipse",
+          "layerId": "body",
+          "x": 17,
+          "y": 4,
+          "width": 17,
+          "height": 15,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.ellipse",
+          "layerId": "body",
+          "x": 19,
+          "y": 5,
+          "width": 13,
+          "height": 12,
+          "fill": "#9baea7ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 19,
+          "y": 12,
+          "width": 14,
+          "height": 5,
+          "fill": "#414b4bff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 24,
+          "y": 11,
+          "width": 3,
+          "height": 7,
+          "fill": "#c4d0b5ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 20,
+          "y": 13,
+          "width": 3,
+          "height": 2,
+          "fill": "#182b32ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 28,
+          "y": 13,
+          "width": 3,
+          "height": 2,
+          "fill": "#182b32ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 23,
+          "y": 3,
+          "width": 6,
+          "height": 3,
+          "fill": "#a86253ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 15,
+          "y": 17,
+          "width": 2,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 12,
+          "y": 18,
+          "width": 6,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 9,
+          "y": 19,
+          "width": 9,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 7,
+          "y": 20,
+          "width": 12,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 7,
+          "y": 21,
+          "width": 13,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 7,
+          "y": 22,
+          "width": 13,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 7,
+          "y": 23,
+          "width": 13,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 7,
+          "y": 24,
+          "width": 13,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 7,
+          "y": 25,
+          "width": 12,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 7,
+          "y": 26,
+          "width": 12,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 7,
+          "y": 27,
+          "width": 12,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 7,
+          "y": 28,
+          "width": 12,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 7,
+          "y": 29,
+          "width": 12,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 7,
+          "y": 30,
+          "width": 11,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 7,
+          "y": 31,
+          "width": 11,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 8,
+          "y": 32,
+          "width": 10,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 9,
+          "y": 33,
+          "width": 8,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 10,
+          "y": 34,
+          "width": 6,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 11,
+          "y": 35,
+          "width": 4,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 12,
+          "y": 36,
+          "width": 2,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 14,
+          "y": 20,
+          "width": 2,
+          "height": 1,
+          "fill": "#687c70ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 11,
+          "y": 21,
+          "width": 5,
+          "height": 1,
+          "fill": "#687c70ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 9,
+          "y": 22,
+          "width": 8,
+          "height": 1,
+          "fill": "#687c70ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 9,
+          "y": 23,
+          "width": 8,
+          "height": 1,
+          "fill": "#687c70ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 9,
+          "y": 24,
+          "width": 8,
+          "height": 1,
+          "fill": "#687c70ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 9,
+          "y": 25,
+          "width": 7,
+          "height": 1,
+          "fill": "#687c70ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 9,
+          "y": 26,
+          "width": 7,
+          "height": 1,
+          "fill": "#687c70ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 9,
+          "y": 27,
+          "width": 7,
+          "height": 1,
+          "fill": "#687c70ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 9,
+          "y": 28,
+          "width": 7,
+          "height": 1,
+          "fill": "#687c70ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 9,
+          "y": 29,
+          "width": 7,
+          "height": 1,
+          "fill": "#687c70ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 9,
+          "y": 30,
+          "width": 6,
+          "height": 1,
+          "fill": "#687c70ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 10,
+          "y": 31,
+          "width": 5,
+          "height": 1,
+          "fill": "#687c70ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 11,
+          "y": 32,
+          "width": 3,
+          "height": 1,
+          "fill": "#687c70ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "body",
+          "x": 12,
+          "y": 33,
+          "width": 1,
+          "height": 1,
+          "fill": "#687c70ff"
+        },
+        {
+          "type": "shape.line",
+          "layerId": "body",
+          "x": 13,
+          "y": 23,
+          "x2": 13,
+          "y2": 30,
+          "color": "#d5b363ff",
+          "size": 2
+        },
+        {
+          "type": "shape.line",
+          "layerId": "body",
+          "x": 10,
+          "y": 26,
+          "x2": 16,
+          "y2": 26,
+          "color": "#d5b363ff",
+          "size": 1
+        },
+        {
+          "type": "layer.add",
+          "id": "weapon",
+          "name": "剣と握り"
+        },
+        {
+          "type": "shape.line",
+          "layerId": "weapon",
+          "x": 36,
+          "y": 9,
+          "x2": 35,
+          "y2": 29,
+          "color": "#1c292dff",
+          "size": 4
+        },
+        {
+          "type": "shape.line",
+          "layerId": "weapon",
+          "x": 36,
+          "y": 10,
+          "x2": 36,
+          "y2": 26,
+          "color": "#d7dfcaff",
+          "size": 2
+        },
+        {
+          "type": "shape.line",
+          "layerId": "weapon",
+          "x": 33,
+          "y": 28,
+          "x2": 39,
+          "y2": 28,
+          "color": "#d5b363ff",
+          "size": 2
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "weapon",
+          "x": 34,
+          "y": 30,
+          "width": 3,
+          "height": 5,
+          "fill": "#b78f68ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "weapon",
+          "x": 36,
+          "y": 35,
+          "width": 2,
+          "height": 2,
+          "fill": "#d5b363ff"
+        }
+      ]
+    }
+  ],
+  "output": {
+    "assetId": "unit-warrior",
+    "revisionId": "v001",
+    "publishMode": "pull_request",
+    "reviewStatus": "candidate"
+  },
+  "checks": {
+    "width": 48,
+    "height": 48,
+    "requireTransparency": true,
+    "maxOpaqueColors": 24
+  }
+}

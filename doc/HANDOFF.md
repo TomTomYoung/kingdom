@@ -6,7 +6,9 @@
 
 次作業: 現行の状態・行動検証の不具合を回帰テスト付きで修正し、M2 Guard・Damage Grid配分と戦闘UIへ進む。
 
-素材制作: [ASSET_LIST.md](./ASSET_LIST.md) の一覧を先に整備し、画像はAIPaint、音声はAIMusicで制作します。原稿・再生成ジョブを保存し、素材完成とゲーム接続を別管理します。
+素材制作: [ASSET_LIST.md](./ASSET_LIST.md) の一覧を先にコミットした後、AIPaintで画像17点、AIMusicでSE8点・BGM2曲の初回候補を生成しました。[ASSET_PREVIEW.md](./ASSET_PREVIEW.md) から確認できます。原稿・再生成ジョブ・検査記録を保存済みで、聴取とゲーム接続は未実施です。
+
+素材の次作業: 音声を聴取して音量・余韻・ループの聞こえ方を確認し、画像ローダーと音声再生基盤へ接続します。画像は整数倍・nearest-neighbor、状態表示は別描画とします。音声はユーザー操作からの再生開始、ミュート・音量、成功／拒否イベントの分離、BGM切替を扱います。P1の戦闘素材は対応イベントと併せて作ります。再生成方法は [tools/assets/README.md](../tools/assets/README.md) にあります。
 
 ## 1. 最初に読むもの
 

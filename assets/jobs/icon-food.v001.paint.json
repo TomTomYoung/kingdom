@@ -1,0 +1,416 @@
+{
+  "schemaVersion": "paint-job/1",
+  "jobId": "icon-food-v001",
+  "idempotencyKey": "icon-food-v001",
+  "rendererProfile": "pixel-v0.1",
+  "source": {
+    "kind": "blank",
+    "documentId": "icon-food-v001",
+    "width": 24,
+    "height": 24,
+    "mode": "pixel",
+    "background": "transparent",
+    "colorSpace": "srgb"
+  },
+  "batches": [
+    {
+      "batchId": "draw-0",
+      "expectedRevision": 0,
+      "commands": [
+        {
+          "type": "layer.add",
+          "id": "base",
+          "name": "地面・下地"
+        },
+        {
+          "type": "layer.add",
+          "id": "symbol",
+          "name": "資源の紋章"
+        },
+        {
+          "type": "shape.line",
+          "layerId": "symbol",
+          "x": 10,
+          "y": 21,
+          "x2": 13,
+          "y2": 4,
+          "color": "#735a32ff",
+          "size": 2
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 6,
+          "y": 5,
+          "width": 1,
+          "height": 1,
+          "fill": "#d9b75cff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 6,
+          "y": 6,
+          "width": 2,
+          "height": 1,
+          "fill": "#d9b75cff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 6,
+          "y": 7,
+          "width": 3,
+          "height": 1,
+          "fill": "#d9b75cff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 7,
+          "y": 8,
+          "width": 3,
+          "height": 1,
+          "fill": "#d9b75cff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 10,
+          "y": 9,
+          "width": 1,
+          "height": 1,
+          "fill": "#d9b75cff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 16,
+          "y": 2,
+          "width": 1,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 15,
+          "y": 3,
+          "width": 2,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 14,
+          "y": 4,
+          "width": 3,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 13,
+          "y": 5,
+          "width": 4,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 13,
+          "y": 6,
+          "width": 4,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 13,
+          "y": 7,
+          "width": 3,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 8,
+          "width": 2,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 9,
+          "width": 1,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 5,
+          "y": 10,
+          "width": 1,
+          "height": 1,
+          "fill": "#d9b75cff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 5,
+          "y": 11,
+          "width": 2,
+          "height": 1,
+          "fill": "#d9b75cff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 5,
+          "y": 12,
+          "width": 3,
+          "height": 1,
+          "fill": "#d9b75cff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 6,
+          "y": 13,
+          "width": 3,
+          "height": 1,
+          "fill": "#d9b75cff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 9,
+          "y": 14,
+          "width": 1,
+          "height": 1,
+          "fill": "#d9b75cff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 15,
+          "y": 7,
+          "width": 1,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 14,
+          "y": 8,
+          "width": 2,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 13,
+          "y": 9,
+          "width": 3,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 10,
+          "width": 4,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 11,
+          "width": 4,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 12,
+          "width": 3,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 11,
+          "y": 13,
+          "width": 2,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 11,
+          "y": 14,
+          "width": 1,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 6,
+          "y": 15,
+          "width": 1,
+          "height": 1,
+          "fill": "#d9b75cff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 6,
+          "y": 16,
+          "width": 2,
+          "height": 1,
+          "fill": "#d9b75cff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 6,
+          "y": 17,
+          "width": 3,
+          "height": 1,
+          "fill": "#d9b75cff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 7,
+          "y": 18,
+          "width": 3,
+          "height": 1,
+          "fill": "#d9b75cff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 10,
+          "y": 19,
+          "width": 1,
+          "height": 1,
+          "fill": "#d9b75cff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 16,
+          "y": 12,
+          "width": 1,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 15,
+          "y": 13,
+          "width": 2,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 14,
+          "y": 14,
+          "width": 3,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 13,
+          "y": 15,
+          "width": 4,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 13,
+          "y": 16,
+          "width": 4,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 13,
+          "y": 17,
+          "width": 3,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 18,
+          "width": 2,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 19,
+          "width": 1,
+          "height": 1,
+          "fill": "#f0d183ff"
+        },
+        {
+          "type": "shape.line",
+          "layerId": "symbol",
+          "x": 13,
+          "y": 5,
+          "x2": 13,
+          "y2": 2,
+          "color": "#d9d9b5ff",
+          "size": 1
+        }
+      ]
+    }
+  ],
+  "output": {
+    "assetId": "icon-food",
+    "revisionId": "v001",
+    "publishMode": "pull_request",
+    "reviewStatus": "candidate"
+  },
+  "checks": {
+    "width": 24,
+    "height": 24,
+    "requireTransparency": true,
+    "maxOpaqueColors": 24
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "format": "aimusic-render-report",
+  "version": 1,
+  "projectId": "bgm-battle",
+  "renderer": "pcm-synth/1",
+  "mode": "loop",
+  "frames": 588000,
+  "bodyFrames": 588000,
+  "seconds": 13.333333333333334,
+  "scoreSeconds": 13.333333333333334,
+  "audibleTracks": 6,
+  "notes": 248,
+  "peak": 0.15573546290397644,
+  "rms": 0.03971518216295943,
+  "limiterGain": 1,
+  "silent": false,
+  "loopBoundaryJump": 0.00005532149225473404,
+  "files": [
+    {
+      "file": "song.wav",
+      "bytes": 2352044,
+      "sha256": "683593ee077091fdda9b5ac82e645bf8b68414d14ddf1a7ef781bd5ba388f765"
+    },
+    {
+      "file": "song.mid",
+      "bytes": 2485,
+      "sha256": "7bc3f75b8aebc090b32f40b4f8199d3cbc3d64a283876bfbfdb8b6c1dff6b810"
+    },
+    {
+      "file": "project.music.json",
+      "bytes": 38255,
+      "sha256": "247742af79d9243e9c7f8ca493836567e6d3900cf47ada79604bfa8c5594fbe5"
+    }
+  ],
+  "githubStored": false,
+  "reviewStatus": "candidate"
+}

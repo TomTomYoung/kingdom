@@ -1,0 +1,561 @@
+{
+  "schemaVersion": "paint-job/1",
+  "jobId": "icon-mana-v001",
+  "idempotencyKey": "icon-mana-v001",
+  "rendererProfile": "pixel-v0.1",
+  "source": {
+    "kind": "blank",
+    "documentId": "icon-mana-v001",
+    "width": 24,
+    "height": 24,
+    "mode": "pixel",
+    "background": "transparent",
+    "colorSpace": "srgb"
+  },
+  "batches": [
+    {
+      "batchId": "draw-0",
+      "expectedRevision": 0,
+      "commands": [
+        {
+          "type": "layer.add",
+          "id": "base",
+          "name": "地面・下地"
+        },
+        {
+          "type": "layer.add",
+          "id": "symbol",
+          "name": "資源の紋章"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 11,
+          "y": 2,
+          "width": 2,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 10,
+          "y": 3,
+          "width": 4,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 9,
+          "y": 4,
+          "width": 6,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 8,
+          "y": 5,
+          "width": 9,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 7,
+          "y": 6,
+          "width": 11,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 6,
+          "y": 7,
+          "width": 13,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 5,
+          "y": 8,
+          "width": 14,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 4,
+          "y": 9,
+          "width": 15,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 4,
+          "y": 10,
+          "width": 15,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 4,
+          "y": 11,
+          "width": 15,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 4,
+          "y": 12,
+          "width": 16,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 4,
+          "y": 13,
+          "width": 16,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 4,
+          "y": 14,
+          "width": 16,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 5,
+          "y": 15,
+          "width": 15,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 5,
+          "y": 16,
+          "width": 15,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 5,
+          "y": 17,
+          "width": 14,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 5,
+          "y": 18,
+          "width": 13,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 6,
+          "y": 19,
+          "width": 11,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 8,
+          "y": 20,
+          "width": 7,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 9,
+          "y": 21,
+          "width": 5,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 11,
+          "y": 22,
+          "width": 2,
+          "height": 1,
+          "fill": "#1c292dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 11,
+          "y": 5,
+          "width": 1,
+          "height": 1,
+          "fill": "#7f71c7ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 10,
+          "y": 6,
+          "width": 2,
+          "height": 1,
+          "fill": "#7f71c7ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 9,
+          "y": 7,
+          "width": 3,
+          "height": 1,
+          "fill": "#7f71c7ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 8,
+          "y": 8,
+          "width": 4,
+          "height": 1,
+          "fill": "#7f71c7ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 7,
+          "y": 9,
+          "width": 5,
+          "height": 1,
+          "fill": "#7f71c7ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 6,
+          "y": 10,
+          "width": 6,
+          "height": 1,
+          "fill": "#7f71c7ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 6,
+          "y": 11,
+          "width": 6,
+          "height": 1,
+          "fill": "#7f71c7ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 6,
+          "y": 12,
+          "width": 6,
+          "height": 1,
+          "fill": "#7f71c7ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 6,
+          "y": 13,
+          "width": 6,
+          "height": 1,
+          "fill": "#7f71c7ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 6,
+          "y": 14,
+          "width": 6,
+          "height": 1,
+          "fill": "#7f71c7ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 6,
+          "y": 15,
+          "width": 6,
+          "height": 1,
+          "fill": "#7f71c7ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 6,
+          "y": 16,
+          "width": 6,
+          "height": 1,
+          "fill": "#7f71c7ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 6,
+          "y": 17,
+          "width": 6,
+          "height": 1,
+          "fill": "#7f71c7ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 7,
+          "y": 18,
+          "width": 5,
+          "height": 1,
+          "fill": "#7f71c7ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 9,
+          "y": 19,
+          "width": 3,
+          "height": 1,
+          "fill": "#7f71c7ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 11,
+          "y": 20,
+          "width": 1,
+          "height": 1,
+          "fill": "#7f71c7ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 4,
+          "width": 1,
+          "height": 1,
+          "fill": "#bcc2ecff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 5,
+          "width": 2,
+          "height": 1,
+          "fill": "#bcc2ecff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 6,
+          "width": 4,
+          "height": 1,
+          "fill": "#bcc2ecff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 7,
+          "width": 5,
+          "height": 1,
+          "fill": "#bcc2ecff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 8,
+          "width": 6,
+          "height": 1,
+          "fill": "#bcc2ecff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 9,
+          "width": 6,
+          "height": 1,
+          "fill": "#bcc2ecff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 10,
+          "width": 6,
+          "height": 1,
+          "fill": "#bcc2ecff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 11,
+          "width": 6,
+          "height": 1,
+          "fill": "#bcc2ecff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 12,
+          "width": 7,
+          "height": 1,
+          "fill": "#bcc2ecff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 13,
+          "width": 7,
+          "height": 1,
+          "fill": "#bcc2ecff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 14,
+          "width": 7,
+          "height": 1,
+          "fill": "#bcc2ecff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 15,
+          "width": 7,
+          "height": 1,
+          "fill": "#bcc2ecff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 16,
+          "width": 6,
+          "height": 1,
+          "fill": "#bcc2ecff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 17,
+          "width": 5,
+          "height": 1,
+          "fill": "#bcc2ecff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 18,
+          "width": 3,
+          "height": 1,
+          "fill": "#bcc2ecff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 19,
+          "width": 2,
+          "height": 1,
+          "fill": "#bcc2ecff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 20,
+          "width": 1,
+          "height": 1,
+          "fill": "#bcc2ecff"
+        },
+        {
+          "type": "shape.line",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 5,
+          "x2": 12,
+          "y2": 19,
+          "color": "#e3f6edff",
+          "size": 1
+        },
+        {
+          "type": "shape.line",
+          "layerId": "symbol",
+          "x": 3,
+          "y": 4,
+          "x2": 5,
+          "y2": 4,
+          "color": "#e3f6edff",
+          "size": 1
+        },
+        {
+          "type": "shape.line",
+          "layerId": "symbol",
+          "x": 4,
+          "y": 3,
+          "x2": 4,
+          "y2": 5,
+          "color": "#e3f6edff",
+          "size": 1
+        }
+      ]
+    }
+  ],
+  "output": {
+    "assetId": "icon-mana",
+    "revisionId": "v001",
+    "publishMode": "pull_request",
+    "reviewStatus": "candidate"
+  },
+  "checks": {
+    "width": 24,
+    "height": 24,
+    "requireTransparency": true,
+    "maxOpaqueColors": 24
+  }
+}

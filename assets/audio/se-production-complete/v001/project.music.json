@@ -1,0 +1,76 @@
+{
+  "format": "aimusic-project",
+  "version": 1,
+  "id": "se-production-complete",
+  "title": "完成",
+  "tempo": 240,
+  "bars": 1,
+  "beatsPerBar": 3,
+  "master": 0.76,
+  "tracks": [
+    {
+      "id": "bell-0",
+      "name": "bell-0",
+      "instrument": "bell",
+      "volume": 0.77,
+      "pan": 0,
+      "mute": false,
+      "solo": false,
+      "notes": [
+        {
+          "id": "bell-0-0",
+          "pitch": 60,
+          "start": 0,
+          "duration": 134,
+          "velocity": 96
+        },
+        {
+          "id": "bell-0-1",
+          "pitch": 64,
+          "start": 192,
+          "duration": 134,
+          "velocity": 96
+        },
+        {
+          "id": "bell-0-2",
+          "pitch": 67,
+          "start": 384,
+          "duration": 144,
+          "velocity": 96
+        },
+        {
+          "id": "bell-0-3",
+          "pitch": 72,
+          "start": 600,
+          "duration": 216,
+          "velocity": 96
+        }
+      ]
+    },
+    {
+      "id": "pluck-1",
+      "name": "pluck-1",
+      "instrument": "pluck",
+      "volume": 0.35,
+      "pan": 0,
+      "mute": false,
+      "solo": false,
+      "notes": [
+        {
+          "id": "pluck-1-0",
+          "pitch": 48,
+          "start": 0,
+          "duration": 240,
+          "velocity": 96
+        },
+        {
+          "id": "pluck-1-1",
+          "pitch": 55,
+          "start": 384,
+          "duration": 288,
+          "velocity": 96
+        }
+      ]
+    }
+  ]
+}

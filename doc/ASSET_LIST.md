@@ -22,7 +22,7 @@ AIMusic確認版: 399fe1351368755f116512a459c95ecf555c5cba。aimusic-job version
 
 両アプリには別リポジトリへの自動保存機能がないため、成果物はkingdomへGitHub連携で格納します。AIPaint／AIMusic本体はこの作業で変更しません。
 
-素材IDは英小文字とハイフンで固定し、原稿更新はv001、v002…と版を分けます。配置先はassets/graphics/<asset-id>/<revision>/、assets/audio/<asset-id>/<revision>/、制作ジョブはassets/jobs/、素材索引はassets/manifest.jsonを予定します。
+素材IDは英小文字とハイフンで固定し、原稿更新はv001、v002…と版を分けます。配置先は `assets/graphics/<asset-id>/<revision>/`、`assets/audio/<asset-id>/<revision>/`、制作ジョブはassets/jobs/、素材索引は [assets/manifest.json](../assets/manifest.json) です。
 
 画像は透過RGBA PNG、地形64×64、建物・人物48×48、アイコン24×24が初回規格です。地形はpointy-top Hex内部へ描き、外部を透過にします。解像度変更は原稿から行います。
 
@@ -30,7 +30,7 @@ AIMusic確認版: 399fe1351368755f116512a459c95ecf555c5cba。aimusic-job version
 
 ## 3. 初回制作 P0: 画像17点
 
-状態: 全点未着手。以下を最初の一組として作成します。
+状態: 17点すべてv001を生成し、寸法・透過・原稿往復・PNGの再デコードと一覧画像の目視を確認しました。ゲーム未接続です。画像は [ASSET_PREVIEW.md](./ASSET_PREVIEW.md) で確認できます。
 
 1. terrain-plains: 平原。64×64。短い草と土の筋で草原と区別する。現行terrainId: plains。
 2. terrain-grassland: 草原。64×64。密な草地と明るい葉。terrainId: grassland。
@@ -52,7 +52,7 @@ AIMusic確認版: 399fe1351368755f116512a459c95ecf555c5cba。aimusic-job version
 
 ## 4. 初回制作 P0: SE8点・BGM2曲
 
-状態: 全点未着手。SEは操作を連打しても耳障りになりにくい短い音量・余韻とします。長さは実際の書き出し後にmanifestへ記録します。
+状態: SE8点・BGM2曲のv001を生成しました。配信用ファイルのデコード・長さ・無音・数値・クリッピング・BGM境界の解析を確認済みです。聴取とゲーム接続は未実施です。実際の長さと再生用ファイルは [ASSET_PREVIEW.md](./ASSET_PREVIEW.md) とmanifestに記録しています。SEの連打時の聞こえ方と音量バランスは聴取時に確認します。
 
 1. se-ui-select: タイル・Party・項目の選択。短い単音。目安0.08〜0.25秒。
 2. se-ui-confirm: 操作確定。上向きの2音。目安0.15〜0.45秒。
@@ -108,4 +108,12 @@ asset-id、revision、toolとcommit、用途、出力形式・寸法・長さ、
 
 ## 8. 作業順
 
-この一覧を先にコミットし、P0の27素材を制作します。初回素材を検査してから一覧へ制作結果を追記します。次に画像読込・音声再生基盤とP1素材を進め、P2は各機能・コンテンツの確定を待ちます。
+この一覧を [4b2fb51](https://github.com/TomTomYoung/kingdom/commit/4b2fb517b55116139f9664ed9992344b0b9a8745) で先にコミットしてから、P0の27素材を制作しました。2026-09-13に初回検査を完了し、制作結果を追記しました。次に音声聴取と画像読込・音声再生基盤、P1素材を進め、P2は各機能・コンテンツの確定を待ちます。
+
+## 9. 初回の保存内容と確認結果
+
+画像17点はAIPaintで生成した透過PNGと編集原稿、音声10点はAIMusicで生成した編集原稿・MIDIと配信用SE WAV／BGM Oggを保存しました。全27点に制作ジョブ・出力ハッシュ・ツールの固定commitがあります。BGMの元WAVは再生成できる中間出力とし、そのハッシュとレンダーレポートを保存しています。
+
+[検証記録](../assets/verification.json) の27件はすべて成功しました。画像は4〜16色で、PNGをFFmpegで復号したRGBAがAIPaintの出力と一致します。音声は44.1kHz・ステレオ、SEは0.184〜0.894秒、地上BGMは17.778秒、戦闘BGMは13.333秒です。Ogg復号後の継ぎ目の振幅差はそれぞれ約0.000511、0.001007（振幅の基準1.0）でした。これは境界サンプルの解析であり、音楽的な接続の聴取評価ではありません。
+
+全点をchecked-candidateとして扱い、integratedはfalseです。ゲームでの表示・再生と音声聴取は未実施です。原稿の開き方と再生成は [制作手順](../tools/assets/README.md) を参照してください。

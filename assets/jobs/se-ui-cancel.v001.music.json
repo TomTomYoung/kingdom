@@ -1,0 +1,46 @@
+{
+  "format": "aimusic-job",
+  "version": 1,
+  "project": {
+    "format": "aimusic-project",
+    "version": 1,
+    "id": "se-ui-cancel",
+    "title": "戻る",
+    "tempo": 240,
+    "bars": 1,
+    "beatsPerBar": 3,
+    "master": 0.76,
+    "tracks": [
+      {
+        "id": "pluck-0",
+        "name": "pluck-0",
+        "instrument": "pluck",
+        "volume": 0.63,
+        "pan": 0,
+        "mute": false,
+        "solo": false,
+        "notes": [
+          {
+            "id": "pluck-0-0",
+            "pitch": 74,
+            "start": 0,
+            "duration": 106,
+            "velocity": 96
+          },
+          {
+            "id": "pluck-0-1",
+            "pitch": 67,
+            "start": 144,
+            "duration": 115,
+            "velocity": 96
+          }
+        ]
+      }
+    ]
+  },
+  "batches": [],
+  "render": {
+    "sampleRate": 44100,
+    "mode": "tail"
+  }
+}

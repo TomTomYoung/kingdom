@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "paint-job/1",
+  "jobId": "icon-popular-support-v001",
+  "idempotencyKey": "icon-popular-support-v001",
+  "rendererProfile": "pixel-v0.1",
+  "source": {
+    "kind": "blank",
+    "documentId": "icon-popular-support-v001",
+    "width": 24,
+    "height": 24,
+    "mode": "pixel",
+    "background": "transparent",
+    "colorSpace": "srgb"
+  },
+  "batches": [
+    {
+      "batchId": "draw-0",
+      "expectedRevision": 0,
+      "commands": [
+        {
+          "type": "layer.add",
+          "id": "base",
+          "name": "地面・下地"
+        },
+        {
+          "type": "layer.add",
+          "id": "symbol",
+          "name": "資源の紋章"
+        },
+        {
+          "type": "shape.ellipse",
+          "layerId": "symbol",
+          "x": 2,
+          "y": 6,
+          "width": 6,
+          "height": 6,
+          "fill": "#7c9b8bff"
+        },
+        {
+          "type": "shape.ellipse",
+          "layerId": "symbol",
+          "x": 16,
+          "y": 6,
+          "width": 6,
+          "height": 6,
+          "fill": "#7c9b8bff"
+        },
+        {
+          "type": "shape.ellipse",
+          "layerId": "symbol",
+          "x": 1,
+          "y": 13,
+          "width": 9,
+          "height": 8,
+          "fill": "#4a756cff"
+        },
+        {
+          "type": "shape.ellipse",
+          "layerId": "symbol",
+          "x": 14,
+          "y": 13,
+          "width": 9,
+          "height": 8,
+          "fill": "#4a756cff"
+        },
+        {
+          "type": "shape.ellipse",
+          "layerId": "symbol",
+          "x": 8,
+          "y": 3,
+          "width": 8,
+          "height": 8,
+          "fill": "#e1bb76ff"
+        },
+        {
+          "type": "shape.ellipse",
+          "layerId": "symbol",
+          "x": 6,
+          "y": 12,
+          "width": 12,
+          "height": 10,
+          "fill": "#c39353ff"
+        },
+        {
+          "type": "shape.line",
+          "layerId": "symbol",
+          "x": 9,
+          "y": 14,
+          "x2": 14,
+          "y2": 14,
+          "color": "#f1d59aff",
+          "size": 1
+        }
+      ]
+    }
+  ],
+  "output": {
+    "assetId": "icon-popular-support",
+    "revisionId": "v001",
+    "publishMode": "pull_request",
+    "reviewStatus": "candidate"
+  },
+  "checks": {
+    "width": 24,
+    "height": 24,
+    "requireTransparency": true,
+    "maxOpaqueColors": 24
+  }
+}

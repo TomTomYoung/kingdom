@@ -1,0 +1,37 @@
+{
+  "format": "aimusic-project",
+  "version": 1,
+  "id": "se-ui-confirm",
+  "title": "確定",
+  "tempo": 240,
+  "bars": 1,
+  "beatsPerBar": 3,
+  "master": 0.76,
+  "tracks": [
+    {
+      "id": "pluck-0",
+      "name": "pluck-0",
+      "instrument": "pluck",
+      "volume": 0.75,
+      "pan": 0,
+      "mute": false,
+      "solo": false,
+      "notes": [
+        {
+          "id": "pluck-0-0",
+          "pitch": 72,
+          "start": 0,
+          "duration": 125,
+          "velocity": 96
+        },
+        {
+          "id": "pluck-0-1",
+          "pitch": 79,
+          "start": 158,
+          "duration": 154,
+          "velocity": 96
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "format": "aimusic-render-report",
+  "version": 1,
+  "projectId": "se-ui-cancel",
+  "renderer": "pcm-synth/1",
+  "mode": "tail",
+  "frames": 55125,
+  "bodyFrames": 33075,
+  "seconds": 1.25,
+  "scoreSeconds": 0.75,
+  "audibleTracks": 1,
+  "notes": 2,
+  "peak": 0.07634003460407257,
+  "rms": 0.010261298736932954,
+  "limiterGain": 1,
+  "silent": false,
+  "loopBoundaryJump": null,
+  "files": [
+    {
+      "file": "song.wav",
+      "bytes": 220544,
+      "sha256": "ebe89d961ccf9fb745e17205269f07a84aeced62f4dcdd343d047e709241c2c0"
+    },
+    {
+      "file": "song.mid",
+      "bytes": 103,
+      "sha256": "c296638459cbc539d4cf82b011bd1396617a4fd4f2343d81cc86c906095f7dcf"
+    },
+    {
+      "file": "project.music.json",
+      "bytes": 670,
+      "sha256": "cdb2eae1540654ffb7f573fff5db980f83d0e1d65ce24e587eba79da7c75df16"
+    }
+  ],
+  "githubStored": false,
+  "reviewStatus": "candidate"
+}

@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "width": 48,
+  "height": 48,
+  "hasTransparency": true,
+  "visibleRGBColors": 8,
+  "rgbaSHA256": "be69887996db526883bebbee14efcd86a14752e9222aa0f118537056e7291b3e",
+  "projectRoundtrip": true,
+  "alphaValues": [
+    0,
+    255
+  ],
+  "renderer": "AIPaint executeJob / PaintCore",
+  "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+  "pngAdapter": "kingdom-node-png/1"
+}

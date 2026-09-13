@@ -1,0 +1,171 @@
+{
+  "schemaVersion": "paint-job/1",
+  "jobId": "icon-religion-v001",
+  "idempotencyKey": "icon-religion-v001",
+  "rendererProfile": "pixel-v0.1",
+  "source": {
+    "kind": "blank",
+    "documentId": "icon-religion-v001",
+    "width": 24,
+    "height": 24,
+    "mode": "pixel",
+    "background": "transparent",
+    "colorSpace": "srgb"
+  },
+  "batches": [
+    {
+      "batchId": "draw-0",
+      "expectedRevision": 0,
+      "commands": [
+        {
+          "type": "layer.add",
+          "id": "base",
+          "name": "地面・下地"
+        },
+        {
+          "type": "layer.add",
+          "id": "symbol",
+          "name": "資源の紋章"
+        },
+        {
+          "type": "shape.ellipse",
+          "layerId": "symbol",
+          "x": 4,
+          "y": 1,
+          "width": 16,
+          "height": 16,
+          "fill": "#756246ff"
+        },
+        {
+          "type": "shape.ellipse",
+          "layerId": "symbol",
+          "x": 6,
+          "y": 3,
+          "width": 12,
+          "height": 12,
+          "fill": "#ddbf79ff"
+        },
+        {
+          "type": "shape.ellipse",
+          "layerId": "symbol",
+          "x": 8,
+          "y": 5,
+          "width": 8,
+          "height": 8,
+          "fill": "#253c3dff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 4,
+          "width": 1,
+          "height": 1,
+          "fill": "#efcd78ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 11,
+          "y": 5,
+          "width": 2,
+          "height": 1,
+          "fill": "#efcd78ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 11,
+          "y": 6,
+          "width": 3,
+          "height": 1,
+          "fill": "#efcd78ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 11,
+          "y": 7,
+          "width": 4,
+          "height": 1,
+          "fill": "#efcd78ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 11,
+          "y": 8,
+          "width": 4,
+          "height": 1,
+          "fill": "#efcd78ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 10,
+          "y": 9,
+          "width": 6,
+          "height": 1,
+          "fill": "#efcd78ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 10,
+          "y": 10,
+          "width": 5,
+          "height": 1,
+          "fill": "#efcd78ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 11,
+          "y": 11,
+          "width": 3,
+          "height": 1,
+          "fill": "#efcd78ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 12,
+          "width": 1,
+          "height": 1,
+          "fill": "#efcd78ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 10,
+          "y": 12,
+          "width": 5,
+          "height": 7,
+          "fill": "#d9d9b5ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 7,
+          "y": 19,
+          "width": 12,
+          "height": 3,
+          "fill": "#9b8152ff"
+        }
+      ]
+    }
+  ],
+  "output": {
+    "assetId": "icon-religion",
+    "revisionId": "v001",
+    "publishMode": "pull_request",
+    "reviewStatus": "candidate"
+  },
+  "checks": {
+    "width": 24,
+    "height": 24,
+    "requireTransparency": true,
+    "maxOpaqueColors": 24
+  }
+}

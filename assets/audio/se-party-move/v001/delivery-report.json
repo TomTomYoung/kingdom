@@ -1,0 +1,28 @@
+{
+  "assetId": "se-party-move",
+  "sourceTool": "AIMusic",
+  "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
+  "sampleRate": 44100,
+  "channels": 2,
+  "seconds": 0.2527891156462585,
+  "derivation": {
+    "operation": "trim trailing silence only",
+    "startFrame": 0,
+    "endFrame": 11148,
+    "thresholdPCM16": 1,
+    "tailPaddingFrames": 882,
+    "pcmSamplesUnchanged": true,
+    "originalWAV": {
+      "file": "song.wav",
+      "bytes": 220544,
+      "sha256": "33f2093b4d17967b2fb6813189e60d910a650bc926115b208a227e153cda4422"
+    }
+  },
+  "listeningReviewed": false,
+  "integrated": false,
+  "delivery": {
+    "path": "assets/audio/se-party-move/v001/audio.wav",
+    "bytes": 44636,
+    "sha256": "a3f774d4dea9e19dd87556761ac21b389c29230730cbaadeddabb1504f8407c9"
+  }
+}

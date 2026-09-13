@@ -1,0 +1,43 @@
+# AIPaint・AIMusicによる素材制作
+
+初回は画像17点、SE8点、BGM2曲です。用途と優先順位は [ASSET_LIST.md](../../doc/ASSET_LIST.md)、見本と音声は [ASSET_PREVIEW.md](../../doc/ASSET_PREVIEW.md) を参照してください。ゲームへの組み込みは別作業です。
+
+## 制作に使ったもの
+
+- AIPaint: TomTomYoung/AIPaint、commit be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d。
+- AIMusic: TomTomYoung/AIMusic、commit 399fe1351368755f116512a459c95ecf555c5cba。
+- Node.js v24.19.0とFFmpeg（libvorbisが必要）。Pythonパッケージ・npmパッケージの追加は不要です。
+
+両リポジトリを別ディレクトリへ取得し、上記commitへcheckoutしてください。[tool-lock.json](./tool-lock.json) にソースファイルのGit blob SHAを記録し、制作スクリプトが実行前に照合します。本リポジトリへ両ツールのコードを複製していません。
+
+画像の図案は [graphics.mjs](./graphics.mjs)、曲とSEの音符は [music.mjs](./music.mjs) にあります。既存の絵・曲・外部音源を入力していません。AIPaintのexecuteJob／PaintCoreがすべての画素を描き、アダプターはRGBAをPNGへ梱包します。一覧画像も同じAIPaintの矩形コマンドで作ります。AIPaintのブラウザUIやPlaywrightを実行したものではありません。
+
+音声はAIMusicの正式scripts/render.mjsで合成します。SEはPCM値を変えず末尾無音を切り、20msの余白を残します。BGMはスコア全長のWAVからOgg Vorbis q3を生成します。LOOPSTART／LOOPENDは制作情報であり、ブラウザが自動でこのタグを解釈する前提にはしません。
+
+## 再生成と検査
+
+kingdomのルートで実行します。パスは実際の取得先へ置き換えてください。出力先のassetsディレクトリが存在すると停止し、既存原稿を上書きしません。
+
+```sh
+node tools/assets/render-first-pack.mjs /path/to/AIPaint /path/to/AIMusic /path/to/new-output
+node tools/assets/verify-first-pack.mjs /path/to/new-output
+```
+
+初回の確認環境で実行し、全27点の検査成功を確認しました。検査はファイルのSHA-256、FFmpegによるPNGのRGBA復号一致、音声復号後のフレーム数・非数値・無音・クリッピング・ループ境界を扱います。これは聴取・ブラウザQAを代替しません。
+
+生成時は画像目視と聴取の欄を未実施に戻します。確認後にmanifestへ実施範囲を記録してください。Oggのコンテナ識別値やエンコーダー版により再生成ファイルのバイト列が変わる場合があります。採用する実ファイルのSHA-256をその都度保存します。
+
+## 保存ファイル
+
+- assets/jobs/: ツールへ渡す27件の制作ジョブ。
+- `assets/graphics/<id>/v001/`: image.png、project.paint.json、report.json。
+- `assets/audio/<id>/v001/`: project.music.json、song.mid、source-render-report.json、delivery-report.json、SEのaudio.wavまたはBGMのaudio.ogg。
+- assets/manifest.json: ID・用途・版・ハッシュ・確認状態・ツール出典。
+- assets/verification.json: 配信用ファイルの独立した復号検査結果。
+- assets/previews/first-pack.png: 画像17点の見本。
+
+project.paint.jsonはAIPaintの「原稿JSONを開く」、project.music.jsonはAIMusicの「原稿を開く」から編集できます。編集結果を採用する際は次revisionを追加し、ジョブまたは図案・音符も更新して再生成できる状態に保ちます。
+
+AIMusicが生成する元song.wavはOSの一時ディレクトリに出力され、生成コマンドがその場所を表示します。大きい元WAVはGitへ保存せず、原稿・MIDI・ジョブ・元WAVのハッシュを保持します。source-render-report.json内のsong.wavはこの中間出力を指します。
+
+ツール原報告のcandidateやgithubStored:falseはレンダリング直後の記録です。GitHubへ保存した事実や採用状態は、kingdomのコミットとmanifestで管理します。初回候補は画像目視済み・音声解析済み、聴取未実施・ゲーム未接続です。

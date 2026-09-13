@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "tools": {
+    "AIPaint": {
+      "repository": "TomTomYoung/AIPaint",
+      "commit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+      "files": {
+        "package.json": "876a4bd533ec885f8cd50abf970735761bc73136",
+        "scripts/browser_support.py": "4a9ffaff445576bf6e0f1c6b7c517e49b2bbbe58",
+        "scripts/render.py": "61e4ceefd81f1bb7fab3575c8f2aed8cf5b65da0",
+        "src/agent.js": "f3c8dde2a0755740310ddc705429c60ddf5c2aa5",
+        "src/app.js": "d213d0b152055d064405a9126f18f8661fa7f7a7",
+        "src/core.js": "fa403774d1da0500d4c5af4927c465f242f65e12"
+      }
+    },
+    "AIMusic": {
+      "repository": "TomTomYoung/AIMusic",
+      "commit": "399fe1351368755f116512a459c95ecf555c5cba",
+      "files": {
+        "package.json": "925b145c9a6de2eb8e6b51970c0d3a93840a03a1",
+        "scripts/check.mjs": "96a51dc8a610cb2c9f92a1d6078594839fe6e20a",
+        "scripts/make-demo.mjs": "d1e1c74362c15bb6b9fa6011dd90650aeccb041b",
+        "scripts/render.mjs": "c273810fdb5f28cad245ffe20716600d48d0784e",
+        "src/agent.mjs": "7bf40d14b506fdcba90d8728fa2c895ec2ca0c10",
+        "src/app.mjs": "df52e473fe88320848053974c7d95a3240256c5d",
+        "src/audio.mjs": "eb91880744510179fe649135e1d39b4d4cb55af2",
+        "src/compose.mjs": "fbd3396d03f309d1ca7a3b8b162a70e7c0998489",
+        "src/core.mjs": "39937c3c3d299f1915e3997418d582815239c157",
+        "src/style.css": "255f46b5c828972d861a42bb2b677781dcc445db",
+        "src/worker.mjs": "66b91a8bafb804bba2ff0a57f910a3b76dfcaa93"
+      }
+    }
+  }
+}

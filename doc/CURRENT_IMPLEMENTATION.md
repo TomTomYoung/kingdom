@@ -14,6 +14,8 @@
 
 エントリーは [index.html](../index.html) です。標準Canvas 2DとDOMを使い、PhaserやCDNを読み込みません。外部npm依存、ビルド工程、バックエンドはありません。
 
+assets/にはAIPaint・AIMusicによる初回素材27点と原稿がありますが、現行UIには接続していません。描画・再生の動作は従来どおりです。tools/assets/は素材制作専用で、ゲーム起動時に実行する依存やビルド工程ではありません。詳細は [ASSET_PREVIEW.md](./ASSET_PREVIEW.md) を参照してください。
+
 リポジトリルートで次を実行し、http://localhost:4173/ を開きます。
 
 ```sh

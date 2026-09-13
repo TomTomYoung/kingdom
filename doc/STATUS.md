@@ -14,6 +14,8 @@ UIからは都市生産・購入、自然領土拡張・タイル購入、Party�
 
 現行の詳細は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md)、次作業は [HANDOFF.md](./HANDOFF.md) です。旧Phaser版のP0不具合と再利用候補は [LEGACY_IMPLEMENTATION.md](./LEGACY_IMPLEMENTATION.md) に移しました。
 
+素材制作は初回27点を生成済みです。AIPaintの画像17点、AIMusicのSE8点・BGM2曲を原稿・ジョブと共に保存しました。画像目視と全点のファイル検査・音声解析を実施済みです。聴取とゲームへの画像・音声接続は未実施で、M2の実装進捗とは分けて扱います。[ASSET_LIST.md](./ASSET_LIST.md) と [ASSET_PREVIEW.md](./ASSET_PREVIEW.md) を参照してください。
+
 ## 2. マイルストーン
 
 ### M0 仕様再編

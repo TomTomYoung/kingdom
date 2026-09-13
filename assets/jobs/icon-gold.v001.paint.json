@@ -1,0 +1,112 @@
+{
+  "schemaVersion": "paint-job/1",
+  "jobId": "icon-gold-v001",
+  "idempotencyKey": "icon-gold-v001",
+  "rendererProfile": "pixel-v0.1",
+  "source": {
+    "kind": "blank",
+    "documentId": "icon-gold-v001",
+    "width": 24,
+    "height": 24,
+    "mode": "pixel",
+    "background": "transparent",
+    "colorSpace": "srgb"
+  },
+  "batches": [
+    {
+      "batchId": "draw-0",
+      "expectedRevision": 0,
+      "commands": [
+        {
+          "type": "layer.add",
+          "id": "base",
+          "name": "地面・下地"
+        },
+        {
+          "type": "layer.add",
+          "id": "symbol",
+          "name": "資源の紋章"
+        },
+        {
+          "type": "shape.ellipse",
+          "layerId": "symbol",
+          "x": 3,
+          "y": 3,
+          "width": 18,
+          "height": 18,
+          "fill": "#624f35ff"
+        },
+        {
+          "type": "shape.ellipse",
+          "layerId": "symbol",
+          "x": 4,
+          "y": 3,
+          "width": 16,
+          "height": 16,
+          "fill": "#ddb867ff"
+        },
+        {
+          "type": "shape.ellipse",
+          "layerId": "symbol",
+          "x": 7,
+          "y": 5,
+          "width": 10,
+          "height": 11,
+          "fill": "#b68644ff"
+        },
+        {
+          "type": "shape.line",
+          "layerId": "symbol",
+          "x": 8,
+          "y": 5,
+          "x2": 13,
+          "y2": 5,
+          "color": "#f4df9dff",
+          "size": 1
+        },
+        {
+          "type": "shape.line",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 7,
+          "x2": 12,
+          "y2": 15,
+          "color": "#f4df9dff",
+          "size": 2
+        },
+        {
+          "type": "shape.line",
+          "layerId": "symbol",
+          "x": 9,
+          "y": 10,
+          "x2": 15,
+          "y2": 10,
+          "color": "#f4df9dff",
+          "size": 1
+        },
+        {
+          "type": "shape.line",
+          "layerId": "symbol",
+          "x": 9,
+          "y": 13,
+          "x2": 15,
+          "y2": 13,
+          "color": "#f4df9dff",
+          "size": 1
+        }
+      ]
+    }
+  ],
+  "output": {
+    "assetId": "icon-gold",
+    "revisionId": "v001",
+    "publishMode": "pull_request",
+    "reviewStatus": "candidate"
+  },
+  "checks": {
+    "width": 24,
+    "height": 24,
+    "requireTransparency": true,
+    "maxOpaqueColors": 24
+  }
+}

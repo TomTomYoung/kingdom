@@ -1,0 +1,37 @@
+{
+  "format": "aimusic-render-report",
+  "version": 1,
+  "projectId": "bgm-overworld",
+  "renderer": "pcm-synth/1",
+  "mode": "loop",
+  "frames": 784000,
+  "bodyFrames": 784000,
+  "seconds": 17.77777777777778,
+  "scoreSeconds": 17.77777777777778,
+  "audibleTracks": 4,
+  "notes": 141,
+  "peak": 0.13193121552467346,
+  "rms": 0.04549946613418852,
+  "limiterGain": 1,
+  "silent": false,
+  "loopBoundaryJump": 0,
+  "files": [
+    {
+      "file": "song.wav",
+      "bytes": 3136044,
+      "sha256": "9eb63ac7a649272847045afa5d428af9d19892e2e642c3b70d19f22e0b96b14b"
+    },
+    {
+      "file": "song.mid",
+      "bytes": 1476,
+      "sha256": "87edbb3d2cb62c57008bfc25b6eaf702c53ae6286c14b654be581e9db11a1bbc"
+    },
+    {
+      "file": "project.music.json",
+      "bytes": 21949,
+      "sha256": "a7a40b7d1fd4420017fb750ce7c49d77bf980a72c187ad0339f881ede17298b2"
+    }
+  ],
+  "githubStored": false,
+  "reviewStatus": "candidate"
+}

@@ -1,0 +1,1767 @@
+{
+  "schemaVersion": 1,
+  "packId": "kingdom-first-pack-v001",
+  "created": "2026-09-13",
+  "plan": "doc/ASSET_LIST.md",
+  "graphics": 17,
+  "soundEffects": 8,
+  "music": 2,
+  "tools": {
+    "AIPaint": {
+      "repository": "TomTomYoung/AIPaint",
+      "commit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+      "files": {
+        "package.json": "876a4bd533ec885f8cd50abf970735761bc73136",
+        "scripts/browser_support.py": "4a9ffaff445576bf6e0f1c6b7c517e49b2bbbe58",
+        "scripts/render.py": "61e4ceefd81f1bb7fab3575c8f2aed8cf5b65da0",
+        "src/agent.js": "f3c8dde2a0755740310ddc705429c60ddf5c2aa5",
+        "src/app.js": "d213d0b152055d064405a9126f18f8661fa7f7a7",
+        "src/core.js": "fa403774d1da0500d4c5af4927c465f242f65e12"
+      }
+    },
+    "AIMusic": {
+      "repository": "TomTomYoung/AIMusic",
+      "commit": "399fe1351368755f116512a459c95ecf555c5cba",
+      "files": {
+        "package.json": "925b145c9a6de2eb8e6b51970c0d3a93840a03a1",
+        "scripts/check.mjs": "96a51dc8a610cb2c9f92a1d6078594839fe6e20a",
+        "scripts/make-demo.mjs": "d1e1c74362c15bb6b9fa6011dd90650aeccb041b",
+        "scripts/render.mjs": "c273810fdb5f28cad245ffe20716600d48d0784e",
+        "src/agent.mjs": "7bf40d14b506fdcba90d8728fa2c895ec2ca0c10",
+        "src/app.mjs": "df52e473fe88320848053974c7d95a3240256c5d",
+        "src/audio.mjs": "eb91880744510179fe649135e1d39b4d4cb55af2",
+        "src/compose.mjs": "fbd3396d03f309d1ca7a3b8b162a70e7c0998489",
+        "src/core.mjs": "39937c3c3d299f1915e3997418d582815239c157",
+        "src/style.css": "255f46b5c828972d861a42bb2b677781dcc445db",
+        "src/worker.mjs": "66b91a8bafb804bba2ff0a57f910a3b76dfcaa93"
+      }
+    }
+  },
+  "authoringScripts": [
+    "tools/assets/graphics.mjs",
+    "tools/assets/music.mjs",
+    "tools/assets/render-first-pack.mjs"
+  ],
+  "integrationStatus": "not-integrated",
+  "imageReview": "contact-sheet-reviewed",
+  "audioListeningReview": "not-performed",
+  "contactSheet": {
+    "path": "assets/previews/first-pack.png",
+    "bytes": 15577,
+    "sha256": "b0975296cfb29cb2ef360b5bd2547528091f3a10374041826456a1e1afc62571"
+  },
+  "assets": [
+    {
+      "id": "terrain-plains",
+      "title": "平原",
+      "category": "terrain",
+      "revision": "v001",
+      "tool": "AIPaint",
+      "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+      "width": 64,
+      "height": 64,
+      "status": "checked-candidate",
+      "integrated": false,
+      "visualReview": true,
+      "files": [
+        {
+          "path": "assets/jobs/terrain-plains.v001.paint.json",
+          "bytes": 44364,
+          "sha256": "6b2cc156951a32ed687da752244c7fa9fcf476ee03e7f7c28cec5cee45c96737"
+        },
+        {
+          "path": "assets/graphics/terrain-plains/v001/image.png",
+          "bytes": 582,
+          "sha256": "aba052ee599ce57668cc049b885cdd39d627f1089de6fb5526c020043b032c31"
+        },
+        {
+          "path": "assets/graphics/terrain-plains/v001/project.paint.json",
+          "bytes": 44276,
+          "sha256": "a30896320b7a01732cbc92beadf0d0e83d202aaecfee6eaf38179fca31e9988c"
+        },
+        {
+          "path": "assets/graphics/terrain-plains/v001/report.json",
+          "bytes": 401,
+          "sha256": "c24764988f02a3706fff1bc28692505b3b0cc8f013eadd555718cd22f021cc76"
+        }
+      ],
+      "checks": {
+        "passed": true,
+        "width": 64,
+        "height": 64,
+        "hasTransparency": true,
+        "visibleRGBColors": 8,
+        "rgbaSHA256": "845fd109a8e61ab12641390e67aa528f8f6657ec071408c8ae1f3e10239fa45d",
+        "projectRoundtrip": true,
+        "alphaValues": [
+          0,
+          255
+        ],
+        "renderer": "AIPaint executeJob / PaintCore",
+        "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+        "pngAdapter": "kingdom-node-png/1"
+      }
+    },
+    {
+      "id": "terrain-grassland",
+      "title": "草原",
+      "category": "terrain",
+      "revision": "v001",
+      "tool": "AIPaint",
+      "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+      "width": 64,
+      "height": 64,
+      "status": "checked-candidate",
+      "integrated": false,
+      "visualReview": true,
+      "files": [
+        {
+          "path": "assets/jobs/terrain-grassland.v001.paint.json",
+          "bytes": 47212,
+          "sha256": "be3d81976a225f93e85f271f2bdb949d1005ff0e0fd3ac6b62d5f70a4fd6d037"
+        },
+        {
+          "path": "assets/graphics/terrain-grassland/v001/image.png",
+          "bytes": 618,
+          "sha256": "d0b2c87bb14eaf27a624173b55a857bb2bcefc305476928d759eded6dec3c7e1"
+        },
+        {
+          "path": "assets/graphics/terrain-grassland/v001/project.paint.json",
+          "bytes": 44279,
+          "sha256": "d294f3c505983cbad1a20bb8b9cf45d6048a1ba9e3da956f7b51cecfc5f93f4c"
+        },
+        {
+          "path": "assets/graphics/terrain-grassland/v001/report.json",
+          "bytes": 401,
+          "sha256": "2dbd5d4f1a99dc389cc4ba97b62f1632bfd0ce475aed2abf8bc909dc42c01516"
+        }
+      ],
+      "checks": {
+        "passed": true,
+        "width": 64,
+        "height": 64,
+        "hasTransparency": true,
+        "visibleRGBColors": 9,
+        "rgbaSHA256": "6ba0c772d1c71bc93ef2e676b7f5542a80d42089c076a51bc0766c7692602909",
+        "projectRoundtrip": true,
+        "alphaValues": [
+          0,
+          255
+        ],
+        "renderer": "AIPaint executeJob / PaintCore",
+        "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+        "pngAdapter": "kingdom-node-png/1"
+      }
+    },
+    {
+      "id": "terrain-forest",
+      "title": "森林",
+      "category": "terrain",
+      "revision": "v001",
+      "tool": "AIPaint",
+      "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+      "width": 64,
+      "height": 64,
+      "status": "checked-candidate",
+      "integrated": false,
+      "visualReview": true,
+      "files": [
+        {
+          "path": "assets/jobs/terrain-forest.v001.paint.json",
+          "bytes": 76280,
+          "sha256": "8b2b1046282d2adebd4728862990d330eb3840f554c6b55aa88c164d6a7dc9fd"
+        },
+        {
+          "path": "assets/graphics/terrain-forest/v001/image.png",
+          "bytes": 740,
+          "sha256": "cf51529edf375d0d2ce05728bfe3dc1919b0f97b81d8eb6dc73f82f255517e5e"
+        },
+        {
+          "path": "assets/graphics/terrain-forest/v001/project.paint.json",
+          "bytes": 44276,
+          "sha256": "bad062162a293e6bbee3e026d8b5372ec291f26eca5e157f019768c55dabf1d0"
+        },
+        {
+          "path": "assets/graphics/terrain-forest/v001/report.json",
+          "bytes": 402,
+          "sha256": "05acd2d31308c1ee9c2830a4b09e50406922a8e7c94831ee268d8cd6a764c594"
+        }
+      ],
+      "checks": {
+        "passed": true,
+        "width": 64,
+        "height": 64,
+        "hasTransparency": true,
+        "visibleRGBColors": 11,
+        "rgbaSHA256": "5e072e59e640f43917424f0d9c9639f8360c491bb1911e8ea13be13d7b822cfe",
+        "projectRoundtrip": true,
+        "alphaValues": [
+          0,
+          255
+        ],
+        "renderer": "AIPaint executeJob / PaintCore",
+        "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+        "pngAdapter": "kingdom-node-png/1"
+      }
+    },
+    {
+      "id": "terrain-hills",
+      "title": "丘陵",
+      "category": "terrain",
+      "revision": "v001",
+      "tool": "AIPaint",
+      "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+      "width": 64,
+      "height": 64,
+      "status": "checked-candidate",
+      "integrated": false,
+      "visualReview": true,
+      "files": [
+        {
+          "path": "assets/jobs/terrain-hills.v001.paint.json",
+          "bytes": 56775,
+          "sha256": "2b1407aeb8488499c0fddfcd4d8eb54333cc6f810da15dea491b563248aa7d9a"
+        },
+        {
+          "path": "assets/graphics/terrain-hills/v001/image.png",
+          "bytes": 667,
+          "sha256": "83e0007aa0cc457f713348cbff56e3bfe031e44bd88087fefabda40558af8302"
+        },
+        {
+          "path": "assets/graphics/terrain-hills/v001/project.paint.json",
+          "bytes": 44275,
+          "sha256": "7e70c8903777cf9ec39892c7bc5b358a025cc75fefaacb5564007d673f284e98"
+        },
+        {
+          "path": "assets/graphics/terrain-hills/v001/report.json",
+          "bytes": 402,
+          "sha256": "2cf49bb0f3be5fb87339cf93834ba3d96f41eeb4675ea0fae881dd640b9f4181"
+        }
+      ],
+      "checks": {
+        "passed": true,
+        "width": 64,
+        "height": 64,
+        "hasTransparency": true,
+        "visibleRGBColors": 13,
+        "rgbaSHA256": "cbafad5a000efe4d97f51ccd17a804315950fa782ea9cc9d976c175a4a2ec999",
+        "projectRoundtrip": true,
+        "alphaValues": [
+          0,
+          255
+        ],
+        "renderer": "AIPaint executeJob / PaintCore",
+        "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+        "pngAdapter": "kingdom-node-png/1"
+      }
+    },
+    {
+      "id": "terrain-arcane",
+      "title": "霊脈",
+      "category": "terrain",
+      "revision": "v001",
+      "tool": "AIPaint",
+      "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+      "width": 64,
+      "height": 64,
+      "status": "checked-candidate",
+      "integrated": false,
+      "visualReview": true,
+      "files": [
+        {
+          "path": "assets/jobs/terrain-arcane.v001.paint.json",
+          "bytes": 76852,
+          "sha256": "c2ab97a3fdb3a69501b56b9c7ff21775fbb0db65c3dd2b552e039ff50cfe1681"
+        },
+        {
+          "path": "assets/graphics/terrain-arcane/v001/image.png",
+          "bytes": 709,
+          "sha256": "23082e6ebac0ac73df1cdbe6fa82240444639a421c5db6adee361526f6ee38c3"
+        },
+        {
+          "path": "assets/graphics/terrain-arcane/v001/project.paint.json",
+          "bytes": 44276,
+          "sha256": "5bab96a7c7f206a74564bc532c3ec04cfc2a46ee93e5051c988c68d50427de16"
+        },
+        {
+          "path": "assets/graphics/terrain-arcane/v001/report.json",
+          "bytes": 402,
+          "sha256": "7cc31eeac2bc12fe0a859fad36c0aa707a98c42045e292284c09ef750eb2b6b8"
+        }
+      ],
+      "checks": {
+        "passed": true,
+        "width": 64,
+        "height": 64,
+        "hasTransparency": true,
+        "visibleRGBColors": 10,
+        "rgbaSHA256": "36c76b7fd88edc5c82e8bafc2d60d4d726b3116cf91d5a0b6674cb882054aabb",
+        "projectRoundtrip": true,
+        "alphaValues": [
+          0,
+          255
+        ],
+        "renderer": "AIPaint executeJob / PaintCore",
+        "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+        "pngAdapter": "kingdom-node-png/1"
+      }
+    },
+    {
+      "id": "terrain-void",
+      "title": "虚無",
+      "category": "terrain",
+      "revision": "v001",
+      "tool": "AIPaint",
+      "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+      "width": 64,
+      "height": 64,
+      "status": "checked-candidate",
+      "integrated": false,
+      "visualReview": true,
+      "files": [
+        {
+          "path": "assets/jobs/terrain-void.v001.paint.json",
+          "bytes": 55386,
+          "sha256": "6a4bde052ab9a16cafdb0bce3fedea3f7f8d8329a51a0a4449439211d10c18f5"
+        },
+        {
+          "path": "assets/graphics/terrain-void/v001/image.png",
+          "bytes": 632,
+          "sha256": "8504d670b1565d27a36b44664b47f0349a0827ad7a0a36762956419b77b9129f"
+        },
+        {
+          "path": "assets/graphics/terrain-void/v001/project.paint.json",
+          "bytes": 44274,
+          "sha256": "fabdcde8b45674c1cab9173fa51441798cbac53b1d402e4ec429f7c42cd6adac"
+        },
+        {
+          "path": "assets/graphics/terrain-void/v001/report.json",
+          "bytes": 402,
+          "sha256": "47a14821f54228589a43380338dfc22fa1db9e9f3ea160803e11f3b2bf2a9f44"
+        }
+      ],
+      "checks": {
+        "passed": true,
+        "width": 64,
+        "height": 64,
+        "hasTransparency": true,
+        "visibleRGBColors": 10,
+        "rgbaSHA256": "7b477725420a2c0ae9e2c566748717c2c08d5cca3aa2d5540061d12b5f287e3d",
+        "projectRoundtrip": true,
+        "alphaValues": [
+          0,
+          255
+        ],
+        "renderer": "AIPaint executeJob / PaintCore",
+        "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+        "pngAdapter": "kingdom-node-png/1"
+      }
+    },
+    {
+      "id": "building-city",
+      "title": "都市",
+      "category": "building",
+      "revision": "v001",
+      "tool": "AIPaint",
+      "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+      "width": 48,
+      "height": 48,
+      "status": "checked-candidate",
+      "integrated": false,
+      "visualReview": true,
+      "files": [
+        {
+          "path": "assets/jobs/building-city.v001.paint.json",
+          "bytes": 13264,
+          "sha256": "c69f2322eb5c4c9d75e454916b495c7fc7609d241e15b3407d69b4a8c6b65f83"
+        },
+        {
+          "path": "assets/graphics/building-city/v001/image.png",
+          "bytes": 416,
+          "sha256": "11e03851f56b7e1734aebd6893c9c1a147325e40cd36e1880dc119fc19ed286d"
+        },
+        {
+          "path": "assets/graphics/building-city/v001/project.paint.json",
+          "bytes": 37592,
+          "sha256": "a84f428feefe306c09b8310dd70b7b4820f31c649418bff441f6293bfbf5253e"
+        },
+        {
+          "path": "assets/graphics/building-city/v001/report.json",
+          "bytes": 402,
+          "sha256": "3d564704851ddf98e8e54c721c81da685144a5e16c37c5c9072189d11d23a96e"
+        }
+      ],
+      "checks": {
+        "passed": true,
+        "width": 48,
+        "height": 48,
+        "hasTransparency": true,
+        "visibleRGBColors": 12,
+        "rgbaSHA256": "40804ec49b31d7cbf86ac968f441cbfbbc7a3a501b232f16c65ef63abc920f8f",
+        "projectRoundtrip": true,
+        "alphaValues": [
+          0,
+          255
+        ],
+        "renderer": "AIPaint executeJob / PaintCore",
+        "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+        "pngAdapter": "kingdom-node-png/1"
+      }
+    },
+    {
+      "id": "building-monument",
+      "title": "モニュメント",
+      "category": "building",
+      "revision": "v001",
+      "tool": "AIPaint",
+      "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+      "width": 48,
+      "height": 48,
+      "status": "checked-candidate",
+      "integrated": false,
+      "visualReview": true,
+      "files": [
+        {
+          "path": "assets/jobs/building-monument.v001.paint.json",
+          "bytes": 16786,
+          "sha256": "4b6e9e714a405b8e76bb43c744a215f430a0a059190ce94a237f7a7604ecee7e"
+        },
+        {
+          "path": "assets/graphics/building-monument/v001/image.png",
+          "bytes": 268,
+          "sha256": "767da64df9c434b16aa17c7ed31e349b1234e13a5816747ae133a3965e4b701c"
+        },
+        {
+          "path": "assets/graphics/building-monument/v001/project.paint.json",
+          "bytes": 37587,
+          "sha256": "60fd4ba790677ce780abccb67f22df1be193c17d1d7d6706f2756ad9eb3816ad"
+        },
+        {
+          "path": "assets/graphics/building-monument/v001/report.json",
+          "bytes": 401,
+          "sha256": "1b6f5996214d17edcabcdd88433792e9b9017ab6315e713a9a7c314969ca5ef1"
+        }
+      ],
+      "checks": {
+        "passed": true,
+        "width": 48,
+        "height": 48,
+        "hasTransparency": true,
+        "visibleRGBColors": 8,
+        "rgbaSHA256": "be69887996db526883bebbee14efcd86a14752e9222aa0f118537056e7291b3e",
+        "projectRoundtrip": true,
+        "alphaValues": [
+          0,
+          255
+        ],
+        "renderer": "AIPaint executeJob / PaintCore",
+        "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+        "pngAdapter": "kingdom-node-png/1"
+      }
+    },
+    {
+      "id": "unit-warrior",
+      "title": "戦士",
+      "category": "unit",
+      "revision": "v001",
+      "tool": "AIPaint",
+      "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+      "width": 48,
+      "height": 48,
+      "status": "checked-candidate",
+      "integrated": false,
+      "visualReview": true,
+      "files": [
+        {
+          "path": "assets/jobs/unit-warrior.v001.paint.json",
+          "bytes": 16196,
+          "sha256": "e74d17aaf8425c75b056f1721f5383fea02edd1e59b35fe508c9fd03d1f53f2a"
+        },
+        {
+          "path": "assets/graphics/unit-warrior/v001/image.png",
+          "bytes": 441,
+          "sha256": "8746d84e39e92472906e72f4baf1c007c43c57cee3b47c0f70b463e0e2aa43e0"
+        },
+        {
+          "path": "assets/graphics/unit-warrior/v001/project.paint.json",
+          "bytes": 37589,
+          "sha256": "db1ab6c0e502365c7da35b9c721bc9932555349dfc635be3432f83f8a28fac60"
+        },
+        {
+          "path": "assets/graphics/unit-warrior/v001/report.json",
+          "bytes": 402,
+          "sha256": "92c7c6e9e70ecf5ebe5bc1c40fed593f4b76f0a3e1c76a722301f09a95508d1a"
+        }
+      ],
+      "checks": {
+        "passed": true,
+        "width": 48,
+        "height": 48,
+        "hasTransparency": true,
+        "visibleRGBColors": 16,
+        "rgbaSHA256": "95b1596a03a188d1932615b014687170a006a621231398fb1b51b2b6508baa80",
+        "projectRoundtrip": true,
+        "alphaValues": [
+          0,
+          255
+        ],
+        "renderer": "AIPaint executeJob / PaintCore",
+        "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+        "pngAdapter": "kingdom-node-png/1"
+      }
+    },
+    {
+      "id": "icon-food",
+      "title": "食料",
+      "category": "icon",
+      "revision": "v001",
+      "tool": "AIPaint",
+      "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+      "width": 24,
+      "height": 24,
+      "status": "checked-candidate",
+      "integrated": false,
+      "visualReview": true,
+      "files": [
+        {
+          "path": "assets/jobs/icon-food.v001.paint.json",
+          "bytes": 9002,
+          "sha256": "5974a90a9163bb75aabd6a1a06f69665c26249a051317d5831c2f8f02a95384f"
+        },
+        {
+          "path": "assets/graphics/icon-food/v001/image.png",
+          "bytes": 194,
+          "sha256": "6a5441d22c9113f0513146a4850696488cdd16d8ec32092ffebb3fb6c0734b30"
+        },
+        {
+          "path": "assets/graphics/icon-food/v001/project.paint.json",
+          "bytes": 6718,
+          "sha256": "ab865211097d982715ac4273276661b4814f9b036e2f5daee219f7e44e9b8ac4"
+        },
+        {
+          "path": "assets/graphics/icon-food/v001/report.json",
+          "bytes": 401,
+          "sha256": "4e5e19cdce13c53953c8e64c72e81f3462eebb6937b966240a113fbdaaee027b"
+        }
+      ],
+      "checks": {
+        "passed": true,
+        "width": 24,
+        "height": 24,
+        "hasTransparency": true,
+        "visibleRGBColors": 4,
+        "rgbaSHA256": "ba5bb88368d71c0d387779e7912b0d5e52715016b29395c8c1bec95ac89e1111",
+        "projectRoundtrip": true,
+        "alphaValues": [
+          0,
+          255
+        ],
+        "renderer": "AIPaint executeJob / PaintCore",
+        "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+        "pngAdapter": "kingdom-node-png/1"
+      }
+    },
+    {
+      "id": "icon-production",
+      "title": "生産",
+      "category": "icon",
+      "revision": "v001",
+      "tool": "AIPaint",
+      "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+      "width": 24,
+      "height": 24,
+      "status": "checked-candidate",
+      "integrated": false,
+      "visualReview": true,
+      "files": [
+        {
+          "path": "assets/jobs/icon-production.v001.paint.json",
+          "bytes": 5278,
+          "sha256": "0867a8141cb07dfe2a828ada603a6c3c329f1371cb0073c3e8d3f61e53094b0c"
+        },
+        {
+          "path": "assets/graphics/icon-production/v001/image.png",
+          "bytes": 187,
+          "sha256": "01a019ab84fbac232fbf4b648530f2c725d99a8e8f6df1089ea99709b648574f"
+        },
+        {
+          "path": "assets/graphics/icon-production/v001/project.paint.json",
+          "bytes": 6724,
+          "sha256": "50299c48009adacab27f87b3c31dc535ed1ee2e6e07255d1cb4d69d1c493badf"
+        },
+        {
+          "path": "assets/graphics/icon-production/v001/report.json",
+          "bytes": 401,
+          "sha256": "1814648eda9ca1290b4d0cae327afdaf1f75e3d378af4c32dc31a56f3c562eb6"
+        }
+      ],
+      "checks": {
+        "passed": true,
+        "width": 24,
+        "height": 24,
+        "hasTransparency": true,
+        "visibleRGBColors": 5,
+        "rgbaSHA256": "a8356b5a8daf094c069f3a43b9d9d331aa7474d7981efa252b38eeb0aa07b470",
+        "projectRoundtrip": true,
+        "alphaValues": [
+          0,
+          255
+        ],
+        "renderer": "AIPaint executeJob / PaintCore",
+        "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+        "pngAdapter": "kingdom-node-png/1"
+      }
+    },
+    {
+      "id": "icon-gold",
+      "title": "Gold",
+      "category": "icon",
+      "revision": "v001",
+      "tool": "AIPaint",
+      "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+      "width": 24,
+      "height": 24,
+      "status": "checked-candidate",
+      "integrated": false,
+      "visualReview": true,
+      "files": [
+        {
+          "path": "assets/jobs/icon-gold.v001.paint.json",
+          "bytes": 2373,
+          "sha256": "af156952de447572519593e487fbb2f346da5ebdfef7c74543ec8a0b7fe3fe5e"
+        },
+        {
+          "path": "assets/graphics/icon-gold/v001/image.png",
+          "bytes": 210,
+          "sha256": "9a3121cd3f5243fee9736f31c135877c4293f79bc8a3d05089df9cb6912606de"
+        },
+        {
+          "path": "assets/graphics/icon-gold/v001/project.paint.json",
+          "bytes": 6718,
+          "sha256": "7e853aaa3e784b227b40ab9810949b65cd6f58f68e409cc382293152b251405b"
+        },
+        {
+          "path": "assets/graphics/icon-gold/v001/report.json",
+          "bytes": 401,
+          "sha256": "dd998573634e020d5ea3796216cfbb63ede7103bd74dd880afe392b9788f0a9f"
+        }
+      ],
+      "checks": {
+        "passed": true,
+        "width": 24,
+        "height": 24,
+        "hasTransparency": true,
+        "visibleRGBColors": 4,
+        "rgbaSHA256": "66329caf82247fdbbff86a43e3421a143552b561b673510aae30236e5e726efd",
+        "projectRoundtrip": true,
+        "alphaValues": [
+          0,
+          255
+        ],
+        "renderer": "AIPaint executeJob / PaintCore",
+        "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+        "pngAdapter": "kingdom-node-png/1"
+      }
+    },
+    {
+      "id": "icon-science",
+      "title": "科学",
+      "category": "icon",
+      "revision": "v001",
+      "tool": "AIPaint",
+      "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+      "width": 24,
+      "height": 24,
+      "status": "checked-candidate",
+      "integrated": false,
+      "visualReview": true,
+      "files": [
+        {
+          "path": "assets/jobs/icon-science.v001.paint.json",
+          "bytes": 11827,
+          "sha256": "b5080f008526c5c0d7ca73aec49a583dcdf03995cde6ac8084b91b829564f052"
+        },
+        {
+          "path": "assets/graphics/icon-science/v001/image.png",
+          "bytes": 174,
+          "sha256": "08e90835f074d424ba7b9e902d0388af087a4b2bc56213a53a3b91dd9fecb940"
+        },
+        {
+          "path": "assets/graphics/icon-science/v001/project.paint.json",
+          "bytes": 6721,
+          "sha256": "24e5f8b300b441f159df601ea717cc0eae0f007b5d21d6b9c8f76fa15bcb403c"
+        },
+        {
+          "path": "assets/graphics/icon-science/v001/report.json",
+          "bytes": 401,
+          "sha256": "8442d44ad3ad21d5c7c0e947a660778f3265ce1619ec6319d4aa208d6af5ffad"
+        }
+      ],
+      "checks": {
+        "passed": true,
+        "width": 24,
+        "height": 24,
+        "hasTransparency": true,
+        "visibleRGBColors": 5,
+        "rgbaSHA256": "e340cfe21c65fd6011f344cea2c7eb5303b34a1e870f6d88f9f686f3d1eaa377",
+        "projectRoundtrip": true,
+        "alphaValues": [
+          0,
+          255
+        ],
+        "renderer": "AIPaint executeJob / PaintCore",
+        "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+        "pngAdapter": "kingdom-node-png/1"
+      }
+    },
+    {
+      "id": "icon-mana",
+      "title": "mana",
+      "category": "icon",
+      "revision": "v001",
+      "tool": "AIPaint",
+      "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+      "width": 24,
+      "height": 24,
+      "status": "checked-candidate",
+      "integrated": false,
+      "visualReview": true,
+      "files": [
+        {
+          "path": "assets/jobs/icon-mana.v001.paint.json",
+          "bytes": 12158,
+          "sha256": "7c66029affc6771f190b81d7ac51d7ff18befe264eaccc0338328b48e4bac043"
+        },
+        {
+          "path": "assets/graphics/icon-mana/v001/image.png",
+          "bytes": 190,
+          "sha256": "0e840721a86be8b505dc11d84330a4b12077afe7070dd07b983a99988da4055d"
+        },
+        {
+          "path": "assets/graphics/icon-mana/v001/project.paint.json",
+          "bytes": 6718,
+          "sha256": "3f1879980b9d564a2f8bab26599d5591651bf44ac28141739883c766b58041d9"
+        },
+        {
+          "path": "assets/graphics/icon-mana/v001/report.json",
+          "bytes": 401,
+          "sha256": "5743012b8a24a974f9f108493633b646b084ccea4f195c0217e814751cfed217"
+        }
+      ],
+      "checks": {
+        "passed": true,
+        "width": 24,
+        "height": 24,
+        "hasTransparency": true,
+        "visibleRGBColors": 4,
+        "rgbaSHA256": "95e6554603b1db6eb9d6cf493bffe7455ff3135842afb6ebf5b004a64408318f",
+        "projectRoundtrip": true,
+        "alphaValues": [
+          0,
+          255
+        ],
+        "renderer": "AIPaint executeJob / PaintCore",
+        "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+        "pngAdapter": "kingdom-node-png/1"
+      }
+    },
+    {
+      "id": "icon-religion",
+      "title": "宗教",
+      "category": "icon",
+      "revision": "v001",
+      "tool": "AIPaint",
+      "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+      "width": 24,
+      "height": 24,
+      "status": "checked-candidate",
+      "integrated": false,
+      "visualReview": true,
+      "files": [
+        {
+          "path": "assets/jobs/icon-religion.v001.paint.json",
+          "bytes": 3698,
+          "sha256": "fcfed235799c416d98dda5c98a7f2b4c916ee060f3f1b5013c6b9987976f4a69"
+        },
+        {
+          "path": "assets/graphics/icon-religion/v001/image.png",
+          "bytes": 197,
+          "sha256": "045616b52031883e1bc04bccb1f7b53ddf834fa190f7bd916d51ad1aecae49ca"
+        },
+        {
+          "path": "assets/graphics/icon-religion/v001/project.paint.json",
+          "bytes": 6722,
+          "sha256": "ef4f3217416a7c201e6e251f91cfba81bb32bfc65cfa943a0d6d72b7438fa724"
+        },
+        {
+          "path": "assets/graphics/icon-religion/v001/report.json",
+          "bytes": 401,
+          "sha256": "1afe5aaff2628589a2282da7687b904de631582b9126e30ec3489f4012fe3655"
+        }
+      ],
+      "checks": {
+        "passed": true,
+        "width": 24,
+        "height": 24,
+        "hasTransparency": true,
+        "visibleRGBColors": 6,
+        "rgbaSHA256": "839dd517d1bb7e97b7bbf6924c0f36cfa7a1fc7cd9b9d17a9d6213864b908837",
+        "projectRoundtrip": true,
+        "alphaValues": [
+          0,
+          255
+        ],
+        "renderer": "AIPaint executeJob / PaintCore",
+        "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+        "pngAdapter": "kingdom-node-png/1"
+      }
+    },
+    {
+      "id": "icon-culture",
+      "title": "文化",
+      "category": "icon",
+      "revision": "v001",
+      "tool": "AIPaint",
+      "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+      "width": 24,
+      "height": 24,
+      "status": "checked-candidate",
+      "integrated": false,
+      "visualReview": true,
+      "files": [
+        {
+          "path": "assets/jobs/icon-culture.v001.paint.json",
+          "bytes": 2588,
+          "sha256": "148f4bf3919b758e60b5d879c1067967cea2b638654c8e4d4d4f5855041e2e20"
+        },
+        {
+          "path": "assets/graphics/icon-culture/v001/image.png",
+          "bytes": 179,
+          "sha256": "1360307cca3081eebec4d2234da40dc4b92a2bb7c616c8fb8b958ff6e614619c"
+        },
+        {
+          "path": "assets/graphics/icon-culture/v001/project.paint.json",
+          "bytes": 6721,
+          "sha256": "7844d58f8d21fbe3b44035abca1789bc2ad913c1119367e2bee05825e12ed443"
+        },
+        {
+          "path": "assets/graphics/icon-culture/v001/report.json",
+          "bytes": 401,
+          "sha256": "8286699a0402716666866b6e4036bdfdd7fb0ceeff9c4878c70f7662e6412623"
+        }
+      ],
+      "checks": {
+        "passed": true,
+        "width": 24,
+        "height": 24,
+        "hasTransparency": true,
+        "visibleRGBColors": 4,
+        "rgbaSHA256": "e6e2f4eae6840a77b06b4f52db351a3e7431b3fb30a0ed8d481ec378d7249f14",
+        "projectRoundtrip": true,
+        "alphaValues": [
+          0,
+          255
+        ],
+        "renderer": "AIPaint executeJob / PaintCore",
+        "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+        "pngAdapter": "kingdom-node-png/1"
+      }
+    },
+    {
+      "id": "icon-popular-support",
+      "title": "人心",
+      "category": "icon",
+      "revision": "v001",
+      "tool": "AIPaint",
+      "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+      "width": 24,
+      "height": 24,
+      "status": "checked-candidate",
+      "integrated": false,
+      "visualReview": true,
+      "files": [
+        {
+          "path": "assets/jobs/icon-popular-support.v001.paint.json",
+          "bytes": 2375,
+          "sha256": "4370ce0f6770b0e903c3e844801fd8729b4f03c554282a2da0b0b94b21a9cbcf"
+        },
+        {
+          "path": "assets/graphics/icon-popular-support/v001/image.png",
+          "bytes": 177,
+          "sha256": "7caa18dedbf61c1d9bb097a8b82ea62a2726e422d70ac22a778061d06a5721db"
+        },
+        {
+          "path": "assets/graphics/icon-popular-support/v001/project.paint.json",
+          "bytes": 6729,
+          "sha256": "a4636e9679c748ab792690d69bd1f63a1fab6a7cc2ffb17169ee3d11eabc5262"
+        },
+        {
+          "path": "assets/graphics/icon-popular-support/v001/report.json",
+          "bytes": 401,
+          "sha256": "4c3dbfbcd6c4dfa15bb12be176d2907db194668d3cc28e6a7638d1dcbe66b033"
+        }
+      ],
+      "checks": {
+        "passed": true,
+        "width": 24,
+        "height": 24,
+        "hasTransparency": true,
+        "visibleRGBColors": 5,
+        "rgbaSHA256": "119baa7720c4409c34710efeaf166a1edac77528c742a4273d204f77ffee5554",
+        "projectRoundtrip": true,
+        "alphaValues": [
+          0,
+          255
+        ],
+        "renderer": "AIPaint executeJob / PaintCore",
+        "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
+        "pngAdapter": "kingdom-node-png/1"
+      }
+    },
+    {
+      "id": "se-ui-select",
+      "title": "選択",
+      "category": "se",
+      "revision": "v001",
+      "tool": "AIMusic",
+      "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
+      "status": "checked-candidate",
+      "integrated": false,
+      "listeningReviewed": false,
+      "seconds": 0.18448979591836734,
+      "sampleRate": 44100,
+      "channels": 2,
+      "loop": false,
+      "files": [
+        {
+          "path": "assets/jobs/se-ui-select.v001.music.json",
+          "bytes": 718,
+          "sha256": "20cc5ba24f66a91b6f5a79de65f4c26585ce85dbf0ae930701b64ead88d4270a"
+        },
+        {
+          "path": "assets/audio/se-ui-select/v001/project.music.json",
+          "bytes": 520,
+          "sha256": "4fa600be220b32197586f6b336d1bc017f51d77ce3a60d93eb0c44b7acefdbd2"
+        },
+        {
+          "path": "assets/audio/se-ui-select/v001/song.mid",
+          "bytes": 95,
+          "sha256": "0f0881416aae6b2405530a8d9636430af85f2183acb00607dba64441e26ef9bd"
+        },
+        {
+          "path": "assets/audio/se-ui-select/v001/source-render-report.json",
+          "bytes": 895,
+          "sha256": "12d3eb9b693489fd6eb83805758c60f47102b7378afd817b4d2158f45660c7ab"
+        },
+        {
+          "path": "assets/audio/se-ui-select/v001/audio.wav",
+          "bytes": 32588,
+          "sha256": "4857fae2ce0a53ebd6152870ec317315f8217211ed029a92688e8f40b9fd7065"
+        },
+        {
+          "path": "assets/audio/se-ui-select/v001/delivery-report.json",
+          "bytes": 784,
+          "sha256": "2dfb6dc0c2587d04882bbad00319c965be013bd338f5987ad8bd4a864e390366"
+        }
+      ],
+      "checks": {
+        "format": "aimusic-render-report",
+        "version": 1,
+        "projectId": "se-ui-select",
+        "renderer": "pcm-synth/1",
+        "mode": "tail",
+        "frames": 55125,
+        "bodyFrames": 33075,
+        "seconds": 1.25,
+        "scoreSeconds": 0.75,
+        "audibleTracks": 1,
+        "notes": 1,
+        "peak": 0.04966099187731743,
+        "rms": 0.007063055189205685,
+        "limiterGain": 1,
+        "silent": false,
+        "loopBoundaryJump": null,
+        "files": [
+          {
+            "file": "song.wav",
+            "bytes": 220544,
+            "sha256": "1a488c9891d7136353a7914fa2def182aaa4c4efb57de56fd3b5e67603c9de72"
+          },
+          {
+            "file": "song.mid",
+            "bytes": 95,
+            "sha256": "0f0881416aae6b2405530a8d9636430af85f2183acb00607dba64441e26ef9bd"
+          },
+          {
+            "file": "project.music.json",
+            "bytes": 520,
+            "sha256": "4fa600be220b32197586f6b336d1bc017f51d77ce3a60d93eb0c44b7acefdbd2"
+          }
+        ],
+        "githubStored": false,
+        "reviewStatus": "candidate"
+      }
+    },
+    {
+      "id": "se-ui-confirm",
+      "title": "確定",
+      "category": "se",
+      "revision": "v001",
+      "tool": "AIMusic",
+      "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
+      "status": "checked-candidate",
+      "integrated": false,
+      "listeningReviewed": false,
+      "seconds": 0.3021768707482993,
+      "sampleRate": 44100,
+      "channels": 2,
+      "loop": false,
+      "files": [
+        {
+          "path": "assets/jobs/se-ui-confirm.v001.music.json",
+          "bytes": 883,
+          "sha256": "a0ec05064e5bd389e327dc8ff772a984d5d39f186b9796f0723460bbca69e72a"
+        },
+        {
+          "path": "assets/audio/se-ui-confirm/v001/project.music.json",
+          "bytes": 671,
+          "sha256": "32cdb5e9629f64995fe00e5c434f3a8dfbfdaafcdf4116de3f219b371632918d"
+        },
+        {
+          "path": "assets/audio/se-ui-confirm/v001/song.mid",
+          "bytes": 104,
+          "sha256": "3e3249b158c1c6317df9a187a107122acbdbb758ee9c4877127192563ae8ba00"
+        },
+        {
+          "path": "assets/audio/se-ui-confirm/v001/source-render-report.json",
+          "bytes": 896,
+          "sha256": "7e91620ea1e51df7e9861d22222afab9e935222835174668a200da5960450271"
+        },
+        {
+          "path": "assets/audio/se-ui-confirm/v001/audio.wav",
+          "bytes": 53348,
+          "sha256": "740b2de47e4dc8f3918ed03a0ab6e9c4ca74e32a8e6b1ab23a71d6ade1e9e5bb"
+        },
+        {
+          "path": "assets/audio/se-ui-confirm/v001/delivery-report.json",
+          "bytes": 786,
+          "sha256": "ea20709a2d47698dee3b8031ee0b1341bfd345630a719245b9fadc0000bc51ea"
+        }
+      ],
+      "checks": {
+        "format": "aimusic-render-report",
+        "version": 1,
+        "projectId": "se-ui-confirm",
+        "renderer": "pcm-synth/1",
+        "mode": "tail",
+        "frames": 55125,
+        "bodyFrames": 33075,
+        "seconds": 1.25,
+        "scoreSeconds": 0.75,
+        "audibleTracks": 1,
+        "notes": 2,
+        "peak": 0.0908452719449997,
+        "rms": 0.012766846670685462,
+        "limiterGain": 1,
+        "silent": false,
+        "loopBoundaryJump": null,
+        "files": [
+          {
+            "file": "song.wav",
+            "bytes": 220544,
+            "sha256": "410449509fb7922309140906c5bd1e4783287f2d28a11313b71be4cbd55f1d1c"
+          },
+          {
+            "file": "song.mid",
+            "bytes": 104,
+            "sha256": "3e3249b158c1c6317df9a187a107122acbdbb758ee9c4877127192563ae8ba00"
+          },
+          {
+            "file": "project.music.json",
+            "bytes": 671,
+            "sha256": "32cdb5e9629f64995fe00e5c434f3a8dfbfdaafcdf4116de3f219b371632918d"
+          }
+        ],
+        "githubStored": false,
+        "reviewStatus": "candidate"
+      }
+    },
+    {
+      "id": "se-ui-cancel",
+      "title": "戻る",
+      "category": "se",
+      "revision": "v001",
+      "tool": "AIMusic",
+      "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
+      "status": "checked-candidate",
+      "integrated": false,
+      "listeningReviewed": false,
+      "seconds": 0.2744671201814059,
+      "sampleRate": 44100,
+      "channels": 2,
+      "loop": false,
+      "files": [
+        {
+          "path": "assets/jobs/se-ui-cancel.v001.music.json",
+          "bytes": 882,
+          "sha256": "04aec0f383f93fb6ed0d8089e7b342471a63efad9e4eacae63e924d2e4635459"
+        },
+        {
+          "path": "assets/audio/se-ui-cancel/v001/project.music.json",
+          "bytes": 670,
+          "sha256": "cdb2eae1540654ffb7f573fff5db980f83d0e1d65ce24e587eba79da7c75df16"
+        },
+        {
+          "path": "assets/audio/se-ui-cancel/v001/song.mid",
+          "bytes": 103,
+          "sha256": "c296638459cbc539d4cf82b011bd1396617a4fd4f2343d81cc86c906095f7dcf"
+        },
+        {
+          "path": "assets/audio/se-ui-cancel/v001/source-render-report.json",
+          "bytes": 896,
+          "sha256": "ded3be2aeffa82415788e3bcf939607a8bfabd08935b89ca2a18611770406efb"
+        },
+        {
+          "path": "assets/audio/se-ui-cancel/v001/audio.wav",
+          "bytes": 48460,
+          "sha256": "f1471a18d62c5fa88cb6c61eef1a879837a5fb313d87bc7b2d910cdacfd1cc79"
+        },
+        {
+          "path": "assets/audio/se-ui-cancel/v001/delivery-report.json",
+          "bytes": 784,
+          "sha256": "5d6552a74132032c48cdb7fe9d309d690b76d3dbe8ac0342b3744b7734675321"
+        }
+      ],
+      "checks": {
+        "format": "aimusic-render-report",
+        "version": 1,
+        "projectId": "se-ui-cancel",
+        "renderer": "pcm-synth/1",
+        "mode": "tail",
+        "frames": 55125,
+        "bodyFrames": 33075,
+        "seconds": 1.25,
+        "scoreSeconds": 0.75,
+        "audibleTracks": 1,
+        "notes": 2,
+        "peak": 0.07634003460407257,
+        "rms": 0.010261298736932954,
+        "limiterGain": 1,
+        "silent": false,
+        "loopBoundaryJump": null,
+        "files": [
+          {
+            "file": "song.wav",
+            "bytes": 220544,
+            "sha256": "ebe89d961ccf9fb745e17205269f07a84aeced62f4dcdd343d047e709241c2c0"
+          },
+          {
+            "file": "song.mid",
+            "bytes": 103,
+            "sha256": "c296638459cbc539d4cf82b011bd1396617a4fd4f2343d81cc86c906095f7dcf"
+          },
+          {
+            "file": "project.music.json",
+            "bytes": 670,
+            "sha256": "cdb2eae1540654ffb7f573fff5db980f83d0e1d65ce24e587eba79da7c75df16"
+          }
+        ],
+        "githubStored": false,
+        "reviewStatus": "candidate"
+      }
+    },
+    {
+      "id": "se-ui-error",
+      "title": "操作不可",
+      "category": "se",
+      "revision": "v001",
+      "tool": "AIMusic",
+      "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
+      "status": "checked-candidate",
+      "integrated": false,
+      "listeningReviewed": false,
+      "seconds": 0.20494331065759638,
+      "sampleRate": 44100,
+      "channels": 2,
+      "loop": false,
+      "files": [
+        {
+          "path": "assets/jobs/se-ui-error.v001.music.json",
+          "bytes": 887,
+          "sha256": "55b3eb2040d96d9fb9fde21c9a8a3bfeadae4e21e318bac7190af9df0340c4b7"
+        },
+        {
+          "path": "assets/audio/se-ui-error/v001/project.music.json",
+          "bytes": 675,
+          "sha256": "76cd2cd8811cb2c289d0bf7cf8ee627db9e102e7afaf025aee558e7b6c637e01"
+        },
+        {
+          "path": "assets/audio/se-ui-error/v001/song.mid",
+          "bytes": 109,
+          "sha256": "2f9880b335979542bff4f4a9548d4edac439b7c8a07884aa95408f4924f54915"
+        },
+        {
+          "path": "assets/audio/se-ui-error/v001/source-render-report.json",
+          "bytes": 895,
+          "sha256": "b0a1b7dbe9d206b114465822db943ca1578fb32ccac0a9e2ae11909c8e8b3b9e"
+        },
+        {
+          "path": "assets/audio/se-ui-error/v001/audio.wav",
+          "bytes": 36196,
+          "sha256": "03d7b448a7128c3120d61f7c83fcdde54c2fc1a4e579a15d51fd4141f1a3f853"
+        },
+        {
+          "path": "assets/audio/se-ui-error/v001/delivery-report.json",
+          "bytes": 782,
+          "sha256": "67629ec7bbfe57988e4cc3cb447ac46d337e4517822f0476d46ba5af28986cdf"
+        }
+      ],
+      "checks": {
+        "format": "aimusic-render-report",
+        "version": 1,
+        "projectId": "se-ui-error",
+        "renderer": "pcm-synth/1",
+        "mode": "tail",
+        "frames": 55125,
+        "bodyFrames": 33075,
+        "seconds": 1.25,
+        "scoreSeconds": 0.75,
+        "audibleTracks": 1,
+        "notes": 2,
+        "peak": 0.02460997737944126,
+        "rms": 0.007976168155679137,
+        "limiterGain": 1,
+        "silent": false,
+        "loopBoundaryJump": null,
+        "files": [
+          {
+            "file": "song.wav",
+            "bytes": 220544,
+            "sha256": "ec344046daf112cd7e4987b4382576cf7a2eb62d933bf4acdc1be039c58fb178"
+          },
+          {
+            "file": "song.mid",
+            "bytes": 109,
+            "sha256": "2f9880b335979542bff4f4a9548d4edac439b7c8a07884aa95408f4924f54915"
+          },
+          {
+            "file": "project.music.json",
+            "bytes": 675,
+            "sha256": "76cd2cd8811cb2c289d0bf7cf8ee627db9e102e7afaf025aee558e7b6c637e01"
+          }
+        ],
+        "githubStored": false,
+        "reviewStatus": "candidate"
+      }
+    },
+    {
+      "id": "se-turn-start",
+      "title": "新しい手番",
+      "category": "se",
+      "revision": "v001",
+      "tool": "AIMusic",
+      "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
+      "status": "checked-candidate",
+      "integrated": false,
+      "listeningReviewed": false,
+      "seconds": 0.83859410430839,
+      "sampleRate": 44100,
+      "channels": 2,
+      "loop": false,
+      "files": [
+        {
+          "path": "assets/jobs/se-turn-start.v001.music.json",
+          "bytes": 1049,
+          "sha256": "67aa8410abaad459f46245ad79a753cc6319123c04e89b2b67c0bcf2069ca182"
+        },
+        {
+          "path": "assets/audio/se-turn-start/v001/project.music.json",
+          "bytes": 823,
+          "sha256": "0d8fe6b60102bdb2606dcbbb506ed46de29bce4f81b4f4035997f43a3790566d"
+        },
+        {
+          "path": "assets/audio/se-turn-start/v001/song.mid",
+          "bytes": 120,
+          "sha256": "c06c111c5ddbd38c65b6fef64f87d4fb7e298fbdef5ee5da3bf40aecd634e7e4"
+        },
+        {
+          "path": "assets/audio/se-turn-start/v001/source-render-report.json",
+          "bytes": 895,
+          "sha256": "1048f7a35f81b182a43f70cf24cc01d9d8ec3f856bbf88e852089406dee623d7"
+        },
+        {
+          "path": "assets/audio/se-turn-start/v001/audio.wav",
+          "bytes": 147972,
+          "sha256": "cf68683dc555060926509f08f0556a5bebcda9e71a46dfa0484833d4f4864920"
+        },
+        {
+          "path": "assets/audio/se-turn-start/v001/delivery-report.json",
+          "bytes": 785,
+          "sha256": "03f92b60986184b95b442593a181264370c133c422d9ceba19cb59a810d52090"
+        }
+      ],
+      "checks": {
+        "format": "aimusic-render-report",
+        "version": 1,
+        "projectId": "se-turn-start",
+        "renderer": "pcm-synth/1",
+        "mode": "tail",
+        "frames": 55125,
+        "bodyFrames": 33075,
+        "seconds": 1.25,
+        "scoreSeconds": 0.75,
+        "audibleTracks": 1,
+        "notes": 3,
+        "peak": 0.1943235695362091,
+        "rms": 0.03481484823580233,
+        "limiterGain": 1,
+        "silent": false,
+        "loopBoundaryJump": null,
+        "files": [
+          {
+            "file": "song.wav",
+            "bytes": 220544,
+            "sha256": "5130774c9d5cfdd914baed7699cbe80be54d38fb76b11d8b9d081cf161897329"
+          },
+          {
+            "file": "song.mid",
+            "bytes": 120,
+            "sha256": "c06c111c5ddbd38c65b6fef64f87d4fb7e298fbdef5ee5da3bf40aecd634e7e4"
+          },
+          {
+            "file": "project.music.json",
+            "bytes": 823,
+            "sha256": "0d8fe6b60102bdb2606dcbbb506ed46de29bce4f81b4f4035997f43a3790566d"
+          }
+        ],
+        "githubStored": false,
+        "reviewStatus": "candidate"
+      }
+    },
+    {
+      "id": "se-production-complete",
+      "title": "完成",
+      "category": "se",
+      "revision": "v001",
+      "tool": "AIMusic",
+      "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
+      "status": "checked-candidate",
+      "integrated": false,
+      "listeningReviewed": false,
+      "seconds": 0.8940136054421769,
+      "sampleRate": 44100,
+      "channels": 2,
+      "loop": false,
+      "files": [
+        {
+          "path": "assets/jobs/se-production-complete.v001.music.json",
+          "bytes": 1751,
+          "sha256": "4c1dba4638f808697f1d2608d6e3dccaca29b261a6012e5a3335f3384446ba37"
+        },
+        {
+          "path": "assets/audio/se-production-complete/v001/project.music.json",
+          "bytes": 1461,
+          "sha256": "9a2b5bf949355c5106d546c8842eda25730b64472983963da6717e5eb1100568"
+        },
+        {
+          "path": "assets/audio/se-production-complete/v001/song.mid",
+          "bytes": 176,
+          "sha256": "91efbae6590a52f59b050f009efec7818b31dbcb3579727fddc4ca89e9522bcb"
+        },
+        {
+          "path": "assets/audio/se-production-complete/v001/source-render-report.json",
+          "bytes": 907,
+          "sha256": "8d1070bc710fcf826bd977a0830101dcc3fbce437023b9f9d56df58683d8bfe2"
+        },
+        {
+          "path": "assets/audio/se-production-complete/v001/audio.wav",
+          "bytes": 157748,
+          "sha256": "05de461c550c5a75b3766cb7660d6084e09e27d532c7d0ba5bd3eb95874098f4"
+        },
+        {
+          "path": "assets/audio/se-production-complete/v001/delivery-report.json",
+          "bytes": 805,
+          "sha256": "8c00c5a14065fc8169ca989bb7adc3bc03c293c5b822d5164e1f4b39f4f5827b"
+        }
+      ],
+      "checks": {
+        "format": "aimusic-render-report",
+        "version": 1,
+        "projectId": "se-production-complete",
+        "renderer": "pcm-synth/1",
+        "mode": "tail",
+        "frames": 55125,
+        "bodyFrames": 33075,
+        "seconds": 1.25,
+        "scoreSeconds": 0.75,
+        "audibleTracks": 2,
+        "notes": 6,
+        "peak": 0.21187180280685425,
+        "rms": 0.042427316330535446,
+        "limiterGain": 1,
+        "silent": false,
+        "loopBoundaryJump": null,
+        "files": [
+          {
+            "file": "song.wav",
+            "bytes": 220544,
+            "sha256": "e78eb5ba649089b80a135911d4da6ea278e6c85357c0b4b3da1d62b06c992ba4"
+          },
+          {
+            "file": "song.mid",
+            "bytes": 176,
+            "sha256": "91efbae6590a52f59b050f009efec7818b31dbcb3579727fddc4ca89e9522bcb"
+          },
+          {
+            "file": "project.music.json",
+            "bytes": 1461,
+            "sha256": "9a2b5bf949355c5106d546c8842eda25730b64472983963da6717e5eb1100568"
+          }
+        ],
+        "githubStored": false,
+        "reviewStatus": "candidate"
+      }
+    },
+    {
+      "id": "se-purchase",
+      "title": "購入",
+      "category": "se",
+      "revision": "v001",
+      "tool": "AIMusic",
+      "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
+      "status": "checked-candidate",
+      "integrated": false,
+      "listeningReviewed": false,
+      "seconds": 0.573718820861678,
+      "sampleRate": 44100,
+      "channels": 2,
+      "loop": false,
+      "files": [
+        {
+          "path": "assets/jobs/se-purchase.v001.music.json",
+          "bytes": 874,
+          "sha256": "b778d66c50c8fbc2290c17be215ba1272732849983263e586cae7fef7958043c"
+        },
+        {
+          "path": "assets/audio/se-purchase/v001/project.music.json",
+          "bytes": 662,
+          "sha256": "e21bc7312eb85d9dfb82cfc3fb652e117053008fac602dd9c40809454b1a3c13"
+        },
+        {
+          "path": "assets/audio/se-purchase/v001/song.mid",
+          "bytes": 102,
+          "sha256": "e2f5fddc6f105696f742b8d1abe80a7c1f36b8d6b77efe78869f8a457c08b755"
+        },
+        {
+          "path": "assets/audio/se-purchase/v001/source-render-report.json",
+          "bytes": 895,
+          "sha256": "937e35075e4d96a0a45fcc11dee0a6194a6650647a663d837b50581b9c05222c"
+        },
+        {
+          "path": "assets/audio/se-purchase/v001/audio.wav",
+          "bytes": 101248,
+          "sha256": "40eebd3ec91173fa65e7cbc73b32015b3d7d4bf317e1233970ceead210552bab"
+        },
+        {
+          "path": "assets/audio/se-purchase/v001/delivery-report.json",
+          "bytes": 782,
+          "sha256": "8b9dd0a9d28ebb0228579e1133c80d0bdfbc3d71f378ce4f599c8a85dbf4ad2d"
+        }
+      ],
+      "checks": {
+        "format": "aimusic-render-report",
+        "version": 1,
+        "projectId": "se-purchase",
+        "renderer": "pcm-synth/1",
+        "mode": "tail",
+        "frames": 55125,
+        "bodyFrames": 33075,
+        "seconds": 1.25,
+        "scoreSeconds": 0.75,
+        "audibleTracks": 1,
+        "notes": 2,
+        "peak": 0.17771266400814056,
+        "rms": 0.021544150197810585,
+        "limiterGain": 1,
+        "silent": false,
+        "loopBoundaryJump": null,
+        "files": [
+          {
+            "file": "song.wav",
+            "bytes": 220544,
+            "sha256": "8091e5a82456807494421507d54ccc529cbb680f70af90a76456e70afdbad73c"
+          },
+          {
+            "file": "song.mid",
+            "bytes": 102,
+            "sha256": "e2f5fddc6f105696f742b8d1abe80a7c1f36b8d6b77efe78869f8a457c08b755"
+          },
+          {
+            "file": "project.music.json",
+            "bytes": 662,
+            "sha256": "e21bc7312eb85d9dfb82cfc3fb652e117053008fac602dd9c40809454b1a3c13"
+          }
+        ],
+        "githubStored": false,
+        "reviewStatus": "candidate"
+      }
+    },
+    {
+      "id": "se-party-move",
+      "title": "足取り",
+      "category": "se",
+      "revision": "v001",
+      "tool": "AIMusic",
+      "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
+      "status": "checked-candidate",
+      "integrated": false,
+      "listeningReviewed": false,
+      "seconds": 0.2527891156462585,
+      "sampleRate": 44100,
+      "channels": 2,
+      "loop": false,
+      "files": [
+        {
+          "path": "assets/jobs/se-party-move.v001.music.json",
+          "bytes": 1255,
+          "sha256": "2b86bb47be8f0c5af0969b3958982b5df14aec6599bef126e60a332ac4cadb20"
+        },
+        {
+          "path": "assets/audio/se-party-move/v001/project.music.json",
+          "bytes": 1007,
+          "sha256": "ec8c7a43fbc30ed97836dce01d438a0dd49d30f1037385878d98be6a5c2e739d"
+        },
+        {
+          "path": "assets/audio/se-party-move/v001/song.mid",
+          "bytes": 127,
+          "sha256": "8e123bd522374531d5d4c20ed44d94b31169676d35d8d6307e54207b95bdc3e9"
+        },
+        {
+          "path": "assets/audio/se-party-move/v001/source-render-report.json",
+          "bytes": 899,
+          "sha256": "97dad5a644a18db7ad95ac28525bc5bac229e408bc1bacd2943bb28bfa3d3d40"
+        },
+        {
+          "path": "assets/audio/se-party-move/v001/audio.wav",
+          "bytes": 44636,
+          "sha256": "a3f774d4dea9e19dd87556761ac21b389c29230730cbaadeddabb1504f8407c9"
+        },
+        {
+          "path": "assets/audio/se-party-move/v001/delivery-report.json",
+          "bytes": 786,
+          "sha256": "66b1f8a5e61f9d429708a65acae964d4ee7aba8a2bd153bd6e35240ef8788f27"
+        }
+      ],
+      "checks": {
+        "format": "aimusic-render-report",
+        "version": 1,
+        "projectId": "se-party-move",
+        "renderer": "pcm-synth/1",
+        "mode": "tail",
+        "frames": 55125,
+        "bodyFrames": 33075,
+        "seconds": 1.25,
+        "scoreSeconds": 0.75,
+        "audibleTracks": 2,
+        "notes": 3,
+        "peak": 0.04182619974017143,
+        "rms": 0.0034629844377658033,
+        "limiterGain": 1,
+        "silent": false,
+        "loopBoundaryJump": null,
+        "files": [
+          {
+            "file": "song.wav",
+            "bytes": 220544,
+            "sha256": "33f2093b4d17967b2fb6813189e60d910a650bc926115b208a227e153cda4422"
+          },
+          {
+            "file": "song.mid",
+            "bytes": 127,
+            "sha256": "8e123bd522374531d5d4c20ed44d94b31169676d35d8d6307e54207b95bdc3e9"
+          },
+          {
+            "file": "project.music.json",
+            "bytes": 1007,
+            "sha256": "ec8c7a43fbc30ed97836dce01d438a0dd49d30f1037385878d98be6a5c2e739d"
+          }
+        ],
+        "githubStored": false,
+        "reviewStatus": "candidate"
+      }
+    },
+    {
+      "id": "bgm-overworld",
+      "title": "暁の王領",
+      "category": "bgm",
+      "revision": "v001",
+      "tool": "AIMusic",
+      "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
+      "status": "checked-candidate",
+      "integrated": false,
+      "listeningReviewed": false,
+      "seconds": 17.77777777777778,
+      "sampleRate": 44100,
+      "channels": 2,
+      "loop": true,
+      "files": [
+        {
+          "path": "assets/jobs/bgm-overworld.v001.music.json",
+          "bytes": 24173,
+          "sha256": "da9a06b803dfd5cdb35e0d26a5bd4a906e35d4a3516de12f294807a5e508131f"
+        },
+        {
+          "path": "assets/audio/bgm-overworld/v001/project.music.json",
+          "bytes": 21949,
+          "sha256": "a7a40b7d1fd4420017fb750ce7c49d77bf980a72c187ad0339f881ede17298b2"
+        },
+        {
+          "path": "assets/audio/bgm-overworld/v001/song.mid",
+          "bytes": 1476,
+          "sha256": "87edbb3d2cb62c57008bfc25b6eaf702c53ae6286c14b654be581e9db11a1bbc"
+        },
+        {
+          "path": "assets/audio/bgm-overworld/v001/source-render-report.json",
+          "bytes": 927,
+          "sha256": "34a1569ebda515a4cd66169884604aca091a0aa181c4d3274d07b5cd51226e64"
+        },
+        {
+          "path": "assets/audio/bgm-overworld/v001/audio.ogg",
+          "bytes": 106909,
+          "sha256": "ca04d8def410b42a64a5c90febb330bf0190ae2068209a0a9942e8a1f2995882"
+        },
+        {
+          "path": "assets/audio/bgm-overworld/v001/delivery-report.json",
+          "bytes": 837,
+          "sha256": "b37267341c9f85eac1ebcec986e6214633b0af56f462abb4527c5710a17e2320"
+        }
+      ],
+      "checks": {
+        "format": "aimusic-render-report",
+        "version": 1,
+        "projectId": "bgm-overworld",
+        "renderer": "pcm-synth/1",
+        "mode": "loop",
+        "frames": 784000,
+        "bodyFrames": 784000,
+        "seconds": 17.77777777777778,
+        "scoreSeconds": 17.77777777777778,
+        "audibleTracks": 4,
+        "notes": 141,
+        "peak": 0.13193121552467346,
+        "rms": 0.04549946613418852,
+        "limiterGain": 1,
+        "silent": false,
+        "loopBoundaryJump": 0,
+        "files": [
+          {
+            "file": "song.wav",
+            "bytes": 3136044,
+            "sha256": "9eb63ac7a649272847045afa5d428af9d19892e2e642c3b70d19f22e0b96b14b"
+          },
+          {
+            "file": "song.mid",
+            "bytes": 1476,
+            "sha256": "87edbb3d2cb62c57008bfc25b6eaf702c53ae6286c14b654be581e9db11a1bbc"
+          },
+          {
+            "file": "project.music.json",
+            "bytes": 21949,
+            "sha256": "a7a40b7d1fd4420017fb750ce7c49d77bf980a72c187ad0339f881ede17298b2"
+          }
+        ],
+        "githubStored": false,
+        "reviewStatus": "candidate"
+      }
+    },
+    {
+      "id": "bgm-battle",
+      "title": "剣旗の進軍",
+      "category": "bgm",
+      "revision": "v001",
+      "tool": "AIMusic",
+      "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
+      "status": "checked-candidate",
+      "integrated": false,
+      "listeningReviewed": false,
+      "seconds": 13.333333333333334,
+      "sampleRate": 44100,
+      "channels": 2,
+      "loop": true,
+      "files": [
+        {
+          "path": "assets/jobs/bgm-battle.v001.music.json",
+          "bytes": 42021,
+          "sha256": "c92a2e5e7b38d8ba96559168c5a018aed07c575b3d1d8cd709b96257de7503d2"
+        },
+        {
+          "path": "assets/audio/bgm-battle/v001/project.music.json",
+          "bytes": 38255,
+          "sha256": "247742af79d9243e9c7f8ca493836567e6d3900cf47ada79604bfa8c5594fbe5"
+        },
+        {
+          "path": "assets/audio/bgm-battle/v001/song.mid",
+          "bytes": 2485,
+          "sha256": "7bc3f75b8aebc090b32f40b4f8199d3cbc3d64a283876bfbfdb8b6c1dff6b810"
+        },
+        {
+          "path": "assets/audio/bgm-battle/v001/source-render-report.json",
+          "bytes": 947,
+          "sha256": "3280b2a795245053e8a617fc0405493713d25eb70a8ccf22f922d0c0d5bb3f09"
+        },
+        {
+          "path": "assets/audio/bgm-battle/v001/audio.ogg",
+          "bytes": 139830,
+          "sha256": "504bdf5fe7328daa4c507abc7d3626d23c796a83fdbf2b44dfab0eed472b63ad"
+        },
+        {
+          "path": "assets/audio/bgm-battle/v001/delivery-report.json",
+          "bytes": 832,
+          "sha256": "9e5fee7a0c5f01dc8d32127caac1e941cc60cac2fe049c6a3e3dd900c4ca6f1d"
+        }
+      ],
+      "checks": {
+        "format": "aimusic-render-report",
+        "version": 1,
+        "projectId": "bgm-battle",
+        "renderer": "pcm-synth/1",
+        "mode": "loop",
+        "frames": 588000,
+        "bodyFrames": 588000,
+        "seconds": 13.333333333333334,
+        "scoreSeconds": 13.333333333333334,
+        "audibleTracks": 6,
+        "notes": 248,
+        "peak": 0.15573546290397644,
+        "rms": 0.03971518216295943,
+        "limiterGain": 1,
+        "silent": false,
+        "loopBoundaryJump": 0.00005532149225473404,
+        "files": [
+          {
+            "file": "song.wav",
+            "bytes": 2352044,
+            "sha256": "683593ee077091fdda9b5ac82e645bf8b68414d14ddf1a7ef781bd5ba388f765"
+          },
+          {
+            "file": "song.mid",
+            "bytes": 2485,
+            "sha256": "7bc3f75b8aebc090b32f40b4f8199d3cbc3d64a283876bfbfdb8b6c1dff6b810"
+          },
+          {
+            "file": "project.music.json",
+            "bytes": 38255,
+            "sha256": "247742af79d9243e9c7f8ca493836567e6d3900cf47ada79604bfa8c5594fbe5"
+          }
+        ],
+        "githubStored": false,
+        "reviewStatus": "candidate"
+      }
+    }
+  ],
+  "verification": {
+    "path": "assets/verification.json",
+    "result": "passed",
+    "count": 27
+  }
+}

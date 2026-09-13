@@ -1,0 +1,37 @@
+{
+  "format": "aimusic-project",
+  "version": 1,
+  "id": "se-ui-error",
+  "title": "操作不可",
+  "tempo": 240,
+  "bars": 1,
+  "beatsPerBar": 3,
+  "master": 0.76,
+  "tracks": [
+    {
+      "id": "pulse-0",
+      "name": "pulse-0",
+      "instrument": "pulse",
+      "volume": 0.38,
+      "pan": 0,
+      "mute": false,
+      "solo": false,
+      "notes": [
+        {
+          "id": "pulse-0-0",
+          "pitch": 48,
+          "start": 0,
+          "duration": 115,
+          "velocity": 96
+        },
+        {
+          "id": "pulse-0-1",
+          "pitch": 47,
+          "start": 173,
+          "duration": 115,
+          "velocity": 96
+        }
+      ]
+    }
+  ]
+}

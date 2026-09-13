@@ -1,0 +1,53 @@
+{
+  "format": "aimusic-job",
+  "version": 1,
+  "project": {
+    "format": "aimusic-project",
+    "version": 1,
+    "id": "se-turn-start",
+    "title": "新しい手番",
+    "tempo": 240,
+    "bars": 1,
+    "beatsPerBar": 3,
+    "master": 0.76,
+    "tracks": [
+      {
+        "id": "bell-0",
+        "name": "bell-0",
+        "instrument": "bell",
+        "volume": 0.76,
+        "pan": 0,
+        "mute": false,
+        "solo": false,
+        "notes": [
+          {
+            "id": "bell-0-0",
+            "pitch": 67,
+            "start": 0,
+            "duration": 120,
+            "velocity": 96
+          },
+          {
+            "id": "bell-0-1",
+            "pitch": 74,
+            "start": 230,
+            "duration": 125,
+            "velocity": 96
+          },
+          {
+            "id": "bell-0-2",
+            "pitch": 79,
+            "start": 470,
+            "duration": 240,
+            "velocity": 96
+          }
+        ]
+      }
+    ]
+  },
+  "batches": [],
+  "render": {
+    "sampleRate": 44100,
+    "mode": "tail"
+  }
+}

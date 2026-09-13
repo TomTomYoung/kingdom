@@ -1,0 +1,55 @@
+{
+  "format": "aimusic-project",
+  "version": 1,
+  "id": "se-party-move",
+  "title": "足取り",
+  "tempo": 240,
+  "bars": 1,
+  "beatsPerBar": 3,
+  "master": 0.76,
+  "tracks": [
+    {
+      "id": "snare-0",
+      "name": "snare-0",
+      "instrument": "snare",
+      "volume": 0.2,
+      "pan": 0,
+      "mute": false,
+      "solo": false,
+      "notes": [
+        {
+          "id": "snare-0-0",
+          "pitch": 38,
+          "start": 0,
+          "duration": 38,
+          "velocity": 96
+        },
+        {
+          "id": "snare-0-1",
+          "pitch": 38,
+          "start": 192,
+          "duration": 38,
+          "velocity": 96
+        }
+      ]
+    },
+    {
+      "id": "kick-1",
+      "name": "kick-1",
+      "instrument": "kick",
+      "volume": 0.32,
+      "pan": 0,
+      "mute": false,
+      "solo": false,
+      "notes": [
+        {
+          "id": "kick-1-0",
+          "pitch": 36,
+          "start": 0,
+          "duration": 29,
+          "velocity": 96
+        }
+      ]
+    }
+  ]
+}

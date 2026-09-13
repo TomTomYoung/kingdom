@@ -1,0 +1,1052 @@
+{
+  "format": "aimusic-job",
+  "version": 1,
+  "project": {
+    "format": "aimusic-project",
+    "version": 1,
+    "id": "bgm-overworld",
+    "title": "暁の王領",
+    "tempo": 108,
+    "bars": 8,
+    "beatsPerBar": 4,
+    "master": 0.76,
+    "tracks": [
+      {
+        "id": "melody",
+        "name": "melody",
+        "instrument": "flute",
+        "volume": 0.62,
+        "pan": -0.1,
+        "mute": false,
+        "solo": false,
+        "notes": [
+          {
+            "id": "melody-0",
+            "pitch": 72,
+            "start": 0,
+            "duration": 408,
+            "velocity": 84
+          },
+          {
+            "id": "melody-1",
+            "pitch": 76,
+            "start": 480,
+            "duration": 182,
+            "velocity": 84
+          },
+          {
+            "id": "melody-2",
+            "pitch": 79,
+            "start": 720,
+            "duration": 576,
+            "velocity": 84
+          },
+          {
+            "id": "melody-3",
+            "pitch": 76,
+            "start": 1440,
+            "duration": 336,
+            "velocity": 84
+          },
+          {
+            "id": "melody-4",
+            "pitch": 74,
+            "start": 1920,
+            "duration": 648,
+            "velocity": 87
+          },
+          {
+            "id": "melody-5",
+            "pitch": 71,
+            "start": 2640,
+            "duration": 192,
+            "velocity": 87
+          },
+          {
+            "id": "melody-6",
+            "pitch": 67,
+            "start": 2880,
+            "duration": 432,
+            "velocity": 87
+          },
+          {
+            "id": "melody-7",
+            "pitch": 69,
+            "start": 3360,
+            "duration": 168,
+            "velocity": 87
+          },
+          {
+            "id": "melody-8",
+            "pitch": 71,
+            "start": 3600,
+            "duration": 168,
+            "velocity": 87
+          },
+          {
+            "id": "melody-9",
+            "pitch": 72,
+            "start": 3840,
+            "duration": 288,
+            "velocity": 90
+          },
+          {
+            "id": "melody-10",
+            "pitch": 76,
+            "start": 4200,
+            "duration": 288,
+            "velocity": 90
+          },
+          {
+            "id": "melody-11",
+            "pitch": 81,
+            "start": 4560,
+            "duration": 408,
+            "velocity": 90
+          },
+          {
+            "id": "melody-12",
+            "pitch": 79,
+            "start": 5040,
+            "duration": 192,
+            "velocity": 90
+          },
+          {
+            "id": "melody-13",
+            "pitch": 76,
+            "start": 5280,
+            "duration": 336,
+            "velocity": 90
+          },
+          {
+            "id": "melody-14",
+            "pitch": 77,
+            "start": 5760,
+            "duration": 624,
+            "velocity": 84
+          },
+          {
+            "id": "melody-15",
+            "pitch": 76,
+            "start": 6480,
+            "duration": 192,
+            "velocity": 84
+          },
+          {
+            "id": "melody-16",
+            "pitch": 74,
+            "start": 6720,
+            "duration": 336,
+            "velocity": 84
+          },
+          {
+            "id": "melody-17",
+            "pitch": 72,
+            "start": 7200,
+            "duration": 336,
+            "velocity": 84
+          },
+          {
+            "id": "melody-18",
+            "pitch": 79,
+            "start": 7680,
+            "duration": 312,
+            "velocity": 87
+          },
+          {
+            "id": "melody-19",
+            "pitch": 84,
+            "start": 8040,
+            "duration": 264,
+            "velocity": 87
+          },
+          {
+            "id": "melody-20",
+            "pitch": 83,
+            "start": 8400,
+            "duration": 192,
+            "velocity": 87
+          },
+          {
+            "id": "melody-21",
+            "pitch": 79,
+            "start": 8640,
+            "duration": 528,
+            "velocity": 87
+          },
+          {
+            "id": "melody-22",
+            "pitch": 76,
+            "start": 9360,
+            "duration": 168,
+            "velocity": 87
+          },
+          {
+            "id": "melody-23",
+            "pitch": 77,
+            "start": 9600,
+            "duration": 288,
+            "velocity": 90
+          },
+          {
+            "id": "melody-24",
+            "pitch": 81,
+            "start": 9960,
+            "duration": 288,
+            "velocity": 90
+          },
+          {
+            "id": "melody-25",
+            "pitch": 79,
+            "start": 10320,
+            "duration": 192,
+            "velocity": 90
+          },
+          {
+            "id": "melody-26",
+            "pitch": 77,
+            "start": 10560,
+            "duration": 288,
+            "velocity": 90
+          },
+          {
+            "id": "melody-27",
+            "pitch": 74,
+            "start": 11040,
+            "duration": 336,
+            "velocity": 90
+          },
+          {
+            "id": "melody-28",
+            "pitch": 74,
+            "start": 11520,
+            "duration": 312,
+            "velocity": 84
+          },
+          {
+            "id": "melody-29",
+            "pitch": 76,
+            "start": 11880,
+            "duration": 192,
+            "velocity": 84
+          },
+          {
+            "id": "melody-30",
+            "pitch": 74,
+            "start": 12240,
+            "duration": 216,
+            "velocity": 84
+          },
+          {
+            "id": "melody-31",
+            "pitch": 71,
+            "start": 12480,
+            "duration": 528,
+            "velocity": 84
+          },
+          {
+            "id": "melody-32",
+            "pitch": 67,
+            "start": 13200,
+            "duration": 168,
+            "velocity": 84
+          },
+          {
+            "id": "melody-33",
+            "pitch": 71,
+            "start": 13440,
+            "duration": 432,
+            "velocity": 87
+          },
+          {
+            "id": "melody-34",
+            "pitch": 74,
+            "start": 13920,
+            "duration": 288,
+            "velocity": 87
+          },
+          {
+            "id": "melody-35",
+            "pitch": 79,
+            "start": 14400,
+            "duration": 384,
+            "velocity": 87
+          },
+          {
+            "id": "melody-36",
+            "pitch": 71,
+            "start": 14880,
+            "duration": 312,
+            "velocity": 87
+          }
+        ]
+      },
+      {
+        "id": "harp",
+        "name": "harp",
+        "instrument": "pluck",
+        "volume": 0.49,
+        "pan": 0.3,
+        "mute": false,
+        "solo": false,
+        "notes": [
+          {
+            "id": "harp-0",
+            "pitch": 72,
+            "start": 0,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-1",
+            "pitch": 76,
+            "start": 240,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-2",
+            "pitch": 79,
+            "start": 480,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-3",
+            "pitch": 76,
+            "start": 720,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-4",
+            "pitch": 72,
+            "start": 960,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-5",
+            "pitch": 79,
+            "start": 1200,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-6",
+            "pitch": 76,
+            "start": 1440,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-7",
+            "pitch": 79,
+            "start": 1680,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-8",
+            "pitch": 67,
+            "start": 1920,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-9",
+            "pitch": 74,
+            "start": 2160,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-10",
+            "pitch": 79,
+            "start": 2400,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-11",
+            "pitch": 74,
+            "start": 2640,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-12",
+            "pitch": 67,
+            "start": 2880,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-13",
+            "pitch": 79,
+            "start": 3120,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-14",
+            "pitch": 74,
+            "start": 3360,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-15",
+            "pitch": 79,
+            "start": 3600,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-16",
+            "pitch": 69,
+            "start": 3840,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-17",
+            "pitch": 72,
+            "start": 4080,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-18",
+            "pitch": 76,
+            "start": 4320,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-19",
+            "pitch": 72,
+            "start": 4560,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-20",
+            "pitch": 69,
+            "start": 4800,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-21",
+            "pitch": 76,
+            "start": 5040,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-22",
+            "pitch": 72,
+            "start": 5280,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-23",
+            "pitch": 76,
+            "start": 5520,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-24",
+            "pitch": 65,
+            "start": 5760,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-25",
+            "pitch": 72,
+            "start": 6000,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-26",
+            "pitch": 77,
+            "start": 6240,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-27",
+            "pitch": 72,
+            "start": 6480,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-28",
+            "pitch": 65,
+            "start": 6720,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-29",
+            "pitch": 77,
+            "start": 6960,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-30",
+            "pitch": 72,
+            "start": 7200,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-31",
+            "pitch": 77,
+            "start": 7440,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-32",
+            "pitch": 72,
+            "start": 7680,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-33",
+            "pitch": 76,
+            "start": 7920,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-34",
+            "pitch": 79,
+            "start": 8160,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-35",
+            "pitch": 76,
+            "start": 8400,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-36",
+            "pitch": 72,
+            "start": 8640,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-37",
+            "pitch": 79,
+            "start": 8880,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-38",
+            "pitch": 76,
+            "start": 9120,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-39",
+            "pitch": 79,
+            "start": 9360,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-40",
+            "pitch": 69,
+            "start": 9600,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-41",
+            "pitch": 74,
+            "start": 9840,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-42",
+            "pitch": 77,
+            "start": 10080,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-43",
+            "pitch": 74,
+            "start": 10320,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-44",
+            "pitch": 69,
+            "start": 10560,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-45",
+            "pitch": 77,
+            "start": 10800,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-46",
+            "pitch": 74,
+            "start": 11040,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-47",
+            "pitch": 77,
+            "start": 11280,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-48",
+            "pitch": 67,
+            "start": 11520,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-49",
+            "pitch": 71,
+            "start": 11760,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-50",
+            "pitch": 74,
+            "start": 12000,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-51",
+            "pitch": 71,
+            "start": 12240,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-52",
+            "pitch": 67,
+            "start": 12480,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-53",
+            "pitch": 74,
+            "start": 12720,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-54",
+            "pitch": 71,
+            "start": 12960,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-55",
+            "pitch": 74,
+            "start": 13200,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-56",
+            "pitch": 67,
+            "start": 13440,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-57",
+            "pitch": 71,
+            "start": 13680,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-58",
+            "pitch": 77,
+            "start": 13920,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-59",
+            "pitch": 71,
+            "start": 14160,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-60",
+            "pitch": 67,
+            "start": 14400,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-61",
+            "pitch": 77,
+            "start": 14640,
+            "duration": 134,
+            "velocity": 60
+          },
+          {
+            "id": "harp-62",
+            "pitch": 71,
+            "start": 14880,
+            "duration": 134,
+            "velocity": 70
+          },
+          {
+            "id": "harp-63",
+            "pitch": 77,
+            "start": 15120,
+            "duration": 134,
+            "velocity": 60
+          }
+        ]
+      },
+      {
+        "id": "bass",
+        "name": "bass",
+        "instrument": "bass",
+        "volume": 0.58,
+        "pan": 0,
+        "mute": false,
+        "solo": false,
+        "notes": [
+          {
+            "id": "bass-0",
+            "pitch": 48,
+            "start": 0,
+            "duration": 768,
+            "velocity": 88
+          },
+          {
+            "id": "bass-1",
+            "pitch": 55,
+            "start": 960,
+            "duration": 744,
+            "velocity": 78
+          },
+          {
+            "id": "bass-2",
+            "pitch": 43,
+            "start": 1920,
+            "duration": 768,
+            "velocity": 88
+          },
+          {
+            "id": "bass-3",
+            "pitch": 55,
+            "start": 2880,
+            "duration": 744,
+            "velocity": 78
+          },
+          {
+            "id": "bass-4",
+            "pitch": 45,
+            "start": 3840,
+            "duration": 768,
+            "velocity": 88
+          },
+          {
+            "id": "bass-5",
+            "pitch": 52,
+            "start": 4800,
+            "duration": 744,
+            "velocity": 78
+          },
+          {
+            "id": "bass-6",
+            "pitch": 41,
+            "start": 5760,
+            "duration": 768,
+            "velocity": 88
+          },
+          {
+            "id": "bass-7",
+            "pitch": 53,
+            "start": 6720,
+            "duration": 744,
+            "velocity": 78
+          },
+          {
+            "id": "bass-8",
+            "pitch": 48,
+            "start": 7680,
+            "duration": 768,
+            "velocity": 88
+          },
+          {
+            "id": "bass-9",
+            "pitch": 55,
+            "start": 8640,
+            "duration": 744,
+            "velocity": 78
+          },
+          {
+            "id": "bass-10",
+            "pitch": 45,
+            "start": 9600,
+            "duration": 768,
+            "velocity": 88
+          },
+          {
+            "id": "bass-11",
+            "pitch": 53,
+            "start": 10560,
+            "duration": 744,
+            "velocity": 78
+          },
+          {
+            "id": "bass-12",
+            "pitch": 43,
+            "start": 11520,
+            "duration": 768,
+            "velocity": 88
+          },
+          {
+            "id": "bass-13",
+            "pitch": 50,
+            "start": 12480,
+            "duration": 744,
+            "velocity": 78
+          },
+          {
+            "id": "bass-14",
+            "pitch": 43,
+            "start": 13440,
+            "duration": 768,
+            "velocity": 88
+          },
+          {
+            "id": "bass-15",
+            "pitch": 53,
+            "start": 14400,
+            "duration": 744,
+            "velocity": 78
+          }
+        ]
+      },
+      {
+        "id": "harmony",
+        "name": "harmony",
+        "instrument": "pad",
+        "volume": 0.19,
+        "pan": -0.25,
+        "mute": false,
+        "solo": false,
+        "notes": [
+          {
+            "id": "harmony-0",
+            "pitch": 60,
+            "start": 0,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-1",
+            "pitch": 64,
+            "start": 0,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-2",
+            "pitch": 67,
+            "start": 0,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-3",
+            "pitch": 55,
+            "start": 1920,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-4",
+            "pitch": 62,
+            "start": 1920,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-5",
+            "pitch": 67,
+            "start": 1920,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-6",
+            "pitch": 57,
+            "start": 3840,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-7",
+            "pitch": 60,
+            "start": 3840,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-8",
+            "pitch": 64,
+            "start": 3840,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-9",
+            "pitch": 53,
+            "start": 5760,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-10",
+            "pitch": 60,
+            "start": 5760,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-11",
+            "pitch": 65,
+            "start": 5760,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-12",
+            "pitch": 60,
+            "start": 7680,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-13",
+            "pitch": 64,
+            "start": 7680,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-14",
+            "pitch": 67,
+            "start": 7680,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-15",
+            "pitch": 57,
+            "start": 9600,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-16",
+            "pitch": 62,
+            "start": 9600,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-17",
+            "pitch": 65,
+            "start": 9600,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-18",
+            "pitch": 55,
+            "start": 11520,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-19",
+            "pitch": 59,
+            "start": 11520,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-20",
+            "pitch": 62,
+            "start": 11520,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-21",
+            "pitch": 55,
+            "start": 13440,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-22",
+            "pitch": 59,
+            "start": 13440,
+            "duration": 432,
+            "velocity": 57
+          },
+          {
+            "id": "harmony-23",
+            "pitch": 65,
+            "start": 13440,
+            "duration": 432,
+            "velocity": 57
+          }
+        ]
+      }
+    ]
+  },
+  "batches": [],
+  "render": {
+    "sampleRate": 44100,
+    "mode": "loop"
+  }
+}

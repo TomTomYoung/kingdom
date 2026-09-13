@@ -1,0 +1,122 @@
+{
+  "schemaVersion": "paint-job/1",
+  "jobId": "icon-culture-v001",
+  "idempotencyKey": "icon-culture-v001",
+  "rendererProfile": "pixel-v0.1",
+  "source": {
+    "kind": "blank",
+    "documentId": "icon-culture-v001",
+    "width": 24,
+    "height": 24,
+    "mode": "pixel",
+    "background": "transparent",
+    "colorSpace": "srgb"
+  },
+  "batches": [
+    {
+      "batchId": "draw-0",
+      "expectedRevision": 0,
+      "commands": [
+        {
+          "type": "layer.add",
+          "id": "base",
+          "name": "地面・下地"
+        },
+        {
+          "type": "layer.add",
+          "id": "symbol",
+          "name": "資源の紋章"
+        },
+        {
+          "type": "shape.line",
+          "layerId": "symbol",
+          "x": 4,
+          "y": 3,
+          "x2": 8,
+          "y2": 18,
+          "color": "#d5b363ff",
+          "size": 3
+        },
+        {
+          "type": "shape.line",
+          "layerId": "symbol",
+          "x": 19,
+          "y": 3,
+          "x2": 15,
+          "y2": 18,
+          "color": "#d5b363ff",
+          "size": 3
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 6,
+          "y": 3,
+          "width": 15,
+          "height": 3,
+          "fill": "#e1c985ff"
+        },
+        {
+          "type": "shape.ellipse",
+          "layerId": "symbol",
+          "x": 6,
+          "y": 15,
+          "width": 12,
+          "height": 7,
+          "fill": "#9d7749ff"
+        },
+        {
+          "type": "shape.rect",
+          "layerId": "symbol",
+          "x": 8,
+          "y": 16,
+          "width": 8,
+          "height": 3,
+          "fill": "#d5b363ff"
+        },
+        {
+          "type": "shape.line",
+          "layerId": "symbol",
+          "x": 9,
+          "y": 7,
+          "x2": 9,
+          "y2": 15,
+          "color": "#f0dba1ff",
+          "size": 1
+        },
+        {
+          "type": "shape.line",
+          "layerId": "symbol",
+          "x": 12,
+          "y": 7,
+          "x2": 12,
+          "y2": 15,
+          "color": "#f0dba1ff",
+          "size": 1
+        },
+        {
+          "type": "shape.line",
+          "layerId": "symbol",
+          "x": 15,
+          "y": 7,
+          "x2": 15,
+          "y2": 15,
+          "color": "#f0dba1ff",
+          "size": 1
+        }
+      ]
+    }
+  ],
+  "output": {
+    "assetId": "icon-culture",
+    "revisionId": "v001",
+    "publishMode": "pull_request",
+    "reviewStatus": "candidate"
+  },
+  "checks": {
+    "width": 24,
+    "height": 24,
+    "requireTransparency": true,
+    "maxOpaqueColors": 24
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "format": "aimusic-render-report",
+  "version": 1,
+  "projectId": "se-ui-error",
+  "renderer": "pcm-synth/1",
+  "mode": "tail",
+  "frames": 55125,
+  "bodyFrames": 33075,
+  "seconds": 1.25,
+  "scoreSeconds": 0.75,
+  "audibleTracks": 1,
+  "notes": 2,
+  "peak": 0.02460997737944126,
+  "rms": 0.007976168155679137,
+  "limiterGain": 1,
+  "silent": false,
+  "loopBoundaryJump": null,
+  "files": [
+    {
+      "file": "song.wav",
+      "bytes": 220544,
+      "sha256": "ec344046daf112cd7e4987b4382576cf7a2eb62d933bf4acdc1be039c58fb178"
+    },
+    {
+      "file": "song.mid",
+      "bytes": 109,
+      "sha256": "2f9880b335979542bff4f4a9548d4edac439b7c8a07884aa95408f4924f54915"
+    },
+    {
+      "file": "project.music.json",
+      "bytes": 675,
+      "sha256": "76cd2cd8811cb2c289d0bf7cf8ee627db9e102e7afaf025aee558e7b6c637e01"
+    }
+  ],
+  "githubStored": false,
+  "reviewStatus": "candidate"
+}
