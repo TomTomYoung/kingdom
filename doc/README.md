@@ -14,6 +14,8 @@ SPECIFICATIONと各システム仕様は目標です。記載された機能・�
 
 起動はリポジトリルートで `npm run dev`、確認は `npm test` と `npm run check` です。現行はCanvas 2D／DOMとES Modulesで、Phaser／Vite／Vitestは使っていません。
 
+プレイヤー向けの用語・効果・費用・ルールは [Kingdom Wiki](../wiki/README.md) にまとめています。リソース・ユニット・区画・建物・地形の一覧から個別項目を参照できます。
+
 ## 文書
 
 1. [SPECIFICATION.md](./SPECIFICATION.md): 目標となる規範仕様
