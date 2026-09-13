@@ -6,6 +6,8 @@
 
 次作業: 現行の状態・行動検証の不具合を回帰テスト付きで修正し、M2 Guard・Damage Grid配分と戦闘UIへ進む。
 
+素材制作: [ASSET_LIST.md](./ASSET_LIST.md) の一覧を先に整備し、画像はAIPaint、音声はAIMusicで制作します。原稿・再生成ジョブを保存し、素材完成とゲーム接続を別管理します。
+
 ## 1. 最初に読むもの
 
 [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md) が現在動く処理、[STATUS.md](./STATUS.md) が進捗と既知課題、[SPECIFICATION.md](./SPECIFICATION.md) が目標です。旧Phaser版は [LEGACY_IMPLEMENTATION.md](./LEGACY_IMPLEMENTATION.md) の保存資料として扱います。

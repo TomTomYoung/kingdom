@@ -28,6 +28,7 @@ SPECIFICATIONと各システム仕様は目標です。記載された機能・�
 10. [HANDOFF.md](./HANDOFF.md): 次作業・修正優先度・受入条件
 11. [CIV6_REFERENCE.md](./CIV6_REFERENCE.md): Civ6準拠点と独自分岐の調査記録
 12. [LEGACY_IMPLEMENTATION.md](./LEGACY_IMPLEMENTATION.md): 旧Phaser版の調査・旧不具合（保存資料）
+13. [ASSET_LIST.md](./ASSET_LIST.md): AIPaint・AIMusicを使う素材制作一覧と優先順位
 
 ## 確定した目標方針（実装完了を意味しません）
 
