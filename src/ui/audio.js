@@ -1,3 +1,5 @@
+import { createSynthBuffer } from '../audio/synth.js';
+
 const SETTINGS_KEY = 'kingdom-audio-v1';
 export function readAudioSettings(storage) {
   try {
@@ -20,11 +22,16 @@ export function soundForResult(result, command) {
 }
 
 export class GameAudio {
-  constructor(assets, { storage, contextFactory, fetcher = fetch, onStatus = () => {} } = {}) {
+  constructor(assets, { storage, contextFactory, fetcher = fetch, synthesizer = createSynthBuffer, timeoutMs = 8000, onStatus = () => {} } = {}) {
     this.assets = assets;
     this.storage = storage;
     this.contextFactory = contextFactory ?? (() => new (globalThis.AudioContext ?? globalThis.webkitAudioContext)());
     this.fetcher = fetcher;
+    this.synthesizer = synthesizer;
+    this.timeoutMs = timeoutMs;
+    this.cacheVersion = 0;
+    this.failures = new Map();
+    this.recovered = new Set();
     this.onStatus = onStatus;
     Object.assign(this, readAudioSettings(storage));
     this.buffers = new Map();
@@ -62,18 +69,58 @@ export class GameAudio {
     return this.unlock();
   }
 
+  reportStatus() {
+    if (this.failures.size) {
+      const [id, reason] = this.failures.entries().next().value;
+      this.onStatus(`音声を再生できません: ${id}（${reason}）。「音声を再読み込み」で再試行できます。`);
+    } else if (this.recovered.size) this.onStatus('音声ファイルを読み込めなかったため、内蔵の音符データで再生しています。');
+    else this.onStatus('');
+  }
+
   async buffer(id) {
-    if (!this.context || !this.assets.entries.has(id)) return null;
+    if (!this.context) return null;
     if (!this.buffers.has(id)) {
-      const context = this.context;
+      const context = this.context, cacheVersion = this.cacheVersion;
       const task = (async () => {
-        const response = await this.fetcher(this.assets.entries.get(id).url);
-        if (!response.ok) throw new Error('audio unavailable');
-        return context.decodeAudioData(await response.arrayBuffer());
-      })().catch(() => { this.buffers.delete(id); this.onStatus('一部の音声を読み込めませんでした'); return null; });
+        let reason;
+        const entry = this.assets.entries.get(id);
+        if (entry) {
+          const controller = new AbortController();
+          let timer;
+          try {
+            // Also settle fetch/decode promises that ignore abort (or never finish).
+            const loaded = (async () => {
+              const response = await this.fetcher(entry.url, { signal: controller.signal });
+              if (!response.ok) throw new Error(`HTTP ${response.status ?? 'error'}`);
+              const bytes = await response.arrayBuffer();
+              try { return await context.decodeAudioData(bytes); }
+              catch { throw new Error('音声形式のデコード失敗'); }
+            })();
+            const timeout = new Promise((_, reject) => { timer = setTimeout(() => { controller.abort(); reject(new Error('読み込みタイムアウト')); }, this.timeoutMs); });
+            const buffer = await Promise.race([loaded, timeout]);
+            if (cacheVersion === this.cacheVersion) { this.failures.delete(id); this.recovered.delete(id); this.reportStatus(); }
+            return buffer;
+          } catch (error) { reason = error.message || '通信失敗'; }
+          finally { clearTimeout(timer); }
+        } else reason = '素材一覧の読み込み失敗';
+        try {
+          const buffer = this.synthesizer && await this.synthesizer(context, id);
+          if (buffer) { if (cacheVersion === this.cacheVersion) { this.failures.delete(id); this.recovered.add(id); this.reportStatus(); } return buffer; }
+        } catch (error) { reason += ` / 内蔵音源: ${error.message}`; }
+        if (cacheVersion === this.cacheVersion) { this.failures.set(id, reason); this.reportStatus(); }
+        return null;
+      })();
       this.buffers.set(id, task);
+      // Keep failure result until an explicit retry; do not repeat bad requests on
+      // every pointer action. Successful synth buffers are cached the same way.
     }
     return this.buffers.get(id);
+  }
+
+  async retry() {
+    this.stop(); this.cacheVersion += 1; this.buffers.clear(); this.failures.clear(); this.recovered.clear();
+    this.reportStatus();
+    return this.unlock();
   }
 
   async play(id) {

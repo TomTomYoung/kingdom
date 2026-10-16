@@ -1,20 +1,20 @@
 # Kingdom 戦闘システム仕様
 
-更新日: 2026-09-13（実装状況と文書整合性を再確認）
+更新日: 2026-10-17（第2段階の実装状況を反映）
 
 仕様状態: 基本構造確定、バランス係数はRulesetで調整可能
 
 ## 0. 現行実装との区分
 
-本文は目標仕様です。現行差分の詳細は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md)、未修正課題は [STATUS.md](./STATUS.md) に記録します。コード確認基準はmain / e0dcb3fc2e6162547d7499fdd913aaaa0b9f10c7です。
+本文は目標仕様です。現行差分の詳細は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md)、未修正課題は [STATUS.md](./STATUS.md) に記録します。開始基準はmain / a9e66eaad5290c366c96eeacd07b1fce497b5dee。第2段階の差分を含みます。
 
-現在はsrc/systems/combat-system.jsのcore APIで、melee／rangedの単体Damage、seed乱数、armor減算、近接反撃、HP0、morale減少、Leader継承を処理します。23テスト中5件がcombat.test.jsです。通常画面に攻撃UIと敵王国セットアップはありません。
+現在はsrc/systems/combat-system.jsのcore APIで、melee／rangedの単体Damage、seed乱数、armor減算、近接反撃、HP0、morale減少、Leader継承を処理します。44テスト中6件がcombat.test.jsです。通常画面に攻撃UIと敵王国セットアップはありません。
 
 戦闘力は生存Unit能力の平均×cohesion補正のみです。対象はfront→middle→rear、各行center→left→rightの最初の一体です。全目標Modifierや列単位露出を実装したものではありません。
 
 HP0はindividualのみdowned、それ以外は一律shatteredです。継承はcommandContribution降順・ID昇順で選び、継承者なしならdefeatedです。successorPriority、Command Check、morale 0の撤退、回復、死傷者・捕虜・Loot、Construct／Monster等の固有遷移は未実装です。
 
-Guard容量は保存・回復だけで、Guard、Intercept、Taunt、Cover、狙撃、範囲・貫通、Resistance／Barrier、Spell、Status Effect、援軍、戦闘予測は未実装です。遠隔能力0でも攻撃できる現行問題などを、目標規則として認めないでください。
+Guard容量は保存・回復だけで、Guard、Intercept、Taunt、Cover、狙撃、範囲・貫通、Resistance／Barrier、Spell、Status Effect、援軍、戦闘予測は未実装です。遠隔能力0の攻撃は拒否するよう修正済みです。遠隔戦闘力は対象へ届く戦闘可能Unitだけを集約します。
 
 ## 1. 基本原則
 

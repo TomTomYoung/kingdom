@@ -45,6 +45,7 @@ class AudioContext {
   async resume() { this.state = 'running'; }
   createGain() { return { gain: { value: 1 }, connect() {}, disconnect() {} }; }
   async decodeAudioData(bytes) { return { duration: bytes.byteLength / 176400 }; }
+  createBuffer(channels, length, sampleRate) { return { duration: length / sampleRate, copyToChannel() {} }; }
   createBufferSource() {
     const node = { connect() {}, disconnect() {}, start() { this.started = true; }, stop() { this.stopped = true; this.onended?.(); } };
     audioNodes.push(node); return node;
@@ -52,7 +53,10 @@ class AudioContext {
 }
 Object.assign(globalThis, { window, document, Image, AudioContext,
   requestAnimationFrame: (fn) => setTimeout(fn, 0), cancelAnimationFrame: clearTimeout,
-  fetch: async (url) => { const bytes = await fs.readFile(new URL(url)); return { ok: true, json: async () => JSON.parse(bytes.toString()), arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) }; } });
+  fetch: async (url) => {
+    if (process.env.KINGDOM_QA_AUDIO_FAILURE && /\.(wav|ogg)$/.test(String(url))) return { ok: false, status: 404 };
+    const bytes = await fs.readFile(new URL(url)); return { ok: true, json: async () => JSON.parse(bytes.toString()), arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) };
+  } });
 const { GameAudio } = await import('../../src/ui/audio.js');
 const originalPlay = GameAudio.prototype.play, sounds = [];
 GameAudio.prototype.play = function (id) { sounds.push(id); return originalPlay.call(this, id); };
@@ -69,9 +73,21 @@ if (!failures.size) assert.equal(text('#asset-status'), '');
 await snapshot('01-map');
 await click('#audio-toggle'); assert.equal(document.querySelector('#audio-toggle').getAttribute('aria-pressed'), 'true');
 assert.equal(audioNodes.filter((node) => node.loop && !node.stopped).length, 1);
+await click('#audio-retry'); assert.equal(audioNodes.filter((node) => node.loop && !node.stopped).length, 1, 'retry must not overlap BGM');
+if (process.env.KINGDOM_QA_AUDIO_FAILURE) assert.ok(text('#audio-status').includes('内蔵の音符'));
 await click('[data-buy="warrior"]'); assert.equal(sounds.at(-1), 'se-purchase');
 await click('[data-buy="monument"]'); assert.equal(sounds.at(-1), 'se-ui-error');
 await click('#form-party'); assert.equal(text('#map-mode'), '部隊移動'); assert.ok(text('#party-status').includes('party-1'));
+assert.equal(document.querySelectorAll('.formation-slot').length, 9);
+assert.equal(document.querySelector('#formation').hidden, false);
+await click('[data-slot="front-left"]'); assert.equal(document.querySelector('[data-slot="front-left"]').getAttribute('aria-pressed'), 'true');
+await click('[data-slot="front-left"]'); assert.equal(sounds.at(-1), 'se-ui-cancel');
+const originalFormation = await saveState();
+await click('[data-slot="front-left"]'); await click('[data-slot="rear-center"]'); assert.equal(sounds.at(-1), 'se-ui-confirm');
+const rearranged = await saveState();
+assert.deepEqual(rearranged.parties['party-1'].formation, { 'rear-center': originalFormation.parties['party-1'].unitIds[0] });
+assert.equal(rearranged.parties['party-1'].movementRemaining, originalFormation.parties['party-1'].movementRemaining);
+assert.equal(rearranged.commandLog.at(-1).type, 'SetFormation');
 await snapshot('02-party-at-city');
 const before = await saveState(); assert.equal(sounds.at(-1), 'se-save');
 const { validatePartyPath } = await import('../../src/systems/movement-system.js');
@@ -85,7 +101,9 @@ clickTile(tile); await settle(); assert.equal(sounds.at(-1), 'se-party-move');
 const after = await saveState(); assert.equal(after.parties['party-1'].location, tile.key);
 await snapshot('03-party-moved');
 await click('#deselect-party'); assert.equal(text('#map-mode'), '領土購入'); assert.equal(sounds.at(-1), 'se-ui-cancel');
+assert.equal(document.querySelector('#formation').hidden, true);
 clickTile(tile); await settle(); assert.equal(sounds.at(-1), 'se-ui-select');
+assert.equal(document.querySelectorAll('.formation-slot[aria-pressed="true"]').length, 0);
 window.document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await settle(); assert.equal(text('#map-mode'), '領土購入');
 const { getTerritoryCandidates } = await import('../../src/systems/territory-system.js');
 const candidate = getTerritoryCandidates(after, after.cities['city-1']).find((candidate) => candidate.key !== tile.key);
@@ -96,6 +114,24 @@ await click('[data-produce="monument"]');
 for (let i = 0; i < 20 && !text('#buildings').includes('モニュメント'); i++) await click('#end-turn');
 assert.ok(text('#buildings').includes('モニュメント')); assert.ok(sounds.includes('se-production-complete'));
 await snapshot('04-city-monument');
+// Two occupied slots swap through a real Command and survive save/load.
+for (let unit = 0; unit < 2; unit++) {
+  const initialCount = (await saveState()).kingdoms['kingdom-1'].unitIds.length;
+  await click('[data-produce="warrior"]');
+  for (let turns = 0; turns < 12 && (await saveState()).kingdoms['kingdom-1'].unitIds.length === initialCount; turns++) await click('#end-turn');
+  assert.equal((await saveState()).kingdoms['kingdom-1'].unitIds.length, initialCount + 1);
+}
+await click('#form-party');
+const beforeSwap = await saveState(), partyId = Object.keys(beforeSwap.parties).at(-1), originalSlots = beforeSwap.parties[partyId].formation;
+assert.equal(beforeSwap.parties[partyId].unitIds.length, 2);
+await click('[data-slot="front-left"]'); await click('[data-slot="front-center"]');
+const swapped = await saveState();
+assert.equal(swapped.parties[partyId].formation['front-left'], originalSlots['front-center']);
+assert.equal(swapped.parties[partyId].formation['front-center'], originalSlots['front-left']);
+assert.equal(swapped.parties[partyId].leaderUnitId, beforeSwap.parties[partyId].leaderUnitId);
+await click('[data-slot="front-left"]'); await click('#load');
+assert.equal(document.querySelector('#formation').hidden, true);
+assert.deepEqual((await saveState()).parties[partyId].formation, swapped.parties[partyId].formation);
 // Bad save must not replace the currently playable state.
 const valid = await saveState(); window.localStorage.setItem('kingdom-m1-save', '{'); await click('#load');
 assert.equal(sounds.at(-1), 'se-ui-error'); assert.deepEqual(await saveState(), valid);
@@ -108,8 +144,8 @@ await click('#reset'); assert.equal(text('#turn'), '1'); assert.equal(text('#map
 width = 530; window.dispatchEvent(new window.Event('resize')); await snapshot('05-minimum-map');
 if (failures.size) assert.ok(text('#asset-status').includes('簡易表示'));
 const report = { date: '2026-10-17', harness: 'happy-dom + native Canvas', realBrowser: false, cssLayoutVerified: false, humanListening: false,
-  checks: ['no autoplay', '17 image load/fallback', 'resource icons', 'purchase/reject sounds', 'party creation/selection/movement', 'city-party overlap', 'deselect/Esc', 'tile purchase after deselect', 'save/load sounds and selection reset', 'production completion and monument', 'broken-save rollback', 'volume persistence', 'mute stops sources', 'new game selection reset', 'minimum map canvas'],
-  soundRoutes: [...new Set(sounds)], missingAssets: [...failures], result: 'passed' };
+  checks: ['no autoplay', '17 image load/fallback', 'resource icons', 'purchase/reject sounds', 'party creation/selection/movement', 'city-party overlap', '3x3 formation empty-slot move/cancel/swap via Command', 'formation save/load and selection reset', 'deselect/Esc', 'tile purchase after deselect', 'save/load sounds and selection reset', 'production completion and monument', 'broken-save rollback', 'volume persistence', 'audio retry keeps one loop', 'mute stops sources', 'new game selection reset', 'minimum map canvas'],
+  soundRoutes: [...new Set(sounds)], missingAssets: [...failures], audioFilesUnavailable: Boolean(process.env.KINGDOM_QA_AUDIO_FAILURE), result: 'passed' };
 await fs.writeFile(path.join(output, 'report.json'), JSON.stringify(report, null, 2) + '\n');
 console.log(JSON.stringify(report));
 GameAudio.prototype.play = originalPlay;

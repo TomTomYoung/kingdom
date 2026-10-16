@@ -1,16 +1,16 @@
 # Kingdom Party・Formation仕様
 
-更新日: 2026-09-13（実装状況と文書整合性を再確認）
+更新日: 2026-10-17（第2段階の実装状況を反映）
 
 ## 0. 現行実装との区分
 
-本文は目標モデルです。現行実装は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md)、未修正課題は [STATUS.md](./STATUS.md) を参照してください。コード確認基準はmain / e0dcb3fc2e6162547d7499fdd913aaaa0b9f10c7です。
+本文は目標モデルです。現行実装は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md)、未修正課題は [STATUS.md](./STATUS.md) を参照してください。開始基準はmain / a9e66eaad5290c366c96eeacd07b1fce497b5dee。第2段階の差分を含みます。
 
 CreateParty、SetFormation、MovePartyとAttackPartyを実装しています。作成Commandは同じ場所の自国未編成Unitを1〜5体に制限します。実キーはid、unitIds、formation、movementMaximum、attacksMaximumで、本文のpartyId／memberUnitIds等と同名ではありません。
 
-UIは首都の未編成UnitからのParty作成、選択、1歩移動までです。3×3配置編集、メンバー選択編集、戦闘、分割・合流・解散、手動Leader設定、Inventory／Supplies／Expeditionは未実装です。
+UIは首都の未編成UnitからのParty作成、選択、1歩移動、3×3配置編集までです。メンバー選択編集、戦闘、分割・合流・解散、手動Leader設定、Inventory／Supplies／Expeditionは未実装です。
 
-最大移動力は固定2、攻撃回数は1です。能力集約は平均×cohesionのみで、Leader・軍師・Formation・loyalty・補給などによる目標の相乗効果は未実装です。作成時の占有制約と敗北Partyの移動制約にも未修正課題があります。
+最大移動力は固定2、攻撃回数は1です。能力集約は平均×cohesionのみで、Leader・軍師・Formation・loyalty・補給などによる目標の相乗効果は未実装です。作成時の非Void・占有・生存検証と敗北Partyの移動拒否は実装済みです。敗北Partyの盤上撤去は未実装です。
 
 ## 1. 定義
 

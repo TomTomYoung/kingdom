@@ -1,14 +1,14 @@
 # Kingdom 目標仕様
 
-更新日: 2026-10-16（実装状況と文書整合性を再確認）
+更新日: 2026-10-17（第2段階の実装状況を反映）
 
 仕様状態: 基本構造確定、数値バランスと一部マルチプレイ規則は暫定
 
 ## 0. 現行実装との区分
 
-この文書は目標仕様です。実装済みの判定は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md) と [STATUS.md](./STATUS.md) を正本とします。コード確認基準はmain / 21826414ea238468ff9b7c2ddaaf47cd012c1f80です。
+この文書は目標仕様です。実装済みの判定は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md) と [STATUS.md](./STATUS.md) を正本とします。開始基準はmain / a9e66eaad5290c366c96eeacd07b1fce497b5dee。第2段階の差分を含みます。
 
-現行はM1都市運営とM2のParty作成・移動・基本単体戦闘までです。Canvas 2D／DOMで表示し、複数王国の手番・配置変更・攻撃はcoreにありますが、複数王国・配置編集・戦闘UIはありません。AI、Dungeon、職業・Ability実行、加入・個別loyalty、Guard・範囲配分、勝利、オンライン通信は未実装です。
+現行はM1都市運営とM2のParty作成・移動・基本単体戦闘までです。Canvas 2D／DOMで表示し、複数王国の手番・配置変更・攻撃はcoreにありますが、配置編集はUIから利用できます。複数王国・戦闘UIはありません。AI、Dungeon、職業・Ability実行、加入・個別loyalty、Guard・範囲配分、勝利、オンライン通信は未実装です。
 
 以下のGameStateフィールドは目標モデルです。実装の実キー・省略項目・暫定式はCURRENT_IMPLEMENTATIONを参照してください。現行の独立ランダム地形、平均戦闘力、固定移動力、簡略HP0を目標仕様へ逆輸入しません。
 

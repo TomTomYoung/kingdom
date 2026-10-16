@@ -2,6 +2,9 @@ export const FORMATION_ROWS = Object.freeze(['front', 'middle', 'rear']);
 export const FORMATION_COLUMNS = Object.freeze(['left', 'center', 'right']);
 export const FORMATION_SLOTS = Object.freeze(FORMATION_ROWS.flatMap((row) => FORMATION_COLUMNS.map((column) => `${row}-${column}`)));
 
+export const isActiveUnit = (unit) => Boolean(unit && unit.currentHp > 0 && unit.status === 'active');
+export const hasActiveUnits = (state, party) => party.unitIds.some((id) => isActiveUnit(state.units[id]));
+
 export function createParty(id, ownerId, unitIds, location, leaderUnitId = unitIds[0]) {
   return {
     id, ownerId, unitIds: [...unitIds], leaderUnitId, location,
@@ -13,6 +16,7 @@ export function createParty(id, ownerId, unitIds, location, leaderUnitId = unitI
 }
 
 export function validateFormation(party, formation) {
+  if (!formation || typeof formation !== 'object' || Array.isArray(formation)) return '配置はslotとUnitの対応で指定してください';
   const entries = Object.entries(formation);
   if (entries.some(([slot]) => !FORMATION_SLOTS.includes(slot))) return '不明なFormation slotです';
   const assigned = entries.map(([, unitId]) => unitId);

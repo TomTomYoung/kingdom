@@ -5,13 +5,14 @@ import { processTurnStart } from './turn-engine.js';
 import { completeItem } from '../systems/production-system.js';
 import { getTerritoryCandidates, tilePurchaseCost } from '../systems/territory-system.js';
 import { updateDerivedCapabilities } from '../models/kingdom.js';
-import { createParty, validateFormation } from '../models/party.js';
+import { createParty, validateFormation, isActiveUnit, hasActiveUnits } from '../models/party.js';
+import { validateCommand } from './command-validation.js';
 import { validatePartyPath } from '../systems/movement-system.js';
 import { resolvePartyAttack } from '../systems/combat-system.js';
 
 const fail = (reason) => ({ ok: false, reason });
 function context(state, command) {
-  if (!command?.commandId) return fail('commandIdが必要です');
+  const malformed = validateCommand(state, command); if (malformed) return fail(malformed);
   if (state.commandLog.some((entry) => entry.commandId === command.commandId)) return fail('処理済みのCommandです');
   if (!state.kingdoms[command.playerId]) return fail('不明なプレイヤーです');
   if (state.activePlayerId !== command.playerId) return fail('現在の手番ではありません');
@@ -19,7 +20,7 @@ function context(state, command) {
   return null;
 }
 function cityFor(state, command) {
-  const city = state.cities[command.payload.cityId];
+  const city = Object.hasOwn(state.cities, command.payload.cityId) && state.cities[command.payload.cityId];
   return city?.ownerId === command.playerId ? city : null;
 }
 
@@ -36,18 +37,18 @@ export class RuleSystem {
       processTurnStart(state, events);
     } else if (command.type === COMMAND_TYPES.SET_CITY_PRODUCTION) {
       if (state.phase !== 'PLAYER_ACTION') return reject('行動フェーズではありません');
-      if (!RULESET.items[command.payload.itemId]) return reject('不明な生産対象です');
-      if (!command.payload.queue.every((id) => RULESET.items[id])) return reject('キューに不明な生産対象があります');
+      if (!Object.hasOwn(RULESET.items, command.payload.itemId)) return reject('不明な生産対象です');
+      if (!command.payload.queue.every((id) => Object.hasOwn(RULESET.items, id))) return reject('キューに不明な生産対象があります');
       city.production.currentItemId = command.payload.itemId; city.production.queue = [...command.payload.queue];
       events.push({ type: 'ProductionSet', cityId: city.id, itemId: command.payload.itemId, queue: [...command.payload.queue] });
     } else if (command.type === COMMAND_TYPES.PURCHASE_CITY_ITEM) {
-      const item = RULESET.items[command.payload.itemId]; if (!item) return reject('不明な購入対象です');
-      const cost = item.purchaseOptions?.[command.payload.currency]; if (cost === undefined) return reject('この対象は指定通貨で購入できません');
+      const item = Object.hasOwn(RULESET.items, command.payload.itemId) && RULESET.items[command.payload.itemId]; if (!item) return reject('不明な購入対象です');
+      const cost = Object.hasOwn(item.purchaseOptions ?? {}, command.payload.currency) ? item.purchaseOptions[command.payload.currency] : undefined; if (cost === undefined) return reject('この対象は指定通貨で購入できません');
       const kingdom = state.kingdoms[command.playerId]; if ((kingdom.stockpiles[command.payload.currency] ?? 0) < cost) return reject(`${command.payload.currency}が不足しています`);
       if (item.category === 'building' && city.buildings.includes(item.itemId)) return reject('建設済みです');
       kingdom.stockpiles[command.payload.currency] -= cost; completeItem(state, city, item.itemId, 'purchase', events); updateDerivedCapabilities(kingdom, state);
     } else if (command.type === COMMAND_TYPES.PURCHASE_TILE) {
-      const tile = state.world.tiles[command.payload.tileKey];
+      const tile = Object.hasOwn(state.world.tiles, command.payload.tileKey) && state.world.tiles[command.payload.tileKey];
       if (!tile || tile.terrainId === 'void') return reject('購入できないタイルです');
       if (tile.ownerId !== null) return reject('所有済みまたは他国領です');
       const candidates = getTerritoryCandidates(state, city); if (!candidates.some(({ key }) => key === tile.key)) return reject('領土に隣接していません');
@@ -57,10 +58,14 @@ export class RuleSystem {
       if (state.phase !== 'PLAYER_ACTION') return reject('行動フェーズではありません');
       const unitIds = command.payload.unitIds;
       if (!Array.isArray(unitIds) || unitIds.length === 0 || unitIds.length > 5 || new Set(unitIds).size !== unitIds.length) return reject('Partyは重複しない1〜5名で編成してください');
-      const units = unitIds.map((id) => state.units[id]);
+      const units = unitIds.map((id) => Object.hasOwn(state.units, id) && state.units[id]);
       if (units.some((unit) => !unit || unit.ownerId !== command.playerId)) return reject('自国のUnitだけを編成できます');
+      if (units.some((unit) => !isActiveUnit(unit))) return reject('戦闘可能なUnitだけを編成できます');
       if (units.some((unit) => unit.partyId !== null)) return reject('既にPartyへ所属するUnitが含まれます');
       if (units.some((unit) => unit.location !== command.payload.location)) return reject('同じ場所にいるUnitだけを編成できます');
+      const tile = Object.hasOwn(state.world.tiles, command.payload.location) && state.world.tiles[command.payload.location];
+      if (!tile || tile.terrainId === 'void') return reject('Partyを編成できない場所です');
+      if (Object.values(state.parties).some((party) => party.location === tile.key)) return reject('他のPartyが占有しています。先に移動してください');
       const partyId = `party-${state.nextIds.party++}`;
       state.parties[partyId] = createParty(partyId, command.playerId, unitIds, command.payload.location);
       units.forEach((unit) => { unit.partyId = partyId; });
@@ -69,6 +74,7 @@ export class RuleSystem {
       if (state.phase !== 'PLAYER_ACTION') return reject('行動フェーズではありません');
       const party = state.parties[command.payload.partyId];
       if (!party || party.ownerId !== command.playerId) return reject('このPartyを操作できません');
+      if (party.status !== 'active' || !hasActiveUnits(state, party)) return reject('編成を変更できるPartyではありません');
       const formationError = validateFormation(party, command.payload.formation);
       if (formationError) return reject(formationError);
       party.formation = { ...command.payload.formation };

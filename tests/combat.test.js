@@ -4,6 +4,7 @@ import { createInitialGameState, serializeGameState } from '../src/core/game-sta
 import { attackParty, createParty as createPartyCommand, endTurn } from '../src/core/commands.js';
 import { RuleSystem } from '../src/core/rule-system.js';
 import { createUnit } from '../src/models/unit.js';
+import { partyCombatStrength } from '../src/systems/combat-system.js';
 const p1='kingdom-1',p2='kingdom-2';let sequence=0;const id=()=>`combat-${++sequence}`;
 function execute(state,command){const result=RuleSystem.execute(state,command);assert.equal(result.ok,true,result.reason);return result.state}
 function battleState(){let state=createInitialGameState(77);state.kingdoms[p2]={...structuredClone(state.kingdoms[p1]),id:p2,name:'敵国',cityIds:[],unitIds:[],controllerType:'human'};state.turnOrder.push(p2);for(const [unitId,owner,location] of [['a',p1,'0,0,0'],['b',p2,'1,-1,0']]){const unit=createUnit(unitId,owner,'warrior',location);state.units[unitId]=unit;state.kingdoms[owner].unitIds.push(unitId);state.activePlayerId=owner;state=execute(state,createPartyCommand(owner,1,[unitId],location,unitId+id()))}state.activePlayerId=p1;state.activePlayerIndex=0;return state}
@@ -14,3 +15,26 @@ test('invalid target, range and exhausted attack reject without state changes',(
 test('zero HP changes status, defeats empty party, and turn start resets actions',()=>{let state=battleState();state.units.b.currentHp=1;state.units.b.hp=1;state.units.b.armor=0;state=execute(state,attackParty(p1,1,'party-1','party-2','melee',id()));assert.equal(state.units.b.status,'shattered');assert.equal(state.parties['party-2'].status,'defeated');state=execute(state,endTurn(p1,1,id()));state=execute(state,endTurn(p2,1,id()));assert.equal(state.parties['party-1'].attacksRemaining,1);assert.equal(state.parties['party-1'].activationState,'ready')});
 
 test('an active successor inherits leadership after the leader falls',()=>{let state=battleState();const successor=createUnit('c',p2,'warrior','1,-1,0');successor.commandContribution=20;state.units.c=successor;state.kingdoms[p2].unitIds.push('c');state.parties['party-2'].unitIds.push('c');state.parties['party-2'].formation['rear-center']='c';successor.partyId='party-2';state.units.b.currentHp=1;state.units.b.hp=1;state.units.b.armor=0;state=execute(state,attackParty(p1,1,'party-1','party-2','melee',id()));assert.equal(state.units.b.status,'shattered');assert.equal(state.parties['party-2'].leaderUnitId,'c');assert.equal(state.parties['party-2'].status,'active');assert.equal(state.parties['party-2'].morale<100,true)});
+
+test('ranged attacks require a living capable unit whose own range reaches the target', () => {
+  const state = battleState();
+  const reject = () => {
+    const before = serializeGameState(state);
+    const result = RuleSystem.execute(state, attackParty(p1, 1, 'party-1', 'party-2', 'ranged', id()));
+    assert.equal(result.ok, false); assert.equal(result.state, state); assert.deepEqual(result.events, []);
+    assert.equal(serializeGameState(state), before, 'HP, RNG, budgets and logs remain unchanged');
+  };
+  reject(); // Warrior has range 1, but rangedStrength 0.
+  state.units.a.range = 5; reject(); // Range alone grants no attack.
+  const archer = createUnit('archer', p1, 'warrior', '0,0,0');
+  archer.rangedStrength = 20; archer.range = 1; archer.partyId = 'party-1';
+  state.units.archer = archer; state.parties['party-1'].unitIds.push('archer'); state.parties['party-1'].formation['rear-center'] = 'archer';
+  state.parties['party-2'].location = '2,-2,0'; state.units.b.location = '2,-2,0';
+  reject(); // Incapable warrior must not extend the archer's range.
+  archer.range = 3; archer.currentHp = 0; reject();
+  archer.currentHp = 100; archer.status = 'downed'; reject();
+  archer.status = 'active';
+  assert.equal(partyCombatStrength(state, state.parties['party-1'], 'ranged', 2), 20);
+  const result = RuleSystem.execute(state, attackParty(p1, 1, 'party-1', 'party-2', 'ranged', id()));
+  assert.equal(result.ok, true); assert.ok(result.state.units.b.currentHp < 100); assert.equal(result.state.units.a.currentHp, 100);
+});

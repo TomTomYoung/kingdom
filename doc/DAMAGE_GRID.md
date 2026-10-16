@@ -1,16 +1,16 @@
 # Kingdom 9グリッド・ダメージ配分仕様
 
-更新日: 2026-09-13（実装状況と文書整合性を再確認）
+更新日: 2026-10-17（第2段階の実装状況を反映）
 
 仕様状態: 基本構造確定、数値係数はCOMBAT_SYSTEM.mdに従う
 
 ## 0. 現行実装との区分
 
-本文は目標のDamage配分規則です。現行は最大5Unitの3×3配置検証とFront優先の単体選択までです。コード確認基準はmain / e0dcb3fc2e6162547d7499fdd913aaaa0b9f10c7です。
+本文は目標のDamage配分規則です。現行は最大5Unitの3×3配置検証とFront優先の単体選択までです。開始基準はmain / a9e66eaad5290c366c96eeacd07b1fce497b5dee。第2段階の差分を含みます。
 
 実装のformationはSlotIdからunitIdへの辞書で、SlotIdはfront-left、front-center、front-right、middle-left、middle-center、middle-right、rear-left、rear-center、rear-rightです。本文のgridSlots等を含むFormation状態全体はまだありません。
 
-対象選択はfront→middle→rear、各行center→left→rightの固定順です。Front全体を優先する簡略処理で、空いた列からの露出、attackVector、Guard、Intercept、Taunt、狙い撃ち、範囲・貫通の配分は未実装です。配置編集UIもありません。
+対象選択はfront→middle→rear、各行center→left→rightの固定順です。Front全体を優先する簡略処理で、空いた列からの露出、attackVector、Guard、Intercept、Taunt、狙い撃ち、範囲・貫通の配分は未実装です。3×3配置編集UIは実装済みですが、上記の未実装効果を追加するものではありません。
 
 実装状況は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md)、次作業は [HANDOFF.md](./HANDOFF.md) を参照してください。以下の受入条件は完成条件であり、現在のテストがすべて保証するものではありません。
 

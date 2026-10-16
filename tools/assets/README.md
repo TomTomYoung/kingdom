@@ -8,7 +8,7 @@
 - AIMusic: TomTomYoung/AIMusic、commit 399fe1351368755f116512a459c95ecf555c5cba。
 - Node.js v24.19.0とFFmpeg（libvorbisが必要）。Pythonパッケージ・npmパッケージの追加は不要です。
 
-両リポジトリを別ディレクトリへ取得し、上記commitへcheckoutしてください。[tool-lock.json](./tool-lock.json) にソースファイルのGit blob SHAを記録し、制作スクリプトが実行前に照合します。本リポジトリへ両ツールのコードを複製していません。
+両リポジトリを別ディレクトリへ取得し、上記commitへcheckoutしてください。[tool-lock.json](./tool-lock.json) にソースファイルのGit blob SHAを記録し、制作スクリプトが実行前に照合します。初回制作ではツール本体を複製していません。第2段階では音声復旧用にAIMusicのcore.mjs・audio.mjsだけを固定版から無変更で同梱しました。出典はsrc/audio/vendor/README.mdを参照してください。
 
 画像の図案は [graphics.mjs](./graphics.mjs)、曲とSEの音符は [music.mjs](./music.mjs) にあります。既存の絵・曲・外部音源を入力していません。AIPaintのexecuteJob／PaintCoreがすべての画素を描き、アダプターはRGBAをPNGへ梱包します。一覧画像も同じAIPaintの矩形コマンドで作ります。AIPaintのブラウザUIやPlaywrightを実行したものではありません。
 
@@ -61,3 +61,16 @@ node tools/assets/verify-first-pack.mjs . assets/verification-YYYY-MM-DD.json
 ```
 
 runtimeConnectedは接続実装の有無、integratedは既存の最終確認条件を含む判定です。今回は実ブラウザと聴取の確認が残るため、runtimeConnected=trueの素材もintegrated=falseで保持しています。
+
+## 音声読み込みの復旧データ
+
+第2段階で、配信ファイルの取得・デコードに失敗した場合に採用音符から再生できるようにしました。スコアを採用変更した場合は、固定版AIMusicを使って次を実行します。
+
+```sh
+node tools/assets/build-audio-fallback.mjs /path/to/AIMusic
+npm test
+```
+
+このコマンドは採用原稿のSHA-256とAIMusicのGit blob SHAを検証し、src/audio/scores.jsとsrc/audio/vendorの2モジュールを生成します。手編集しないでください。ゲームの通常起動には生成コマンドや外部AIMusic取得は不要です。
+
+tests/audio-fallback.test.jsは全13件を再合成し、SEは配信用WAV、BGMはOgg変換前の元WAVとハッシュで照合します。Oggの不可逆圧縮後と元PCMのバイト一致を要求するものではありません。

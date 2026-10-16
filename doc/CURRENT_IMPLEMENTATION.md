@@ -2,7 +2,7 @@
 
 確認・更新日: 2026-10-17
 
-開始基準: main / f59804d8b6dfad75704bfa40024e148dee03391b。2026-10-17の素材接続差分を反映しています。
+開始基準: main / a9e66eaad5290c366c96eeacd07b1fce497b5dee。第2段階の音声復旧・状態検証・配置編集の差分を反映しています。
 
 ## 1. 範囲と現在地
 
@@ -14,7 +14,7 @@
 
 エントリーは [index.html](../index.html) です。標準Canvas 2DとDOMを使い、PhaserやCDNを読み込みません。外部npm依存、ビルド工程、バックエンドはありません。
 
-assets/には既存27点と追加SE3点があります。画像17点、SE11点、地上BGM1曲をUIへ接続しました。戦闘BGMは戦闘UI待ちです。AssetStoreがmanifestの採用パスから画像を取得し、読み込めなければ地形色・城文字・部隊記号で継続します。画像は整数倍・等方拡大、音声はWeb Audioでユーザー操作後に開始します。初期ミュート、主音量・設定保存、非表示停止、連打制限、BGM切替時の遅延読込取消があります。tools/assets/は制作専用でゲーム実行時の依存ではありません。[ASSET_AUDIT.md](ASSET_AUDIT.md) が最新台帳です。
+assets/には既存27点と追加SE3点があります。画像17点、SE11点、地上BGM1曲をUIへ接続しました。戦闘BGMは戦闘UI待ちです。AssetStoreがmanifestの採用パスから画像を取得し、読み込めなければ地形色・城文字・部隊記号で継続します。画像は整数倍・等方拡大、音声はWeb Audioでユーザー操作後に開始します。初期ミュート、主音量・設定保存、非表示停止、連打制限、BGM切替時の遅延読込取消があります。WAV/OggのHTTP失敗・デコード失敗・8秒タイムアウト時は、src/audioに同梱した採用音符13件と固定版AIMusicからPCMを合成します。Workerが使えなければ同じ合成器で処理します。全13件の再合成WAVは制作時のWAVのSHA-256と一致します。音声設定の再読み込みでキャッシュを消して再試行できます。tools/assets/は制作専用でゲーム実行時の依存ではありません。[ASSET_AUDIT.md](ASSET_AUDIT.md) が最新台帳です。
 
 リポジトリルートで次を実行し、http://localhost:4173/ を開きます。
 
@@ -38,8 +38,9 @@ npm run check
 3. src/world: Hex座標、共通Edge key、固定seedマップ
 4. src/systems: Yield、生産、領土、移動、戦闘
 5. src/ui: Canvas描画とDOM入力
-6. tests: game、hex、party、combat、assets、audioの6ファイル
-7. legacy/index.html: 旧Phaser版。現行起動経路では使いません。
+6. src/audio: 採用音符・固定版AIMusicのPCM合成とWorker
+7. tests: ゲーム・素材・音声・Worker・Command検証の9ファイル
+8. legacy/index.html: 旧Phaser版。現行起動経路では使いません。
 
 ## 3. UIから使える機能
 
@@ -49,13 +50,13 @@ npm run check
 
 戦士とモニュメントの生産・Gold購入、未所有の合法タイル購入、首都にいる未編成Unit最大5体のParty化、Party選択と隣接Hexへの1歩移動を操作できます。
 
-Party選択中のタイルクリックは移動として処理されます。解除ボタン、同Partyの再クリック、Escで領土購入へ戻れます。合法な隣接移動先は点線、所有地は金枠で表示し、カーソル下の地形・費用・拒否理由を表示します。ロード・新規開始では選択を解除します。複数王国切替、戦闘、3×3配置編集、生産キュー編集、JSONファイル入出力のUIはありません。カメラ移動、ズーム、旧版の文章イベント窓も移植されていません。
+Party選択中のタイルクリックは移動として処理されます。解除ボタン、同Partyの再クリック、Escで領土購入へ戻れます。合法な隣接移動先は点線、所有地は金枠で表示し、カーソル下の地形・費用・拒否理由を表示します。ロード・新規開始では選択を解除します。Party欄の3×3配置で、Unitを選んで空き枠へ移動・他Unitと交換できます。指揮者とHPを表示し、変更はSetFormationを通します。複数王国切替、戦闘、生産キュー編集、JSONファイル入出力のUIはありません。カメラ移動、ズーム、旧版の文章イベント窓も移植されていません。
 
 ## 4. GameStateとCommand
 
 GameStateはschemaVersion 1、rulesetVersion m1.0です。主な実キーはphase、world、turnOrder、activePlayerId、activePlayerIndex、kingdoms、cities、units、parties、rng、nextIds、commandLog、eventLogです。目標文書のcurrentPhase、worldMap、playerSlots等と同名とは限りません。
 
-RuleSystem.execute(original, command)は成功時に複製したstateとeventsを返し、検証で拒否した場合は元stateを返します。commandIdの重複、playerId、手番、turnを共通検証します。全payloadのスキーマ検証や全Command共通のphase検証は未完成です。
+RuleSystem.execute(original, command)は成功時に複製したstateとeventsを返し、検証で拒否した場合は元stateを返します。commandIdの重複、playerId、手番、turnを共通検証します。全9Commandの種別・phase・必須payload・配列と辞書の型を事前検証し、参照先・所有者を処理前に確認します。拒否時は元stateと空eventsを返し、RNG・資源・ID・ログを変更しません。破損GameStateそのものの検証はK-09として別途残っています。
 
 現在のCommandは9種類です。
 
@@ -88,7 +89,7 @@ processTurnStartの現行順序は次です。
 7. Partyの移動力、攻撃回数、reactionCharges、行動状態とUnitのGuard容量の回復
 8. 軍事力・統治力・統治負荷の再計算
 
-Dungeon・World Resolution、勝利判定、オートセーブ、自然HP回復、継続Status Effectの解決はありません。敗北Partyにも行動値が回復する問題はSTATUSのK-01を参照してください。
+Dungeon・World Resolution、勝利判定、オートセーブ、自然HP回復、継続Status Effectの解決はありません。敗北Partyや戦闘可能構成員がいないPartyの移動・攻撃・reactionChargesは0、activationStateはendedのままです。UnitのGuard容量は戦闘可能な構成員だけ回復します。
 
 ## 6. マップ・領土
 
@@ -142,7 +143,7 @@ Capacity不足のPenaltyやUnitの徴募・登用はありません。人的資�
 
 CreatePartyは同じ場所の自国未所属Unitを1〜5体まとめます。実キーはid、unitIds、formation、movementMaximum、attacksMaximumです。formationはfront/middle/rearとleft/center/rightを組み合わせたSlotIdからunitIdへの辞書です。初期配置はfront-left、front-center、front-right、middle-left、middle-centerの順です。
 
-SetFormationは9Slotへの全構成Unitの一度ずつの配置を検証します。編成時の占有・生存検証、解散・分割・合流、Leader手動変更、敵隣接時の編成制限、配置編集UIはありません。
+SetFormationは9Slotへの全構成Unitの一度ずつの配置を検証します。作成時に既存の非Voidタイル・他Party非占有・UnitのHPとactive状態を検証します。敗北・全員戦闘不能のPartyは移動と配置変更を拒否します。3×3配置編集UIは実装済みです。解散・分割・合流、Leader手動変更、敵隣接時の編成制限はありません。
 
 Partyは移動力2、攻撃回数1で初期化されます。最も遅い構成員から移動力を計算する処理はありません。移動コストは平原・草原・霊脈1、森林・丘陵2です。指定経路の全段階で隣接性・非Void・他Party占有・必要移動力を検証し、成功時に所属Unitのlocationも更新します。
 
@@ -156,7 +157,7 @@ Party戦闘力は戦闘可能Unitの対象能力の算術平均×(0.5＋cohesion
 
 基礎Damageは30×exp(0.04×戦闘力差)×seed乱数0.85〜1.15を1〜90へ制限して丸め、対象Unitのarmorを引き、最低1を適用します。選択順はfront→middle→rear、各行内はcenter→left→rightで、最初の戦闘可能Unit一体へ適用します。空いた列だけの後方露出や複数UnitへのDamage配分はありません。
 
-攻撃側は攻撃回数1を消費し、移動力0・activationState endedになります。近接では生き残った防御Partyが反撃し、遠隔には標準反撃がありません。射線・攻撃能力の所持・撃破後前進の検証は未完成です。
+攻撃側は攻撃回数1を消費し、移動力0・activationState endedになります。近接では生き残った防御Partyが反撃し、遠隔には標準反撃がありません。遠隔攻撃は生存・active・rangedStrength>0かつ自分の射程が届くUnitを必要とし、そのUnitだけから遠隔戦闘力を計算します。無能力・戦闘不能Unitで射程を延ばせません。射線・撃破後前進は未実装です。
 
 HP0ではscaleClassがindividualならdowned、それ以外は一律shatteredです。現行定義はdetachmentのwarriorだけで、他scaleClassの完全な状態遷移は未実装です。
 
@@ -168,7 +169,7 @@ Guard容量の保存・ターン回復はありますが、Guard／Intercept／T
 
 serializeGameState／restoreGameStateでJSON化・復元します。UIはlocalStorageのkingdom-m1-save一枠を使用します。旧M1セーブへのParty・turnOrder・戦闘フィールド等の補完がありますが、任意の破損セーブへの網羅的検証ではありません。
 
-2026-10-17: 素材接続を実装し、Node標準32テスト、全JS構文、30素材の整合性・復号、実UIを使うDOM/Canvas操作検証に成功しました。実ブラウザのCSS描画・音声再生と人による聴取は未確認です。 保存に失敗しても進行を継続でき、不正ロードは元のstateへ戻します。K-09の完全なセーブスキーマ検証を実装した意味ではありません。詳細は[検証記録](ASSET_INTEGRATION_QA.md)。
+2026-10-17 第2段階: Node標準44テスト、全45 JavaScriptファイルの構文検査、30素材の整合性・復号に成功しました。実UIのDOM/Canvas検証では3×3配置の移動・交換・保存復元、全音声ファイルがHTTP 404の場合の再合成、再試行後のBGM重複防止を確認しました。実ブラウザのCSS・音声出力と人による聴取は未確認です。 保存に失敗しても進行を継続でき、不正ロードは元のstateへ戻します。K-09の完全なセーブスキーマ検証を実装した意味ではありません。詳細は[検証記録](ASSET_INTEGRATION_QA.md)。
 
 ## 12. 2026-10-16再調査の結果
 

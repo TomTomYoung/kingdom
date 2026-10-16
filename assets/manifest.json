@@ -563,7 +563,13 @@
         "commandOrDomHarness": true,
         "browserReviewed": false,
         "humanListeningReviewed": false
-      }
+      },
+      "runtimeUses": [
+        "map-party",
+        "selected-party",
+        "production",
+        "formation-grid"
+      ]
     },
     {
       "id": "icon-food",
@@ -2200,5 +2206,16 @@
   "updated": "2026-10-17",
   "runtimeConnectedCount": 29,
   "reviewDocument": "doc/ASSET_INTEGRATION_QA.md",
-  "basePackId": "kingdom-first-pack-v001"
+  "basePackId": "kingdom-first-pack-v001",
+  "runtimeAudioFallback": {
+    "scoreCount": 13,
+    "scores": "src/audio/scores.js",
+    "renderer": "src/audio/vendor/audio.mjs",
+    "tool": "AIMusic",
+    "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
+    "buildScript": "tools/assets/build-audio-fallback.mjs",
+    "originalWAVHashesVerified": true,
+    "browserReviewed": false,
+    "humanListeningReviewed": false
+  }
 }

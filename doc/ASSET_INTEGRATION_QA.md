@@ -3,6 +3,27 @@
 確認日: 2026-10-17（日本時間）
 開始基準: main / f59804d8b6dfad75704bfa40024e148dee03391b
 
+## 第2段階: 音声読み込み失敗への対応と配置編集
+
+開始基準: main / a9e66eaad5290c366c96eeacd07b1fce497b5dee。以下は2026-10-17の追加実装です。後述の第1段階の記録も保持しています。
+
+報告された音声読み込み失敗に対し、公開GitHub Pagesのindex・manifest・地上BGM・確定SEを取得し、HTTP 200と採用ファイルのハッシュ一致を確認しました。音声ファイルの破損は再現しておらず、利用端末での原因は未確定です。
+
+WAV/OggのHTTP失敗・デコード失敗・8秒タイムアウト時に、採用済み原稿を同梱した13件のスコアからPCMを再合成します。AIMusic固定版のcore.mjs・audio.mjsを無変更で同梱し、通常はmodule Workerで処理、Workerが拒否される環境では同じ合成器へ戻ります。新しい音色や曲を作る変更ではありません。戦闘BGMも復旧データに含めますが、通常UIへの接続はまだありません。
+
+復旧した場合は内蔵音符で再生中と表示します。合成も失敗した場合は素材IDと理由を表示します。「音声を再読み込み」はキャッシュを消して再試行し、古い読み込みやBGMを重ねません。音声オン・オフ、非表示停止、保存した音量を維持します。
+
+3×3配置編集には既存の戦士画像を使用します。空き枠への移動、Unit同士の交換、同じ枠による取消、HP・指揮者の表示を追加しました。配置変更はSetFormationを通し、元の最大5Unit・9枠、移動力と攻撃回数の意味を維持します。
+
+- `npm test`: 44件成功。全13音源の再合成WAVが制作時のWAVのSHA-256と一致。HTTP 404・デコード失敗・manifest欠損・タイムアウト・合成中のミュート・再試行を検証しました。
+- Node worker_threadsによるWeb Worker APIアダプターで、実際のsynth-worker.jsを別スレッドで実行し、同時要求のステレオPCM転送とWorker失敗時の復旧を確認。ブラウザ固有のWorker制約を確認した意味ではありません。
+- `npm run check`: 全45 JavaScriptファイル成功。`npm run check:assets`: 30素材成功。
+- 実UIコードで配置の移動・交換・取消、指揮者と行動値の保持、保存復元、選択クリア、音声再試行後のBGM一重再生に成功。[通常時の結果](../assets/qa/ui-formation-audio.json)。
+- 全WAV/OggをHTTP 404にし、戦士画像も欠損させて同じ操作を完了。[音声・画像欠損時の結果](../assets/qa/ui-audio-recovery.json)。
+- K-01〜K-04の回帰テストにより、敗北Partyの移動・回復、占有済み地点での作成、無能力射撃、不正payload/phaseを拒否し、元state・HP・RNG・資源・ID・ログを保持することを確認。
+
+実ブラウザのCSS・実AudioContext出力・ブラウザ別再生開始・聴取は引き続き未確認です。利用端末での復旧を確認済みとは扱いません。
+
 ## 実装したもの
 
 既存画像17点・既存SE8点・地上BGM1曲を接続し、自然拡張・保存・復元のSE3点を追加しました。全30素材のうち29点が現在のUIに接続されています。戦闘BGMは戦闘UI未実装のため未接続です。元の27素材・原稿・ジョブのバイト列は維持しています。
@@ -13,7 +34,7 @@
 
 音声は初期ミュートで、利用者の入力からAudioContextを開始します。音量は0〜100%、BGMは主音量に対して0.4倍です。設定保存、非表示時の停止、SE同時4音までの制限、ミュート・曲切替・非表示後に遅れて完了した読み込みの無効化を実装しています。
 
-## 実施した検証
+## 第1段階で実施した検証
 
 - `npm test`: 32件成功。従来23件と、素材整合性・画像失敗・等方拡大・操作と効果音の対応・設定・音声の遅延読み込み競合に関する9件。
 - `npm run check`: src・tests・toolsの全34 JavaScriptファイルの構文検査に成功。
@@ -44,6 +65,8 @@ manifestは `runtimeConnected: true` と `status: connected-candidate` で接続
 4. モニュメント生産を進め、完成と自然領土拡張、保存と復元の音を聴く。完成と手番の重複通知がうるさくならないことを確認する。
 5. 地上曲を少なくとも3周聴き、継ぎ目・繰り返し・SEとの音量差を確認する。別タブに移動して停止し、戻ったとき重複ループが生じないことを確認する。
 6. 問題がある素材だけv002を制作し、manifestの採用版を切り替える。旧版を削除しない。問題がなければ確認環境と日付を記録し、最終確認フラグを更新する。
+7. 配置欄の前・中・後列がPC幅・狭い画面とも3列を保ち、48pxの戦士画像が潰れないことを確認する。Unit選択→空き枠へ移動、2体の交換、保存・ロードを試す。
+8. 音声ファイルの取得をブロックし、内蔵音符による復旧を聴く。再読み込みで重複再生せず、取得制限を解除して再試行すると通知が消えることを確認する。問題が残る場合は素材ID・理由・端末とブラウザを記録する。
 
 ## 再実行
 
@@ -59,6 +82,7 @@ DOM/Canvasハーネスはゲームの実行依存に追加していません。�
 npm install --prefix /tmp/kingdom-qa happy-dom @napi-rs/canvas
 KINGDOM_QA_MODULES=/tmp/kingdom-qa/node_modules node tools/qa/ui-smoke.mjs /tmp/kingdom-ui-output
 KINGDOM_QA_MODULES=/tmp/kingdom-qa/node_modules KINGDOM_QA_MISSING=terrain-plains node tools/qa/ui-smoke.mjs /tmp/kingdom-ui-missing
+KINGDOM_QA_MODULES=/tmp/kingdom-qa/node_modules KINGDOM_QA_AUDIO_FAILURE=1 KINGDOM_QA_MISSING=unit-warrior node tools/qa/ui-smoke.mjs /tmp/kingdom-ui-recovery
 ```
 
 このハーネスでもCSS実レイアウト・ブラウザ互換性・聴取は確認できません。

@@ -1,13 +1,13 @@
 import { RULESET } from '../core/ruleset.js';
 import { SeededRng } from '../core/rng.js';
 import { Hex } from '../world/hex.js';
+import { isActiveUnit as isActive } from '../models/party.js';
 
 const ROW_ORDER = ['front', 'middle', 'rear'];
 const COLUMN_ORDER = ['center', 'left', 'right'];
-const isActive = (unit) => unit && unit.currentHp > 0 && unit.status === 'active';
 
-export function partyCombatStrength(state, party, kind = 'melee') {
-  const units = party.unitIds.map((id) => state.units[id]).filter(isActive);
+export function partyCombatStrength(state, party, kind = 'melee', distance = 1) {
+  const units = party.unitIds.map((id) => state.units[id]).filter((unit) => isActive(unit) && (kind !== 'ranged' || (unit.rangedStrength > 0 && unit.range >= distance)));
   if (!units.length) return 0;
   const property = kind === 'defense' ? 'defenseStrength' : `${kind}Strength`;
   const base = units.reduce((sum, unit) => sum + (unit[property] ?? 0), 0) / units.length;
@@ -43,12 +43,12 @@ function inheritLeadership(state, party, events) {
   if (isActive(state.units[party.leaderUnitId])) return;
   const successor = party.unitIds.map((id) => state.units[id]).filter(isActive).sort((a, b) => b.commandContribution - a.commandContribution || a.id.localeCompare(b.id))[0];
   if (successor) { const previousLeaderUnitId = party.leaderUnitId; party.leaderUnitId = successor.id; party.morale = Math.max(0, party.morale - 10); events.push({ type: 'PartyLeaderChanged', partyId: party.id, previousLeaderUnitId, leaderUnitId: successor.id }); }
-  else { party.status = 'defeated'; party.activationState = 'ended'; events.push({ type: 'PartyDefeated', partyId: party.id }); }
+  else { party.status = 'defeated'; party.activationState = 'ended'; party.movementRemaining = 0; party.attacksRemaining = 0; party.reactionCharges = 0; events.push({ type: 'PartyDefeated', partyId: party.id }); }
 }
 
-function strike(state, sourceParty, targetParty, kind, events, counter = false) {
+function strike(state, sourceParty, targetParty, kind, events, counter = false, distance = 1) {
   const target = selectPrimaryTarget(state, targetParty); if (!target) return null;
-  const rawDamage = rollDamage(state, partyCombatStrength(state, sourceParty, kind), partyCombatStrength(state, targetParty, 'defense'));
+  const rawDamage = rollDamage(state, partyCombatStrength(state, sourceParty, kind, distance), partyCombatStrength(state, targetParty, 'defense'));
   const damage = applyDamage(target, rawDamage);
   targetParty.morale = Math.max(0, targetParty.morale - Math.ceil(damage * RULESET.combat.moraleDamageRate));
   events.push({ type: 'CombatDamage', attackerPartyId: sourceParty.id, defenderPartyId: targetParty.id, targetUnitId: target.id, attackType: kind, rawDamage, damage, counter, remainingHp: target.currentHp });
@@ -60,12 +60,15 @@ export function resolvePartyAttack(state, attacker, defender, attackType, events
   if (!['melee', 'ranged'].includes(attackType)) return { ok: false, reason: '未対応の攻撃種別です' };
   if (attacker.status !== 'active' || attacker.activationState === 'ended') return { ok: false, reason: '攻撃可能なPartyではありません' };
   if (attacker.attacksRemaining < 1) return { ok: false, reason: '攻撃回数が残っていません' };
+  if (defender.status !== 'active') return { ok: false, reason: '戦闘可能な敵Partyではありません' };
   const distance = Hex.fromKey(attacker.location).distance(Hex.fromKey(defender.location));
-  const range = attackType === 'melee' ? 1 : Math.max(...attacker.unitIds.map((id) => state.units[id].range ?? 1));
+  const rangedUnits = attacker.unitIds.map((id) => state.units[id]).filter((unit) => isActive(unit) && unit.rangedStrength > 0);
+  if (attackType === 'ranged' && !rangedUnits.length) return { ok: false, reason: '遠隔攻撃が可能なUnitがいません' };
+  const range = attackType === 'melee' ? 1 : Math.max(...rangedUnits.map((unit) => unit.range ?? 1));
   if (distance < 1 || distance > range) return { ok: false, reason: '攻撃射程外です' };
   if (!selectPrimaryTarget(state, attacker) || !selectPrimaryTarget(state, defender)) return { ok: false, reason: '戦闘可能なUnitがいません' };
   attacker.attacksRemaining -= 1; attacker.hasAttacked = true; attacker.movementRemaining = 0; attacker.activationState = 'ended';
-  strike(state, attacker, defender, attackType, events);
+  strike(state, attacker, defender, attackType, events, false, distance);
   if (attackType === 'melee' && defender.status === 'active' && selectPrimaryTarget(state, defender)) strike(state, defender, attacker, 'melee', events, true);
   return { ok: true };
 }

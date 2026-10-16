@@ -13,7 +13,7 @@ function fixture(fetcher = async () => ({ ok: true, arrayBuffer: async () => new
     decodeAudioData: async () => ({ duration: 12 }),
     createBufferSource: () => { const node = { started: false, stopped: false, connect() {}, disconnect() {}, start() { this.started = true; }, stop() { this.stopped = true; this.onended?.(); } }; nodes.push(node); return node; } };
   const assets = { entries: new Map(['bgm-overworld', 'bgm-battle', 'se-ui-confirm'].map((id) => [id, { url: `https://example.test/${id}` }])) };
-  const audio = new GameAudio(assets, { contextFactory: () => context, fetcher, storage: { getItem: (key) => settings.get(key), setItem: (key, value) => settings.set(key, value) } });
+  const audio = new GameAudio(assets, { contextFactory: () => context, fetcher, synthesizer: null, storage: { getItem: (key) => settings.get(key), setItem: (key, value) => settings.set(key, value) } });
   return { audio, context, nodes, settings };
 }
 const flush = () => new Promise((resolve) => setImmediate(resolve));
@@ -82,7 +82,7 @@ test('failed audio download is nonfatal and rapid clicks have at most four effec
   let fail = true;
   const { audio, nodes } = fixture(async () => { if (fail) throw Error('offline'); return { ok: true, arrayBuffer: async () => new ArrayBuffer(4) }; });
   await audio.setMuted(false); assert.equal(await audio.play('se-ui-confirm'), false);
-  fail = false;
+  fail = false; await audio.retry();
   await Promise.all(Array.from({ length: 12 }, () => audio.play('se-ui-confirm')));
   assert.equal(audio.effects.size, 4); assert.equal(nodes.filter((node) => !node.loop && !node.stopped).length, 4);
 });

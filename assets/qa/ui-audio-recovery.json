@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-17",
+  "harness": "happy-dom + native Canvas",
+  "realBrowser": false,
+  "cssLayoutVerified": false,
+  "humanListening": false,
+  "checks": [
+    "no autoplay",
+    "17 image load/fallback",
+    "resource icons",
+    "purchase/reject sounds",
+    "party creation/selection/movement",
+    "city-party overlap",
+    "3x3 formation empty-slot move/cancel/swap via Command",
+    "formation save/load and selection reset",
+    "deselect/Esc",
+    "tile purchase after deselect",
+    "save/load sounds and selection reset",
+    "production completion and monument",
+    "broken-save rollback",
+    "volume persistence",
+    "audio retry keeps one loop",
+    "mute stops sources",
+    "new game selection reset",
+    "minimum map canvas"
+  ],
+  "soundRoutes": [
+    "se-purchase",
+    "se-ui-error",
+    "se-ui-confirm",
+    "se-ui-select",
+    "se-ui-cancel",
+    "se-save",
+    "se-party-move",
+    "se-load",
+    "se-turn-start",
+    "se-territory-expand",
+    "se-production-complete"
+  ],
+  "missingAssets": [
+    "unit-warrior"
+  ],
+  "audioFilesUnavailable": true,
+  "result": "passed"
+}

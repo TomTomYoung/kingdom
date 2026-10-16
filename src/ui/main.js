@@ -7,6 +7,8 @@ import { getTerritoryCandidates, tilePurchaseCost } from '../systems/territory-s
 import { validatePartyPath } from '../systems/movement-system.js';
 import { AssetStore } from './assets.js';
 import { GameAudio, soundForResult } from './audio.js';
+import { FormationPanel } from './formation.js';
+import { isActiveUnit } from '../models/party.js';
 
 const $ = (selector) => document.querySelector(selector);
 const canvas = $('#map'), ctx = canvas.getContext('2d');
@@ -20,6 +22,11 @@ state = RuleSystem.execute(state, controller.startTurn(state)).state;
 const labels = { food: '食料', production: '生産', gold: 'Gold', science: '科学', mana: 'Mana', religion: '宗教', culture: '文化', popularSupport: '人心' };
 const assetId = (name) => `icon-${name === 'popularSupport' ? 'popular-support' : name}`;
 const show = (message) => { $('#message').textContent = message; };
+const formationPanel = new FormationPanel($('#formation'), assets, {
+  onChange: (partyId, formation) => run(controller.setFormation(state, partyId, formation), '部隊の配置を変更しました'),
+  onSelect: () => { void audio.play('se-ui-select'); },
+  onCancel: () => { void audio.play('se-ui-cancel'); },
+});
 
 function run(command, success) {
   const result = RuleSystem.execute(state, command);
@@ -134,6 +141,7 @@ function render() {
     $('#party-detail').textContent = '部隊を選ぶと移動先を確認できます。';
   }
   $('#deselect-party').disabled = !party;
+  formationPanel.render(state, party);
   $('#map-mode').textContent = party ? '部隊移動' : '領土購入';
   updateHover(); drawMap();
 }
@@ -172,7 +180,7 @@ document.querySelectorAll('[data-buy]').forEach((button) => {
 });
 $('#form-party').onclick = () => {
   const city = state.cities['city-1'];
-  const units = state.kingdoms['kingdom-1'].unitIds.filter((id) => !state.units[id].partyId && state.units[id].location === city.centerHex).slice(0, 5);
+  const units = state.kingdoms['kingdom-1'].unitIds.filter((id) => !state.units[id].partyId && isActiveUnit(state.units[id]) && state.units[id].location === city.centerHex).slice(0, 5);
   if (!units.length) return reject('首都に未編成のUnitがいません');
   const result = run(controller.createParty(state, units, city.centerHex), 'Partyを編成しました');
   if (result.ok) { selectedPartyId = result.events.find((event) => event.type === 'PartyCreated').partyId; render(); }
@@ -190,12 +198,12 @@ $('#load').onclick = () => {
     const restored = restoreGameState(save);
     // The current UI supports a single kingdom/city. Check before replacing state.
     if (!restored.kingdoms?.['kingdom-1'] || !restored.cities?.['city-1'] || !restored.world?.tiles) throw new Error('このセーブは現在の画面に対応していません');
-    state = restored; selectedPartyId = null; hoveredKey = null; render(); show('セーブをロードしました'); void audio.play('se-load');
+    state = restored; selectedPartyId = null; hoveredKey = null; formationPanel.clear(); render(); show('セーブをロードしました'); void audio.play('se-load');
   } catch (error) { state = before; selectedPartyId = previousSelection; hoveredKey = previousHover; render(); reject(error.message || 'セーブをロードできませんでした'); }
 };
 $('#reset').onclick = () => {
   state = createInitialGameState(117); state = RuleSystem.execute(state, controller.startTurn(state)).state;
-  selectedPartyId = null; hoveredKey = null; audio.stop(); void audio.startMusic(); render(); show('固定シードで新規開始しました'); void audio.play('se-turn-start');
+  selectedPartyId = null; hoveredKey = null; formationPanel.clear(); audio.stop(); void audio.startMusic(); render(); show('固定シードで新規開始しました'); void audio.play('se-turn-start');
 };
 canvas.onclick = (event) => {
   const tile = tileAt(event); if (!tile) return;
@@ -216,6 +224,7 @@ function updateAudioControls() {
   $('#volume').value = Math.round(audio.volume * 100); $('#volume-value').textContent = `${Math.round(audio.volume * 100)}%`;
 }
 $('#audio-toggle').onclick = () => { void audio.setMuted(!audio.muted); updateAudioControls(); };
+$('#audio-retry').onclick = () => { void audio.retry(); };
 $('#volume').oninput = (event) => { audio.setVolume(Number(event.target.value) / 100); updateAudioControls(); };
 document.addEventListener('visibilitychange', () => audio.setHidden(document.hidden));
 window.addEventListener('pagehide', () => audio.stop());
