@@ -1,8 +1,8 @@
 # Kingdom 開発ハンドオフ
 
-確認・更新日: 2026-09-13
+確認・更新日: 2026-10-16
 
-コード基準: main / e0dcb3fc2e6162547d7499fdd913aaaa0b9f10c7
+コード基準: main / 21826414ea238468ff9b7c2ddaaf47cd012c1f80
 
 次作業: 現行の状態・行動検証の不具合を回帰テスト付きで修正し、M2 Guard・Damage Grid配分と戦闘UIへ進む。
 
@@ -91,7 +91,7 @@ npm run check
 npm run dev
 ```
 
-2026-09-13の基準は23テスト成功です。npm run checkはUI一ファイルの構文確認であり、ブラウザQAではありません。今回、ブラウザ実操作は未実施です。
+2026-10-16の基準は23テスト成功です。npm run checkはUI一ファイルの構文確認であり、ブラウザQAではありません。今回、ブラウザ実操作は未実施です。
 
 変更後は該当回帰テスト、既存テスト、変更JSの構文、必要なUI実操作を確認します。UIでは新規開始→生産・購入→Party作成→移動→選択解除→領土購入→保存・復元を確認し、戦闘UI追加後は攻撃・反撃・HP0・継承も含めます。
 
@@ -105,3 +105,13 @@ npm run dev
 6. LEGACY_IMPLEMENTATIONは旧版の保存資料として維持し、現在の課題を書き足さない。
 7. コード確認の基準SHA、確認日、テスト実施範囲、未検証項目を記録する。
 8. 名称・費用・能力・産出・利用できる操作を変更したら、[Wiki](../wiki/README.md) の該当一覧・個別項目・関連ルールも更新する。実装済みと予定を分け、[更新方法](../wiki/EDITING.md) に従ってリンクと出典を照合する。
+
+## 10. 再開用の具体的な確認箇所（2026-10-16）
+
+- 状態・行動検証: `src/core/rule-system.js` の `RuleSystem.execute`、`src/systems/movement-system.js` の `validatePartyPath`、`src/core/turn-engine.js` の `processTurnStart`。
+- 遠隔攻撃の合法性: `src/systems/combat-system.js` の `resolvePartyAttack` と `src/core/ruleset.js` のwarrior定義。
+- UI: `src/ui/main.js` のParty選択、固定王国・都市ID、save/load/newの選択状態。
+- 複数都市: `src/systems/yield-system.js` の作業タイル選択と `src/systems/territory-system.js` の候補生成。
+- 保存: `src/core/game-state.js` の `restoreGameState`。schemaVersion・rulesetVersionを変える場合は移行方針も記録する。
+
+mainの最新SHAを取得して本書の基準と比較し、差分があればCURRENT_IMPLEMENTATION・STATUSを先に照合してください。今回のブランチ一覧はmainのみ、open PR・open issueは各0件でした。既存doc・wikiを維持したまま再開でき、M1再実装は不要です。
