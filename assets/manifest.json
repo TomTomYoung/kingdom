@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "packId": "kingdom-first-pack-v001",
+  "packId": "kingdom-assets-2026-10-17",
   "created": "2026-09-13",
-  "plan": "doc/ASSET_LIST.md",
+  "plan": "doc/ASSET_AUDIT.md",
   "graphics": 17,
-  "soundEffects": 8,
+  "soundEffects": 11,
   "music": 2,
   "tools": {
     "AIPaint": {
@@ -40,9 +40,10 @@
   "authoringScripts": [
     "tools/assets/graphics.mjs",
     "tools/assets/music.mjs",
-    "tools/assets/render-first-pack.mjs"
+    "tools/assets/render-first-pack.mjs",
+    "tools/assets/render-ui-audio.mjs"
   ],
-  "integrationStatus": "not-integrated",
+  "integrationStatus": "connected-awaiting-browser-review",
   "imageReview": "contact-sheet-reviewed",
   "audioListeningReview": "not-performed",
   "contactSheet": {
@@ -60,7 +61,7 @@
       "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
       "width": 64,
       "height": 64,
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "visualReview": true,
       "files": [
@@ -100,6 +101,12 @@
         "renderer": "AIPaint executeJob / PaintCore",
         "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
         "pngAdapter": "kingdom-node-png/1"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -111,7 +118,7 @@
       "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
       "width": 64,
       "height": 64,
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "visualReview": true,
       "files": [
@@ -151,6 +158,12 @@
         "renderer": "AIPaint executeJob / PaintCore",
         "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
         "pngAdapter": "kingdom-node-png/1"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -162,7 +175,7 @@
       "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
       "width": 64,
       "height": 64,
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "visualReview": true,
       "files": [
@@ -202,6 +215,12 @@
         "renderer": "AIPaint executeJob / PaintCore",
         "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
         "pngAdapter": "kingdom-node-png/1"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -213,7 +232,7 @@
       "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
       "width": 64,
       "height": 64,
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "visualReview": true,
       "files": [
@@ -253,6 +272,12 @@
         "renderer": "AIPaint executeJob / PaintCore",
         "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
         "pngAdapter": "kingdom-node-png/1"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -264,7 +289,7 @@
       "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
       "width": 64,
       "height": 64,
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "visualReview": true,
       "files": [
@@ -304,6 +329,12 @@
         "renderer": "AIPaint executeJob / PaintCore",
         "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
         "pngAdapter": "kingdom-node-png/1"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -315,7 +346,7 @@
       "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
       "width": 64,
       "height": 64,
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "visualReview": true,
       "files": [
@@ -355,6 +386,12 @@
         "renderer": "AIPaint executeJob / PaintCore",
         "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
         "pngAdapter": "kingdom-node-png/1"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -366,7 +403,7 @@
       "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
       "width": 48,
       "height": 48,
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "visualReview": true,
       "files": [
@@ -406,6 +443,12 @@
         "renderer": "AIPaint executeJob / PaintCore",
         "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
         "pngAdapter": "kingdom-node-png/1"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -417,7 +460,7 @@
       "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
       "width": 48,
       "height": 48,
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "visualReview": true,
       "files": [
@@ -457,6 +500,12 @@
         "renderer": "AIPaint executeJob / PaintCore",
         "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
         "pngAdapter": "kingdom-node-png/1"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -468,7 +517,7 @@
       "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
       "width": 48,
       "height": 48,
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "visualReview": true,
       "files": [
@@ -508,6 +557,12 @@
         "renderer": "AIPaint executeJob / PaintCore",
         "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
         "pngAdapter": "kingdom-node-png/1"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -519,7 +574,7 @@
       "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
       "width": 24,
       "height": 24,
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "visualReview": true,
       "files": [
@@ -559,6 +614,12 @@
         "renderer": "AIPaint executeJob / PaintCore",
         "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
         "pngAdapter": "kingdom-node-png/1"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -570,7 +631,7 @@
       "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
       "width": 24,
       "height": 24,
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "visualReview": true,
       "files": [
@@ -610,6 +671,12 @@
         "renderer": "AIPaint executeJob / PaintCore",
         "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
         "pngAdapter": "kingdom-node-png/1"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -621,7 +688,7 @@
       "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
       "width": 24,
       "height": 24,
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "visualReview": true,
       "files": [
@@ -661,6 +728,12 @@
         "renderer": "AIPaint executeJob / PaintCore",
         "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
         "pngAdapter": "kingdom-node-png/1"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -672,7 +745,7 @@
       "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
       "width": 24,
       "height": 24,
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "visualReview": true,
       "files": [
@@ -712,6 +785,12 @@
         "renderer": "AIPaint executeJob / PaintCore",
         "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
         "pngAdapter": "kingdom-node-png/1"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -723,7 +802,7 @@
       "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
       "width": 24,
       "height": 24,
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "visualReview": true,
       "files": [
@@ -763,6 +842,12 @@
         "renderer": "AIPaint executeJob / PaintCore",
         "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
         "pngAdapter": "kingdom-node-png/1"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -774,7 +859,7 @@
       "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
       "width": 24,
       "height": 24,
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "visualReview": true,
       "files": [
@@ -814,6 +899,12 @@
         "renderer": "AIPaint executeJob / PaintCore",
         "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
         "pngAdapter": "kingdom-node-png/1"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -825,7 +916,7 @@
       "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
       "width": 24,
       "height": 24,
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "visualReview": true,
       "files": [
@@ -865,6 +956,12 @@
         "renderer": "AIPaint executeJob / PaintCore",
         "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
         "pngAdapter": "kingdom-node-png/1"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -876,7 +973,7 @@
       "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
       "width": 24,
       "height": 24,
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "visualReview": true,
       "files": [
@@ -916,6 +1013,12 @@
         "renderer": "AIPaint executeJob / PaintCore",
         "toolCommit": "be94fc261c1ce926a5d63bf0720feb4b6bb2fd0d",
         "pngAdapter": "kingdom-node-png/1"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -925,7 +1028,7 @@
       "revision": "v001",
       "tool": "AIMusic",
       "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "listeningReviewed": false,
       "seconds": 0.18448979591836734,
@@ -1000,6 +1103,12 @@
         ],
         "githubStored": false,
         "reviewStatus": "candidate"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -1009,7 +1118,7 @@
       "revision": "v001",
       "tool": "AIMusic",
       "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "listeningReviewed": false,
       "seconds": 0.3021768707482993,
@@ -1084,6 +1193,12 @@
         ],
         "githubStored": false,
         "reviewStatus": "candidate"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -1093,7 +1208,7 @@
       "revision": "v001",
       "tool": "AIMusic",
       "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "listeningReviewed": false,
       "seconds": 0.2744671201814059,
@@ -1168,6 +1283,12 @@
         ],
         "githubStored": false,
         "reviewStatus": "candidate"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -1177,7 +1298,7 @@
       "revision": "v001",
       "tool": "AIMusic",
       "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "listeningReviewed": false,
       "seconds": 0.20494331065759638,
@@ -1252,6 +1373,12 @@
         ],
         "githubStored": false,
         "reviewStatus": "candidate"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -1261,7 +1388,7 @@
       "revision": "v001",
       "tool": "AIMusic",
       "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "listeningReviewed": false,
       "seconds": 0.83859410430839,
@@ -1336,6 +1463,12 @@
         ],
         "githubStored": false,
         "reviewStatus": "candidate"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -1345,7 +1478,7 @@
       "revision": "v001",
       "tool": "AIMusic",
       "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "listeningReviewed": false,
       "seconds": 0.8940136054421769,
@@ -1420,6 +1553,12 @@
         ],
         "githubStored": false,
         "reviewStatus": "candidate"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -1429,7 +1568,7 @@
       "revision": "v001",
       "tool": "AIMusic",
       "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "listeningReviewed": false,
       "seconds": 0.573718820861678,
@@ -1504,6 +1643,12 @@
         ],
         "githubStored": false,
         "reviewStatus": "candidate"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -1513,7 +1658,7 @@
       "revision": "v001",
       "tool": "AIMusic",
       "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "listeningReviewed": false,
       "seconds": 0.2527891156462585,
@@ -1588,6 +1733,12 @@
         ],
         "githubStored": false,
         "reviewStatus": "candidate"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -1597,7 +1748,7 @@
       "revision": "v001",
       "tool": "AIMusic",
       "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "listeningReviewed": false,
       "seconds": 17.77777777777778,
@@ -1672,6 +1823,12 @@
         ],
         "githubStored": false,
         "reviewStatus": "candidate"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     },
     {
@@ -1736,7 +1893,7 @@
         "rms": 0.03971518216295943,
         "limiterGain": 1,
         "silent": false,
-        "loopBoundaryJump": 0.00005532149225473404,
+        "loopBoundaryJump": 5.532149225473404e-05,
         "files": [
           {
             "file": "song.wav",
@@ -1756,6 +1913,282 @@
         ],
         "githubStored": false,
         "reviewStatus": "candidate"
+      },
+      "runtimeConnected": false,
+      "integrationChecks": {
+        "commandOrDomHarness": false,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
+      }
+    },
+    {
+      "id": "se-territory-expand",
+      "title": "文化による領土拡張",
+      "category": "se",
+      "revision": "v001",
+      "tool": "AIMusic",
+      "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
+      "status": "connected-candidate",
+      "integrated": false,
+      "listeningReviewed": false,
+      "seconds": 0.7989569160997733,
+      "sampleRate": 44100,
+      "channels": 2,
+      "loop": false,
+      "files": [
+        {
+          "path": "assets/jobs/se-territory-expand.v001.music.json",
+          "bytes": 1248,
+          "sha256": "9824395780f19dec34c61e36fd178245a4ea3308977e82ec320666e5eb8cff89"
+        },
+        {
+          "path": "assets/audio/se-territory-expand/v001/project.music.json",
+          "bytes": 1008,
+          "sha256": "2104e92c0011d785da9a4d49a315c18343bcbd0051647afffe4ffa3cfc9ecbea"
+        },
+        {
+          "path": "assets/audio/se-territory-expand/v001/song.mid",
+          "bytes": 162,
+          "sha256": "5f3a9961e0c485c92a1d289594a9460e51166b555d93f8a62a9f81b6a02d8300"
+        },
+        {
+          "path": "assets/audio/se-territory-expand/v001/source-render-report.json",
+          "bytes": 903,
+          "sha256": "0725292159abf31c88f2037101984274ded80d8501040b2825d71e082de6ac60"
+        },
+        {
+          "path": "assets/audio/se-territory-expand/v001/audio.wav",
+          "bytes": 140980,
+          "sha256": "c2982435bcdda127bfc8308f92111b6f2091a452cf7ae46688a86f0b710ac319"
+        },
+        {
+          "path": "assets/audio/se-territory-expand/v001/delivery-report.json",
+          "bytes": 799,
+          "sha256": "c15f896d05a758d8499e7d234c60ef80ded5b3e2d5bfb9322345803e0afb833f"
+        }
+      ],
+      "checks": {
+        "format": "aimusic-render-report",
+        "version": 1,
+        "projectId": "se-territory-expand",
+        "renderer": "pcm-synth/1",
+        "mode": "tail",
+        "frames": 55125,
+        "bodyFrames": 33075,
+        "seconds": 1.25,
+        "scoreSeconds": 0.75,
+        "audibleTracks": 1,
+        "notes": 4,
+        "peak": 0.13967038691043854,
+        "rms": 0.02724504422784136,
+        "limiterGain": 1,
+        "silent": false,
+        "loopBoundaryJump": null,
+        "files": [
+          {
+            "file": "song.wav",
+            "bytes": 220544,
+            "sha256": "6faec5df46535d2c616e2ee9082c9ec8048ec463129db85959a3337955220d99"
+          },
+          {
+            "file": "song.mid",
+            "bytes": 162,
+            "sha256": "5f3a9961e0c485c92a1d289594a9460e51166b555d93f8a62a9f81b6a02d8300"
+          },
+          {
+            "file": "project.music.json",
+            "bytes": 1008,
+            "sha256": "2104e92c0011d785da9a4d49a315c18343bcbd0051647afffe4ffa3cfc9ecbea"
+          }
+        ],
+        "githubStored": false,
+        "reviewStatus": "candidate"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
+      }
+    },
+    {
+      "id": "se-save",
+      "title": "保存",
+      "category": "se",
+      "revision": "v001",
+      "tool": "AIMusic",
+      "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
+      "status": "connected-candidate",
+      "integrated": false,
+      "listeningReviewed": false,
+      "seconds": 0.31943310657596374,
+      "sampleRate": 44100,
+      "channels": 2,
+      "loop": false,
+      "files": [
+        {
+          "path": "assets/jobs/se-save.v001.music.json",
+          "bytes": 875,
+          "sha256": "40b4f2a4c4d6fd8753cce8f06805daa1b8c94c38d1c52b2e6cf65d40aad318a4"
+        },
+        {
+          "path": "assets/audio/se-save/v001/project.music.json",
+          "bytes": 663,
+          "sha256": "89be9f9723c40f9c096fbb46efb69a90f3658a9ef6f3a03abb0754eef599a133"
+        },
+        {
+          "path": "assets/audio/se-save/v001/song.mid",
+          "bytes": 103,
+          "sha256": "8e56b3c3b3f93501df3abb00382da0b692b4bce993f3a5ff3f636f949f37dead"
+        },
+        {
+          "path": "assets/audio/se-save/v001/source-render-report.json",
+          "bytes": 891,
+          "sha256": "e4000f50930d2987e73e046f2e9937cf5aa6045d43f9ea37b96fdd020e25de42"
+        },
+        {
+          "path": "assets/audio/se-save/v001/audio.wav",
+          "bytes": 56392,
+          "sha256": "3a73db1f46a4e85e2358865edd315c7a83cc0ce967ab394458fb47672775caf7"
+        },
+        {
+          "path": "assets/audio/se-save/v001/delivery-report.json",
+          "bytes": 775,
+          "sha256": "82bf0853720759262fb8367801e0d2671a7789aaeedfc7665c51e1d31207b1b7"
+        }
+      ],
+      "checks": {
+        "format": "aimusic-render-report",
+        "version": 1,
+        "projectId": "se-save",
+        "renderer": "pcm-synth/1",
+        "mode": "tail",
+        "frames": 55125,
+        "bodyFrames": 33075,
+        "seconds": 1.25,
+        "scoreSeconds": 0.75,
+        "audibleTracks": 1,
+        "notes": 2,
+        "peak": 0.06474892795085907,
+        "rms": 0.010945118731382887,
+        "limiterGain": 1,
+        "silent": false,
+        "loopBoundaryJump": null,
+        "files": [
+          {
+            "file": "song.wav",
+            "bytes": 220544,
+            "sha256": "30bd034a6f66f248b8d9eba79d82b3b61c508f1ce25d38ac6aaf9e700c9edea3"
+          },
+          {
+            "file": "song.mid",
+            "bytes": 103,
+            "sha256": "8e56b3c3b3f93501df3abb00382da0b692b4bce993f3a5ff3f636f949f37dead"
+          },
+          {
+            "file": "project.music.json",
+            "bytes": 663,
+            "sha256": "89be9f9723c40f9c096fbb46efb69a90f3658a9ef6f3a03abb0754eef599a133"
+          }
+        ],
+        "githubStored": false,
+        "reviewStatus": "candidate"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
+      }
+    },
+    {
+      "id": "se-load",
+      "title": "復元",
+      "category": "se",
+      "revision": "v001",
+      "tool": "AIMusic",
+      "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
+      "status": "connected-candidate",
+      "integrated": false,
+      "listeningReviewed": false,
+      "seconds": 0.3949659863945578,
+      "sampleRate": 44100,
+      "channels": 2,
+      "loop": false,
+      "files": [
+        {
+          "path": "assets/jobs/se-load.v001.music.json",
+          "bytes": 1034,
+          "sha256": "bfd94ab990968d2fd83b570fc4aa283d140866a3f5bc52f8ccc8c8fea69d388c"
+        },
+        {
+          "path": "assets/audio/se-load/v001/project.music.json",
+          "bytes": 808,
+          "sha256": "c836c8ed6be9d17083fec297d0669bdda6263eee30870379abfa008dff68f5d2"
+        },
+        {
+          "path": "assets/audio/se-load/v001/song.mid",
+          "bytes": 111,
+          "sha256": "75605f4b48abe346a1a794fc978bdf0e743a716fb1e508eb18dc41d095d595ca"
+        },
+        {
+          "path": "assets/audio/se-load/v001/source-render-report.json",
+          "bytes": 891,
+          "sha256": "c4b0313c9afc7963ec9bee432ead29161e6bb778e7d1a19e8f6e078c21dd9b1b"
+        },
+        {
+          "path": "assets/audio/se-load/v001/audio.wav",
+          "bytes": 69716,
+          "sha256": "a292cb6fae7849d1221286028b2aeac30118f41116416654a7296359149e6fc3"
+        },
+        {
+          "path": "assets/audio/se-load/v001/delivery-report.json",
+          "bytes": 774,
+          "sha256": "dd2b49272940cc7b982c99c77610e918c15d458319f5c4334cd0c186fcb485f7"
+        }
+      ],
+      "checks": {
+        "format": "aimusic-render-report",
+        "version": 1,
+        "projectId": "se-load",
+        "renderer": "pcm-synth/1",
+        "mode": "tail",
+        "frames": 55125,
+        "bodyFrames": 33075,
+        "seconds": 1.25,
+        "scoreSeconds": 0.75,
+        "audibleTracks": 1,
+        "notes": 3,
+        "peak": 0.07572191953659058,
+        "rms": 0.013095352634640416,
+        "limiterGain": 1,
+        "silent": false,
+        "loopBoundaryJump": null,
+        "files": [
+          {
+            "file": "song.wav",
+            "bytes": 220544,
+            "sha256": "daf6cb1894b9471b4f17c8ddd7878d46fefab0ec9993fad62877f3f2ac7c1568"
+          },
+          {
+            "file": "song.mid",
+            "bytes": 111,
+            "sha256": "75605f4b48abe346a1a794fc978bdf0e743a716fb1e508eb18dc41d095d595ca"
+          },
+          {
+            "file": "project.music.json",
+            "bytes": 808,
+            "sha256": "c836c8ed6be9d17083fec297d0669bdda6263eee30870379abfa008dff68f5d2"
+          }
+        ],
+        "githubStored": false,
+        "reviewStatus": "candidate"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": false,
+        "humanListeningReviewed": false
       }
     }
   ],
@@ -1763,5 +2196,9 @@
     "path": "assets/verification.json",
     "result": "passed",
     "count": 27
-  }
+  },
+  "updated": "2026-10-17",
+  "runtimeConnectedCount": 29,
+  "reviewDocument": "doc/ASSET_INTEGRATION_QA.md",
+  "basePackId": "kingdom-first-pack-v001"
 }

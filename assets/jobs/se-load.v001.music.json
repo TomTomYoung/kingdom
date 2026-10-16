@@ -1,0 +1,53 @@
+{
+  "format": "aimusic-job",
+  "version": 1,
+  "project": {
+    "format": "aimusic-project",
+    "version": 1,
+    "id": "se-load",
+    "title": "復元",
+    "tempo": 240,
+    "bars": 1,
+    "beatsPerBar": 3,
+    "master": 0.76,
+    "tracks": [
+      {
+        "id": "notification",
+        "name": "復元",
+        "instrument": "pluck",
+        "volume": 0.68,
+        "pan": 0,
+        "mute": false,
+        "solo": false,
+        "notes": [
+          {
+            "id": "note-0",
+            "pitch": 60,
+            "start": 0,
+            "duration": 96,
+            "velocity": 90
+          },
+          {
+            "id": "note-1",
+            "pitch": 67,
+            "start": 144,
+            "duration": 106,
+            "velocity": 90
+          },
+          {
+            "id": "note-2",
+            "pitch": 76,
+            "start": 298,
+            "duration": 192,
+            "velocity": 90
+          }
+        ]
+      }
+    ]
+  },
+  "batches": [],
+  "render": {
+    "sampleRate": 44100,
+    "mode": "tail"
+  }
+}

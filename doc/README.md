@@ -1,12 +1,12 @@
 # Kingdom 開発資料
 
-確認・更新日: 2026-10-16
+確認・更新日: 2026-10-17
 
 目標: Civilization VI 型の帝国運営、Party・Formation、Dungeon探索を統合したターン制ストラテジー
 
 ## 現在地と読み方
 
-mainのコード確認基準は 21826414ea238468ff9b7c2ddaaf47cd012c1f80 です。M1都市運営は実装済み、M2はParty・移動・基本戦闘の途中です。23テスト成功を確認しましたが、現行不具合と未実装項目が残っています。今回のブラウザ実操作確認は未実施です。2026-10-16に既存23テスト、構文確認、K-01〜K-05の一時診断を再実行しました。調査時点のブランチはmainのみ、open PR・open issueは各0件です。
+素材接続作業の開始基準は main / f59804d8b6dfad75704bfa40024e148dee03391b です。最新差分は素材29点の接続・追加SE3点・K-06修正です。2026-10-17: 素材接続を実装し、Node標準32テスト、全JS構文、30素材の整合性・復号、実UIを使うDOM/Canvas操作検証に成功しました。実ブラウザのCSS描画・音声再生と人による聴取は未確認です。 以降の2026-10-16の記載は前回調査記録です。M1都市運営は実装済み、M2はParty・移動・基本戦闘の途中です。23テスト成功を確認しましたが、現行不具合と未実装項目が残っています。今回のブラウザ実操作確認は未実施です。2026-10-16に既存23テスト、構文確認、K-01〜K-05の一時診断を再実行しました。調査時点のブランチはmainのみ、open PR・open issueは各0件です。
 
 まずCURRENT_IMPLEMENTATIONで現行の実挙動、STATUSで実装段階と未修正課題、HANDOFFで次作業を確認してください。画面から使える機能とcore APIだけの機能を区別します。
 
@@ -32,6 +32,8 @@ SPECIFICATIONと各システム仕様は目標です。記載された機能・�
 12. [LEGACY_IMPLEMENTATION.md](./LEGACY_IMPLEMENTATION.md): 旧Phaser版の調査・旧不具合（保存資料）
 13. [ASSET_LIST.md](./ASSET_LIST.md): AIPaint・AIMusicを使う素材制作一覧と優先順位
 14. [ASSET_PREVIEW.md](./ASSET_PREVIEW.md): 初回27素材の画像一覧・音声ファイル・検査状況
+15. [ASSET_AUDIT.md](./ASSET_AUDIT.md): 既存を含む全必要素材、制作・適用順、最新進捗
+16. [ASSET_INTEGRATION_QA.md](./ASSET_INTEGRATION_QA.md): 接続29点の動作検証と残るブラウザ・聴取確認
 
 ## 確定した目標方針（実装完了を意味しません）
 

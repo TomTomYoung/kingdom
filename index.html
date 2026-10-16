@@ -3,23 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kingdom — M1</title>
-  <link rel="stylesheet" href="/src/ui/style.css" />
+  <title>Kingdom — 黎明王国</title>
+  <link rel="stylesheet" href="./src/ui/style.css" />
 </head>
 <body>
-  <header><div><span class="eyebrow">KINGDOM / M1</span><h1>黎明王国</h1></div><div class="turn"><small>現在のターン</small><strong id="turn">1</strong></div></header>
+  <header><div><span class="eyebrow">KINGDOM</span><h1>黎明王国</h1></div><div class="turn"><small>現在のターン</small><strong id="turn">1</strong></div></header>
   <main>
-    <section class="map-panel"><div class="panel-title"><h2>王領地図</h2><span id="seed"></span></div><canvas id="map" aria-label="六角形の王領地図"></canvas><p class="hint">未所有の隣接タイルを選択すると、Goldで購入できます。</p></section>
+    <section class="map-panel"><div class="panel-title"><h2>王領地図</h2><span id="seed"></span></div><div class="map-toolbar"><span id="map-mode">領土購入</span><span>金枠：王領 ／ 点線：移動可能</span></div><div class="map-scroll"><canvas id="map" aria-label="六角形の王領地図"></canvas></div><p id="tile-info" class="hint"></p><p id="asset-status" role="status"></p></section>
     <aside>
-      <section class="card resources"><h2>国庫と進捗</h2><div id="resources" class="stat-grid"></div><div id="derived" class="derived"></div></section>
-      <section class="card"><div class="city-heading"><div><small>首都</small><h2 id="city-name"></h2></div><span id="population"></span></div><div id="yields" class="yield-row"></div><div class="progress-label"><span>食料</span><span id="food-label"></span></div><div class="bar"><i id="food-bar"></i></div><div class="progress-label"><span>領土文化</span><span id="culture-label"></span></div><div class="bar culture"><i id="culture-bar"></i></div></section>
+      <section class="card resources"><h2>国庫と進捗</h2><div id="resources" class="stat-grid"></div><div id="derived" class="derived"><span>軍事力 <b id="military"></b></span><span>統治力 <b id="governance"></b> / 負荷 <b id="load-value"></b></span></div></section>
+      <section class="card"><div class="city-heading"><div id="city-art"></div><div><small>首都</small><h2 id="city-name"></h2></div><span id="population"></span></div><div id="buildings" class="building-row"></div><div id="yields" class="yield-row"></div><div class="progress-label"><span>食料</span><span id="food-label"></span></div><div class="bar"><i id="food-bar"></i></div><div class="progress-label"><span>領土文化</span><span id="culture-label"></span></div><div class="bar culture"><i id="culture-bar"></i></div></section>
       <section class="card"><h2>都市生産</h2><div id="production-status" class="production-status"></div><div class="actions"><button data-produce="warrior">戦士を生産</button><button data-buy="warrior" class="secondary">戦士を購入 · 48</button><button data-produce="monument">モニュメントを生産</button><button data-buy="monument" class="secondary">建物を購入 · 80</button></div></section>
-      <section class="card"><h2>Party</h2><div id="party-status" class="production-status"></div><button id="form-party" class="secondary">未編成のUnitからPartyを作成</button><p class="hint">Partyを選択後、隣接タイルをクリックして移動します。</p></section>
+      <section class="card"><h2>Party</h2><div id="party-status" class="production-status"></div><p id="party-detail" class="hint"></p><button id="deselect-party" class="secondary" disabled>部隊の選択を解除</button><button id="form-party" class="secondary">未編成のUnitからPartyを作成</button><p class="hint">Partyを選択後、隣接タイルをクリックして移動します。</p></section>
       <button id="end-turn" class="end-turn">ターンを終了 <span>→</span></button>
       <div class="save-actions"><button id="save">セーブ</button><button id="load">ロード</button><button id="reset">新規開始</button></div>
-      <p id="message" role="status"></p>
+      <section class="audio-controls" aria-label="音声設定"><button id="audio-toggle" class="secondary" aria-pressed="false">音声をオン</button><label for="volume">音量 <output id="volume-value">50%</output></label><input id="volume" type="range" min="0" max="100" step="5" value="50"><span id="audio-status" role="status"></span></section><p id="message" role="status"></p>
     </aside>
   </main>
-  <script type="module" src="/src/ui/main.js"></script>
+  <script type="module" src="./src/ui/main.js"></script>
 </body>
 </html>

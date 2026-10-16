@@ -1,0 +1,28 @@
+{
+  "assetId": "se-territory-expand",
+  "sourceTool": "AIMusic",
+  "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
+  "sampleRate": 44100,
+  "channels": 2,
+  "seconds": 0.7989569160997733,
+  "derivation": {
+    "operation": "trim trailing silence only",
+    "startFrame": 0,
+    "endFrame": 35234,
+    "thresholdPCM16": 1,
+    "tailPaddingFrames": 882,
+    "pcmSamplesUnchanged": true,
+    "originalWAV": {
+      "file": "song.wav",
+      "bytes": 220544,
+      "sha256": "6faec5df46535d2c616e2ee9082c9ec8048ec463129db85959a3337955220d99"
+    }
+  },
+  "listeningReviewed": false,
+  "integrated": false,
+  "delivery": {
+    "path": "assets/audio/se-territory-expand/v001/audio.wav",
+    "bytes": 140980,
+    "sha256": "c2982435bcdda127bfc8308f92111b6f2091a452cf7ae46688a86f0b710ac319"
+  }
+}

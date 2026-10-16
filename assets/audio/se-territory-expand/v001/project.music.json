@@ -1,0 +1,51 @@
+{
+  "format": "aimusic-project",
+  "version": 1,
+  "id": "se-territory-expand",
+  "title": "文化による領土拡張",
+  "tempo": 240,
+  "bars": 1,
+  "beatsPerBar": 3,
+  "master": 0.76,
+  "tracks": [
+    {
+      "id": "notification",
+      "name": "文化による領土拡張",
+      "instrument": "bell",
+      "volume": 0.56,
+      "pan": 0,
+      "mute": false,
+      "solo": false,
+      "notes": [
+        {
+          "id": "note-0",
+          "pitch": 60,
+          "start": 0,
+          "duration": 106,
+          "velocity": 90
+        },
+        {
+          "id": "note-1",
+          "pitch": 67,
+          "start": 154,
+          "duration": 120,
+          "velocity": 90
+        },
+        {
+          "id": "note-2",
+          "pitch": 72,
+          "start": 326,
+          "duration": 168,
+          "velocity": 90
+        },
+        {
+          "id": "note-3",
+          "pitch": 76,
+          "start": 490,
+          "duration": 144,
+          "velocity": 90
+        }
+      ]
+    }
+  ]
+}

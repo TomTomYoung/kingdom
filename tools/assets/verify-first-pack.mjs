@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 
 const root=path.resolve(process.argv[2]||'.');
+const reportPath=process.argv[3]||'assets/verification.json';
 const manifest=JSON.parse(fs.readFileSync(path.join(root,'assets/manifest.json'),'utf8'));
 const sha=b=>createHash('sha256').update(b).digest('hex');
 const results=[];
@@ -27,6 +28,6 @@ for(const asset of manifest.assets){
 }
 const sheet=fs.readFileSync(path.join(root,manifest.contactSheet.path));
 if(sha(sheet)!==manifest.contactSheet.sha256)throw Error('Contact sheet hash mismatch');
-const output={schemaVersion:1,packId:manifest.packId,checked:'2026-09-13',result:'passed',assets:results.length,method:'Manifest SHA-256 and independent FFmpeg PNG/audio decoding',audioListeningReview:'not-performed',gameIntegration:'not-integrated',results};
-fs.writeFileSync(path.join(root,'assets/verification.json'),JSON.stringify(output,null,2)+'\n');
+const output={schemaVersion:1,packId:manifest.packId,checked:new Date().toISOString().slice(0,10),result:'passed',assets:results.length,method:'Manifest SHA-256 and independent FFmpeg PNG/audio decoding',audioListeningReview:'not-performed',gameIntegration:manifest.integrationStatus,scope:'File and decode verification only; runtime checks are separate',results};
+if(reportPath!=='--check')fs.writeFileSync(path.join(root,reportPath),JSON.stringify(output,null,2)+'\n');
 console.log(JSON.stringify(output,null,2));

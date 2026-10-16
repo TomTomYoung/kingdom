@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-17",
+  "harness": "happy-dom + native Canvas",
+  "realBrowser": false,
+  "cssLayoutVerified": false,
+  "humanListening": false,
+  "checks": [
+    "no autoplay",
+    "17 image load/fallback",
+    "resource icons",
+    "purchase/reject sounds",
+    "party creation/selection/movement",
+    "city-party overlap",
+    "deselect/Esc",
+    "tile purchase after deselect",
+    "save/load sounds and selection reset",
+    "production completion and monument",
+    "broken-save rollback",
+    "volume persistence",
+    "mute stops sources",
+    "new game selection reset",
+    "minimum map canvas"
+  ],
+  "soundRoutes": [
+    "se-purchase",
+    "se-ui-error",
+    "se-ui-confirm",
+    "se-save",
+    "se-party-move",
+    "se-ui-cancel",
+    "se-ui-select",
+    "se-load",
+    "se-turn-start",
+    "se-territory-expand",
+    "se-production-complete"
+  ],
+  "missingAssets": [],
+  "result": "passed"
+}

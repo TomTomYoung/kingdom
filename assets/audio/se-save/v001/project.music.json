@@ -1,0 +1,37 @@
+{
+  "format": "aimusic-project",
+  "version": 1,
+  "id": "se-save",
+  "title": "保存",
+  "tempo": 240,
+  "bars": 1,
+  "beatsPerBar": 3,
+  "master": 0.76,
+  "tracks": [
+    {
+      "id": "notification",
+      "name": "保存",
+      "instrument": "pluck",
+      "volume": 0.68,
+      "pan": 0,
+      "mute": false,
+      "solo": false,
+      "notes": [
+        {
+          "id": "note-0",
+          "pitch": 76,
+          "start": 0,
+          "duration": 115,
+          "velocity": 90
+        },
+        {
+          "id": "note-1",
+          "pitch": 60,
+          "start": 163,
+          "duration": 182,
+          "velocity": 90
+        }
+      ]
+    }
+  ]
+}

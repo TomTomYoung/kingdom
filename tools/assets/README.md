@@ -1,6 +1,6 @@
 # AIPaint・AIMusicによる素材制作
 
-初回は画像17点、SE8点、BGM2曲です。用途と優先順位は [ASSET_LIST.md](../../doc/ASSET_LIST.md)、見本と音声は [ASSET_PREVIEW.md](../../doc/ASSET_PREVIEW.md) を参照してください。ゲームへの組み込みは別作業です。
+初回は画像17点、SE8点、BGM2曲です。用途と優先順位は [ASSET_LIST.md](../../doc/ASSET_LIST.md)、見本と音声は [ASSET_PREVIEW.md](../../doc/ASSET_PREVIEW.md) を参照してください。初回制作当時はゲーム未接続でした。最新の接続状況は末尾の2026-10-17追記を参照してください。
 
 ## 制作に使ったもの
 
@@ -41,3 +41,23 @@ project.paint.jsonはAIPaintの「原稿JSONを開く」、project.music.jsonは
 AIMusicが生成する元song.wavはOSの一時ディレクトリに出力され、生成コマンドがその場所を表示します。大きい元WAVはGitへ保存せず、原稿・MIDI・ジョブ・元WAVのハッシュを保持します。source-render-report.json内のsong.wavはこの中間出力を指します。
 
 ツール原報告のcandidateやgithubStored:falseはレンダリング直後の記録です。GitHubへ保存した事実や採用状態は、kingdomのコミットとmanifestで管理します。初回候補は画像目視済み・音声解析済み、聴取未実施・ゲーム未接続です。
+
+## 2026-10-17の追加素材と接続
+
+現在は既存画像17点・SE8点・地上BGMに加え、自然拡張・保存・復元のSE3点をゲームへ接続しています。初回27点の原稿・出力は変更していません。最新の台帳は[ASSET_AUDIT.md](../../doc/ASSET_AUDIT.md)、確認範囲は[ASSET_INTEGRATION_QA.md](../../doc/ASSET_INTEGRATION_QA.md)です。
+
+追加SE3点は同じ固定版のAIMusicを使い、次のコマンドで新しい出力先へ再生成できます。
+
+```sh
+node tools/assets/render-ui-audio.mjs /path/to/AIMusic /path/to/new-output
+```
+
+生成先にはassets/jobs、assets/audioとui-audio-pack.jsonができ、採用する実ファイルのレコードをmanifestへ追記します。既存のassetsがある出力先には書き込みません。短音の末尾無音だけを20msの余白まで切り、PCMの音量・音色は変更しません。
+
+`npm run check:assets` は現在のmanifestにある全素材を検査し、過去のレポートを上書きしません。日付つきレポートを保存する場合は第3引数で出力先を指定します。
+
+```sh
+node tools/assets/verify-first-pack.mjs . assets/verification-YYYY-MM-DD.json
+```
+
+runtimeConnectedは接続実装の有無、integratedは既存の最終確認条件を含む判定です。今回は実ブラウザと聴取の確認が残るため、runtimeConnected=trueの素材もintegrated=falseで保持しています。
