@@ -568,7 +568,9 @@
         "map-party",
         "selected-party",
         "production",
-        "formation-grid"
+        "formation-grid",
+        "map-waiting-unit",
+        "unit-inspection"
       ]
     },
     {

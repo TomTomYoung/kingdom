@@ -8,7 +8,7 @@
 
 CreateParty、SetFormation、MovePartyとAttackPartyを実装しています。作成Commandは同じ場所の自国未編成Unitを1〜5体に制限します。実キーはid、unitIds、formation、movementMaximum、attacksMaximumで、本文のpartyId／memberUnitIds等と同名ではありません。
 
-UIは首都の未編成UnitからのParty作成、選択、1歩移動、3×3配置編集までです。メンバー選択編集、戦闘、分割・合流・解散、手動Leader設定、Inventory／Supplies／Expeditionは未実装です。
+UIは選択セルの未編成Unitを1〜5体選んで作成、部隊・Unit選択、移動力内の経路移動、3×3配置編集、詳細表示までです。既存部隊のメンバー追加・削除、戦闘、分割・合流・解散、手動Leader設定、Inventory／Supplies／Expeditionは未実装です。
 
 最大移動力は固定2、攻撃回数は1です。能力集約は平均×cohesionのみで、Leader・軍師・Formation・loyalty・補給などによる目標の相乗効果は未実装です。作成時の非Void・占有・生存検証と敗北Partyの移動拒否は実装済みです。敗北Partyの盤上撤去は未実装です。
 

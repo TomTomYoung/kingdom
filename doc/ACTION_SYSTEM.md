@@ -8,7 +8,7 @@
 
 本文は目標の行動規則であり、全Commandが使用可能という意味ではありません。実装一覧は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md)、課題は [STATUS.md](./STATUS.md) を参照してください。開始基準はmain / a9e66eaad5290c366c96eeacd07b1fce497b5dee。第2段階の差分を含みます。
 
-MovePartyとAttackParty、Partyのターン開始回復は実装済みです。現行の攻撃Command名はMeleeAttack／RangedAttackではなく、AttackPartyにattackType: melee／rangedを指定します。移動はUI公開済み、攻撃はcore APIのみです。
+MovePartyとAttackParty、Partyのターン開始回復は実装済みです。現行の攻撃Command名はMeleeAttack／RangedAttackではなく、AttackPartyにattackType: melee／rangedを指定します。移動はUI公開済みで、Dijkstraによる移動力内の経路を確認し、明示ボタンまたは右クリックでMovePartyを発行します。左クリックは詳細確認です。攻撃はcore APIのみです。
 
 Partyの実キーはmovementMaximum、attacksMaximumで初期値は2と1、activationStateはready／endedです。最遅構成員からの算出、道路・河川・ZoC、Ability、Charge消費、Pillage、Fortify、Wait／Skip／Sleep、FoundCity、Build、Promote、Upgradeは未実装です。UnitのchargesやabilityStatesは保存欄です。
 

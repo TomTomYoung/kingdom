@@ -4,9 +4,11 @@ import { Hex } from '../world/hex.js';
 import { createKingdom, updateDerivedCapabilities } from '../models/kingdom.js';
 import { createCity } from '../models/city.js';
 import { calculateCityYields } from '../systems/yield-system.js';
+import { createUnit } from '../models/unit.js';
+import { createParty } from '../models/party.js';
 
-export function createInitialGameState(seed = 117) {
-  const world = createWorldMap(seed);
+export function createInitialGameState(seed = 117, { radius = RULESET.mapRadius, startingParty = false } = {}) {
+  const world = createWorldMap(seed, radius);
   const kingdom = createKingdom(); const center = new Hex(0, 0, 0);
   const city = createCity(kingdom.id, center.key);
   for (const hex of [center, ...Array.from({ length: 6 }, (_, index) => center.neighbor(index))]) {
@@ -19,6 +21,12 @@ export function createInitialGameState(seed = 117) {
     rng: { territory: { seed: (seed ^ 0x9e3779b9) >>> 0, state: (seed ^ 0x9e3779b9) >>> 0 }, combat: { seed: (seed ^ 0x85ebca6b) >>> 0, state: (seed ^ 0x85ebca6b) >>> 0 } },
     nextIds: { unit: 1, party: 1, command: 1 }, commandLog: [], eventLog: [],
   };
+  if (startingParty) {
+    const unit = createUnit('unit-1', kingdom.id, 'warrior', center.key);
+    unit.partyId = 'party-1'; state.units[unit.id] = unit; kingdom.unitIds.push(unit.id);
+    state.parties['party-1'] = createParty('party-1', kingdom.id, [unit.id], center.key);
+    state.nextIds.unit = 2; state.nextIds.party = 2;
+  }
   calculateCityYields(state, city); updateDerivedCapabilities(kingdom, state);
   return state;
 }

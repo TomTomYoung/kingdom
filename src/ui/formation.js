@@ -41,7 +41,7 @@ export class FormationPanel {
       button.disabled = !editable || (!unit && !this.sourceSlot);
       button.onclick = () => {
         if (this.sourceSlot === slot) { this.sourceSlot = null; this.onCancel(); this.render(state, party); return; }
-        if (!this.sourceSlot) { this.sourceSlot = slot; this.onSelect(); this.render(state, party); return; }
+        if (!this.sourceSlot) { this.sourceSlot = slot; this.onSelect(unitId); this.render(state, party); return; }
         const formation = { ...party.formation }, source = this.sourceSlot;
         formation[slot] = party.formation[source];
         if (unitId) formation[source] = unitId; else delete formation[source];

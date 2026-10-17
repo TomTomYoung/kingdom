@@ -1,7 +1,7 @@
 export const RULESET_VERSION = 'm1.0';
 
 export const RULESET = Object.freeze({
-  mapRadius: 3,
+  mapRadius: 10,
   growthFoodBase: 12,
   growthFoodPerPopulation: 6,
   cultureExpansionCost: 10,
