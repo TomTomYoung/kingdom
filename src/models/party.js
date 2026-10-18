@@ -11,7 +11,7 @@ export function createParty(id, ownerId, unitIds, location, leaderUnitId = unitI
     formation: Object.fromEntries(unitIds.map((unitId, index) => [FORMATION_SLOTS[index], unitId])),
     movementRemaining: 2, movementMaximum: 2, attacksRemaining: 1, attacksMaximum: 1,
     activationState: 'ready', hasMoved: false, hasAttacked: false, reactionCharges: 1,
-    morale: 100, cohesion: 100, status: 'active',
+    guardOrders: {}, morale: 100, cohesion: 100, status: 'active',
   };
 }
 

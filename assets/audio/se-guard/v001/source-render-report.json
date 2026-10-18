@@ -1,0 +1,37 @@
+{
+  "format": "aimusic-render-report",
+  "version": 1,
+  "projectId": "se-guard",
+  "renderer": "pcm-synth/1",
+  "mode": "tail",
+  "frames": 55125,
+  "bodyFrames": 33075,
+  "seconds": 1.25,
+  "scoreSeconds": 0.75,
+  "audibleTracks": 1,
+  "notes": 2,
+  "peak": 0.12230441719293594,
+  "rms": 0.015542451546028284,
+  "limiterGain": 1,
+  "silent": false,
+  "loopBoundaryJump": null,
+  "files": [
+    {
+      "file": "song.wav",
+      "bytes": 220544,
+      "sha256": "a41bb7111b10546b80516052edf1f1199b79114b5a19aa0508edcaf4700282fa"
+    },
+    {
+      "file": "song.mid",
+      "bytes": 132,
+      "sha256": "255948ba9db9614d259c24dc4f34624ba07184b7664da198c5d57fd785701e19"
+    },
+    {
+      "file": "project.music.json",
+      "bytes": 690,
+      "sha256": "111284a322faeabb483b899da628cbe05fd541765ba70ffadda5b0fbd52a97ff"
+    }
+  ],
+  "githubStored": false,
+  "reviewStatus": "candidate"
+}

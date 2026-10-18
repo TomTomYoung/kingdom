@@ -74,3 +74,13 @@ npm test
 このコマンドは採用原稿のSHA-256とAIMusicのGit blob SHAを検証し、src/audio/scores.jsとsrc/audio/vendorの2モジュールを生成します。手編集しないでください。ゲームの通常起動には生成コマンドや外部AIMusic取得は不要です。
 
 tests/audio-fallback.test.jsは全13件を再合成し、SEは配信用WAV、BGMはOgg変換前の元WAVとハッシュで照合します。Oggの不可逆圧縮後と元PCMのバイト一致を要求するものではありません。
+
+## 2026-10-18 戦闘音の追加
+
+命中・護衛SE2点は同じ固定版から次で再生成します。既存出力先は指定しません。
+
+```sh
+node tools/assets/render-ui-audio.mjs /path/to/AIMusic /path/to/new-combat-output combat
+```
+
+combat-audio-pack.jsonと2点の原稿・MIDI・ジョブ・WAV・レポートを出力します。省略時のuiパックは従来の3点です。現在は32素材接続、代替合成15スコア。機械検査・実ブラウザ確認済みですが、聴取の最終判定は未実施です。

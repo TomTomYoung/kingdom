@@ -47,3 +47,10 @@ main{max-width:1720px;grid-template-columns:minmax(0,1fr) 360px;align-items:star
 @media(max-width:1100px){main{grid-template-columns:minmax(0,1fr) 320px;padding:20px;gap:16px}.inspection-grid{grid-template-columns:1fr}}
 @media(max-width:900px){main{grid-template-columns:minmax(0,1fr)}.inspection-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){main{padding:10px}.inspection-grid{grid-template-columns:1fr}.map-toolbar{flex-wrap:wrap}.panel-title{align-items:flex-start;gap:8px}.panel-title h2{font-size:20px}.panel-title span{max-width:48%;text-align:right}.minimap-box{right:5px;bottom:5px}#minimap{width:126px;height:111px}.minimap-box>span{font-size:9px}#map{height:460px}.map-controls button{font-size:12px}.map-panel{padding:10px}}
+
+/* Battle controls remain native keyboard/touch controls. */
+#active-kingdom{display:block;font-size:11px;color:#d8cba9}.game-setup label,.combat-panel label{display:block;font-size:12px;color:#c8cbaa;margin:10px 0}
+select{display:block;width:100%;max-width:100%;min-width:0;padding:9px;margin-top:6px;background:#10221c;border:1px solid #71866b;color:#f0e7cd;font:inherit}
+.combat-panel h3{font-size:14px;margin-top:18px}.combat-panel button{width:100%;margin:8px 0}.enemy-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}.enemy-grid>div{white-space:pre-line;font-size:11px;overflow-wrap:anywhere;padding:8px 3px;border:1px solid #80534b;background:#261b18;min-height:50px}.enemy-grid .defeated{opacity:.45}.combat-forecast{padding:10px;background:#0b1915;margin-top:10px;font-size:12px}.combat-forecast p{margin:5px 0}.combat-forecast small{letter-spacing:0}.combat-log{max-height:260px;overflow-y:auto;padding-left:22px;font-size:12px;line-height:1.6}.combat-log li{margin:7px 0}.guard-order{font-size:12px;overflow-wrap:anywhere}
+
+#combat-panel{scroll-margin-top:16px}

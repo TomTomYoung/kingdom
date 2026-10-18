@@ -1,18 +1,16 @@
 # Kingdom 行動システム仕様
 
-更新日: 2026-10-17（第2段階の実装状況を反映）
+更新日: 2026-10-18（単体護衛・戦闘UIの実装範囲と暫定値を反映）
 
 仕様状態: Civ6準拠部分確定、特殊Abilityの個別数値は暫定
 
 ## 0. 現行実装との区分
 
-本文は目標の行動規則であり、全Commandが使用可能という意味ではありません。実装一覧は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md)、課題は [STATUS.md](./STATUS.md) を参照してください。開始基準はmain / a9e66eaad5290c366c96eeacd07b1fce497b5dee。第2段階の差分を含みます。
+本文は目標規則です。2026-10-18時点ではMoveParty、AttackParty、SetGuardOrderと行動回復をUIから使えます。攻撃種別はAttackParty.attackTypeのmelee／ranged。遠隔能力のない戦士はrangedを拒否します。
 
-MovePartyとAttackParty、Partyのターン開始回復は実装済みです。現行の攻撃Command名はMeleeAttack／RangedAttackではなく、AttackPartyにattackType: melee／rangedを指定します。移動はUI公開済みで、Dijkstraによる移動力内の経路を確認し、明示ボタンまたは右クリックでMovePartyを発行します。左クリックは詳細確認です。攻撃はcore APIのみです。
+Partyの移動力は固定2・攻撃回数1です。攻撃後は移動力0・行動終了。近接通常反撃は攻撃回数・反応を消費せず、Interceptだけ反応1を使います。護衛指示の変更は移動力・攻撃回数を消費しません。全王国の一巡後に行動・容量・反応を回復し、HPは回復しません。
 
-Partyの実キーはmovementMaximum、attacksMaximumで初期値は2と1、activationStateはready／endedです。最遅構成員からの算出、道路・河川・ZoC、Ability、Charge消費、Pillage、Fortify、Wait／Skip／Sleep、FoundCity、Build、Promote、Upgradeは未実装です。UnitのchargesやabilityStatesは保存欄です。
-
-K-01〜K-04は修正済みです。Partyの生存・状態、作成場所の占有、遠隔能力と射程、全Commandのphase・必須payloadを検証します。保存構造検証や敗北後の撤去など、目標規則の未実装部分はSTATUSに残しています。
+有限Charge・Ability実行、最遅構成員からの移動力、道路・河川・ZoC、略奪・防御・待機・都市建設・改善・昇進は未実装です。K-01〜K-04、K-08、K-09は修正済み、敗北後の撤去等は残ります。[現行仕様](CURRENT_IMPLEMENTATION.md)・[課題](STATUS.md)・[戦闘操作](COMBAT_OPERATIONS.md)を参照してください。
 
 ## 1. 基本方針
 

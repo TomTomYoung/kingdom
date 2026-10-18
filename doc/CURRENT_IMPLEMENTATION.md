@@ -2,9 +2,11 @@
 
 確認・更新日: 2026-10-18
 
-開始基準: main / 6303da9319711786e9313476a1b5ab927e31caa3。第3段階まで反映済みの状態から、保存検証と音声取得を修正しました。
+開始基準: main / a2e53449664ef50fa1b7041ffc0634b6b74e9ae9。保存・音声修正後から戦闘UIと護衛を追加しました。
 
 2026-10-18 引き継ぎ: main / 6303da9319711786e9313476a1b5ab927e31caa3 と前回の全ファイルが一致することを確認。K-09の保存構造・参照整合性検証と、音声fetchの呼出し先修正を追加しました。Node標準56テスト、全52 JavaScriptファイルの構文検査、30素材の整合性・復号、Chromium 153で通常時・全音声HTTP 404時の実操作に成功しました。PC幅1440pxと390pxで表示を確認。音声は実AudioContextの復号・再生開始・停止を確認し、人による聴取と利用端末での再確認は未実施です。 [検証記録](ASSET_INTEGRATION_QA.md)。
+
+2026-10-18 戦闘・護衛追加（開始基準: main / a2e53449664ef50fa1b7041ffc0634b6b74e9ae9）: K-08の重複建物生産と購入後のキューを修正。二国交互操作、敵選択、攻撃予測、単体Guard／Intercept、戦闘ログをUIへ接続しました。新規SE2点と既存戦闘BGMを接続し、素材は32点すべて接続済みです。Node標準68テスト、全57 JavaScriptファイルの構文、32素材の検査とChromiumで通常音声／全音声404の操作に成功。人による聴取は未実施です。[戦闘操作](COMBAT_OPERATIONS.md)・[検証記録](ASSET_INTEGRATION_QA.md)。
 
 ## 1. 範囲と現在地
 
@@ -16,7 +18,7 @@
 
 エントリーは [index.html](../index.html) です。標準Canvas 2DとDOMを使い、PhaserやCDNを読み込みません。外部npm依存、ビルド工程、バックエンドはありません。
 
-assets/には既存27点と追加SE3点があります。画像17点、SE11点、地上BGM1曲をUIへ接続しました。戦闘BGMは戦闘UI待ちです。AssetStoreがmanifestの採用パスから画像を取得し、読み込めなければ地形色・城文字・部隊記号で継続します。画像は整数倍・等方拡大、音声はWeb Audioでユーザー操作後に開始します。初期ミュート、主音量・設定保存、非表示停止、連打制限、BGM切替時の遅延読込取消があります。WAV/OggのHTTP失敗・デコード失敗・8秒タイムアウト時は、src/audioに同梱した採用音符13件と固定版AIMusicからPCMを合成します。Workerが使えなければ同じ合成器で処理します。全13件の再合成WAVは制作時のWAVのSHA-256と一致します。音声設定の再読み込みでキャッシュを消して再試行できます。tools/assets/は制作専用でゲーム実行時の依存ではありません。[ASSET_AUDIT.md](ASSET_AUDIT.md) が最新台帳です。
+assets/には画像17点、SE13点、BGM2曲の32点があり、すべてUIへ接続済みです。既存30点に命中・護衛のSE2点を追加し、戦闘BGMを接続しました。AssetStoreがmanifestの採用パスから画像を取得し、読み込めなければ地形色・城文字・部隊記号で継続します。画像は整数倍・等方拡大、音声はWeb Audioでユーザー操作後に開始します。初期ミュート、主音量・設定保存、非表示停止、連打制限、BGM切替時の遅延読込取消があります。WAV/OggのHTTP失敗・デコード失敗・8秒タイムアウト時は、src/audioに同梱した採用音符15件と固定版AIMusicからPCMを合成します。Workerが使えなければ同じ合成器で処理します。全15件の再合成WAVは制作時のWAVのSHA-256と一致します。音声設定の再読み込みでキャッシュを消して再試行できます。tools/assets/は制作専用でゲーム実行時の依存ではありません。[ASSET_AUDIT.md](ASSET_AUDIT.md) が最新台帳です。
 
 リポジトリルートで次を実行し、http://localhost:4173/ を開きます。
 
@@ -42,7 +44,7 @@ npm run check
 5. src/ui: Canvas描画とDOM入力
 6. src/uiにはmap-camera・map-view・inspectionによる表示専用状態もあります。カメラと選択をGameStateへ混入しません。
 7. src/audio: 採用音符・固定版AIMusicのPCM合成とWorker
-8. tests: ゲーム・素材・音声・Worker・Command・地図操作検証の10ファイル
+8. tests: ゲーム・素材・音声・Worker・Command・地図操作検証の13ファイル
 9. legacy/index.html: 旧Phaser版。現行起動経路では使いません。
 
 ## 3. UIから使える機能
@@ -53,15 +55,17 @@ npm run check
 
 戦士とモニュメントの生産・Gold購入、未所有の合法タイル購入、選択セルの未編成Unitを1〜5体指定してParty化し、現在の移動力で到達できるセルまで経路移動できます。待機Unitも地図に表示され、一覧と地図の両方から選択できます。
 
-左クリックはセル・駒の詳細確認です。クリックだけでは移動・購入を実行しません。部隊選択後に目的地を選び「ここへ移動」、または目的地を右クリックすると移動します。領土はセル詳細の購入ボタンで購入します。到達可能セルの点線、経路と消費移動力、所有地の金枠を表示します。解除ボタン・Escで部隊とUnitを解除し、ロードでも解除、新規開始では初期部隊を選択します。セル詳細は座標・地形・所有・都市・基本産出・移動費・駐留一覧、Unit詳細はHP・状態・近接/遠隔・防御/装甲・射程・所属・配置・指揮者・部隊行動値を表示します。Party欄の3×3配置で、Unitを選んで空き枠へ移動・他Unitと交換できます。指揮者とHPを表示し、変更はSetFormationを通します。複数王国切替、戦闘、生産キュー編集、JSONファイル入出力のUIはありません。ドラッグ・矢印キーによるカメラ移動、1/2/3倍の等方整数ズーム、クリックで移動する全体図、首都・選択Unitへのフォーカス、部隊の順送りがあります。旧版の文章イベント窓は未移植です。操作は[MAP_OPERATIONS.md](MAP_OPERATIONS.md)を参照してください。
+左クリックはセル・駒の詳細確認です。クリックだけでは移動・購入を実行しません。部隊選択後に目的地を選び「ここへ移動」、または目的地を右クリックすると移動します。領土はセル詳細の購入ボタンで購入します。到達可能セルの点線、経路と消費移動力、所有地の金枠を表示します。解除ボタン・Escで部隊とUnitを解除し、ロードでも解除、新規開始では初期部隊を選択します。セル詳細は座標・地形・所有・都市・基本産出・移動費・駐留一覧、Unit詳細はHP・状態・近接/遠隔・防御/装甲・射程・所属・配置・指揮者・部隊行動値を表示します。Party欄の3×3配置で、Unitを選んで空き枠へ移動・他Unitと交換できます。指揮者とHPを表示し、変更はSetFormationを通します。二国交互操作、敵選択、近接・遠隔の合法性表示、予測・攻撃、護衛設定、戦闘ログを利用できます。生産キュー編集、JSONファイル入出力、任意プレイヤー設定のUIはありません。ドラッグ・矢印キーによるカメラ移動、1/2/3倍の等方整数ズーム、クリックで移動する全体図、首都・選択Unitへのフォーカス、部隊の順送りがあります。旧版の文章イベント窓は未移植です。操作は[MAP_OPERATIONS.md](MAP_OPERATIONS.md)を参照してください。
+
+「二国対戦（交互操作）」を選んで新規開始すると、二国・各1都市・戦士3体ずつの隣接部隊から始まります。ターン終了で操作王国と首都が切り替わり、双方を人が操作します。AIはありません。[戦闘操作](COMBAT_OPERATIONS.md)を参照してください。
 
 ## 4. GameStateとCommand
 
 GameStateはschemaVersion 1、rulesetVersion m1.0です。主な実キーはphase、world、turnOrder、activePlayerId、activePlayerIndex、kingdoms、cities、units、parties、rng、nextIds、commandLog、eventLogです。目標文書のcurrentPhase、worldMap、playerSlots等と同名とは限りません。
 
-RuleSystem.execute(original, command)は成功時に複製したstateとeventsを返し、検証で拒否した場合は元stateを返します。commandIdの重複、playerId、手番、turnを共通検証します。全9Commandの種別・phase・必須payload・配列と辞書の型を事前検証し、参照先・所有者を処理前に確認します。拒否時は元stateと空eventsを返し、RNG・資源・ID・ログを変更しません。破損GameStateそのものの検証はK-09として別途残っています。
+RuleSystem.execute(original, command)は成功時に複製したstateとeventsを返し、検証で拒否した場合は元stateを返します。commandIdの重複、playerId、手番、turnを共通検証します。全10Commandの種別・phase・必須payload・配列と辞書の型を事前検証し、参照先・所有者を処理前に確認します。拒否時は元stateと空eventsを返し、RNG・資源・ID・ログを変更しません。保存読込時のGameState構造検証はK-09で実装済みです。
 
-現在のCommandは9種類です。
+現在のCommandは10種類です。
 
 1. StartTurn
 2. SetCityProduction
@@ -72,6 +76,7 @@ RuleSystem.execute(original, command)は成功時に複製したstateとevents�
 7. SetFormation
 8. MoveParty
 9. AttackParty（attackTypeはmeleeまたはranged）
+10. SetGuardOrder（modeはoff／share／intercept）
 
 HumanControllerは上記のCommandを生成します。AIController、RemoteController、ReplayController、合法手一覧APIはありません。
 
@@ -116,7 +121,7 @@ Productionは都市ローカルです。currentItemId、queue、progressByItem�
 
 生産可能な定義はwarrior（Production 12／Gold 48）とmonument（Production 20／Gold 80）のみです。Unitは都市中心へ生成されます。Gold購入は全額即時払いで、生産進捗を減額・返金しません。
 
-建設済み建物の重複購入は拒否しますが、生産キュー側の重複建設や、進行中の同建物を購入した後のキュー整理はありません。建物配列は重複させずとも、生産力を使って完了イベントを出し得ます。
+建設済み建物の生産・購入、現在の対象とキュー内の重複建物を拒否します。Unitの連続生産は許可します。建物購入後は、その建物を現在の生産・キューから取り除き、その建物の進捗だけ0へ戻します。返金・Unitへの無料進捗はありません。旧キューの完成済み・重複建物も生産投入前に除き、二重完成イベントを出しません。
 
 ## 8. 人心・派生能力・人的資源
 
@@ -152,13 +157,13 @@ Partyは移動力2、攻撃回数1で初期化されます。最も遅い構成�
 
 Unitにはcharges、abilityStates、loyalty、supportUpkeep、statusEffects等の保存欄がありますが、対応するAbilityや忠誠システムが使えるわけではありません。
 
-## 10. 基本戦闘（core APIのみ）
+## 10. 単体戦闘・護衛とUI
 
-AttackPartyは敵Partyへのmelee／rangedを扱います。通常UIに敵王国や攻撃操作はなく、テスト・API用の基盤です。
+AttackPartyは敵Partyへのmelee／rangedを扱います。二国の交互操作、敵の配置とHP、予測HP損失、反撃、護衛設定、最新18件の戦闘ログをUIから使えます。予測はRNGを参照せず、HP0・護衛・反撃分岐を含む損失範囲を表示します。
 
 Party戦闘力は戦闘可能Unitの対象能力の算術平均×(0.5＋cohesion/200)です。Leader、Formation、補給、地形等を含む目標PartyParameterの完全な集約ではありません。
 
-基礎Damageは30×exp(0.04×戦闘力差)×seed乱数0.85〜1.15を1〜90へ制限して丸め、対象Unitのarmorを引き、最低1を適用します。選択順はfront→middle→rear、各行内はcenter→left→rightで、最初の戦闘可能Unit一体へ適用します。空いた列だけの後方露出や複数UnitへのDamage配分はありません。
+基礎Damageは30×exp(0.04×戦闘力差)×seed乱数0.85〜1.15を1〜90へ制限して丸め、対象Unitのarmorを引き、最低1を適用します。各列の最初の生存Unitを露出候補として、前寄り・中央・左・右順で主対象を選びます。Guard／Interceptを解決後、各対象に装甲を適用し、実HP損失は残りHPまでに制限します。
 
 攻撃側は攻撃回数1を消費し、移動力0・activationState endedになります。近接では生き残った防御Partyが反撃し、遠隔には標準反撃がありません。遠隔攻撃は生存・active・rangedStrength>0かつ自分の射程が届くUnitを必要とし、そのUnitだけから遠隔戦闘力を計算します。無能力・戦闘不能Unitで射程を延ばせません。射線・撃破後前進は未実装です。
 
@@ -166,11 +171,11 @@ HP0ではscaleClassがindividualならdowned、それ以外は一律shatteredで
 
 Damageに応じてmoraleを下げ、Leader喪失時は生存UnitのcommandContribution降順・ID昇順で継承者を選び、追加でmoraleを10下げます。継承者がいなければPartyをdefeatedにします。morale 0の撤退、Command Check、回復、捕虜、Lootはありません。
 
-Guard容量の保存・ターン回復はありますが、Guard／Intercept／Taunt／Targeted Attack／範囲・貫通の解決はありません。
+SetGuardOrderで同一Party内の護衛役・対象・方式を設定します。新規戦士は率50％・容量50・縦横距離1。肩代わりは装甲前Damageの最大70％・残り容量まで、割り込みは反応1を消費し全量を受けます。複数候補は割り込み→距離→ID順で1体、連鎖なし。詳細は[戦闘操作](COMBAT_OPERATIONS.md)。Taunt／Cover／狙い撃ち／範囲・貫通は未実装です。
 
 ## 11. セーブと検証範囲
 
-serializeGameState／restoreGameStateでJSON化・復元します。UIはlocalStorageのkingdom-m1-save一枠を使用します。save-validation.jsで必須構造・数値範囲・地形と都市・所属の双方向参照・3×3配置・次ID・手番・RNGを検証し、復元成功後だけstateを置換します。既知M1のParty・turnOrder・戦闘フィールドの欠落を補完し、旧37セルを再生成せず維持します。nullや不明参照を既定値で隠さず、未知版を拒否します。失敗時は現在の対局・選択・カメラ倍率を維持します。
+serializeGameState／restoreGameStateでJSON化・復元します。UIはlocalStorageのkingdom-m1-save一枠を使用します。save-validation.jsで必須構造・数値範囲・地形と都市・所属の双方向参照・3×3配置・次ID・手番・RNGを検証し、復元成功後だけstateを置換します。guardOrders・guardRangeの欠落は空指示・距離1で補完し、既存の率0・容量0は維持します。既知M1のParty・turnOrder・戦闘フィールドの欠落を補完し、旧37セルを再生成せず維持します。nullや不明参照を既定値で隠さず、未知版を拒否します。失敗時は現在の対局・選択・カメラ倍率を維持します。
 
 2026-10-17 第2段階: Node標準44テスト、全45 JavaScriptファイルの構文検査、30素材の整合性・復号に成功しました。実UIのDOM/Canvas検証では3×3配置の移動・交換・保存復元、全音声ファイルがHTTP 404の場合の再合成、再試行後のBGM重複防止を確認しました。実ブラウザのCSS・音声出力と人による聴取は未確認です。 保存に失敗しても進行を継続でき、不正ロードは元のstateへ戻します。この第2段階時点ではK-09は未実装でした。2026-10-18の対応は本節冒頭とSTATUSを参照してください。詳細は[検証記録](ASSET_INTEGRATION_QA.md)。
 

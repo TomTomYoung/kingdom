@@ -2,120 +2,56 @@
 
 確認・更新日: 2026-10-18
 
-開始基準: main / 6303da9319711786e9313476a1b5ab927e31caa3。第3段階まで反映済みの状態から、保存検証と音声取得を修正しました。
+2026-10-18 戦闘・護衛追加（開始基準: main / a2e53449664ef50fa1b7041ffc0634b6b74e9ae9）: K-08の重複建物生産と購入後のキューを修正。二国交互操作、敵選択、攻撃予測、単体Guard／Intercept、戦闘ログをUIへ接続しました。新規SE2点と既存戦闘BGMを接続し、素材は32点すべて接続済みです。Node標準68テスト、全57 JavaScriptファイルの構文、32素材の検査とChromiumで通常音声／全音声404の操作に成功。人による聴取は未実施です。[戦闘操作](COMBAT_OPERATIONS.md)・[検証記録](ASSET_INTEGRATION_QA.md)。
 
-次作業: K-08の建物重複生産・即時購入後のキュー整理を回帰テスト付きで修正し、M2 Guard・Damage Grid配分と戦闘UIへ進む。音量・余韻・BGMループの人による聴取も残っています。
+## 1. 再開位置
 
-素材制作: [ASSET_AUDIT.md](ASSET_AUDIT.md)で既存・新規・後続を総点検しました。画像17点・既存SE8点・地上BGMを接続し、自然拡張・保存・復元のSE3点を制作・接続しました。現在30点、接続29点です。原稿とv001は保持しています。
+[CURRENT_IMPLEMENTATION.md](CURRENT_IMPLEMENTATION.md) が現行挙動、[STATUS.md](STATUS.md) が課題、[SPECIFICATION.md](SPECIFICATION.md) が目標です。GameState、ES Modules、Command／RuleSystem、Node標準テストとCanvas 2D／DOMは導入済みです。旧Phaser版は[保存資料](LEGACY_IMPLEMENTATION.md)で、M1の再実装は不要です。
 
-素材の次作業: SEの音量・余韻と地上BGMのループを聴取する。Chromiumで表示・操作・実音声ノードを確認済み。正常音源でも代替合成に入っていたfetch呼出しを修正し、通常時はWAV/Oggから復号、全音声404時はWorker合成で復旧することを確認しました。初回は音声オフなのでボタンで有効化します。[ASSET_INTEGRATION_QA.md](ASSET_INTEGRATION_QA.md)の記録・手順を使用してください。戦闘曲は制作済み・未接続で、近接・被弾の素材はGuard・Damage Gridと戦闘UIの実イベントに合わせて追加します。既存原稿と素材を保持します。
-
-2026-10-18 引き継ぎ: main / 6303da9319711786e9313476a1b5ab927e31caa3 と前回の全ファイルが一致することを確認。K-09の保存構造・参照整合性検証と、音声fetchの呼出し先修正を追加しました。Node標準56テスト、全52 JavaScriptファイルの構文検査、30素材の整合性・復号、Chromium 153で通常時・全音声HTTP 404時の実操作に成功しました。PC幅1440pxと390pxで表示を確認。音声は実AudioContextの復号・再生開始・停止を確認し、人による聴取と利用端末での再確認は未実施です。 [検証記録](ASSET_INTEGRATION_QA.md)。
-
-## 1. 最初に読むもの
-
-[CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md) が現在動く処理、[STATUS.md](./STATUS.md) が進捗と既知課題、[SPECIFICATION.md](./SPECIFICATION.md) が目標です。旧Phaser版は [LEGACY_IMPLEMENTATION.md](./LEGACY_IMPLEMENTATION.md) の保存資料として扱います。
-
-GameState、ES Modules、Command／RuleSystem、Node.js標準テストは導入済みです。M1導入やPhaser依存除去を最初からやり直す必要はありません。描画はCanvas 2D／DOMです。現在の構成にVite／Vitestはありません。
+「二国対戦（交互操作）」を選び「新規開始」で、各国戦士3体の隣接部隊を使えます。敵を選び、予測を確認して攻撃します。ターン終了で操作王国と首都が切り替わります。AIはありません。通常新規開始は331セル・戦士1体、旧37セルの保存はそのまま維持します。
 
 ## 2. 維持する設計境界
 
-1. GameStateを正本とし、UI・AI・Remoteは同じCommandとRuleSystemを使います。描画オブジェクトやControllerへルールを分散させません。
-2. WorldMapの移動・戦闘主体はPartyです。最大5Unit、3×3配置を維持し、同じUnitを地上とDungeonへ複製しません。
-3. Gridは対象選択とDamage配分に使い、移動盤面・行動順・追加行動回数へ転用しません。
-4. 移動力、攻撃回数、有限Charge、Ability固有コストを分けます。単一actionsRemainingや独立dungeonActionsへ戻しません。
-5. 都市Productionと全額即時購入、Party行動は別です。
-6. 軍事力・統治力は派生能力、人心は備蓄、loyaltyは個別状態です。Religion・Culture・Science独立勝利は設けません。
-7. 戦闘・領土等の乱数は分離したseed付きRNGを使います。同じGameState・Command列で再現できることを守ります。
-8. 目標仕様と現在の暫定実装を区別し、平均能力・固定移動力等を完成仕様として固定しません。
+1. GameStateを正本とし、すべての操作はCommandとRuleSystemへ通します。
+2. 地上の移動・戦闘主体はParty。最大5Unit、3×3配置で、Gridは対象・被害配分に使います。
+3. 移動力、攻撃回数、有限Charge、Abilityコストを分けます。都市生産・購入も別です。
+4. 軍事力・統治力は派生能力、人心は備蓄、loyaltyは個別状態です。
+5. 戦闘・領土のseed付きRNGを分離し、同じ状態・Command列で再現します。予測でRNGを読んだり進めたりしません。
+6. 目標仕様と暫定実装を区別します。平均戦闘力・固定移動力2・簡略HP0は完成仕様ではありません。
 
-## 3. 現在あるもの
+## 3. 今回までに解消した課題
 
-第3段階で通常新規開始を331セル・初期戦士1体の部隊へ変更。待機Unitも地図と一覧に表示し、セル/Unit詳細、指定1〜5体の編成、移動力内の最小コスト経路、ドラッグ・矢印・整数ズーム・全体図を追加しました。旧セーブは37セルのまま保持します。[MAP_OPERATIONS.md](MAP_OPERATIONS.md)に操作と検証範囲を記録しています。
+K-01〜K-04は敗北Party・編成・遠隔能力・Command検証、K-06は選択解除、K-09は保存構造・参照整合性を修正済みです。今回K-08を修正し、建設済み・同一キュー内重複建物を拒否、購入した建物を現行生産・キューから除き、その建物の進捗だけ破棄します。返金・無料Unitは発生させません。Unitの連続生産は維持します。
 
-M1の都市Yield・生産キュー・購入・領土・人心の基礎収支・派生計算・JSON保存があります。UIは一王国一都市を操作します。
+K-07は固定二国の交互操作に対応済みです。任意のプレイヤー設定・AI・オンラインは未実装です。K-05の同一王国内複数都市の作業タイル重複、K-10の敗北Partyによる占有継続は残ります。
 
-M2には複数王国の順次手番、Party作成、3×3配置検証、経路移動、melee／rangedの単体Damage、近接反撃、HP0、Leader継承があります。
+## 4. 戦闘・護衛の実装境界
 
-SetFormationは3×3配置編集UIから利用でき、空き枠への移動とUnit同士の交換・HP・指揮者表示があります。AttackPartyはHumanControllerから生成できますが、攻撃UIはありません。Guard容量、charges、abilityStates、loyalty等の保存欄を、対応システム完成と誤認しないでください。
+[COMBAT_OPERATIONS.md](COMBAT_OPERATIONS.md)に操作と現在の計算規則を記録しています。通常単体攻撃は各列の露出Unitから選びます。護衛は設定済みの1体だけで、割り込み→距離→ID順。連鎖しません。肩代わりは装甲前Damageの最大70％・残り容量まで、割り込みは反応1を消費します。新規戦士は率50％・容量50・縦横距離1。保存済みの率0・容量0は変更しません。
 
-## 4. 優先する修正と受入条件
+敵選択は自軍選択を保持します。予測は両軍HP損失の範囲、護衛・反撃分岐を表示し、確定ダメージや次の乱数を漏らしません。HP0・指揮継承・敗北、容量・反応の回復、保存復元を確認済みです。空き枠を自動で詰めません。
 
-詳細と修正状況はSTATUSのK-01〜K-10にあります。第2段階でK-01〜K-04を修正し、以下1〜4は維持する受入条件です。K-09は2026-10-18に修正しました。
+次はTaunt／Cover、Unit・Slot狙い撃ち、Row／Column／Area／Pierceと対応する遠隔Unitを、同じResolver・予測・ログへ追加します。攻撃方向の内部ヘルパーはありますが、通常Commandは正面のみです。範囲攻撃が完成したと扱わないでください。
 
-### 4.1 状態・行動の検証
+その後、PartyParameter集約、構成員依存移動、Ability、撤退・回復・死傷者・Loot、敗北後の占有解消を整理します。Settler／Builder、都市別領土・作業、研究・mana用途・宗教統治接続、人心・loyalty、AI、勝利、Dungeonは後続です。
 
-1. K-01／K-10: defeated Partyや戦闘可能構成員のないPartyの通常移動を拒否し、次ターン回復でも復活させない。敗北後の盤上占有は死傷者・撤退規則と分けて整理する。
-2. K-02: Party作成時にも場所・占有・Unit生存状態を検証する。都市で待機する未編成Unitと主戦闘Party一体の区別を保つ。
-3. K-03: 遠隔攻撃能力のないUnitだけのPartyでrangedを発行しても、HP・RNG・行動回数を変えず拒否する。合法な遠隔攻撃は反撃なしを維持する。
-4. K-04: 全Commandの必須payload、phase、所有者、参照先を検証する。cityId欠落等で例外を外へ漏らさず、拒否時に元stateを保持する。
-5. K-09: 修正済み。save-validation.jsで必須構造・数値・地形/都市/所属/配置/ID/手番/RNGを検証し、既知の旧M1欠落だけを補完する。未知版・破損セーブはstateを置換する前に拒否する。ゲーム状態とUI選択・倍率を保ち、拒否後もターンを進められることを確認済み。
+## 5. 素材と検証
 
-問題ごとの回帰テストを追加済みです。今後も既存56件を維持します。Party戦闘状態、行動終了、Guard回復、占有が独立に矛盾しないことを確認してください。
-
-### 4.2 UIと都市運営
-
-1. K-06: 修正済み。解除ボタン・Esc・ロードの選択クリアを維持する。左クリックは詳細確認に統一済み。新規開始では最初の部隊を選択する。
-2. K-07: 複数王国の設定・切替UIを入れるまで「複数人で遊べる」と表示しない。UIの固定kingdom-1／city-1参照を整理する。
-3. K-05: 同一王国内の複数都市を扱う前に、都市別作業タイルと領土帰属・取得候補を定義する。同じタイルの二重産出を防ぐ。
-4. K-08: 重複建物の生産選択と、進行中の同建物を即時購入した後のキュー・progress処理を整理しテストする。
-5. セル選択→明示ボタンで購入・移動するタッチ対応操作を実装済み。右クリック移動も同じMovePartyを通す。未編成Unitを独立に瞬間移動させず、1体の部隊を作る操作を使う。
-
-## 5. 次のM2機能: Guard・Damage Grid・戦闘UI
-
-規範は [COMBAT_SYSTEM.md](./COMBAT_SYSTEM.md)、[DAMAGE_GRID.md](./DAMAGE_GRID.md)、[PARTY_FORMATION.md](./PARTY_FORMATION.md)、[ACTION_SYSTEM.md](./ACTION_SYSTEM.md) です。
-
-1. 現行のFront優先単体選択を基礎に、列の露出・攻撃方向・Targeting情報を追加する。
-2. Guard Shareと容量上限、InterceptとreactionCharges、複数候補の決定論的優先順位を実装する。
-3. Taunt、Cover、Unit／Slot狙い撃ち、Row／Column／Area／Pierceを同じResolverへ接続する。
-4. HP0・継承・morale・空Slotを攻撃ごとに更新し、次の攻撃に反映する。後列は自動で詰めない。
-5. 3×3配置編集、敵Party選択、攻撃種別、予測Damage・反撃・Guard・戦闘ログをUIへ接続する。
-
-受入条件は、5Unitの一意配置、Guard容量超過禁止、単体・範囲・貫通で配分規則が明確なこと、対象非公開情報を漏らさないこと、同じ入力・RNGによる再現、失敗Commandで状態を変えないことです。保存・復元後もHP、配置、容量、行動値、戦闘RNGが一致するようテストします。
-
-PartyParameterの本来の集約、構成員依存移動力、Ability実行基盤、撤退・回復・死傷・Lootは別途実装します。現行の平均×cohesion、移動力固定2、non-individual一律shatteredを完全実装扱いにしません。
-
-## 6. M2の残り
-
-Settler／Builder、FoundCity／改善、技術解禁、mana用途、宗教の統治力接続、Capacity不足Penalty、NPC加入・人心・個別loyalty、敵AI、蛮族、Dominationへ進みます。
-
-AIController、RemoteController、ReplayControllerは未実装です。合法手取得と実行はRuleSystemと共有し、AIだけ別ルールでstateを書き換えません。addKingdomは現状セットアップ補助であり、ゲーム内FoundCityの代替にしません。
-
-## 7. M3以降
-
-地上の状態・行動が安定してからDungeon Site、EnterDungeon、DungeonState、Expedition、階層、宝箱・撤退・帰還・戦利品確保を追加します。行動はPartyのmovementRemaining、attacksRemaining、AbilityDefinitionを共用し、Dungeonの距離・地形補正として扱います。
-
-carriedとsecured lootを分け、帰還時に王国の資源・装備・人材へ確定します。初期は一Dungeon一遠征隊です。オンライン・同時ターン競合はM5で扱います。
-
-## 8. 検証と引継ぎの完了条件
+画像17点、SE13点、BGM2曲の計32点を接続。既存30点の原稿・配信ファイルは保持し、命中0.191秒・護衛0.558秒のSEをAIMusic固定版で制作しました。敵選択中は既存戦闘曲へ切り替えます。音声は初期オフです。全15スコアの再合成WAVは元のハッシュと一致します。
 
 ```sh
 npm test
 npm run check
+npm run check:assets
 npm run dev
 ```
 
-2026-10-17 第2段階: Node標準44テスト、全45 JavaScriptファイルの構文検査、30素材の整合性・復号に成功しました。実UIのDOM/Canvas検証では3×3配置の移動・交換・保存復元、全音声ファイルがHTTP 404の場合の再合成、再試行後のBGM重複防止を確認しました。実ブラウザのCSS・音声出力と人による聴取は未確認です。 npm run checkはsrc・tests・toolsの全JS、npm run check:assetsはファイルと復号の検査です。ブラウザQAの代替とはしません。
+68テスト・57ファイル・32素材が成功。Chromium 153で二国の都市所有、護衛・割り込み・反撃、行動消費、無能力射撃の拒否、継承・敗北、戦闘保存を実操作しました。従来の地図・配置・保存・37セル互換も通過。1440px／390pxで確認。通常音声と全音声404時のWorker合成、BGM一重再生、ミュート停止を確認しました。人による聴取・利用端末・他ブラウザは未確認です。
 
-変更後は該当回帰テスト、既存テスト、変更JSの構文、必要なUI実操作を確認します。UIでは新規開始→生産・購入→Party作成→3×3配置の移動・交換→移動→選択解除→領土購入→保存・復元を確認し、戦闘UI追加後は攻撃・反撃・HP0・継承も含めます。
+## 6. 更新と受入条件
 
-## 9. 文書更新規則
+変更時は該当回帰テストと既存テスト、構文、関連UI実操作を確認します。失敗Commandで状態・RNG・資源・ID・ログを変えず、保存復元後もHP・配置・容量・行動・RNGが一致することを維持します。新しい攻撃方式では単体・範囲・貫通の配分規則と公開可能な予測範囲を明確にします。
 
-1. コードの実挙動・UI公開範囲が変わったらCURRENT_IMPLEMENTATIONを更新する。
-2. 進捗・未修正課題・検証結果が変わったらSTATUSを更新する。
-3. 次作業と受入条件が変わったらHANDOFFを更新する。
-4. ゲーム規則の決定を変える場合は対応する目標仕様とSPECIFICATIONを更新し、決定日と理由を残す。
-5. READMEの案内と目標文書冒頭の実装状況も同時にそろえる。
-6. LEGACY_IMPLEMENTATIONは旧版の保存資料として維持し、現在の課題を書き足さない。
-7. コード確認の基準SHA、確認日、テスト実施範囲、未検証項目を記録する。
-8. 名称・費用・能力・産出・利用できる操作を変更したら、[Wiki](../wiki/README.md) の該当一覧・個別項目・関連ルールも更新する。実装済みと予定を分け、[更新方法](../wiki/EDITING.md) に従ってリンクと出典を照合する。
+実挙動はCURRENT_IMPLEMENTATION、課題はSTATUS、次作業は本書、目標決定は対応仕様へ反映します。名称・能力・費用・操作は[Wiki更新方法](../wiki/EDITING.md)に従って一覧・個別項目・ルールを同期します。素材の制作・接続・機械検査・聴取は[台帳](ASSET_AUDIT.md)で区別します。
 
-## 10. 再開用の具体的な確認箇所（2026-10-16）
-
-- 状態・行動検証: `src/core/rule-system.js` の `RuleSystem.execute`、`src/systems/movement-system.js` の `validatePartyPath`、`src/core/turn-engine.js` の `processTurnStart`。
-- 遠隔攻撃の合法性: `src/systems/combat-system.js` の `resolvePartyAttack` と `src/core/ruleset.js` のwarrior定義。
-- UI: `src/ui/main.js` のParty選択、固定王国・都市ID、save/load/newの選択状態。
-- 複数都市: `src/systems/yield-system.js` の作業タイル選択と `src/systems/territory-system.js` の候補生成。
-- 保存: `src/core/game-state.js` の `restoreGameState`。schemaVersion・rulesetVersionを変える場合は移行方針も記録する。
-
-mainの最新SHAを取得して本書の基準と比較し、差分があればCURRENT_IMPLEMENTATION・STATUSを先に照合してください。今回のブランチ一覧はmainのみ、open PR・open issueは各0件でした。既存doc・wikiを維持したまま再開でき、M1再実装は不要です。
+再開時にmainの最新SHAと今回の基準・変更内容を照合してください。過去の保存修正・素材接続記録はSTATUSとASSET_INTEGRATION_QAに保持しています。

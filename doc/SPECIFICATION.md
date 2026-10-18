@@ -6,9 +6,9 @@
 
 ## 0. 現行実装との区分
 
-この文書は目標仕様です。実装済みの判定は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md) と [STATUS.md](./STATUS.md) を正本とします。開始基準はmain / 6303da9319711786e9313476a1b5ab927e31caa3。331セルの広域マップ・セル/Unit詳細・指定編成と経路移動を実装済み。現行セーブの構造検証と音声取得修正を追加しました。
+この文書は目標仕様です。実装済みの判定は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md) と [STATUS.md](./STATUS.md) を正本とします。開始基準はmain / a2e53449664ef50fa1b7041ffc0634b6b74e9ae9。331セルの広域マップ・セル/Unit詳細・指定編成と経路移動を実装済み。現行セーブの構造検証と音声取得修正を追加しました。
 
-現行はM1都市運営とM2のParty作成・移動・基本単体戦闘までです。Canvas 2D／DOMで表示し、複数王国の手番・配置変更・攻撃はcoreにありますが、配置編集はUIから利用できます。複数王国・戦闘UIはありません。AI、Dungeon、職業・Ability実行、加入・個別loyalty、Guard・範囲配分、勝利、オンライン通信は未実装です。
+現行はM1都市運営とM2のParty作成・移動・基本単体戦闘までです。Canvas 2D／DOMで表示し、複数王国の手番・配置変更・攻撃はcoreにありますが、配置編集はUIから利用できます。固定二国の交互操作と戦闘UI、単体Guard／Intercept、予測・ログを追加しました。AI、Dungeon、職業・Ability実行、加入・個別loyalty、Taunt／Cover・狙い撃ち・範囲配分、勝利、オンライン通信は未実装です。
 
 以下のGameStateフィールドは目標モデルです。実装の実キー・省略項目・暫定式はCURRENT_IMPLEMENTATIONを参照してください。現行の独立ランダム地形、平均戦闘力、固定移動力、簡略HP0を目標仕様へ逆輸入しません。
 

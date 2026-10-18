@@ -1,4 +1,4 @@
-import { attackParty, createParty, endTurn, moveParty, purchaseCityItem, purchaseTile, setCityProduction, setFormation, startTurn } from './commands.js';
+import { attackParty, createParty, endTurn, moveParty, purchaseCityItem, purchaseTile, setCityProduction, setFormation, setGuardOrder, startTurn } from './commands.js';
 export class HumanController {
   constructor(playerId) { this.playerId = playerId; }
   nextId(state) { return `${this.playerId}-${state.currentTurn}-${state.commandLog.length + 1}`; }
@@ -10,5 +10,6 @@ export class HumanController {
   setFormation(state, partyId, formation) { return setFormation(this.playerId, state.currentTurn, partyId, formation, this.nextId(state)); }
   moveParty(state, partyId, path) { return moveParty(this.playerId, state.currentTurn, partyId, path, this.nextId(state)); }
   attackParty(state, attackerPartyId, defenderPartyId, attackType = 'melee') { return attackParty(this.playerId, state.currentTurn, attackerPartyId, defenderPartyId, attackType, this.nextId(state)); }
+  setGuardOrder(state, partyId, guardUnitId, targetUnitId, mode) { return setGuardOrder(this.playerId, state.currentTurn, partyId, guardUnitId, targetUnitId, mode, this.nextId(state)); }
   endTurn(state) { return endTurn(this.playerId, state.currentTurn, this.nextId(state)); }
 }

@@ -15,7 +15,7 @@ export class MapView {
   constructor(canvas, minimap, assets, { onInspect, onMove, onHover, onCameraChange }) {
     this.canvas = canvas; this.ctx = canvas.getContext('2d'); this.minimap = minimap; this.assets = assets;
     this.camera = new MapCamera(); this.onCameraChange = onCameraChange;
-    this.markers = []; this.options = {}; this.suppressClick = false;
+    this.markers = []; this.options = {}; this.suppressClick = false; this.effects = [];
     canvas.onclick = (event) => {
       if (this.suppressClick) { this.suppressClick = false; return; }
       const hit = this.hitAt(event); if (hit.tile) onInspect(hit);
@@ -66,6 +66,17 @@ export class MapView {
   }
 
   setState(state, options) { this.state = state; this.options = options; this.draw(); }
+  playCombat(events) {
+    cancelAnimationFrame(this.effectFrame);
+    this.effects = events.filter(e => e.type === 'CombatDamage').map(e => ({ ...e, location: this.state.units[e.targetUnitId]?.location }));
+    if (!this.effects.length) return;
+    this.effectStart = performance.now();
+    const animate = () => {
+      if (performance.now() - this.effectStart > 850) { this.effects = []; this.draw(); return; }
+      this.draw(); this.effectFrame = requestAnimationFrame(animate);
+    };
+    animate();
+  }
   focus(key) { if (this.state?.world.tiles[key]) { this.camera.centerOn(this.state.world.tiles[key]); this.draw(); } }
   zoomBy(delta, anchor) {
     const rect = this.canvas.getBoundingClientRect(); this.camera.setZoom(this.camera.zoom + delta, rect.width, rect.height, anchor); this.draw();
@@ -118,10 +129,11 @@ export class MapView {
       const tile = state.world.tiles[marker.location]; if (!tile) return;
       const p = project(tile); if (!visible(p)) return;
       const x = p.x + offset * scale, y = p.y + (tile.cityId ? 12 : 0) * scale;
+      const targeted = marker.kind === 'party' && marker.id === this.options.targetPartyId;
       const selected = marker.kind === 'party' ? marker.id === selectedPartyId : units.some((u) => u.id === selectedUnitId);
       ctx.beginPath(); ctx.ellipse(x, y + 19 * scale, 22 * scale, 8 * scale, 0, 0, Math.PI * 2);
       ctx.fillStyle = ownerId === playerId ? (marker.kind === 'unit' ? '#6c5941' : '#355c69') : '#803f47'; ctx.fill();
-      ctx.strokeStyle = selected ? '#fff1b5' : '#a3b8ac'; ctx.lineWidth = selected ? 3 : 1; ctx.stroke(); ctx.globalAlpha = active ? 1 : 0.45;
+      ctx.strokeStyle = targeted ? '#ff9a86' : selected ? '#fff1b5' : '#a3b8ac'; ctx.lineWidth = selected ? 3 : 1; ctx.stroke(); ctx.globalAlpha = active ? 1 : 0.45;
       if (!assets.draw(ctx, `unit-${units[0]?.typeId ?? 'warrior'}`, x, y, scale)) { ctx.fillStyle = '#bd9262'; ctx.fillRect(x - 10 * scale, y - 10 * scale, 20 * scale, 20 * scale); }
       ctx.globalAlpha = 1; ctx.fillStyle = '#101d1b'; ctx.fillRect(x + 4 * scale, y + 8 * scale, 27 * scale, 17 * scale);
       ctx.fillStyle = '#fff0c9'; ctx.font = `700 ${11 * scale}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(badge, x + 17 * scale, y + 17 * scale);
@@ -135,6 +147,14 @@ export class MapView {
       drawMarker({ kind: 'party', id: party.id, location: party.location }, party.unitIds.map((id) => state.units[id]).filter(Boolean), party.ownerId, String(party.unitIds.length), party.status === 'active', others || state.world.tiles[party.location]?.cityId ? -18 : 0);
     }
     for (const units of waiting.values()) drawMarker({ kind: 'unit', id: units[0].id, location: units[0].location }, units, units[0].ownerId, `待${units.length}`, units.some((u) => u.currentHp > 0 && u.status === 'active'), 18);
+    for (const [index, effect] of this.effects.entries()) {
+      const tile = state.world.tiles[effect.location]; if (!tile) continue;
+      const p = project(tile), elapsed = Math.min(1, (performance.now() - this.effectStart) / 850);
+      ctx.save(); ctx.globalAlpha = 1 - elapsed; ctx.strokeStyle = effect.role === 'primary' ? '#ff9782' : '#a5ecff';
+      ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(p.x, p.y, (22 + elapsed * 24) * scale, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillStyle = '#fff4d8'; ctx.font = `bold ${16 * scale}px sans-serif`; ctx.textAlign = 'center';
+      ctx.fillText(`−${effect.damage}`, p.x + (index % 2 ? 20 : -20) * scale, p.y - (25 + elapsed * 30 + Math.floor(index / 2) * 17) * scale); ctx.restore();
+    }
     canvas._layout = { size, center: { x: rect.width / 2 - camera.x * scale, y: rect.height / 2 - camera.y * scale } };
     this.drawMinimap(rect.width, rect.height); this.onCameraChange?.(camera);
   }

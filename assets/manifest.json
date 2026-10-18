@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "packId": "kingdom-assets-2026-10-17",
+  "packId": "kingdom-assets-2026-10-18",
   "created": "2026-09-13",
   "plan": "doc/ASSET_AUDIT.md",
   "graphics": 17,
-  "soundEffects": 11,
+  "soundEffects": 13,
   "music": 2,
   "tools": {
     "AIPaint": {
@@ -43,7 +43,7 @@
     "tools/assets/render-first-pack.mjs",
     "tools/assets/render-ui-audio.mjs"
   ],
-  "integrationStatus": "connected-awaiting-browser-review",
+  "integrationStatus": "browser-reviewed-awaiting-listening",
   "imageReview": "contact-sheet-reviewed",
   "audioListeningReview": "not-performed",
   "contactSheet": {
@@ -1846,7 +1846,7 @@
       "revision": "v001",
       "tool": "AIMusic",
       "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
-      "status": "checked-candidate",
+      "status": "connected-candidate",
       "integrated": false,
       "listeningReviewed": false,
       "seconds": 13.333333333333334,
@@ -1922,10 +1922,10 @@
         "githubStored": false,
         "reviewStatus": "candidate"
       },
-      "runtimeConnected": false,
+      "runtimeConnected": true,
       "integrationChecks": {
-        "commandOrDomHarness": false,
-        "browserReviewed": false,
+        "commandOrDomHarness": true,
+        "browserReviewed": true,
         "humanListeningReviewed": false
       }
     },
@@ -2198,6 +2198,186 @@
         "browserReviewed": false,
         "humanListeningReviewed": false
       }
+    },
+    {
+      "id": "se-combat-hit",
+      "title": "戦闘の命中",
+      "category": "se",
+      "revision": "v001",
+      "tool": "AIMusic",
+      "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
+      "status": "connected-candidate",
+      "integrated": false,
+      "listeningReviewed": false,
+      "seconds": 0.19104308390022676,
+      "sampleRate": 44100,
+      "channels": 2,
+      "loop": false,
+      "files": [
+        {
+          "path": "assets/jobs/se-combat-hit.v001.music.json",
+          "bytes": 896,
+          "sha256": "d55c072fcd5095cca466995d23fcae4316eb9112d867a724ea265d327c3391c7"
+        },
+        {
+          "path": "assets/audio/se-combat-hit/v001/project.music.json",
+          "bytes": 684,
+          "sha256": "3c6fee73500ff21f681761cbaa1dd24a75c8585cfa93f049eae3d0fc5c090fb5"
+        },
+        {
+          "path": "assets/audio/se-combat-hit/v001/song.mid",
+          "bytes": 109,
+          "sha256": "c1125683ba9e543cd0344b9515523fed241b1798430512226f05a12a355dc32d"
+        },
+        {
+          "path": "assets/audio/se-combat-hit/v001/source-render-report.json",
+          "bytes": 898,
+          "sha256": "2cc7b6de84da7bb10ef66e662ecf9fd25e0f8ebee0a5deda05ae2a45cf082216"
+        },
+        {
+          "path": "assets/audio/se-combat-hit/v001/audio.wav",
+          "bytes": 33744,
+          "sha256": "101d181c23173afc758b3cc6a4e6efc02d61942c6e4118edfb2567662c25d0b0"
+        },
+        {
+          "path": "assets/audio/se-combat-hit/v001/delivery-report.json",
+          "bytes": 786,
+          "sha256": "f8b128d53ef6868dfea4fb04ba096489bbfa487399e32225c5b58cd5ee0b827a"
+        }
+      ],
+      "checks": {
+        "format": "aimusic-render-report",
+        "version": 1,
+        "projectId": "se-combat-hit",
+        "renderer": "pcm-synth/1",
+        "mode": "tail",
+        "frames": 55125,
+        "bodyFrames": 33075,
+        "seconds": 1.25,
+        "scoreSeconds": 0.75,
+        "audibleTracks": 1,
+        "notes": 2,
+        "peak": 0.04835094138979912,
+        "rms": 0.0037080785511834696,
+        "limiterGain": 1,
+        "silent": false,
+        "loopBoundaryJump": null,
+        "files": [
+          {
+            "file": "song.wav",
+            "bytes": 220544,
+            "sha256": "b0c02b12161f0b4449269143de4991d407779de71f121e470c46105d07ff46da"
+          },
+          {
+            "file": "song.mid",
+            "bytes": 109,
+            "sha256": "c1125683ba9e543cd0344b9515523fed241b1798430512226f05a12a355dc32d"
+          },
+          {
+            "file": "project.music.json",
+            "bytes": 684,
+            "sha256": "3c6fee73500ff21f681761cbaa1dd24a75c8585cfa93f049eae3d0fc5c090fb5"
+          }
+        ],
+        "githubStored": false,
+        "reviewStatus": "candidate"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": true,
+        "humanListeningReviewed": false
+      }
+    },
+    {
+      "id": "se-guard",
+      "title": "護衛と割り込み",
+      "category": "se",
+      "revision": "v001",
+      "tool": "AIMusic",
+      "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
+      "status": "connected-candidate",
+      "integrated": false,
+      "listeningReviewed": false,
+      "seconds": 0.5576643990929705,
+      "sampleRate": 44100,
+      "channels": 2,
+      "loop": false,
+      "files": [
+        {
+          "path": "assets/jobs/se-guard.v001.music.json",
+          "bytes": 902,
+          "sha256": "959dcb9287493e53aa986eea87a6fa83d4f0683d153564b70ac1f8d022dbf39f"
+        },
+        {
+          "path": "assets/audio/se-guard/v001/project.music.json",
+          "bytes": 690,
+          "sha256": "111284a322faeabb483b899da628cbe05fd541765ba70ffadda5b0fbd52a97ff"
+        },
+        {
+          "path": "assets/audio/se-guard/v001/song.mid",
+          "bytes": 132,
+          "sha256": "255948ba9db9614d259c24dc4f34624ba07184b7664da198c5d57fd785701e19"
+        },
+        {
+          "path": "assets/audio/se-guard/v001/source-render-report.json",
+          "bytes": 892,
+          "sha256": "7e6f8665a8db50cdb980f8c272c2328c522ec8e1f81ad53f5a4f7dfcb8d8eaad"
+        },
+        {
+          "path": "assets/audio/se-guard/v001/audio.wav",
+          "bytes": 98416,
+          "sha256": "bfb90d22021dca56fe38b2613b1a2736792d781b2427cd260d92a5a35c2c11be"
+        },
+        {
+          "path": "assets/audio/se-guard/v001/delivery-report.json",
+          "bytes": 776,
+          "sha256": "4ac72e87629041b837054b5cb2b9be35d6adf90b9d807b4b864c574f82ad3236"
+        }
+      ],
+      "checks": {
+        "format": "aimusic-render-report",
+        "version": 1,
+        "projectId": "se-guard",
+        "renderer": "pcm-synth/1",
+        "mode": "tail",
+        "frames": 55125,
+        "bodyFrames": 33075,
+        "seconds": 1.25,
+        "scoreSeconds": 0.75,
+        "audibleTracks": 1,
+        "notes": 2,
+        "peak": 0.12230441719293594,
+        "rms": 0.015542451546028284,
+        "limiterGain": 1,
+        "silent": false,
+        "loopBoundaryJump": null,
+        "files": [
+          {
+            "file": "song.wav",
+            "bytes": 220544,
+            "sha256": "a41bb7111b10546b80516052edf1f1199b79114b5a19aa0508edcaf4700282fa"
+          },
+          {
+            "file": "song.mid",
+            "bytes": 132,
+            "sha256": "255948ba9db9614d259c24dc4f34624ba07184b7664da198c5d57fd785701e19"
+          },
+          {
+            "file": "project.music.json",
+            "bytes": 690,
+            "sha256": "111284a322faeabb483b899da628cbe05fd541765ba70ffadda5b0fbd52a97ff"
+          }
+        ],
+        "githubStored": false,
+        "reviewStatus": "candidate"
+      },
+      "runtimeConnected": true,
+      "integrationChecks": {
+        "commandOrDomHarness": true,
+        "browserReviewed": true,
+        "humanListeningReviewed": false
+      }
     }
   ],
   "verification": {
@@ -2205,19 +2385,30 @@
     "result": "passed",
     "count": 27
   },
-  "updated": "2026-10-17",
-  "runtimeConnectedCount": 29,
+  "updated": "2026-10-18",
+  "runtimeConnectedCount": 32,
   "reviewDocument": "doc/ASSET_INTEGRATION_QA.md",
   "basePackId": "kingdom-first-pack-v001",
   "runtimeAudioFallback": {
-    "scoreCount": 13,
+    "scoreCount": 15,
     "scores": "src/audio/scores.js",
     "renderer": "src/audio/vendor/audio.mjs",
     "tool": "AIMusic",
     "toolCommit": "399fe1351368755f116512a459c95ecf555c5cba",
     "buildScript": "tools/assets/build-audio-fallback.mjs",
     "originalWAVHashesVerified": true,
-    "browserReviewed": false,
+    "browserReviewed": true,
     "humanListeningReviewed": false
+  },
+  "latestVerification": {
+    "path": "assets/verification-combat-2026-10-18.json",
+    "result": "passed",
+    "count": 32
+  },
+  "browserReview": {
+    "path": "assets/qa/browser-combat-2026-10-18.json",
+    "realBrowser": true,
+    "humanListening": false,
+    "scope": "Map, hotseat combat, Guard/Intercept, save/load, native AudioContext and all-audio-404 Worker synthesis"
   }
 }

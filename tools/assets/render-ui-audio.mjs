@@ -1,4 +1,4 @@
-// Add three operation sounds with the same pinned AIMusic renderer as v001.
+// Add operation or combat sounds with the same pinned AIMusic renderer as v001.
 // Never overwrite existing deliveries. Original score, MIDI and reports remain editable.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -6,8 +6,9 @@ import os from 'node:os';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 
-const [musicArg, outputArg] = process.argv.slice(2);
-if (!musicArg || !outputArg) throw Error('Usage: node tools/assets/render-ui-audio.mjs AIMUSIC_ROOT NEW_OUTPUT_ROOT');
+const [musicArg, outputArg, pack = 'ui'] = process.argv.slice(2);
+if (!['ui', 'combat'].includes(pack)) throw Error('Unknown audio pack');
+if (!musicArg || !outputArg) throw Error('Usage: node tools/assets/render-ui-audio.mjs AIMUSIC_ROOT NEW_OUTPUT_ROOT [ui|combat]');
 const musicRoot = path.resolve(musicArg), root = path.resolve(outputArg);
 if (fs.existsSync(path.join(root, 'assets'))) throw Error('Choose a fresh output directory');
 const lock = JSON.parse(fs.readFileSync(new URL('./tool-lock.json', import.meta.url))).tools.AIMusic;
@@ -18,7 +19,10 @@ for (const [file, expected] of Object.entries(lock.files)) {
 const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
 function write(file, bytes) { const target = path.join(root, file); fs.mkdirSync(path.dirname(target), { recursive: true }); fs.writeFileSync(target, bytes, { flag: 'wx' }); return { path: file, bytes: Buffer.byteLength(bytes), sha256: hash(bytes) }; }
 const json = (file, value) => write(file, JSON.stringify(value, null, 2) + '\n');
-const specs = [
+const specs = pack === 'combat' ? [
+  { id: 'se-combat-hit', title: '戦闘の命中', instrument: 'snare', volume: 0.48, notes: [[38, 0, 0.12], [38, 0.14, 0.08]] },
+  { id: 'se-guard', title: '護衛と割り込み', instrument: 'bell', volume: 0.48, notes: [[84, 0, 0.1], [72, 0.18, 0.18]] },
+] : [
   { id: 'se-territory-expand', title: '文化による領土拡張', instrument: 'bell', volume: 0.56, notes: [[60, 0, 0.22], [67, 0.32, 0.25], [72, 0.68, 0.35], [76, 1.02, 0.3]] },
   { id: 'se-save', title: '保存', instrument: 'pluck', volume: 0.68, notes: [[76, 0, 0.24], [60, 0.34, 0.38]] },
   { id: 'se-load', title: '復元', instrument: 'pluck', volume: 0.68, notes: [[60, 0, 0.2], [67, 0.30, 0.22], [76, 0.62, 0.4]] },
@@ -46,4 +50,4 @@ for (const spec of specs) {
   records.push({ id: spec.id, title: spec.title, category: 'se', revision: 'v001', tool: 'AIMusic', toolCommit: lock.commit, status: 'rendered-analysis-checked', integrated: false, listeningReviewed: false, seconds: frames / 44100, sampleRate: 44100, channels: 2, loop: false, files, checks: report });
   console.log(`${spec.id}: ${(frames / 44100).toFixed(3)}s`);
 }
-json('assets/ui-audio-pack.json', { created: '2026-10-17', authoringScript: 'tools/assets/render-ui-audio.mjs', assets: records });
+json(`assets/${pack}-audio-pack.json`, { created: pack === 'combat' ? '2026-10-19' : '2026-10-17', authoringScript: 'tools/assets/render-ui-audio.mjs', assets: records });

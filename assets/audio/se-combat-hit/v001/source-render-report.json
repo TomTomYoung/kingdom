@@ -1,0 +1,37 @@
+{
+  "format": "aimusic-render-report",
+  "version": 1,
+  "projectId": "se-combat-hit",
+  "renderer": "pcm-synth/1",
+  "mode": "tail",
+  "frames": 55125,
+  "bodyFrames": 33075,
+  "seconds": 1.25,
+  "scoreSeconds": 0.75,
+  "audibleTracks": 1,
+  "notes": 2,
+  "peak": 0.04835094138979912,
+  "rms": 0.0037080785511834696,
+  "limiterGain": 1,
+  "silent": false,
+  "loopBoundaryJump": null,
+  "files": [
+    {
+      "file": "song.wav",
+      "bytes": 220544,
+      "sha256": "b0c02b12161f0b4449269143de4991d407779de71f121e470c46105d07ff46da"
+    },
+    {
+      "file": "song.mid",
+      "bytes": 109,
+      "sha256": "c1125683ba9e543cd0344b9515523fed241b1798430512226f05a12a355dc32d"
+    },
+    {
+      "file": "project.music.json",
+      "bytes": 684,
+      "sha256": "3c6fee73500ff21f681761cbaa1dd24a75c8585cfa93f049eae3d0fc5c090fb5"
+    }
+  ],
+  "githubStored": false,
+  "reviewStatus": "candidate"
+}

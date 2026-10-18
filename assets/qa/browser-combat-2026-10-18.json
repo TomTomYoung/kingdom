@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-18T15:44:04.895Z",
+  "browser": "153.0.8010.0",
+  "realBrowser": true,
+  "humanListening": false,
+  "checks": [
+    "331-cell map",
+    "waiting unit and party selection",
+    "two-cell route and right-click movement",
+    "3x3 formation edit",
+    "drag suppresses click",
+    "zoom and minimap",
+    "save/load",
+    "invalid load preserves game, selection and zoom",
+    "37-cell save compatibility",
+    "new game",
+    "390px layout",
+    "native audio decoding/playback nodes",
+    "404 Worker synthesis",
+    "retry without overlapping BGM",
+    "mute stops sources",
+    "two-kingdom hotseat setup and city ownership",
+    "enemy selection retains attacker",
+    "RNG-free forecast",
+    "Guard/Intercept and counter",
+    "battle music and SE",
+    "action exhaustion",
+    "invalid ranged attack disabled",
+    "leadership succession and defeat",
+    "combat save/load"
+  ],
+  "results": [
+    {
+      "missingAudio": false,
+      "errors": [],
+      "expectedAudio404s": 0,
+      "result": "passed"
+    },
+    {
+      "missingAudio": true,
+      "errors": [],
+      "expectedAudio404s": 14,
+      "result": "passed"
+    }
+  ]
+}

@@ -37,9 +37,11 @@ export function migrateAndValidateSave(state) {
     defaultMissing(unit, 'guardCapacityRemaining', unit.guardCapacityMax);
     defaultMissing(unit, 'status', unit.currentHp > 0 ? 'active' : unit.scaleClass === 'individual' ? 'downed' : 'shattered');
     defaultMissing(unit, 'statusEffects', []);
+    defaultMissing(unit, 'guardRange', 1);
   }
   for (const [id, party] of Object.entries(state.parties)) {
     object(party, `parties.${id}`);
+    defaultMissing(party, 'guardOrders', {});
     for (const [key, value] of Object.entries({ attacksMaximum: 1, activationState: 'ready', hasMoved: false, hasAttacked: false, reactionCharges: 1 })) defaultMissing(party, key, value);
   }
 
@@ -132,6 +134,7 @@ export function migrateAndValidateSave(state) {
     fields(unit, ['meleeStrength', 'rangedStrength', 'magicStrength', 'defenseStrength', 'resistance', 'armor', 'range', 'guardRate', 'guardCapacityMax', 'moraleContribution', 'commandContribution'], `units.${id}`);
     number(unit.guardCapacityRemaining, `units.${id}.guardCapacityRemaining`, 0, unit.guardCapacityMax);
     array(unit.statusEffects, `units.${id}.statusEffects`);
+    integer(unit.guardRange, `units.${id}.guardRange`, 0, 4);
     if (unit.partyId !== null) check(array(reference(state.parties, unit.partyId, `units.${id}.partyId`).unitIds, `units.${id}.partyId.unitIds`).includes(id), `units.${id}.partyId`);
   }
   const occupied = new Set();
@@ -146,6 +149,12 @@ export function migrateAndValidateSave(state) {
     }
     check(party.unitIds.includes(party.leaderUnitId), `parties.${id}.leaderUnitId`);
     check(!validateFormation(party, party.formation), `parties.${id}.formation`);
+    object(party.guardOrders, `parties.${id}.guardOrders`);
+    for (const [guardId, order] of Object.entries(party.guardOrders)) {
+      object(order, `parties.${id}.guardOrders.${guardId}`);
+      check(party.unitIds.includes(guardId) && party.unitIds.includes(order.targetUnitId) && guardId !== order.targetUnitId, `parties.${id}.guardOrders.${guardId}`);
+      check(['share', 'intercept'].includes(order.mode), `parties.${id}.guardOrders.${guardId}.mode`);
+    }
     fields(party, ['movementMaximum', 'attacksMaximum', 'reactionCharges', 'morale', 'cohesion'], `parties.${id}`);
     number(party.movementRemaining, `parties.${id}.movementRemaining`, 0, party.movementMaximum);
     integer(party.attacksRemaining, `parties.${id}.attacksRemaining`, 0, party.attacksMaximum);
