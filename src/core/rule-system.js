@@ -2,12 +2,13 @@ import { cloneGameState } from './game-state.js';
 import { COMMAND_TYPES } from './commands.js';
 import { RULESET } from './ruleset.js';
 import { processTurnStart } from './turn-engine.js';
-import { completeItem } from '../systems/production-system.js';
+import { completeItem, validateProductionSelection } from '../systems/production-system.js';
 import { getTerritoryCandidates, tilePurchaseCost } from '../systems/territory-system.js';
 import { updateDerivedCapabilities } from '../models/kingdom.js';
 import { createParty, validateFormation, isActiveUnit, hasActiveUnits } from '../models/party.js';
 import { validateCommand } from './command-validation.js';
 import { validatePartyPath } from '../systems/movement-system.js';
+import { validateGuardOrder } from '../systems/damage-grid.js';
 import { resolvePartyAttack } from '../systems/combat-system.js';
 
 const fail = (reason) => ({ ok: false, reason });
@@ -39,6 +40,8 @@ export class RuleSystem {
       if (state.phase !== 'PLAYER_ACTION') return reject('行動フェーズではありません');
       if (!Object.hasOwn(RULESET.items, command.payload.itemId)) return reject('不明な生産対象です');
       if (!command.payload.queue.every((id) => Object.hasOwn(RULESET.items, id))) return reject('キューに不明な生産対象があります');
+      const productionError = validateProductionSelection(city, command.payload.itemId, command.payload.queue);
+      if (productionError) return reject(productionError);
       city.production.currentItemId = command.payload.itemId; city.production.queue = [...command.payload.queue];
       events.push({ type: 'ProductionSet', cityId: city.id, itemId: command.payload.itemId, queue: [...command.payload.queue] });
     } else if (command.type === COMMAND_TYPES.PURCHASE_CITY_ITEM) {
@@ -79,6 +82,16 @@ export class RuleSystem {
       if (formationError) return reject(formationError);
       party.formation = { ...command.payload.formation };
       events.push({ type: 'FormationChanged', partyId: party.id, formation: { ...party.formation } });
+    } else if (command.type === COMMAND_TYPES.SET_GUARD_ORDER) {
+      const { partyId, guardUnitId, targetUnitId, mode } = command.payload;
+      const party = Object.hasOwn(state.parties, partyId) && state.parties[partyId];
+      if (!party || party.ownerId !== command.playerId || party.status !== 'active') return reject('この部隊の護衛は変更できません');
+      const guardError = validateGuardOrder(state, party, guardUnitId, targetUnitId, mode);
+      if (guardError) return reject(guardError);
+      party.guardOrders ??= {};
+      if (mode === 'off') delete party.guardOrders[guardUnitId];
+      else party.guardOrders[guardUnitId] = { targetUnitId, mode };
+      events.push({ type: 'GuardOrderChanged', partyId, guardUnitId, targetUnitId, mode });
     } else if (command.type === COMMAND_TYPES.MOVE_PARTY) {
       if (state.phase !== 'PLAYER_ACTION') return reject('行動フェーズではありません');
       const party = state.parties[command.payload.partyId];

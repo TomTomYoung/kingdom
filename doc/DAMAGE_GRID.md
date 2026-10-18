@@ -1,18 +1,16 @@
 # Kingdom 9グリッド・ダメージ配分仕様
 
-更新日: 2026-10-17（第2段階の実装状況を反映）
+更新日: 2026-10-18（単体護衛・戦闘UIの実装範囲と暫定値を反映）
 
 仕様状態: 基本構造確定、数値係数はCOMBAT_SYSTEM.mdに従う
 
 ## 0. 現行実装との区分
 
-本文は目標のDamage配分規則です。現行は最大5Unitの3×3配置検証とFront優先の単体選択までです。開始基準はmain / a9e66eaad5290c366c96eeacd07b1fce497b5dee。第2段階の差分を含みます。
+本文は目標の配分規則です。2026-10-18時点では最大5Unit・9Slot検証と編集、各列の露出、正面単体攻撃のGuard／Interceptを実装しています。formationはfront/middle/rearとleft/center/rightを組み合わせたSlotIdからunitIdへの辞書です。
 
-実装のformationはSlotIdからunitIdへの辞書で、SlotIdはfront-left、front-center、front-right、middle-left、middle-center、middle-right、rear-left、rear-center、rear-rightです。本文のgridSlots等を含むFormation状態全体はまだありません。
+護衛指示はParty.guardOrdersへ保存し、割り込み優先・近い枠・ID順で1体を選びます。肩代わりは装甲前Damageから最大70％・残り容量まで、割り込みは反応1を消費し、連鎖しません。新規戦士は率50％・容量50・範囲1。これは2026-10-18に採用した暫定値です。既存セーブのゼロ能力は維持します。
 
-対象選択はfront→middle→rear、各行center→left→rightの固定順です。Front全体を優先する簡略処理で、空いた列からの露出、attackVector、Guard、Intercept、Taunt、狙い撃ち、範囲・貫通の配分は未実装です。3×3配置編集UIは実装済みですが、上記の未実装効果を追加するものではありません。
-
-実装状況は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md)、次作業は [HANDOFF.md](./HANDOFF.md) を参照してください。以下の受入条件は完成条件であり、現在のテストがすべて保証するものではありません。
+側面・後方露出の内部ヘルパーはありますが、攻撃Commandの方向指定、Taunt／Cover、Unit・Slot狙い撃ち、Row／Column／Area／Pierceは未実装です。予測はRNGを参照しないHP損失範囲を表示します。[操作と規則](COMBAT_OPERATIONS.md)・[現行仕様](CURRENT_IMPLEMENTATION.md)・[次作業](HANDOFF.md)を参照してください。以下は完成時の受入条件です。
 
 ## 1. 目的
 

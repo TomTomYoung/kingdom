@@ -6,6 +6,8 @@
 
 2026-10-18 引き継ぎ: main / 6303da9319711786e9313476a1b5ab927e31caa3 と前回の全ファイルが一致することを確認。K-09の保存構造・参照整合性検証と、音声fetchの呼出し先修正を追加しました。Node標準56テスト、全52 JavaScriptファイルの構文検査、30素材の整合性・復号、Chromium 153で通常時・全音声HTTP 404時の実操作に成功しました。PC幅1440pxと390pxで表示を確認。音声は実AudioContextの復号・再生開始・停止を確認し、人による聴取と利用端末での再確認は未実施です。 [検証記録](ASSET_INTEGRATION_QA.md)。
 
+2026-10-18 戦闘・護衛追加（開始基準: main / a2e53449664ef50fa1b7041ffc0634b6b74e9ae9）: K-08の重複建物生産と購入後のキューを修正。二国交互操作、敵選択、攻撃予測、単体Guard／Intercept、戦闘ログをUIへ接続しました。新規SE2点と既存戦闘BGMを接続し、素材は32点すべて接続済みです。Node標準68テスト、全57 JavaScriptファイルの構文、32素材の検査とChromiumで通常音声／全音声404の操作に成功。人による聴取は未実施です。[戦闘操作](COMBAT_OPERATIONS.md)・[検証記録](ASSET_INTEGRATION_QA.md)。
+
 ## 現在地と読み方
 
 第3段階（2026-10-17）は331セルのマップと初期戦士部隊、待機Unitの表示・選択、セル/Unit詳細、指定編成、経路移動、カメラ・全体図を実装しました。[操作と確認範囲](MAP_OPERATIONS.md)を参照してください。下の第2段階の記録も保持しています。
@@ -37,7 +39,9 @@ SPECIFICATIONと各システム仕様は目標です。記載された機能・�
 13. [ASSET_LIST.md](./ASSET_LIST.md): AIPaint・AIMusicを使う素材制作一覧と優先順位
 14. [ASSET_PREVIEW.md](./ASSET_PREVIEW.md): 初回27素材の画像一覧・音声ファイル・検査状況
 15. [ASSET_AUDIT.md](./ASSET_AUDIT.md): 既存を含む全必要素材、制作・適用順、最新進捗
-16. [ASSET_INTEGRATION_QA.md](./ASSET_INTEGRATION_QA.md): 接続29点の動作検証と残るブラウザ・聴取確認
+16. [ASSET_INTEGRATION_QA.md](./ASSET_INTEGRATION_QA.md): 接続32点の動作検証と残る聴取確認
+
+17. [COMBAT_OPERATIONS.md](COMBAT_OPERATIONS.md): 二国交互操作・護衛・予測と現行配分規則
 
 ## 確定した目標方針（実装完了を意味しません）
 

@@ -48,7 +48,7 @@ export class InspectionView {
         this.tileRoot.append(move);
         this.tileRoot.append(node('p', route ? `${route.path.length}セルの経路。現在のターン内に移動します。` : tile.key === party.location ? 'この部隊の現在位置です。' : tile.terrainId === 'void' ? '虚無には進入できません。' : parties.length ? '他の部隊が占有しています。' : 'このターンの移動範囲外です。ターン終了で移動力が回復します。', 'hint'));
       }
-      const capital = state.cities['city-1'], cost = tilePurchaseCost(state, capital, tile);
+      const capital = state.cities[state.kingdoms[playerId].cityIds[0]], cost = tilePurchaseCost(state, capital, tile);
       const candidate = getTerritoryCandidates(state, capital).some((t) => t.key === tile.key);
       const affordable = state.kingdoms[playerId].stockpiles.gold >= cost;
       const purchase = button(tile.ownerId ? '所有済み' : candidate ? `このセルを購入 · Gold ${cost}` : '購入できないセル', () => this.callbacks.onPurchase(tile.key)); purchase.id = 'purchase-tile';
@@ -92,7 +92,7 @@ export class InspectionView {
     this.unitRoot.append(facts([
       ['状態', stateLabels[unit.status] ?? unit.status], ['HP', `${unit.currentHp} / ${unit.maxHp}`], ['所属国', state.kingdoms[unit.ownerId]?.name ?? unit.ownerId],
       ['所属部隊', unitParty ? partyName(unitParty) : '未編成・待機中'], ['位置', unit.location], ['配置', slotLabel ?? 'なし'], ['指揮者', unitParty?.leaderUnitId === unit.id ? 'このUnit' : unitParty?.leaderUnitId ?? 'なし'],
-      ['近接 / 遠隔', `${unit.meleeStrength} / ${unit.rangedStrength}`], ['防御 / 装甲', `${unit.defenseStrength} / ${unit.armor}`], ['射程', unit.range],
+      ['近接 / 遠隔', `${unit.meleeStrength} / ${unit.rangedStrength}`], ['防御 / 装甲', `${unit.defenseStrength} / ${unit.armor}`], ['射程', unit.range], ['護衛容量', `${unit.guardCapacityRemaining} / ${unit.guardCapacityMax}`], ['肩代わり率', `${Math.round(unit.guardRate * 100)}%`],
     ]));
     if (unitParty) {
       this.unitRoot.append(facts([['部隊の移動力', `${unitParty.movementRemaining} / ${unitParty.movementMaximum}`], ['部隊の攻撃回数', `${unitParty.attacksRemaining} / ${unitParty.attacksMaximum}`]]));

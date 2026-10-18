@@ -3,7 +3,7 @@ import { COMMAND_TYPES } from './commands.js';
 const record = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 const identifier = (value) => typeof value === 'string' && value.trim().length > 0;
 const fields = {
-  StartTurn: [], EndTurn: [],
+  StartTurn: [], EndTurn: [], SetGuardOrder: ['partyId', 'guardUnitId', 'mode'],
   SetCityProduction: ['cityId', 'itemId'],
   PurchaseCityItem: ['cityId', 'itemId', 'currency'],
   PurchaseTile: ['cityId', 'tileKey'],
@@ -32,5 +32,6 @@ export function validateCommand(state, command) {
   if (command.type === COMMAND_TYPES.CREATE_PARTY && (!Array.isArray(payload.unitIds) || !payload.unitIds.every(identifier))) return 'UnitのIDを配列で指定してください';
   if (command.type === COMMAND_TYPES.MOVE_PARTY && (!Array.isArray(payload.path) || !payload.path.every(identifier))) return '移動経路はタイルIDの配列で指定してください';
   if (command.type === COMMAND_TYPES.SET_FORMATION && !record(payload.formation)) return '配置はslotとUnitの対応で指定してください';
+  if (command.type === COMMAND_TYPES.SET_GUARD_ORDER && payload.mode !== 'off' && !identifier(payload.targetUnitId)) return '護衛対象のUnit IDが必要です';
   return null;
 }

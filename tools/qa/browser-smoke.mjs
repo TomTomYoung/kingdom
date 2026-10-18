@@ -125,7 +125,47 @@ try {
     const old = createInitialGameState(117, { radius: 3 }); await load(old);
     assert.deepEqual(await save(), old); assert.match(await page.locator('#seed').innerText(), /37セル/);
     await page.click('#reset'); assert.match(await page.locator('#seed').innerText(), /331セル/);
+    // Reach battle through the ordinary setup and controls, with no fixture injection.
+    await page.selectOption('#game-mode', 'duel'); await page.click('#reset');
+    state = await save(); assert.equal(state.turnOrder.length, 2); assert.equal(Object.keys(state.units).length, 6);
+    await tileClick(state.world.tiles[state.parties['party-2'].location]);
+    assert.match(await page.locator('#party-status').innerText(), /部隊 1/, 'enemy selection keeps the attacker');
+    assert.match(await page.locator('#unit-content').innerText(), /unit-4/);
+    assert.deepEqual(await save(), state, 'enemy preview does not consume RNG or change the game');
+    assert.match(await page.locator('#combat-forecast').innerText(), /護衛/);
+    await page.waitForFunction(() => window.qaAudioSources.filter(s => s.loop && s.qaStarted && !s.qaStopped && !s.qaEnded && Math.abs(s.buffer?.duration - 13.3333333) < .02).length === 1);
+    await page.selectOption('#guard-unit', 'unit-2'); await page.selectOption('#guard-mode', 'intercept'); await page.click('#set-guard');
+    assert.equal((await save()).parties['party-1'].guardOrders['unit-2'].mode, 'intercept');
+    await page.click('#attack-party'); state = await save();
+    assert.ok(state.units['unit-4'].currentHp < 100 && state.units['unit-5'].currentHp < 100);
+    assert.equal(state.units['unit-1'].currentHp, 100); assert.ok(state.units['unit-2'].currentHp < 100);
+    assert.equal(state.parties['party-1'].reactionCharges, 0);
+    assert.equal(await page.locator('#attack-party').isDisabled(), true);
+    assert.match(await page.locator('#combat-log').innerText(), /肩代わり/); assert.match(await page.locator('#combat-log').innerText(), /割り込み/);
+    await page.locator('#combat-panel').screenshot({ path: path.join(output, missingAudio ? 'battle-fallback.png' : 'battle.png') });
+    await page.click('#end-turn');
+    assert.match(await page.locator('#active-kingdom').innerText(), /夕映王国/); assert.equal(await page.locator('#city-name').innerText(), '黄昏都');
+    await page.click('[data-buy="warrior"]'); state = await save();
+    assert.equal(state.units['unit-7'].ownerId, 'kingdom-2'); assert.equal(state.units['unit-7'].location, '4,-4,0');
+    await page.selectOption('#combat-target', 'party-1'); await page.selectOption('#attack-type', 'ranged');
+    assert.equal(await page.locator('#attack-party').isDisabled(), true); assert.deepEqual(await save(), state);
+    await page.selectOption('#attack-type', 'melee'); await page.click('#attack-party'); state = await save();
+    await page.click('#load'); assert.deepEqual(await save(), state); assert.match(await page.locator('#active-kingdom').innerText(), /夕映王国/);
+    await page.click('[data-select-party="party-2"]');
+    for (let action = 0; action < 40 && !Object.values(state.parties).some(p => p.status === 'defeated'); action++) {
+      const own = Object.values(state.parties).find(p => p.ownerId === state.activePlayerId), enemy = Object.values(state.parties).find(p => p.ownerId !== state.activePlayerId);
+      if (own.attacksRemaining > 0 && own.activationState !== 'ended') { await page.selectOption('#combat-target', enemy.id); await page.click('#attack-party'); }
+      else await page.click('#end-turn');
+      state = await save();
+    }
+    assert.ok(Object.values(state.parties).some(p => p.status === 'defeated'), 'battle reaches defeat through normal attacks');
+    assert.ok(state.eventLog.some(e => e.type === 'PartyLeaderChanged'), 'leadership succession is reachable');
+    assert.equal(Object.keys(state.parties['party-1'].formation).length, 3, 'casualties do not rearrange the formation');
+    await page.click('#load'); assert.deepEqual(await save(), state, 'defeat and reactions survive loading');
+    // Return to a fresh battle for the desktop/mobile layout screenshots.
+    await page.click('#reset'); await page.selectOption('#combat-target', 'party-2');
     await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForFunction(() => [0.1910430839, 0.5576643991].every(duration => window.qaAudioSources.some(source => source.qaStarted && Math.abs(source.buffer?.duration - duration) < .001)));
     await page.screenshot({ path: path.join(output, missingAudio ? 'desktop-audio-fallback.png' : 'desktop.png'), fullPage: true });
     await page.setViewportSize({ width: 390, height: 844 });
     await page.evaluate(() => window.scrollTo(0, 0));
@@ -140,7 +180,7 @@ try {
     await context.close();
   }
   const report = { date: new Date().toISOString(), browser: await browser.version(), realBrowser: true, humanListening: false,
-    checks: ['331-cell map', 'waiting unit and party selection', 'two-cell route and right-click movement', '3x3 formation edit', 'drag suppresses click', 'zoom and minimap', 'save/load', 'invalid load preserves game, selection and zoom', '37-cell save compatibility', 'new game', '390px layout', 'native audio decoding/playback nodes', '404 Worker synthesis', 'retry without overlapping BGM', 'mute stops sources'], results };
+    checks: ['331-cell map', 'waiting unit and party selection', 'two-cell route and right-click movement', '3x3 formation edit', 'drag suppresses click', 'zoom and minimap', 'save/load', 'invalid load preserves game, selection and zoom', '37-cell save compatibility', 'new game', '390px layout', 'native audio decoding/playback nodes', '404 Worker synthesis', 'retry without overlapping BGM', 'mute stops sources', 'two-kingdom hotseat setup and city ownership', 'enemy selection retains attacker', 'RNG-free forecast', 'Guard/Intercept and counter', 'battle music and SE', 'action exhaustion', 'invalid ranged attack disabled', 'leadership succession and defeat', 'combat save/load'], results };
   await fs.writeFile(path.join(output, 'report.json'), JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report));
 } finally { await browser?.close(); server.close(); }

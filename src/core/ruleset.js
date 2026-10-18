@@ -8,7 +8,7 @@ export const RULESET = Object.freeze({
   popularSupportCap: 100,
   combat: Object.freeze({ baseDamage: 30, strengthExponent: 0.04, randomMinimum: 0.85, randomMaximum: 1.15, minimumDamage: 1, maximumDamage: 90, moraleDamageRate: 0.25 }),
   unitTypes: Object.freeze({
-    warrior: Object.freeze({ scaleClass: 'detachment', maxHp: 100, meleeStrength: 20, rangedStrength: 0, magicStrength: 0, defenseStrength: 18, resistance: 5, armor: 2, range: 1, guardRate: 0, guardCapacity: 0, moraleContribution: 10, commandContribution: 5 }),
+    warrior: Object.freeze({ scaleClass: 'detachment', maxHp: 100, meleeStrength: 20, rangedStrength: 0, magicStrength: 0, defenseStrength: 18, resistance: 5, armor: 2, range: 1, guardRate: 0.5, guardCapacity: 50, guardRange: 1, moraleContribution: 10, commandContribution: 5 }),
   }),
   items: Object.freeze({
     warrior: Object.freeze({ itemId: 'warrior', name: '戦士', category: 'unit', productionCost: 12, purchaseOptions: { gold: 48 } }),

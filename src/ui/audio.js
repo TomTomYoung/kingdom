@@ -13,6 +13,8 @@ export function readAudioSettings(storage) {
 export function soundForResult(result, command) {
   if (!result.ok) return 'se-ui-error';
   const events = result.events ?? [];
+  if (events.some((e) => e.type === 'CombatGuard' || e.type === 'CombatIntercept')) return 'se-guard';
+  if (events.some((e) => e.type === 'CombatDamage')) return 'se-combat-hit';
   if (events.some((e) => (e.type === 'ItemCompleted' && e.source === 'purchase') || (e.type === 'TerritoryExpanded' && e.source === 'gold'))) return 'se-purchase';
   if (events.some((e) => e.type === 'ItemCompleted' && e.source === 'production')) return 'se-production-complete';
   if (events.some((e) => e.type === 'PartyMoved')) return 'se-party-move';

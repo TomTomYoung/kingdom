@@ -34,7 +34,7 @@ test('malformed saves reject structural, numeric and reference corruption', () =
     ['unknown unit type', s => { s.units['unit-1'].typeId = 'missing'; }],
     ['invalid HP', s => { s.units['unit-1'].currentHp = 101; }],
     ['mismatched HP', s => { s.units['unit-1'].hp = 1; }],
-    ['invalid guard', s => { s.units['unit-1'].guardCapacityRemaining = 5; }],
+    ['invalid guard', s => { s.units['unit-1'].guardCapacityRemaining = s.units['unit-1'].guardCapacityMax + 1; }],
     ['missing party', s => { s.units['unit-1'].partyId = 'missing'; }],
     ['broken party membership', s => { s.units['unit-1'].partyId = null; }],
     ['mismatched location', s => { s.units['unit-1'].location = '1,-1,0'; }],

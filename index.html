@@ -7,22 +7,24 @@
   <link rel="stylesheet" href="./src/ui/style.css" />
 </head>
 <body>
-  <header><div><span class="eyebrow">KINGDOM</span><h1>黎明王国</h1></div><div class="turn"><small>現在のターン</small><strong id="turn">1</strong></div></header>
+  <header><div><span class="eyebrow">KINGDOM</span><h1>黎明王国</h1></div><div class="turn"><small>現在のターン</small><strong id="turn">1</strong><span id="active-kingdom"></span></div></header>
   <main>
     <section class="map-panel">
       <div class="panel-title"><h2>王領地図</h2><span id="seed"></span></div>
       <div class="map-toolbar"><span id="map-mode">セル確認</span><span>金枠：王領 ／ 点線：移動可能 ／ 待：未編成</span></div>
       <div class="map-controls" aria-label="地図の表示操作"><button id="zoom-out" aria-label="地図を縮小">−</button><output id="map-zoom">100%</output><button id="zoom-in" aria-label="地図を拡大">＋</button><button id="focus-city">首都へ</button><button id="focus-party">選択Unitへ</button><button id="next-party">次の部隊</button></div>
       <p id="message" role="status"></p><div class="map-viewport"><canvas id="map" tabindex="0" aria-label="王領地図。ドラッグまたは矢印キーで移動、左クリックでセルとUnit確認、右クリックで部隊移動" aria-describedby="map-help"></canvas><div class="minimap-box"><span>全体図 · クリックで移動</span><canvas id="minimap" width="168" height="148" aria-label="マップ全体図"></canvas></div></div>
-      <div class="map-selection"><span id="map-selection-name"></span><button id="map-move">ここへ移動</button><a href="#cell-view">セル詳細</a><a href="#unit-view">Unit詳細</a></div>
+      <div class="map-selection"><span id="map-selection-name"></span><button id="map-move">ここへ移動</button><a href="#cell-view">セル詳細</a><a href="#unit-view">Unit詳細</a><a href="#combat-panel">戦闘・護衛</a></div>
       <p id="tile-info" class="hint"></p><p id="map-help" class="hint">移動：部隊を選ぶ → 移動先セルを選ぶ →「ここへ移動」。右クリックでも移動できます。全体図は白枠が現在の表示範囲です。</p><p id="asset-status" role="status"></p>
       <div class="inspection-grid"><section id="cell-view" class="inspection-card" aria-label="セル詳細"><h2>セル詳細</h2><div id="cell-content"></div></section><section id="unit-view" class="inspection-card" aria-label="ユニット詳細"><h2>ユニット詳細</h2><div id="unit-content"></div></section></div>
     </section>
     <aside>
+      <section class="card game-setup"><label for="game-mode">新規ゲーム</label><select id="game-mode"><option value="single">単独開拓</option><option value="duel">二国対戦（交互操作）</option></select><p class="hint">二国対戦は両王国を交互に操作します。敵AIはありません。</p></section>
       <section class="card resources"><h2>国庫と進捗</h2><div id="resources" class="stat-grid"></div><div id="derived" class="derived"><span>軍事力 <b id="military"></b></span><span>統治力 <b id="governance"></b> / 負荷 <b id="load-value"></b></span></div></section>
       <section class="card"><div class="city-heading"><div id="city-art"></div><div><small>首都</small><h2 id="city-name"></h2></div><span id="population"></span></div><div id="buildings" class="building-row"></div><div id="yields" class="yield-row"></div><div class="progress-label"><span>食料</span><span id="food-label"></span></div><div class="bar"><i id="food-bar"></i></div><div class="progress-label"><span>領土文化</span><span id="culture-label"></span></div><div class="bar culture"><i id="culture-bar"></i></div></section>
       <section class="card"><h2>都市生産</h2><div id="production-status" class="production-status"></div><div class="actions"><button data-produce="warrior">戦士を生産</button><button data-buy="warrior" class="secondary">戦士を購入 · 48</button><button data-produce="monument">モニュメントを生産</button><button data-buy="monument" class="secondary">建物を購入 · 80</button></div></section>
       <section class="card"><h2>部隊と待機Unit</h2><div id="unit-roster" class="unit-roster"></div><div id="party-status" class="production-status"></div><p id="party-detail" class="hint"></p><div id="formation" class="formation-panel" hidden></div><button id="deselect-party" class="secondary" disabled>部隊・Unitの選択を解除</button><p class="hint">待機Unitはセル詳細で選び、1〜5体の部隊に編成すると移動できます。</p></section>
+      <section id="combat-panel" class="card combat-panel"></section>
       <button id="end-turn" class="end-turn">ターンを終了 <span>→</span></button>
       <div class="save-actions"><button id="save">セーブ</button><button id="load">ロード</button><button id="reset">新規開始</button></div>
       <section class="audio-controls" aria-label="音声設定"><button id="audio-toggle" class="secondary" aria-pressed="false">音声をオン</button><label for="volume">音量 <output id="volume-value">50%</output></label><input id="volume" type="range" min="0" max="100" step="5" value="50"><button id="audio-retry" class="secondary">音声を再読み込み</button><span id="audio-status" role="status"></span></section>

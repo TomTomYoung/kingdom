@@ -35,6 +35,9 @@ test('real command results choose purchase, rejection, completion, movement and 
   result.events = result.events.filter((e) => e.type !== 'ItemCompleted');
   assert.equal(soundForResult(result, command), 'se-territory-expand');
   assert.equal(soundForResult({ ok: true, events: [{ type: 'PartyMoved' }] }, { type: 'MoveParty' }), 'se-party-move');
+  assert.equal(soundForResult({ ok: true, events: [{ type: 'CombatDamage' }] }, { type: 'AttackParty' }), 'se-combat-hit');
+  assert.equal(soundForResult({ ok: true, events: [{ type: 'CombatDamage' }, { type: 'CombatGuard' }] }, { type: 'AttackParty' }), 'se-guard');
+  assert.equal(soundForResult({ ok: true, events: [{ type: 'CombatIntercept' }, { type: 'CombatDamage' }] }, { type: 'AttackParty' }), 'se-guard');
 });
 
 test('settings survive denied storage and clamp invalid values', () => {
