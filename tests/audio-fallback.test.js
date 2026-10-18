@@ -35,6 +35,19 @@ function setup(fetcher, decodeAudioData = async () => { throw Error('codec'); })
   return { audio, context, sources, messages };
 }
 const tick = () => new Promise((resolve) => setImmediate(resolve));
+test('default fetch preserves the global receiver required by native browsers', async (t) => {
+  const original = globalThis.fetch; t.after(() => { globalThis.fetch = original; });
+  let fetched = 0;
+  globalThis.fetch = async function () {
+    assert.equal(this, globalThis, 'native fetch rejects a GameAudio receiver'); fetched++;
+    return { ok: true, arrayBuffer: async () => new ArrayBuffer(4) };
+  };
+  const { audio } = setup(undefined, async () => ({ duration: 4 }));
+  await audio.setMuted(false); await audio.startMusic();
+  assert.equal(fetched, 1); assert.equal(audio.recovered.size, 0); assert.ok(audio.music);
+  await audio.setMuted(true);
+});
+
 test('HTTP failures recover from bundled scores and only retry when explicitly requested', async () => {
   let requests = 0, works = false;
   const { audio, sources, messages } = setup(async () => { requests++; return { ok: works, status: 404, arrayBuffer: async () => new ArrayBuffer(4) }; }, async () => ({ duration: 4 }));

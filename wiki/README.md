@@ -35,3 +35,5 @@
 第2段階確認日: 2026-10-17。開始基準はmain / a9e66eaad5290c366c96eeacd07b1fce497b5dee。変更された画面操作・編成・戦闘条件を更新しました。初回調査時のmainは [636c222](https://github.com/TomTomYoung/kingdom/commit/636c222634927ec2fe54dd1b5e33d1950c31861e)、ゲームコードの基準はe0dcb3f、ルール版はm1.0です。今後の変更に合わせて項目を更新します。
 
 開発上の既知課題は [STATUS](../doc/STATUS.md)、実装詳細は [CURRENT_IMPLEMENTATION](../doc/CURRENT_IMPLEMENTATION.md)、Wikiの更新方法は [EDITING](./EDITING.md) にあります。
+
+2026-10-18: セーブの構造・参照検証と音声取得の修正を追加し、Chromiumでマップ操作・保存互換・音声復旧を確認しました。操作方法・ゲームの数値は維持しています。聴取確認は残ります。
