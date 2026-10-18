@@ -22,7 +22,7 @@ export function soundForResult(result, command) {
 }
 
 export class GameAudio {
-  constructor(assets, { storage, contextFactory, fetcher = fetch, synthesizer = createSynthBuffer, timeoutMs = 8000, onStatus = () => {} } = {}) {
+  constructor(assets, { storage, contextFactory, fetcher = (...args) => globalThis.fetch(...args), synthesizer = createSynthBuffer, timeoutMs = 8000, onStatus = () => {} } = {}) {
     this.assets = assets;
     this.storage = storage;
     this.contextFactory = contextFactory ?? (() => new (globalThis.AudioContext ?? globalThis.webkitAudioContext)());

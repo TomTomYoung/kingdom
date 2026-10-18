@@ -6,6 +6,7 @@ import { createCity } from '../models/city.js';
 import { calculateCityYields } from '../systems/yield-system.js';
 import { createUnit } from '../models/unit.js';
 import { createParty } from '../models/party.js';
+import { migrateAndValidateSave } from './save-validation.js';
 
 export function createInitialGameState(seed = 117, { radius = RULESET.mapRadius, startingParty = false } = {}) {
   const world = createWorldMap(seed, radius);
@@ -34,22 +35,10 @@ export function createInitialGameState(seed = 117, { radius = RULESET.mapRadius,
 export function cloneGameState(state) { return structuredClone(state); }
 export function serializeGameState(state) { return JSON.stringify(state); }
 export function restoreGameState(json) {
-  const value = JSON.parse(json);
-  if (value.schemaVersion !== 1 || value.rulesetVersion !== RULESET_VERSION) throw new Error('Unsupported save version');
-  value.parties ??= {};
-  value.rng.combat ??= { seed: (value.seed ^ 0x85ebca6b) >>> 0, state: (value.seed ^ 0x85ebca6b) >>> 0 };
-  value.turnOrder ??= Object.keys(value.kingdoms);
-  value.activePlayerIndex ??= Math.max(0, value.turnOrder.indexOf(value.activePlayerId));
-  value.nextIds.party ??= 1;
-  for (const unit of Object.values(value.units)) {
-    const definition = RULESET.unitTypes[unit.typeId] ?? RULESET.unitTypes.warrior;
-    unit.partyId ??= null; unit.currentHp ??= unit.hp ?? definition.maxHp; unit.maxHp ??= definition.maxHp; unit.hp = unit.currentHp;
-    for (const key of ['scaleClass', 'meleeStrength', 'rangedStrength', 'magicStrength', 'defenseStrength', 'resistance', 'armor', 'range', 'guardRate', 'moraleContribution', 'commandContribution']) unit[key] ??= definition[key];
-    unit.guardCapacityMax ??= definition.guardCapacity; unit.guardCapacityRemaining ??= unit.guardCapacityMax;
-    unit.status ??= 'active'; unit.statusEffects ??= [];
-  }
-  for (const party of Object.values(value.parties)) { party.attacksMaximum ??= 1; party.activationState ??= 'ready'; party.hasMoved ??= false; party.hasAttacked ??= false; party.reactionCharges ??= 1; }
-  return value;
+  let value;
+  try { value = JSON.parse(json); } catch { throw new Error('セーブデータが不正です: JSONを読み取れません'); }
+  if (!value || value.schemaVersion !== 1 || value.rulesetVersion !== RULESET_VERSION) throw new Error('未対応のセーブ形式です');
+  return migrateAndValidateSave(value);
 }
 
 export function addKingdom(state, { id, name, cityId, cityName, centerHex, controllerType = 'human' }) {
