@@ -1,4 +1,4 @@
-import { createDuelGameState, createRangedDuelGameState } from '../core/scenarios.js';
+import { createDuelGameState, createRangedDuelGameState, createTwoCityGameState } from '../core/scenarios.js';
 import { CombatPanel } from './combat-panel.js';
 import { createInitialGameState, restoreGameState, serializeGameState } from '../core/game-state.js';
 import { HumanController } from '../core/human-controller.js';
@@ -17,9 +17,9 @@ const controller = new HumanController('kingdom-1'), assets = new AssetStore();
 let storage;
 try { storage = window.localStorage; } catch { /* The game is playable without persistence. */ }
 const audio = new GameAudio(assets, { storage, onStatus: (text) => { $('#audio-status').textContent = text; } });
-function newGame(mode = 'single') { controller.playerId = 'kingdom-1'; const initial = mode === 'ranged-duel' ? createRangedDuelGameState(117) : mode === 'duel' ? createDuelGameState(117) : createInitialGameState(117, { startingParty: true }); return RuleSystem.execute(initial, controller.startTurn(initial)).state; }
-let state = newGame(), selectedPartyId = 'party-1', selectedUnitId = 'unit-1', selectedTileKey = '0,0,0', hoveredKey = null, reachable = new Map(), selectedEnemyId = null;
-const capital = () => state.cities[state.kingdoms[controller.playerId].cityIds[0]];
+function newGame(mode = 'single') { controller.playerId = 'kingdom-1'; const initial = mode === 'two-cities' ? createTwoCityGameState(117) : mode === 'ranged-duel' ? createRangedDuelGameState(117) : mode === 'duel' ? createDuelGameState(117) : createInitialGameState(117, { startingParty: true }); return RuleSystem.execute(initial, controller.startTurn(initial)).state; }
+let state = newGame(), selectedPartyId = 'party-1', selectedUnitId = 'unit-1', selectedTileKey = '0,0,0', hoveredKey = null, reachable = new Map(), selectedEnemyId = null, selectedCityId = 'city-1';
+const currentCity = () => state.cities[state.kingdoms[controller.playerId].cityIds.includes(selectedCityId) ? selectedCityId : state.kingdoms[controller.playerId].cityIds[0]];
 const labels = { food: '食料', production: '生産', gold: 'Gold', science: '科学', mana: 'Mana', religion: '宗教', culture: '文化', popularSupport: '人心' };
 const assetId = (name) => `icon-${name === 'popularSupport' ? 'popular-support' : name}`;
 const show = (message) => { $('#message').textContent = message; };
@@ -36,7 +36,7 @@ const map = new MapView($('#map'), $('#minimap'), assets, {
 });
 const inspection = new InspectionView($('#cell-content'), $('#unit-content'), assets, {
   onMove: moveTo, onParty: selectParty, onUnit: selectUnit, onCreate: createParty,
-  onPurchase: (key) => run(controller.purchaseTile(state, capital().id, key), `セルをGold ${tilePurchaseCost(state, capital(), state.world.tiles[key])}で購入しました`),
+  onPurchase: (key) => run(controller.purchaseTile(state, currentCity().id, key), `セルをGold ${tilePurchaseCost(state, currentCity(), state.world.tiles[key])}で購入しました`),
   onFocus: (key) => map.focus(key),
 });
 const formationPanel = new FormationPanel($('#formation'), assets, {
@@ -57,8 +57,8 @@ function run(command, success) {
   const previousPlayer = state.activePlayerId;
   state = result.state;
   if (state.activePlayerId !== previousPlayer) {
-    controller.playerId = state.activePlayerId; selectedPartyId = Object.values(state.parties).find(p => p.ownerId === controller.playerId && p.status === 'active')?.id ?? null;
-    selectedUnitId = state.parties[selectedPartyId]?.leaderUnitId ?? null; selectedEnemyId = null; selectedTileKey = state.parties[selectedPartyId]?.location ?? capital().centerHex;
+    controller.playerId = state.activePlayerId; selectedCityId = state.kingdoms[controller.playerId].cityIds[0]; selectedPartyId = Object.values(state.parties).find(p => p.ownerId === controller.playerId && p.status === 'active')?.id ?? null;
+    selectedUnitId = state.parties[selectedPartyId]?.leaderUnitId ?? null; selectedEnemyId = null; selectedTileKey = state.parties[selectedPartyId]?.location ?? currentCity().centerHex;
     formationPanel.clear(); inspection.clear(); hoveredKey = null;
   }
   show(typeof success === 'function' ? success() : success); render();
@@ -106,10 +106,10 @@ function moveTo(key) {
   if (result.ok) { selectedTileKey = key; render(); map.focus(key); }
 }
 function drawMap() {
-  map.setState(state, { playerId: controller.playerId, selectedPartyId, selectedUnitId, selectedTileKey, hoveredKey, reachable, targetPartyId: selectedEnemyId, candidates: new Set(getTerritoryCandidates(state, capital()).map((t) => t.key)) });
+  map.setState(state, { playerId: controller.playerId, selectedCityId: currentCity().id, selectedPartyId, selectedUnitId, selectedTileKey, hoveredKey, reachable, targetPartyId: selectedEnemyId, candidates: new Set(getTerritoryCandidates(state, currentCity()).map((t) => t.key)) });
 }
 function renderInspection() {
-  inspection.render({ state, playerId: controller.playerId, tileKey: selectedTileKey, unitId: selectedUnitId, partyId: selectedPartyId, reachable });
+  inspection.render({ state, playerId: controller.playerId, cityId: currentCity().id, tileKey: selectedTileKey, unitId: selectedUnitId, partyId: selectedPartyId, reachable });
   const tile = state.world.tiles[selectedTileKey], route = reachable.get(selectedTileKey);
   $('#map-selection-name').textContent = tile ? `${RULESET.terrain[tile.terrainId].name} (${tile.q}, ${tile.r}, ${tile.s})` : 'セルを選択してください';
   $('#map-move').disabled = !route; $('#map-move').textContent = route ? `ここへ移動 · 移動力 ${route.cost}` : 'ここへ移動';
@@ -133,8 +133,53 @@ function renderRoster() {
   for (const unit of Object.values(state.units).filter((u) => u.ownerId === controller.playerId && !u.partyId)) append(`待機 ${unitName(unit)} ${unit.id} · HP ${unit.currentHp}/${unit.maxHp} · (${unit.location})`, 'selectUnit', unit.id, selectedUnitId === unit.id, () => selectUnit(unit.id));
   if (!root.childNodes.length) root.textContent = 'Unitがいません。都市でUnitを生産・購入してください。';
 }
+function selectCity(id) {
+  if (!state.kingdoms[controller.playerId].cityIds.includes(id)) return;
+  selectedCityId = id; selectedTileKey = currentCity().centerHex; hoveredKey = null; inspection.clear();
+  render(); map.focus(selectedTileKey); show(`${currentCity().name}を操作します。生産・購入・領土取得はこの都市が対象です。`);
+  void audio.play('se-ui-select');
+}
+function renderCityDetails(city) {
+  const selector = $('#city-select'); selector.replaceChildren();
+  for (const id of state.kingdoms[controller.playerId].cityIds) {
+    const option = document.createElement('option'); option.value = id; option.textContent = state.cities[id].name; option.selected = id === city.id; selector.append(option);
+  }
+  const territory = Object.values(state.world.tiles).filter(tile => tile.ownerId === city.ownerId && tile.territoryCityId === city.id);
+  $('#city-territory').textContent = `所属領土 ${territory.length}セル · 収集時の作業 ${city.workedTiles.length}セル`;
+  $('#production-city').textContent = `${city.name}の生産・購入`;
+  const root = $('#city-yield-details'); root.replaceChildren();
+  const add = (tag, text, className) => { const element = document.createElement(tag); element.textContent = text; if (className) element.className = className; root.append(element); return element; };
+  const describe = values => Object.entries(values ?? {}).filter(([, value]) => value !== 0).map(([name, value]) => `${labels[name] ?? name} ${value > 0 ? '+' : ''}${value}`).join(' · ') || '産出なし';
+  const breakdown = city.lastYieldBreakdown;
+  const record = value => value !== null && typeof value === 'object' && !Array.isArray(value);
+  if (!record(breakdown) || !Array.isArray(breakdown.tiles) || !Array.isArray(breakdown.buildings) || !record(breakdown.center) || !record(breakdown.total)) {
+    add('p', '産出内訳の記録がありません。次の収集後に表示します。', 'hint');
+    add('p', `収集合計: ${describe(city.yieldSummary)}`, 'city-yield-total');
+    return;
+  }
+  const collected = breakdown.tiles;
+  add('p', '作業先は自動で選びます。表示は収集時の記録です。取得した領土や建物、増えた人口は次のターンの収集に反映されます。', 'hint');
+  add('h3', '収集時の作業タイル');
+  for (const entry of collected) {
+    const button = add('button', `${RULESET.terrain[entry.terrainId]?.name ?? entry.terrainId} (${entry.tileKey}) · ${describe(entry.yields)}`, 'secondary city-work-tile');
+    button.type = 'button'; button.dataset.workedTile = entry.tileKey;
+    button.onclick = () => { selectedTileKey = entry.tileKey; renderInspection(); drawMap(); map.focus(entry.tileKey); };
+  }
+  if (!collected.length) add('p', '作業タイルなし', 'hint');
+  add('h3', 'その他の産出');
+  add('p', `都市中心の固定産出: ${describe(breakdown.center)}`, 'city-yield-line');
+  for (const entry of breakdown.buildings ?? []) add('p', `${RULESET.items[entry.buildingId]?.name ?? entry.buildingId}: ${describe(entry.yields)}`, 'city-yield-line');
+  // The summary is the recorded collection, not a fresh calculation on selection.
+  const accounted = Object.fromEntries(Object.keys(city.yieldSummary).map(key => [key, (breakdown.center?.[key] ?? 0) + [...collected, ...(breakdown.buildings ?? [])].reduce((sum, entry) => sum + (entry.yields?.[key] ?? 0), 0)]));
+  const modifiers = Object.fromEntries(Object.entries(city.yieldSummary).map(([key, value]) => [key, value - accounted[key]]));
+  if (Object.values(modifiers).some(value => value !== 0)) add('p', `産出補正: ${describe(modifiers)}`, 'city-yield-line');
+  add('p', `収集合計: ${describe(city.yieldSummary)}`, 'city-yield-total');
+}
+
 function render() {
-  const k = state.kingdoms[controller.playerId], city = capital();
+  const k = state.kingdoms[controller.playerId], city = currentCity();
+  selectedCityId = city.id;
+  renderCityDetails(city);
   if (!state.parties[selectedPartyId]) selectedPartyId = null;
   if (!state.units[selectedUnitId]) selectedUnitId = null;
   if (!state.world.tiles[selectedTileKey]) selectedTileKey = city.centerHex;
@@ -168,12 +213,13 @@ function render() {
 const gesture = () => { void audio.unlock(); };
 document.addEventListener('pointerdown', gesture, { capture: true });
 document.addEventListener('keydown', (event) => { gesture(); if (event.key === 'Escape') deselect(); });
-document.querySelectorAll('[data-produce]').forEach((button) => { button.onclick = () => run(controller.setProduction(state, capital().id, button.dataset.produce), `${RULESET.items[button.dataset.produce].name}の生産を開始しました`); });
-document.querySelectorAll('[data-buy]').forEach((button) => { const item = RULESET.items[button.dataset.buy]; button.textContent = `${item.name}を購入 · ${item.purchaseOptions.gold}`; button.onclick = () => run(controller.purchaseItem(state, capital().id, button.dataset.buy), item.category === 'unit' ? `${item.name}を購入しました。首都の待機Unitに追加しました` : `${item.name}を建設しました。生産キューを更新しました`); });
+document.querySelectorAll('[data-produce]').forEach((button) => { button.onclick = () => run(controller.setProduction(state, currentCity().id, button.dataset.produce), `${RULESET.items[button.dataset.produce].name}の生産を開始しました`); });
+document.querySelectorAll('[data-buy]').forEach((button) => { const item = RULESET.items[button.dataset.buy]; button.textContent = `${item.name}を購入 · ${item.purchaseOptions.gold}`; button.onclick = () => run(controller.purchaseItem(state, currentCity().id, button.dataset.buy), item.category === 'unit' ? `${item.name}を購入しました。${currentCity().name}の待機Unitに追加しました` : `${item.name}を建設しました。生産キューを更新しました`); });
+$('#city-select').onchange = event => selectCity(event.target.value);
 $('#deselect-party').onclick = deselect;
 $('#map-move').onclick = () => moveTo(selectedTileKey);
 $('#zoom-in').onclick = () => map.zoomBy(1); $('#zoom-out').onclick = () => map.zoomBy(-1);
-$('#focus-city').onclick = () => { selectedTileKey = capital().centerHex; renderInspection(); drawMap(); map.focus(selectedTileKey); };
+$('#focus-city').onclick = () => { selectedTileKey = currentCity().centerHex; renderInspection(); drawMap(); map.focus(selectedTileKey); };
 $('#focus-party').onclick = () => map.focus(state.parties[selectedPartyId]?.location ?? state.units[selectedUnitId]?.location);
 $('#next-party').onclick = () => {
   const parties = Object.values(state.parties).filter((p) => p.ownerId === controller.playerId && p.status === 'active');
@@ -186,18 +232,18 @@ $('#save').onclick = () => {
   catch { reject('セーブできませんでした。ブラウザの保存設定を確認してください。'); }
 };
 $('#load').onclick = () => {
-  const before = state, selection = { selectedPartyId, selectedUnitId, selectedTileKey, hoveredKey, selectedEnemyId, playerId: controller.playerId };
+  const before = state, selection = { selectedCityId, selectedPartyId, selectedUnitId, selectedTileKey, hoveredKey, selectedEnemyId, playerId: controller.playerId };
   try {
     const save = storage?.getItem('kingdom-m1-save'); if (!save) return reject('セーブデータがありません');
     const restored = restoreGameState(save);
     if (!restored.turnOrder.every(id => restored.cities[restored.kingdoms[id].cityIds[0]])) throw new Error('このセーブは現在の画面に対応していません');
-    state = restored; controller.playerId = state.activePlayerId; selectedEnemyId = null; $('#game-mode').value = state.scenarioId === 'ranged-duel' ? 'ranged-duel' : state.turnOrder.length > 1 ? 'duel' : 'single'; selectedPartyId = null; selectedUnitId = null; selectedTileKey = capital().centerHex; hoveredKey = null;
+    state = restored; controller.playerId = state.activePlayerId; selectedCityId = state.kingdoms[controller.playerId].cityIds[0]; selectedEnemyId = null; $('#game-mode').value = state.scenarioId === 'two-cities' ? 'two-cities' : state.scenarioId === 'ranged-duel' ? 'ranged-duel' : state.turnOrder.length > 1 ? 'duel' : 'single'; selectedPartyId = null; selectedUnitId = null; selectedTileKey = currentCity().centerHex; hoveredKey = null;
     formationPanel.clear(); inspection.clear(); combatPanel.reset(); map.camera.zoom = 1; render(); map.focus(selectedTileKey); show('セーブをロードしました'); void audio.play('se-load');
-  } catch (error) { state = before; ({ selectedPartyId, selectedUnitId, selectedTileKey, hoveredKey, selectedEnemyId } = selection); controller.playerId = selection.playerId; render(); reject(error.message || 'セーブをロードできませんでした'); }
+  } catch (error) { state = before; ({ selectedCityId, selectedPartyId, selectedUnitId, selectedTileKey, hoveredKey, selectedEnemyId } = selection); controller.playerId = selection.playerId; render(); reject(error.message || 'セーブをロードできませんでした'); }
 };
 $('#reset').onclick = () => {
-  state = newGame($('#game-mode').value); selectedEnemyId = null; selectedPartyId = 'party-1'; selectedUnitId = 'unit-1'; selectedTileKey = state.parties[selectedPartyId].location; hoveredKey = null;
-  formationPanel.clear(); inspection.clear(); combatPanel.reset(); map.camera.zoom = 1; audio.stop(); void audio.startMusic(); render(); map.focus(selectedTileKey); show(state.turnOrder.length > 1 ? '二国対戦を開始しました。敵部隊を選んで攻撃できます。ターン終了で操作する王国を交代します。' : '331セルの新規マップで開始しました。最初の部隊を操作できます。'); void audio.play('se-turn-start');
+  state = newGame($('#game-mode').value); selectedCityId = state.kingdoms[controller.playerId].cityIds[0]; selectedEnemyId = null; selectedPartyId = 'party-1'; selectedUnitId = 'unit-1'; selectedTileKey = state.parties[selectedPartyId].location; hoveredKey = null;
+  formationPanel.clear(); inspection.clear(); combatPanel.reset(); map.camera.zoom = 1; audio.stop(); void audio.startMusic(); render(); map.focus(selectedTileKey); show(state.scenarioId === 'two-cities' ? '二都市の運営を開始しました。操作都市を切り替えると、生産・購入・領土取得の対象が変わります。' : state.turnOrder.length > 1 ? '二国対戦を開始しました。敵部隊を選んで攻撃できます。ターン終了で操作する王国を交代します。' : '331セルの新規マップで開始しました。最初の部隊を操作できます。'); void audio.play('se-turn-start');
 };
 function updateAudioControls() {
   $('#audio-toggle').textContent = audio.muted ? '音声をオン' : '音声をオフ'; $('#audio-toggle').setAttribute('aria-pressed', String(!audio.muted));

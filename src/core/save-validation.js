@@ -1,5 +1,8 @@
 import { RULESET } from './ruleset.js';
 import { validateFormation, occupiesMapTile, hasActiveUnits } from '../models/party.js';
+import { assignLegacyCityTerritories } from '../systems/city-territory.js';
+import { calculateCityYields } from '../systems/yield-system.js';
+import { updateDerivedCapabilities } from '../models/kingdom.js';
 
 const invalid = (path) => { throw new Error(`セーブデータが不正です: ${path}`); };
 const check = (condition, path) => { if (!condition) invalid(path); };
@@ -13,11 +16,20 @@ const reference = (records, id, path) => { text(id, path); check(Object.hasOwn(r
 const fields = (value, names, path) => { object(value, path); for (const name of names) number(value[name], `${path}.${name}`); };
 const defaultMissing = (value, key, fallback) => { if (!Object.hasOwn(value, key)) value[key] = fallback; };
 const yields = ['food', 'production', 'gold', 'science', 'mana', 'religion', 'culture'];
+function yieldRecord(value, path, negative = false) {
+  object(value, path);
+  for (const [key, amount] of Object.entries(value)) {
+    check(yields.includes(key), path);
+    number(amount, `${path}.${key}`, negative ? -Number.MAX_SAFE_INTEGER : 0);
+  }
+}
 
 // Only known historical omissions are migrated. Nulls and broken references are
 // errors, not invitations to regenerate a map, an army, or its random streams.
 export function migrateAndValidateSave(state) {
   object(state, 'root');
+  const legacyTerritory = !Object.hasOwn(state, 'cityTerritoryVersion');
+  if (!legacyTerritory) check(state.cityTerritoryVersion === 1, 'cityTerritoryVersion');
   for (const name of ['kingdoms', 'cities', 'units', 'world', 'rng', 'nextIds']) object(state[name], name);
   integer(state.seed, 'seed', -Number.MAX_SAFE_INTEGER);
   defaultMissing(state, 'parties', {}); object(state.parties, 'parties');
@@ -86,9 +98,21 @@ export function migrateAndValidateSave(state) {
     check(tile.q + tile.r + tile.s === 0 && key === `${tile.q},${tile.r},${tile.s}` && key === tile.key, `world.tiles.${key}.coordinates`);
     reference(RULESET.terrain, tile.terrainId, `world.tiles.${key}.terrainId`);
     if (tile.ownerId !== null) reference(state.kingdoms, tile.ownerId, `world.tiles.${key}.ownerId`);
+    if (legacyTerritory) {
+      // A partial new representation is damaged, not a historical save.
+      check(!Object.hasOwn(tile, 'territoryCityId'), `world.tiles.${key}.territoryCityId: 都市領土の版がありません`);
+    } else {
+      check(Object.hasOwn(tile, 'territoryCityId'), `world.tiles.${key}.territoryCityId`);
+      if (tile.ownerId === null) check(tile.territoryCityId === null, `world.tiles.${key}.territoryCityId`);
+      else {
+        const territoryCity = reference(state.cities, tile.territoryCityId, `world.tiles.${key}.territoryCityId`);
+        check(territoryCity.ownerId === tile.ownerId, `world.tiles.${key}.territoryCityId.ownerId`);
+      }
+    }
     if (tile.cityId !== null) {
       const city = reference(state.cities, tile.cityId, `world.tiles.${key}.cityId`);
       check(city.centerHex === key && city.ownerId === tile.ownerId, `world.tiles.${key}.cityId`);
+      if (!legacyTerritory) check(tile.territoryCityId === tile.cityId, `world.tiles.${key}.territoryCityId: 都市中心の所属が一致しません`);
     }
   }
   const location = (key, path) => { const tile = reference(tiles, key, path); check(tile.terrainId !== 'void', path); return tile; };
@@ -104,6 +128,7 @@ export function migrateAndValidateSave(state) {
     fields(kingdom.derived, ['militaryPower', 'governanceCapacity', 'governanceLoad'], `kingdoms.${id}.derived`);
     fields(kingdom, ['institutions', 'supportIncome', 'supportUpkeep'], `kingdoms.${id}`);
   }
+  const worked = new Set();
   for (const [id, city] of Object.entries(state.cities)) {
     object(city, `cities.${id}`); check(city.id === id, `cities.${id}.id`); text(city.name, `cities.${id}.name`);
     check(reference(state.kingdoms, city.ownerId, `cities.${id}.ownerId`).cityIds.includes(id), `cities.${id}.ownerId`);
@@ -112,8 +137,33 @@ export function migrateAndValidateSave(state) {
     integer(city.population, `cities.${id}.population`, 1);
     fields(city, ['foodStorage', 'localCultureProgress'], `cities.${id}`);
     ids(city.workedTiles, `cities.${id}.workedTiles`);
-    for (const key of city.workedTiles) check(location(key, `cities.${id}.workedTiles`).ownerId === city.ownerId, `cities.${id}.workedTiles.ownerId`);
+    check(city.workedTiles.length <= city.population, `cities.${id}.workedTiles: 作業人数が人口を超えています`);
+    for (const key of city.workedTiles) {
+      const workedTile = location(key, `cities.${id}.workedTiles`);
+      check(workedTile.ownerId === city.ownerId, `cities.${id}.workedTiles.ownerId`);
+      if (!legacyTerritory) {
+        check(workedTile.territoryCityId === id, `cities.${id}.workedTiles.territoryCityId`);
+        check(!worked.has(key), `cities.${id}.workedTiles: 作業タイルが重複しています`);
+        worked.add(key);
+      }
+    }
     fields(city.yieldSummary, yields, `cities.${id}.yieldSummary`);
+    // Historical saves may omit the display snapshot. If supplied, validate
+    // the shape now used by the city panel, without rewriting past collection.
+    if (Object.hasOwn(city, 'lastYieldBreakdown')) {
+      const path = `cities.${id}.lastYieldBreakdown`, breakdown = object(city.lastYieldBreakdown, path);
+      if (Object.hasOwn(breakdown, 'tiles')) for (const entry of array(breakdown.tiles, `${path}.tiles`)) {
+        object(entry, `${path}.tiles`); reference(tiles, entry.tileKey, `${path}.tiles.tileKey`);
+        reference(RULESET.terrain, entry.terrainId, `${path}.tiles.terrainId`);
+        yieldRecord(entry.yields, `${path}.tiles.yields`);
+      }
+      if (Object.hasOwn(breakdown, 'buildings')) for (const entry of array(breakdown.buildings, `${path}.buildings`)) {
+        object(entry, `${path}.buildings`);
+        check(reference(RULESET.items, entry.buildingId, `${path}.buildings.buildingId`).category === 'building', `${path}.buildings.buildingId`);
+        yieldRecord(entry.yields, `${path}.buildings.yields`);
+      }
+      for (const key of ['center', 'total', 'modifiers']) if (Object.hasOwn(breakdown, key)) yieldRecord(breakdown[key], `${path}.${key}`, key === 'modifiers');
+    }
     object(city.yieldModifiers, `cities.${id}.yieldModifiers`);
     for (const [key, value] of Object.entries(city.yieldModifiers)) { check(yields.includes(key), `cities.${id}.yieldModifiers`); number(value, `cities.${id}.yieldModifiers.${key}`, -Number.MAX_SAFE_INTEGER); }
     ids(city.buildings, `cities.${id}.buildings`);
@@ -175,6 +225,24 @@ export function migrateAndValidateSave(state) {
     if (party.status === 'defeated') check(!hasActiveUnits(state, party), `parties.${id}.status: 敗北部隊に活動中のUnitがあります`);
     check(['ready', 'ended'].includes(party.activationState), `parties.${id}.activationState`);
     for (const key of ['hasMoved', 'hasAttacked']) check(typeof party[key] === 'boolean', `parties.${id}.${key}`);
+  }
+  if (legacyTerritory) {
+    // Validate the whole historical save before repairing its known K-05
+    // snapshots. Never collect income, progress production, or consume RNG.
+    for (const kingdom of Object.values(state.kingdoms)) {
+      if (Object.values(tiles).some(tile => tile.ownerId === kingdom.id)) check(kingdom.cityIds.length > 0, `kingdoms.${kingdom.id}.cityIds`);
+    }
+    assignLegacyCityTerritories(state);
+    state.cityTerritoryVersion = 1;
+    for (const kingdom of Object.values(state.kingdoms)) {
+      if (kingdom.cityIds.length < 2) continue;
+      for (const cityId of kingdom.cityIds) {
+        calculateCityYields(state, state.cities[cityId]);
+        fields(state.cities[cityId].yieldSummary, yields, `cities.${cityId}.yieldSummary`);
+      }
+      updateDerivedCapabilities(kingdom, state);
+      fields(kingdom.derived, ['militaryPower', 'governanceCapacity', 'governanceLoad'], `kingdoms.${kingdom.id}.derived`);
+    }
   }
   return state;
 }

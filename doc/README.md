@@ -2,13 +2,13 @@
 
 確認・更新日: 2026-10-24
 
-目標はCivilization VI型の帝国運営、Party・Formation、Dungeon探索を統合したターン制ストラテジーです。現行はM1都市運営とM2のParty・移動・近接／遠隔戦闘の途中です。
+目標はCivilization VI型の帝国運営、Party・Formation、Dungeon探索を統合したターン制ストラテジーです。現行はM1都市運営とM2の複数都市・Party・移動・近接／遠隔戦闘の途中です。
 
 ## 現在地と読み方
 
-今回、弓兵・弩砲、各国5体の遠隔二国対戦、通常・狙い射ち・精密射撃・横列・縦列・十字・貫通、Taunt／Cover、照準と予測、敗北後の占有解消を追加しました。従来duel・旧37セル保存を維持します。両国を人が操作し、AI・勝利・都市別作業・Dungeonは未実装です。
+今回はK-05を修正し、都市別の領土・市民作業・文化／Gold取得、二都市運営と都市切替・産出内訳を追加しました。弓兵・弩砲と7攻撃、敗北非占有、旧37セル保存を維持します。FoundCity・Settler、AI、勝利、Dungeonは未実装です。
 
-まず[現行実装](CURRENT_IMPLEMENTATION.md)、[課題](STATUS.md)、[次作業](HANDOFF.md)を確認してください。操作は[戦闘操作](COMBAT_OPERATIONS.md)と[地図操作](MAP_OPERATIONS.md)、定義・配分・保存互換は[遠隔仕様](RANGED_COMBAT.md)にあります。次の優先事項はK-05と都市別領土・市民作業です。
+まず[現行実装](CURRENT_IMPLEMENTATION.md)、[課題](STATUS.md)、[次作業](HANDOFF.md)を確認してください。操作は[戦闘操作](COMBAT_OPERATIONS.md)と[地図操作](MAP_OPERATIONS.md)、定義・配分・保存互換は[遠隔仕様](RANGED_COMBAT.md)にあります。都市操作・所属・保存移行は[CITY_MANAGEMENT.md](CITY_MANAGEMENT.md)、次の優先事項はSettler／FoundCityです。
 
 起動は `npm run dev`、検証は `npm test`、`npm run check`、`npm run check:assets`。Canvas 2D／DOM・ES Modules・Node標準テストを使い、Phaser／Vite／Vitestは使いません。プレイヤー向け名称・費用・操作は[Kingdom Wiki](../wiki/README.md)で確認できます。
 
@@ -35,6 +35,7 @@
 
 17. [COMBAT_OPERATIONS.md](COMBAT_OPERATIONS.md): 二国交互操作・遠隔照準・護衛・予測
 18. [RANGED_COMBAT.md](RANGED_COMBAT.md): 新兵種・7攻撃定義・payload・命中・範囲配分・保存互換
+19. [CITY_MANAGEMENT.md](CITY_MANAGEMENT.md): 都市別の領土・市民作業・取得・都市切替・旧保存移行
 
 ## 確定した目標方針（実装完了を意味しません）
 

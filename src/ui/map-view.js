@@ -98,7 +98,8 @@ export class MapView {
     camera.clamp(state.world.radius, rect.width, rect.height);
     const scale = camera.zoom, size = HEX_SIZE * scale, project = (hex) => camera.project(hex, rect.width, rect.height);
     const visible = (p) => p.x > -size * 2 && p.y > -size * 2 && p.x < rect.width + size * 2 && p.y < rect.height + size * 2;
-    const { selectedPartyId, selectedUnitId, selectedTileKey, hoveredKey, reachable = new Map(), candidates = new Set(), playerId } = this.options;
+    const { selectedPartyId, selectedUnitId, selectedTileKey, hoveredKey, reachable = new Map(), candidates = new Set(), playerId, selectedCityId } = this.options;
+    const worked = new Set(state.cities[selectedCityId]?.workedTiles ?? []);
     for (const tile of Object.values(state.world.tiles)) {
       const p = project(tile); if (!visible(p)) continue;
       hexPath(ctx, p.x, p.y, size - 2);
@@ -108,6 +109,14 @@ export class MapView {
       const canMove = reachable.has(tile.key);
       ctx.strokeStyle = canMove ? '#9de4df' : tile.ownerId ? '#e2c472' : candidates.has(tile.key) ? '#8b9868' : '#37453e'; ctx.lineWidth = canMove || tile.ownerId ? 2 : 1;
       ctx.setLineDash(canMove ? [5, 3] : []); ctx.stroke(); ctx.setLineDash([]);
+      if (tile.territoryCityId === selectedCityId && tile.ownerId === playerId) {
+        hexPath(ctx, p.x, p.y, size - 7 * scale); ctx.strokeStyle = '#96bda2'; ctx.lineWidth = 1.5; ctx.stroke();
+      }
+      if (worked.has(tile.key)) {
+        ctx.beginPath(); ctx.arc(p.x, p.y + 22 * scale, 4 * scale, 0, Math.PI * 2); ctx.fillStyle = '#d6eac0'; ctx.fill();
+        ctx.strokeStyle = '#233f2e'; ctx.lineWidth = 1; ctx.stroke();
+      }
+      hexPath(ctx, p.x, p.y, size - 2);
       if (tile.key === selectedTileKey || tile.key === hoveredKey) { ctx.strokeStyle = tile.key === selectedTileKey ? '#ffffff' : '#fff1be'; ctx.lineWidth = tile.key === selectedTileKey ? 3 : 2; ctx.stroke(); }
       if (tile.cityId) {
         if (!assets.draw(ctx, 'building-city', p.x, p.y - 11 * scale, scale)) { ctx.fillStyle = '#ffe2a0'; ctx.font = `${24 * scale}px serif`; ctx.textAlign = 'center'; ctx.fillText('城', p.x, p.y); }

@@ -2,11 +2,11 @@
 
 確認・更新日: 2026-10-24
 
-開始基準: main / f3ca8a5ee0f7e9619ec8e7fa5ccd6ec4344fe1cb（PR #3）。弓兵・弩砲、遠隔5体の二国対戦、照準・範囲・貫通、Taunt／Cover、敗北Partyの非占有（K-10）を追加しました。操作は[COMBAT_OPERATIONS.md](COMBAT_OPERATIONS.md)、定義と配分は[RANGED_COMBAT.md](RANGED_COMBAT.md)、検証記録は[ASSET_INTEGRATION_QA.md](ASSET_INTEGRATION_QA.md)を参照してください。
+開始基準: main / d3f79162e0a6254dc36ed8f580a8a1d90c8f5761（PR #4）。K-05の重複市民作業を修正し、都市別の領土・文化取得・Gold購入、都市切替と産出内訳、二都市運営モードを追加しました。操作・モデル・保存移行は[CITY_MANAGEMENT.md](CITY_MANAGEMENT.md)を参照してください。前回の弓兵・弩砲、7攻撃、K-10の敗北非占有も維持しています。
 
 ## 1. 範囲と現在地
 
-現在の実装はM1の都市運営ループと、M2のParty作成・移動・近接・遠隔・照準・範囲戦闘です。画面から使える範囲とcore APIだけの範囲を分けて記録します。「内部実装済み」は目標仕様の全受入条件を満たした意味ではありません。
+現在の実装はM1の都市運営ループと、M2の複数都市運営・Party作成・移動・近接・遠隔・照準・範囲戦闘です。画面から使える範囲とcore APIだけの範囲を分けて記録します。「内部実装済み」は目標仕様の全受入条件を満たした意味ではありません。
 
 目標仕様は [SPECIFICATION.md](./SPECIFICATION.md)、未修正課題と検証結果は [STATUS.md](./STATUS.md)、次作業は [HANDOFF.md](./HANDOFF.md) を参照してください。旧Phaser版は [LEGACY_IMPLEMENTATION.md](./LEGACY_IMPLEMENTATION.md) に保存しています。
 
@@ -51,13 +51,15 @@ npm run check
 
 戦士・弓兵・弩砲とモニュメントの生産・Gold購入、未所有の合法タイル購入、選択セルの未編成Unitを1〜5体指定してParty化し、現在の移動力で到達できるセルまで経路移動できます。待機Unitも地図に表示され、一覧と地図の両方から選択できます。
 
-左クリックはセル・駒の詳細確認です。クリックだけでは移動・購入を実行しません。部隊選択後に目的地を選び「ここへ移動」、または目的地を右クリックすると移動します。領土はセル詳細の購入ボタンで購入します。到達可能セルの点線、経路と消費移動力、所有地の金枠を表示します。解除ボタン・Escで部隊とUnitを解除し、ロードでも解除、新規開始では初期部隊を選択します。セル詳細は座標・地形・所有・都市・基本産出・移動費・駐留一覧、Unit詳細はHP・状態・近接/遠隔・防御/装甲・射程・所属・配置・指揮者・部隊行動値を表示します。Party欄の3×3配置で、Unitを選んで空き枠へ移動・他Unitと交換できます。指揮者とHPを表示し、変更はSetFormationを通します。二国交互操作、敵選択、近接・遠隔の合法性表示、予測・攻撃、護衛設定、戦闘ログを利用できます。生産キュー編集、JSONファイル入出力、任意プレイヤー設定のUIはありません。ドラッグ・矢印キーによるカメラ移動、1/2/3倍の等方整数ズーム、クリックで移動する全体図、首都・選択Unitへのフォーカス、部隊の順送りがあります。旧版の文章イベント窓は未移植です。操作は[MAP_OPERATIONS.md](MAP_OPERATIONS.md)を参照してください。
+左クリックはセル・駒の詳細確認です。クリックだけでは移動・購入を実行しません。部隊選択後に目的地を選び「ここへ移動」、または目的地を右クリックすると移動します。領土はセル詳細の購入ボタンで購入します。到達可能セルの点線、経路と消費移動力、所有地の金枠を表示します。解除ボタン・Escで部隊とUnitを解除し、ロードでも解除、新規開始では初期部隊を選択します。セル詳細は座標・地形・所有・都市・基本産出・移動費・駐留一覧、Unit詳細はHP・状態・近接/遠隔・防御/装甲・射程・所属・配置・指揮者・部隊行動値を表示します。Party欄の3×3配置で、Unitを選んで空き枠へ移動・他Unitと交換できます。指揮者とHPを表示し、変更はSetFormationを通します。二国交互操作、敵選択、近接・遠隔の合法性表示、予測・攻撃、護衛設定、戦闘ログを利用できます。生産キュー編集、JSONファイル入出力、任意プレイヤー設定のUIはありません。ドラッグ・矢印キーによるカメラ移動、1/2/3倍の等方整数ズーム、クリックで移動する全体図、選択都市・選択Unitへのフォーカス、部隊の順送りがあります。旧版の文章イベント窓は未移植です。操作は[MAP_OPERATIONS.md](MAP_OPERATIONS.md)を参照してください。
 
 「二国対戦（交互操作）」を選んで新規開始すると、二国・各1都市・戦士3体ずつの隣接部隊から始まります。「遠隔部隊の二国対戦」は戦士2・弓兵2・弩砲1の5体ずつです。攻撃内容とUnit／枠／行／列の照準を選び、命中率・範囲・予測被害を表示します。ターン終了で操作王国と首都が切り替わり、双方を人が操作します。AIはありません。[戦闘操作](COMBAT_OPERATIONS.md)を参照してください。
 
+「二都市運営」は同一王国の暁都（0,0,0）と東都（4,-4,0）で始まります。「操作する都市」で表示と生産・購入・領土取得先を切り替えます。地図は選択都市の領土を緑の内枠、収集時の作業を緑点で示します。セル詳細は所有国・所属都市・都市中心・作業記録を分けます。選択都市は表示状態で、ロード成功後は現在手番の先頭都市へ戻り、ロード失敗では都市選択も維持します。
+
 ## 4. GameStateとCommand
 
-GameStateはschemaVersion 1、rulesetVersion m1.0です。主な実キーはphase、world、turnOrder、activePlayerId、activePlayerIndex、kingdoms、cities、units、parties、rng、nextIds、commandLog、eventLogです。目標文書のcurrentPhase、worldMap、playerSlots等と同名とは限りません。
+GameStateはschemaVersion 1、rulesetVersion m1.0、cityTerritoryVersion 1です。主な実キーはphase、world、turnOrder、activePlayerId、activePlayerIndex、kingdoms、cities、units、parties、rng、nextIds、commandLog、eventLogです。目標文書のcurrentPhase、worldMap、playerSlots等と同名とは限りません。
 
 RuleSystem.execute(original, command)は成功時に複製したstateとeventsを返し、検証で拒否した場合は元stateを返します。commandIdの重複、playerId、手番、turnを共通検証します。全10Commandの種別・phase・必須payload・配列と辞書の型を事前検証し、参照先・所有者を処理前に確認します。拒否時は元stateと空eventsを返し、RNG・資源・ID・ログを変更しません。保存読込時のGameState構造検証はK-09で実装済みです。
 
@@ -76,7 +78,7 @@ RuleSystem.execute(original, command)は成功時に複製したstateとevents�
 
 HumanControllerは上記のCommandを生成します。AIController、RemoteController、ReplayController、合法手一覧APIはありません。
 
-addKingdomは別王国とその都市を追加できるセットアップ用関数です。Command経由のFoundCityや同一王国内の複数都市運営、プレイヤー設定画面ではありません。
+addKingdomは別王国とその都市、addCityは同一王国の都市を追加するセットアップ用関数です。createTwoCityGameStateで同一王国の暁都・東都を配置し、画面で切り替えて運営できます。Command経由のFoundCity・Settler消費・任意プレイヤー設定は未実装です。
 
 ## 5. ターン
 
@@ -99,7 +101,7 @@ Dungeon・World Resolution、勝利判定、オートセーブ、自然HP回復�
 
 新規開始は半径10のpointy-top Hexマップで、全331タイルです。既存セーブのworldを再生成しないため、半径3・37セルの旧セーブはそのまま続けられます。平原、草原、森林、丘陵、霊脈からseed付きで地形を選び、外周には確率でVoidを置きます。連続地形生成はまだなく、目標の連続性ある地形とは異なります。
 
-初期領土は中心と隣接6タイルです。所有者はTile.ownerIdを正本とします。文化取得・Gold購入の候補は自国領のいずれかに隣接する未所有・非VoidのHexです。都市別の所属範囲や最大取得半径はありません。
+初期領土は中心と隣接6タイルです。Tile.ownerIdは所有王国、Tile.territoryCityIdは所属都市、Tile.cityIdは都市中心の参照です。文化取得・Gold購入の候補は実行都市の所属する非Void領土に隣接する未所有・非VoidのHexだけです。共通境界の候補は先に取得した都市へ固定所属し、後から他都市へ自動移管しません。最大取得半径は設けていません。
 
 文化取得コストは1タイル10です。候補評価は地形Yield合計×3－都市中心からの距離で、同点は領土用RNGで選びます。蓄積が十分なら同じ開始処理で複数取得します。候補がなければ文化進捗を残します。
 
@@ -109,9 +111,9 @@ Hex.round、neighbor、distance、range、正規化Edge keyがあります。riv
 
 ## 7. Yield・人口・生産
 
-Yieldはfood、production、gold、science、mana、religion、cultureです。市民配置は自国の全非Void所有タイルを評価して人口数だけ選びます。都市中心にfood 2、production 1、gold 2、science 1、culture 1を固定加算し、モニュメントはculture 2を加算します。
+Yieldはfood、production、gold、science、mana、religion、cultureです。市民配置は当該都市の所属する自国の非Voidタイルを評価して人口数まで選びます。同じタイルを複数都市が作業しません。従来の評価式と同点時のタイルキー順を維持し、作業半径の制限は追加していません。都市中心にfood 2、production 1、gold 2、science 1、culture 1を固定加算し、モニュメントはculture 2を加算します。
 
-都市のlastYieldBreakdownにタイル・建物・中心・合計を保存します。UIは合計Yieldを表示し、完全な内訳表示はありません。食料成長閾値は12＋現在人口×6で、成長時にpopulationとhumanResources.nativeを1増やします。
+都市のlastYieldBreakdownにタイル・建物・中心・実適用補正・合計を保存します。補正後の産出は最低0です。UIは選択都市の収集時の合計と内訳、作業タイルを表示し、都市切替で再計算しません。土地・建物の購入と人口増加は次の収集に反映します。旧保存で内訳が省略されていれば、合計と内訳記録がない旨を表示します。食料成長閾値は12＋現在人口×6で、成長時にpopulationとhumanResources.nativeを1増やします。
 
 Productionは都市ローカルです。currentItemId、queue、progressByItemを持ち、費用到達時に完成、余剰を次キューへ投入し、キューが空なら余剰を捨てます。対象切替で途中進捗を保持します。
 
@@ -176,6 +178,8 @@ HP0ではindividualならdowned、他はshatteredです。現行定義はdetachm
 serializeGameState／restoreGameStateでJSON化・復元します。UIはlocalStorageのkingdom-m1-save一枠を使用します。save-validation.jsで必須構造・数値範囲・地形と都市・所属の双方向参照・3×3配置・次ID・手番・RNGを検証し、復元成功後だけstateを置換します。guardOrders・guardRangeの欠落は空指示・距離1で補完し、既存の率0・容量0は維持します。accuracy欠落は1、evasion／tauntStrength／coverPower欠落は0で補完し、全確率を0〜1の有限値で検証します。statusEffectsは空でない文字列、またはtype/idに空でない文字列を持つ辞書に限ります。活動中Partyの重複占有と、生存Unitを含む偽の敗北Partyを拒否し、敗北記録と生存Partyの同座標を許可します。既知M1のParty・turnOrder・戦闘フィールドの欠落を補完し、旧37セルを再生成せず維持します。nullや不明参照を既定値で隠さず、未知版を拒否します。失敗時は現在の対局・選択・カメラ倍率を維持します。
 
 2026-10-17 第2段階: Node標準44テスト、全45 JavaScriptファイルの構文検査、30素材の整合性・復号に成功しました。実UIのDOM/Canvas検証では3×3配置の移動・交換・保存復元、全音声ファイルがHTTP 404の場合の再合成、再試行後のBGM重複防止を確認しました。実ブラウザのCSS・音声出力と人による聴取は未確認です。 保存に失敗しても進行を継続でき、不正ロードは元のstateへ戻します。この第2段階時点ではK-09は未実装でした。現行の対応は本節冒頭とSTATUSを参照してください。詳細は[検証記録](ASSET_INTEGRATION_QA.md)。
+
+都市所属はcityTerritoryVersion 1で区別します。版と全タイルの所属が共にない完全な旧保存のみ、同国最寄り都市・同距離ID順で所属を補完します。一都市王国の収集記録は保持し、複数都市王国の重複作業・表示集計・派生能力だけ再計算します。資源・生産・食料・文化・RNG・ログは再処理しません。現行形式の一部欠落、所属国不一致、中心不整合、他都市作業・人口超過は拒否します。存在する収集内訳の型・参照・数値も検証します。[詳細と検証](CITY_MANAGEMENT.md)。
 
 ## 12. 2026-10-16再調査の結果
 

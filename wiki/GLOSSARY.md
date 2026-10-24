@@ -17,18 +17,19 @@
 | 文化 | culture | [都市拡張と王国の統治を支える産出](./resources/culture.md) |
 | 人心 | popularSupport | [王国への加入・随従意思を表す備蓄](./resources/popular-support.md) |
 | 産出 | Yield | [都市がターン開始に得る7種類の量](./resources/README.md) |
-| 市民配置・働くタイル | workedTiles | [人口数まで自動で選ぶ産出元](./rules/cities.md) |
+| 市民配置・働くタイル | workedTiles | [その都市の所属領土から人口数まで選ぶ産出元](./rules/cities.md) |
 | 人口・人的資源 | population / HumanResource | [都市住民の規模と王国の人員区分](./rules/population.md) |
 | 軍事力 | MilitaryPower | [王国の軍事基盤の表示指標](./rules/governance.md) |
 | 統治力・統治容量 | GovernanceCapacity | [領土・組織を管理する能力](./rules/governance.md) |
 | 統治負荷 | GovernanceLoad | [領土・人口などの管理負担](./rules/governance.md) |
-| 都市・暁都 | City | [人口・産出・生産を持つ拠点](./rules/cities.md) |
+| 都市・暁都・東都 | City | [人口・産出・生産を持つ拠点](./rules/cities.md) |
 | 王国・黎明王国 | Kingdom | [備蓄・都市・人材を持つ勢力](./rules/turns.md) |
 | 区画 | District | [都市で建設する予定の分類](./districts/README.md) |
 | 建物・建造物 | Building | [現在はモニュメント1種類](./buildings/README.md) |
 | モニュメント | monument | [文化+2の建物](./buildings/monument.md) |
 | タイル改善 | Improvement | [労働者が建設・修理する予定の施設](./units/builder.md) |
-| 領土 | Territory | [王国が所有するHex](./rules/territory.md) |
+| 領土 | Territory | [王国が所有し、一つの都市に所属するHex](./rules/territory.md) |
+| 所属都市・都市中心 | territoryCityId / cityId | [作業・拡張を担当する都市と、中心施設の区別](./rules/territory.md) |
 | 地形・六角タイル | Terrain / Hex | [6種類の地形と産出・移動コスト](./terrain/README.md) |
 | 技術・制度・政策 | Technology / Institution / Policy | [研究や統治の解禁体系の予定](./rules/research.md) |
 

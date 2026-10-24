@@ -60,3 +60,7 @@ select{display:block;width:100%;max-width:100%;min-width:0;padding:9px;margin-to
 .enemy-grid .attack-area{outline:2px solid #e7cb77;outline-offset:-3px}.enemy-grid .damage-target{background:#542d25}.enemy-grid .support-target{border:2px solid #83b7d0}.combat-panel .hint{text-align:left;line-height:1.6}.combat-panel small{line-height:1.6}
 .unit-type-badge{display:inline-flex;width:40px;height:40px;align-items:center;justify-content:center;border:1px solid #c4ab72;background:#2b4336;color:#f2dfad;font-size:21px;line-height:1;flex:none}
 select:focus-visible{outline:2px solid #fff1be;outline-offset:3px}
+
+/* City selection is view state; the collection details are a recorded snapshot. */
+.city-card>label{font-size:12px;color:#c8cbaa}.city-card .city-heading{margin-top:14px;gap:8px}.city-card .hint{text-align:left;line-height:1.6}.city-section-label{font-size:12px;font-weight:500;color:#c7c9a3;margin:14px 0 4px}
+#city-work-panel{border-top:1px solid #53634c;margin:12px 0;padding-top:10px;font-size:12px;line-height:1.7}#city-work-panel summary{cursor:pointer;color:#d9cdab}#city-work-panel h3{font-size:12px;font-weight:500;color:#c7c9a3;margin:12px 0 6px}.city-work-tile{display:block;width:100%;text-align:left;margin:5px 0;line-height:1.6;overflow-wrap:anywhere}.city-yield-line,.city-yield-total{overflow-wrap:anywhere;margin:8px 0}.city-yield-total{border-top:1px solid #53634c;padding-top:8px}#city-territory,#production-city{font-size:12px}.map-toolbar>span:last-child{line-height:1.7}

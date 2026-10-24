@@ -4,6 +4,7 @@ import { Hex } from '../world/hex.js';
 import { createKingdom, updateDerivedCapabilities } from '../models/kingdom.js';
 import { createCity } from '../models/city.js';
 import { calculateCityYields } from '../systems/yield-system.js';
+import { claimTileForCity } from '../systems/city-territory.js';
 import { createUnit } from '../models/unit.js';
 import { createParty } from '../models/party.js';
 import { migrateAndValidateSave } from './save-validation.js';
@@ -14,10 +15,10 @@ export function createInitialGameState(seed = 117, { radius = RULESET.mapRadius,
   const city = createCity(kingdom.id, center.key);
   for (const hex of [center, ...Array.from({ length: 6 }, (_, index) => center.neighbor(index))]) {
     const tile = world.tiles[hex.key];
-    if (tile) { tile.ownerId = kingdom.id; if (hex.equals(center)) tile.cityId = city.id; }
+    if (tile) { tile.ownerId = kingdom.id; tile.territoryCityId = city.id; if (hex.equals(center)) tile.cityId = city.id; }
   }
   const state = {
-    schemaVersion: 1, rulesetVersion: RULESET_VERSION, seed, currentTurn: 1, phase: 'PLAYER_ACTION', lastProcessedTurn: 0,
+    schemaVersion: 1, rulesetVersion: RULESET_VERSION, cityTerritoryVersion: 1, seed, currentTurn: 1, phase: 'PLAYER_ACTION', lastProcessedTurn: 0,
     activePlayerId: kingdom.id, activePlayerIndex: 0, turnOrder: [kingdom.id], kingdoms: { [kingdom.id]: kingdom }, cities: { [city.id]: city }, units: {}, parties: {}, world,
     rng: { territory: { seed: (seed ^ 0x9e3779b9) >>> 0, state: (seed ^ 0x9e3779b9) >>> 0 }, combat: { seed: (seed ^ 0x85ebca6b) >>> 0, state: (seed ^ 0x85ebca6b) >>> 0 } },
     nextIds: { unit: 1, party: 1, command: 1 }, commandLog: [], eventLog: [],
@@ -47,8 +48,27 @@ export function addKingdom(state, { id, name, cityId, cityName, centerHex, contr
   if (!centerTile || centerTile.terrainId === 'void' || centerTile.ownerId !== null) throw new Error('都市を配置できないHexです');
   const kingdom = createKingdom(id, name, [cityId], controllerType); const city = createCity(id, center.key, cityId, cityName);
   for (const hex of [center, ...Array.from({ length: 6 }, (_, index) => center.neighbor(index))]) {
-    const tile = state.world.tiles[hex.key]; if (tile?.ownerId === null && tile.terrainId !== 'void') tile.ownerId = id;
+    const tile = state.world.tiles[hex.key]; if (tile?.ownerId === null && tile.terrainId !== 'void') { tile.ownerId = id; tile.territoryCityId = cityId; }
   }
   centerTile.cityId = cityId; state.kingdoms[id] = kingdom; state.cities[cityId] = city; state.turnOrder.push(id);
   calculateCityYields(state, city); updateDerivedCapabilities(kingdom, state); return state;
+}
+
+// Scenario/setup helper. FoundCity, Settler costs and city spacing remain separate.
+export function addCity(state, { ownerId, id, name = '新都', centerHex }) {
+  if (typeof id !== 'string' || !id || Object.hasOwn(state.cities, id) || ['__proto__', 'constructor', 'prototype'].includes(id)) throw new Error('City IDが不正または重複しています');
+  const kingdom = Object.hasOwn(state.kingdoms, ownerId) && state.kingdoms[ownerId];
+  if (!kingdom) throw new Error('不明な王国です');
+  const center = Hex.fromKey(centerHex), tile = state.world.tiles[center.key];
+  if (!tile || tile.terrainId === 'void' || tile.cityId !== null || tile.territoryCityId !== null
+    || (tile.ownerId !== null && tile.ownerId !== ownerId)) throw new Error('都市を配置できないHexです');
+  const city = createCity(ownerId, center.key, id, name);
+  state.cities[id] = city; kingdom.cityIds.push(id);
+  claimTileForCity(state, city, tile); tile.cityId = id;
+  for (let direction = 0; direction < 6; direction++) {
+    const neighbor = state.world.tiles[center.neighbor(direction).key];
+    if (neighbor?.ownerId === null && neighbor.territoryCityId === null && neighbor.cityId === null && neighbor.terrainId !== 'void') claimTileForCity(state, city, neighbor);
+  }
+  calculateCityYields(state, city); updateDerivedCapabilities(kingdom, state);
+  return state;
 }
