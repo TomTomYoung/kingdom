@@ -8,10 +8,14 @@ export const RULESET = Object.freeze({
   popularSupportCap: 100,
   combat: Object.freeze({ baseDamage: 30, strengthExponent: 0.04, randomMinimum: 0.85, randomMaximum: 1.15, minimumDamage: 1, maximumDamage: 90, moraleDamageRate: 0.25 }),
   unitTypes: Object.freeze({
-    warrior: Object.freeze({ scaleClass: 'detachment', maxHp: 100, meleeStrength: 20, rangedStrength: 0, magicStrength: 0, defenseStrength: 18, resistance: 5, armor: 2, range: 1, guardRate: 0.5, guardCapacity: 50, guardRange: 1, moraleContribution: 10, commandContribution: 5 }),
+    warrior: Object.freeze({ scaleClass: 'detachment', maxHp: 100, meleeStrength: 20, rangedStrength: 0, magicStrength: 0, defenseStrength: 18, resistance: 5, armor: 2, range: 1, guardRate: 0.5, guardCapacity: 50, guardRange: 1, moraleContribution: 10, commandContribution: 5, accuracy: 1, evasion: 0, tauntStrength: 0.15, coverPower: 0.25 }),
+    archer: Object.freeze({ scaleClass: 'detachment', maxHp: 100, meleeStrength: 10, rangedStrength: 22, magicStrength: 0, defenseStrength: 12, resistance: 5, armor: 1, range: 2, guardRate: 0, guardCapacity: 0, guardRange: 0, moraleContribution: 8, commandContribution: 3, accuracy: 0.9, evasion: 0.05, tauntStrength: 0, coverPower: 0.1 }),
+    ballista: Object.freeze({ scaleClass: 'construct', maxHp: 100, meleeStrength: 8, rangedStrength: 25, magicStrength: 0, defenseStrength: 10, resistance: 3, armor: 2, range: 3, guardRate: 0, guardCapacity: 0, guardRange: 0, moraleContribution: 6, commandContribution: 2, accuracy: 0.85, evasion: 0, tauntStrength: 0, coverPower: 0 }),
   }),
   items: Object.freeze({
     warrior: Object.freeze({ itemId: 'warrior', name: '戦士', category: 'unit', productionCost: 12, purchaseOptions: { gold: 48 } }),
+    archer: Object.freeze({ itemId: 'archer', name: '弓兵', category: 'unit', productionCost: 18, purchaseOptions: { gold: 72 } }),
+    ballista: Object.freeze({ itemId: 'ballista', name: '弩砲', category: 'unit', productionCost: 28, purchaseOptions: { gold: 112 } }),
     monument: Object.freeze({ itemId: 'monument', name: 'モニュメント', category: 'building', productionCost: 20, purchaseOptions: { gold: 80 } }),
   }),
   terrain: Object.freeze({

@@ -14,7 +14,7 @@
 
 ## 用途
 
-[戦士](../units/warrior.md)は48、[モニュメント](../buildings/monument.md)は80で即時完成します。費用は生産進捗によらず全額です。
+[戦士](../units/warrior.md)は48、[弓兵](../units/archer.md)は72、[弩砲](../units/ballista.md)は112、[モニュメント](../buildings/monument.md)は80で即時完成します。費用は生産進捗によらず全額です。
 
 [領土購入](../rules/territory.md)では対象ごとの費用を一括で支払います。他国領や虚無は購入できません。購入で都市の文化進捗は減りません。
 

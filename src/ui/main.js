@@ -1,4 +1,4 @@
-import { createDuelGameState } from '../core/scenarios.js';
+import { createDuelGameState, createRangedDuelGameState } from '../core/scenarios.js';
 import { CombatPanel } from './combat-panel.js';
 import { createInitialGameState, restoreGameState, serializeGameState } from '../core/game-state.js';
 import { HumanController } from '../core/human-controller.js';
@@ -17,7 +17,7 @@ const controller = new HumanController('kingdom-1'), assets = new AssetStore();
 let storage;
 try { storage = window.localStorage; } catch { /* The game is playable without persistence. */ }
 const audio = new GameAudio(assets, { storage, onStatus: (text) => { $('#audio-status').textContent = text; } });
-function newGame(mode = 'single') { controller.playerId = 'kingdom-1'; const initial = mode === 'duel' ? createDuelGameState(117) : createInitialGameState(117, { startingParty: true }); return RuleSystem.execute(initial, controller.startTurn(initial)).state; }
+function newGame(mode = 'single') { controller.playerId = 'kingdom-1'; const initial = mode === 'ranged-duel' ? createRangedDuelGameState(117) : mode === 'duel' ? createDuelGameState(117) : createInitialGameState(117, { startingParty: true }); return RuleSystem.execute(initial, controller.startTurn(initial)).state; }
 let state = newGame(), selectedPartyId = 'party-1', selectedUnitId = 'unit-1', selectedTileKey = '0,0,0', hoveredKey = null, reachable = new Map(), selectedEnemyId = null;
 const capital = () => state.cities[state.kingdoms[controller.playerId].cityIds[0]];
 const labels = { food: '食料', production: '生産', gold: 'Gold', science: '科学', mana: 'Mana', religion: '宗教', culture: '文化', popularSupport: '人心' };
@@ -47,7 +47,7 @@ const formationPanel = new FormationPanel($('#formation'), assets, {
 
 const combatPanel = new CombatPanel($('#combat-panel'), {
   onTarget: (id) => { if (id) selectParty(id); else { selectedEnemyId = null; render(); } },
-  onAttack: (id, type) => run(controller.attackParty(state, selectedPartyId, id, type), '戦闘を解決しました。HP・護衛・反撃は戦闘ログで確認できます。'),
+  onAttack: (id, type, targeting) => run(controller.attackParty(state, selectedPartyId, id, type, targeting), '戦闘を解決しました。HP・護衛・反撃は戦闘ログで確認できます。'),
   onGuard: (partyId, guardId, targetId, mode) => run(controller.setGuardOrder(state, partyId, guardId, targetId, mode), '護衛設定を変更しました'),
 });
 
@@ -129,9 +129,9 @@ function renderRoster() {
     const button = document.createElement('button'); button.className = 'secondary roster-entry'; button.textContent = text; button.dataset[attribute] = id;
     button.setAttribute('aria-pressed', String(selected)); button.onclick = onClick; root.append(button);
   };
-  for (const party of Object.values(state.parties).filter((p) => p.ownerId === controller.playerId)) append(`${partyName(party)} · ${party.unitIds.length}体 · 移動 ${party.movementRemaining}/${party.movementMaximum} · (${party.location})`, 'selectParty', party.id, selectedPartyId === party.id, () => selectParty(party.id));
+  for (const party of Object.values(state.parties).filter((p) => p.ownerId === controller.playerId)) append(`${partyName(party)}${party.status === 'defeated' ? '（敗北記録・占有なし）' : ''} · ${party.unitIds.length}体 · 移動 ${party.movementRemaining}/${party.movementMaximum} · (${party.location})`, 'selectParty', party.id, selectedPartyId === party.id, () => selectParty(party.id));
   for (const unit of Object.values(state.units).filter((u) => u.ownerId === controller.playerId && !u.partyId)) append(`待機 ${unitName(unit)} ${unit.id} · HP ${unit.currentHp}/${unit.maxHp} · (${unit.location})`, 'selectUnit', unit.id, selectedUnitId === unit.id, () => selectUnit(unit.id));
-  if (!root.childNodes.length) root.textContent = 'Unitがいません。都市で戦士を生産・購入してください。';
+  if (!root.childNodes.length) root.textContent = 'Unitがいません。都市でUnitを生産・購入してください。';
 }
 function render() {
   const k = state.kingdoms[controller.playerId], city = capital();
@@ -153,9 +153,9 @@ function render() {
   if (city.buildings.includes('monument')) $('#buildings').append(assets.icon('building-monument', 'unit-art'), 'モニュメント建設済み');
   const item = city.production.currentItemId && RULESET.items[city.production.currentItemId];
   $('#production-status').textContent = item ? `${item.name}: ${city.production.progressByItem[item.itemId] ?? 0} / ${item.productionCost}` : '生産対象を選択してください';
-  document.querySelectorAll('[data-produce]').forEach((button) => { const item = RULESET.items[button.dataset.produce]; button.replaceChildren(assets.icon(item.category === 'unit' ? 'unit-warrior' : 'building-monument', 'unit-art'), `${item.name}を生産`); });
+  document.querySelectorAll('[data-produce]').forEach((button) => { const item = RULESET.items[button.dataset.produce]; button.replaceChildren(assets.icon(item.category === 'unit' ? `unit-${item.itemId}` : 'building-monument', 'unit-art'), `${item.name}を生産`); });
   $('#party-status').replaceChildren();
-  if (party) { $('#party-status').append(assets.icon('unit-warrior', 'unit-art'), `${partyName(party)} · ${party.unitIds.length}体`); $('#party-detail').textContent = `移動力 ${party.movementRemaining}/${party.movementMaximum} · 攻撃回数 ${party.attacksRemaining}/${party.attacksMaximum}`; }
+  if (party) { $('#party-status').append(assets.icon(`unit-${state.units[party.leaderUnitId]?.typeId ?? 'warrior'}`, 'unit-art'), `${partyName(party)} · ${party.unitIds.length}体`); $('#party-detail').textContent = `移動力 ${party.movementRemaining}/${party.movementMaximum} · 攻撃回数 ${party.attacksRemaining}/${party.attacksMaximum}`; }
   else { $('#party-status').textContent = selectedUnitId ? `${unitName(state.units[selectedUnitId])} ${selectedUnitId} · 待機中` : '部隊・Unitを選択してください'; $('#party-detail').textContent = '地図の駒または上の一覧から選べます。'; }
   $('#deselect-party').disabled = !party && !selectedUnitId; $('#focus-party').disabled = !party && !selectedUnitId;
   $('#map-mode').textContent = party ? `${partyName(party)} 選択中` : selectedUnitId ? '待機Unit 選択中' : 'セル確認';
@@ -191,13 +191,13 @@ $('#load').onclick = () => {
     const save = storage?.getItem('kingdom-m1-save'); if (!save) return reject('セーブデータがありません');
     const restored = restoreGameState(save);
     if (!restored.turnOrder.every(id => restored.cities[restored.kingdoms[id].cityIds[0]])) throw new Error('このセーブは現在の画面に対応していません');
-    state = restored; controller.playerId = state.activePlayerId; selectedEnemyId = null; $('#game-mode').value = state.turnOrder.length > 1 ? 'duel' : 'single'; selectedPartyId = null; selectedUnitId = null; selectedTileKey = capital().centerHex; hoveredKey = null;
-    formationPanel.clear(); inspection.clear(); map.camera.zoom = 1; render(); map.focus(selectedTileKey); show('セーブをロードしました'); void audio.play('se-load');
+    state = restored; controller.playerId = state.activePlayerId; selectedEnemyId = null; $('#game-mode').value = state.scenarioId === 'ranged-duel' ? 'ranged-duel' : state.turnOrder.length > 1 ? 'duel' : 'single'; selectedPartyId = null; selectedUnitId = null; selectedTileKey = capital().centerHex; hoveredKey = null;
+    formationPanel.clear(); inspection.clear(); combatPanel.reset(); map.camera.zoom = 1; render(); map.focus(selectedTileKey); show('セーブをロードしました'); void audio.play('se-load');
   } catch (error) { state = before; ({ selectedPartyId, selectedUnitId, selectedTileKey, hoveredKey, selectedEnemyId } = selection); controller.playerId = selection.playerId; render(); reject(error.message || 'セーブをロードできませんでした'); }
 };
 $('#reset').onclick = () => {
   state = newGame($('#game-mode').value); selectedEnemyId = null; selectedPartyId = 'party-1'; selectedUnitId = 'unit-1'; selectedTileKey = state.parties[selectedPartyId].location; hoveredKey = null;
-  formationPanel.clear(); inspection.clear(); map.camera.zoom = 1; audio.stop(); void audio.startMusic(); render(); map.focus(selectedTileKey); show(state.turnOrder.length > 1 ? '二国対戦を開始しました。敵部隊を選んで攻撃できます。ターン終了で操作する王国を交代します。' : '331セルの新規マップで開始しました。最初の部隊を操作できます。'); void audio.play('se-turn-start');
+  formationPanel.clear(); inspection.clear(); combatPanel.reset(); map.camera.zoom = 1; audio.stop(); void audio.startMusic(); render(); map.focus(selectedTileKey); show(state.turnOrder.length > 1 ? '二国対戦を開始しました。敵部隊を選んで攻撃できます。ターン終了で操作する王国を交代します。' : '331セルの新規マップで開始しました。最初の部隊を操作できます。'); void audio.play('se-turn-start');
 };
 function updateAudioControls() {
   $('#audio-toggle').textContent = audio.muted ? '音声をオン' : '音声をオフ'; $('#audio-toggle').setAttribute('aria-pressed', String(!audio.muted));

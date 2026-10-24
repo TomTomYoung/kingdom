@@ -6,7 +6,7 @@
 
 都市がユニットや建物を完成させる力です。王国共通の備蓄ではなく、都市で選んだ生産対象の進捗になります。
 
-現在: [戦士](../units/warrior.md)は12、[モニュメント](../buildings/monument.md)は20で完成します。識別子は `production` です。
+現在: [戦士](../units/warrior.md)は12、[弓兵](../units/archer.md)は18、[弩砲](../units/ballista.md)は28、[モニュメント](../buildings/monument.md)は20で完成します。識別子は `production` です。
 
 ## 入手と進行
 

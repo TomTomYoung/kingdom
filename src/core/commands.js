@@ -9,6 +9,6 @@ export const endTurn = (playerId, turn, commandId) => command(COMMAND_TYPES.END_
 export const createParty = (playerId, turn, unitIds, location, commandId) => command(COMMAND_TYPES.CREATE_PARTY, playerId, turn, { unitIds, location }, commandId);
 export const setFormation = (playerId, turn, partyId, formation, commandId) => command(COMMAND_TYPES.SET_FORMATION, playerId, turn, { partyId, formation }, commandId);
 export const moveParty = (playerId, turn, partyId, path, commandId) => command(COMMAND_TYPES.MOVE_PARTY, playerId, turn, { partyId, path }, commandId);
-export const attackParty = (playerId, turn, attackerPartyId, defenderPartyId, attackType = 'melee', commandId) => command(COMMAND_TYPES.ATTACK_PARTY, playerId, turn, { attackerPartyId, defenderPartyId, attackType }, commandId);
+export const attackParty = (playerId, turn, attackerPartyId, defenderPartyId, attackType = 'melee', commandId, targeting = {}) => command(COMMAND_TYPES.ATTACK_PARTY, playerId, turn, { attackerPartyId, defenderPartyId, attackType, targeting }, commandId);
 
 export const setGuardOrder = (playerId, turn, partyId, guardUnitId, targetUnitId, mode, commandId) => command(COMMAND_TYPES.SET_GUARD_ORDER, playerId, turn, { partyId, guardUnitId, targetUnitId, mode }, commandId);

@@ -1,16 +1,16 @@
 # Kingdom 戦闘システム仕様
 
-更新日: 2026-10-18（単体護衛・戦闘UIの実装範囲と暫定値を反映）
+更新日: 2026-10-24（現行実装の区分のみ更新。目標仕様は維持）
 
 仕様状態: 基本構造確定、バランス係数はRulesetで調整可能
 
 ## 0. 現行実装との区分
 
-本文は目標仕様です。2026-10-18時点では単体melee／ranged、seed付きDamage、装甲、近接反撃、HP0、士気低下、指揮継承に加え、単体Guard／InterceptとUIを実装しました。二国交互操作、敵配置・HP、RNGを進めない予測、戦闘ログが使えます。
+本文は目標仕様です。2026-10-24時点ではmelee／ranged、seed付きDamage、装甲、近接反撃、HP0、士気低下、指揮継承、Guard／Intercept、Taunt／Cover、Unit／Slot狙い撃ちと横列・縦列・十字・貫通を実装しています。固定二国の交互操作、敵配置・HP、RNGを参照・更新しない予測、照準・戦闘ログが使えます。弓兵・弩砲を生産購入でき、各国5体の遠隔対戦を追加しました。
 
-各列の露出Unitから主対象を選び、指示済み護衛1体へ配分します。2026-10-18の暫定バランスとして新規戦士に率50％・容量50・範囲1を採用。肩代わり上限70％、割り込みは反応1、連鎖なし。保存済みゼロ能力は維持します。[操作・配分の実装規則](COMBAT_OPERATIONS.md)を参照してください。
+7攻撃定義は共通Resolverを使用します。参加兵種と各Unitの射程を検証し、攻撃開始時の対象集合を固定します。範囲・貫通でも主対象へのGuard／Interceptは1回だけで、直撃と肩代わりをUnitごとに合算して装甲を1回適用します。新規戦士の率50％・容量50・範囲1、肩代わり上限70％、割り込み反応1、連鎖なしを維持します。狙い射ち／精密射撃に限り命中判定があり、失敗も行動を消費します。[現行の式・照準・配分](RANGED_COMBAT.md)・[画面操作](COMBAT_OPERATIONS.md)を参照してください。
 
-戦闘力は生存Unitの平均×cohesionのみ。HP0はindividualのみdowned、他はshatteredです。Taunt／Cover、狙い撃ち、範囲・貫通、全Modifier、Resistance／Barrier、Spell、状態付与Ability、援軍、撤退・回復・死傷・Lootは未実装です。全目標を満たすものではありません。[現行仕様](CURRENT_IMPLEMENTATION.md)・[課題](STATUS.md)を正本とします。
+戦闘力は参加する生存Unitの平均×cohesionのみです。HP0はindividualのみdowned、他はshattered。敗北部隊の所属・配置・位置は履歴として保存し、地図の占有・駒表示から除外します。全Modifier、Resistance／Barrier、Spell、状態付与Ability、援軍、撤退・回復・死傷の全規則・Loot、勝利判定は未実装です。全目標を満たすものではありません。[現行仕様](CURRENT_IMPLEMENTATION.md)・[課題](STATUS.md)を正本とします。
 
 ## 1. 基本原則
 

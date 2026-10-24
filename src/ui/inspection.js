@@ -1,5 +1,5 @@
 import { RULESET } from '../core/ruleset.js';
-import { isActiveUnit } from '../models/party.js';
+import { isActiveUnit, occupiesMapTile } from '../models/party.js';
 import { terrainMovementCost } from '../systems/movement-system.js';
 import { getTerritoryCandidates, tilePurchaseCost } from '../systems/territory-system.js';
 
@@ -31,6 +31,7 @@ export class InspectionView {
     else {
       const terrain = RULESET.terrain[tile.terrainId], city = state.cities[tile.cityId];
       const parties = Object.values(state.parties).filter((p) => p.location === tile.key);
+      const occupants = parties.filter(occupiesMapTile);
       const units = Object.values(state.units).filter((u) => u.location === tile.key);
       const eligible = units.filter((u) => !u.partyId && u.ownerId === playerId && isActiveUnit(u));
       if (this.draftLocation !== tile.key) { this.draft.clear(); this.draftLocation = tile.key; }
@@ -46,7 +47,7 @@ export class InspectionView {
         const route = reachable.get(tile.key), move = button(route ? `${partyName(party)}をここへ移動 · 移動力 ${route.cost}` : 'ここへ移動', () => this.callbacks.onMove(tile.key)); move.id = 'move-party';
         move.disabled = !route || party.ownerId !== playerId || state.activePlayerId !== playerId;
         this.tileRoot.append(move);
-        this.tileRoot.append(node('p', route ? `${route.path.length}セルの経路。現在のターン内に移動します。` : tile.key === party.location ? 'この部隊の現在位置です。' : tile.terrainId === 'void' ? '虚無には進入できません。' : parties.length ? '他の部隊が占有しています。' : 'このターンの移動範囲外です。ターン終了で移動力が回復します。', 'hint'));
+        this.tileRoot.append(node('p', route ? `${route.path.length}セルの経路。現在のターン内に移動します。` : tile.key === party.location ? 'この部隊の現在位置です。' : tile.terrainId === 'void' ? '虚無には進入できません。' : occupants.length ? '他の部隊が占有しています。' : 'このターンの移動範囲外です。ターン終了で移動力が回復します。', 'hint'));
       }
       const capital = state.cities[state.kingdoms[playerId].cityIds[0]], cost = tilePurchaseCost(state, capital, tile);
       const candidate = getTerritoryCandidates(state, capital).some((t) => t.key === tile.key);
@@ -54,9 +55,9 @@ export class InspectionView {
       const purchase = button(tile.ownerId ? '所有済み' : candidate ? `このセルを購入 · Gold ${cost}` : '購入できないセル', () => this.callbacks.onPurchase(tile.key)); purchase.id = 'purchase-tile';
       purchase.disabled = !candidate || !affordable || state.activePlayerId !== playerId; this.tileRoot.append(purchase);
       if (candidate && !affordable) this.tileRoot.append(node('p', `購入にはGold ${cost}が必要です。`, 'hint'));
-      this.tileRoot.append(node('h3', `駐留部隊 ${parties.length} · Unit ${units.length}`));
+      this.tileRoot.append(node('h3', `駐留部隊 ${occupants.length} · Unit記録 ${units.length}`));
       for (const p of parties) {
-        const entry = button(`${partyName(p)} · ${p.unitIds.length}体 · ${stateLabels[p.status] ?? p.status}`, () => this.callbacks.onParty(p.id), { cellParty: p.id });
+        const entry = button(`${partyName(p)} · ${p.unitIds.length}体 · ${occupiesMapTile(p) ? stateLabels[p.status] : '敗北記録（占有なし）'}`, () => this.callbacks.onParty(p.id), { cellParty: p.id });
         entry.setAttribute('aria-pressed', String(p.id === partyId)); this.tileRoot.append(entry);
       }
       const roster = node('div', undefined, 'cell-roster'), checkboxes = [];
@@ -78,10 +79,10 @@ export class InspectionView {
       if (eligible.length) {
         const create = button('', () => this.callbacks.onCreate([...this.draft], tile.key)); create.id = 'form-party';
         const selectAll = button('待機Unitを最大5体選択', () => { this.draft = new Set(eligible.slice(0, 5).map((u) => u.id)); updateDraft(); }); selectAll.id = 'select-waiting';
-        function updateButton() { create.textContent = `選択した${this.draft.size}体で部隊を作成`; create.disabled = !this.draft.size || parties.length > 0 || state.activePlayerId !== playerId; }
+        function updateButton() { create.textContent = `選択した${this.draft.size}体で部隊を作成`; create.disabled = !this.draft.size || occupants.length > 0 || state.activePlayerId !== playerId; }
         updateDraft = () => { for (const input of checkboxes) { input.checked = this.draft.has(input.dataset.formUnit); input.disabled = !input.checked && this.draft.size >= 5; } updateButton.call(this); };
         updateDraft(); this.tileRoot.append(selectAll, create);
-        this.tileRoot.append(node('p', parties.length ? 'このセルの部隊を先に移動すると、新しい部隊を作れます。' : 'チェックで1〜5体を選びます。待機Unitは部隊に編成すると移動できます。', 'hint'));
+        this.tileRoot.append(node('p', occupants.length ? 'このセルの部隊を先に移動すると、新しい部隊を作れます。' : 'チェックで1〜5体を選びます。待機Unitは部隊に編成すると移動できます。', 'hint'));
       }
     }
     if (!unit) { this.unitRoot.append(node('p', '地図の駒、駐留一覧、または部隊配置からUnitを選択してください。', 'hint')); return; }
@@ -91,15 +92,16 @@ export class InspectionView {
     const slotLabel = slot?.replace('front', '前列').replace('middle', '中列').replace('rear', '後列').replace('left', '左').replace('center', '中央').replace('right', '右').replace('-', '・');
     this.unitRoot.append(facts([
       ['状態', stateLabels[unit.status] ?? unit.status], ['HP', `${unit.currentHp} / ${unit.maxHp}`], ['所属国', state.kingdoms[unit.ownerId]?.name ?? unit.ownerId],
-      ['所属部隊', unitParty ? partyName(unitParty) : '未編成・待機中'], ['位置', unit.location], ['配置', slotLabel ?? 'なし'], ['指揮者', unitParty?.leaderUnitId === unit.id ? 'このUnit' : unitParty?.leaderUnitId ?? 'なし'],
+      ['所属部隊', unitParty ? `${partyName(unitParty)}${occupiesMapTile(unitParty) ? '' : ' · 敗北記録（占有なし）'}` : '未編成・待機中'], ['位置', unit.location], ['配置', slotLabel ?? 'なし'], ['指揮者', unitParty?.leaderUnitId === unit.id ? 'このUnit' : unitParty?.leaderUnitId ?? 'なし'],
       ['近接 / 遠隔', `${unit.meleeStrength} / ${unit.rangedStrength}`], ['防御 / 装甲', `${unit.defenseStrength} / ${unit.armor}`], ['射程', unit.range], ['護衛容量', `${unit.guardCapacityRemaining} / ${unit.guardCapacityMax}`], ['肩代わり率', `${Math.round(unit.guardRate * 100)}%`],
+      ['命中 / 回避', `${Math.round((unit.accuracy ?? 1) * 100)}% / ${Math.round((unit.evasion ?? 0) * 100)}%`], ['挑発 / 遮蔽', `${Math.round((unit.tauntStrength ?? 0) * 100)}% / ${Math.round((unit.coverPower ?? 0) * 100)}%`],
     ]));
     if (unitParty) {
       this.unitRoot.append(facts([['部隊の移動力', `${unitParty.movementRemaining} / ${unitParty.movementMaximum}`], ['部隊の攻撃回数', `${unitParty.attacksRemaining} / ${unitParty.attacksMaximum}`]]));
       this.unitRoot.append(button('所属部隊を選択', () => this.callbacks.onParty(unitParty.id)));
     } else if (unit.ownerId === playerId) {
       const deploy = button('このUnitで部隊を作成', () => this.callbacks.onCreate([unit.id], unit.location)); deploy.id = 'deploy-unit';
-      deploy.disabled = !isActiveUnit(unit) || Object.values(state.parties).some((p) => p.location === unit.location) || state.activePlayerId !== playerId;
+      deploy.disabled = !isActiveUnit(unit) || Object.values(state.parties).some((p) => occupiesMapTile(p) && p.location === unit.location) || state.activePlayerId !== playerId;
       this.unitRoot.append(deploy);
     }
     this.unitRoot.append(button('地図でこのUnitを見る', () => this.callbacks.onFocus(unit.location)));

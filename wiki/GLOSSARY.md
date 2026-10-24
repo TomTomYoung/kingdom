@@ -37,7 +37,9 @@
 | 日本語・別名 | 英語・識別子 | 説明 |
 | --- | --- | --- |
 | ユニット | Unit | [パーティーを構成する最小運用単位](./units/README.md) |
-| 戦士 | warrior | [現在の正式な軍事ユニット](./units/warrior.md) |
+| 戦士 | warrior | [近接と護衛を担当する部隊](./units/warrior.md) |
+| 弓兵 | archer | [射程2の狙い撃ち・横列射撃](./units/archer.md) |
+| 弩砲 | ballista | [射程3の縦列・十字・貫通](./units/ballista.md) |
 | 開拓者 | Settler | [都市建設役の予定](./units/settler.md) |
 | 労働者 | Builder | [改善建設・修理役の予定](./units/builder.md) |
 | 尺度 | scaleClass | [個人・部隊・兵器・魔物・群体の区分](./units/README.md) |
@@ -53,7 +55,8 @@
 | 攻撃回数 | attacksRemaining | [現在はパーティーの標準1回](./rules/actions.md) |
 | 建設チャージ | buildCharges | [労働者が使う有限回数の予定](./units/builder.md) |
 | 能力・スキル・魔法 | Ability / Skill / Spell | [個別発動や効果の予定](./rules/abilities.md) |
-| 庇護・割り込み・挑発 | Guard / Intercept / Taunt | [被害の肩代わりや対象変更の予定](./rules/abilities.md) |
+| 護衛・割り込み・挑発・遮蔽 | Guard / Intercept / Taunt / Cover | [被害の配分と照準への影響](./rules/abilities.md) |
+| 狙い撃ち・範囲・貫通 | aimed / precise / row / column / area / pierce | [照準と被害の分配](./rules/combat.md) |
 | 戦闘不能・壊滅・敗北 | downed / shattered / defeated | [HP0とパーティー敗北の状態](./rules/combat.md) |
 
 ## 探索・進行

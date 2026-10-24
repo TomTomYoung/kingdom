@@ -6,7 +6,7 @@ import { AssetStore, indexAssets } from '../src/ui/assets.js';
 import { RULESET } from '../src/core/ruleset.js';
 const manifest = JSON.parse(fs.readFileSync(new URL('../assets/manifest.json', import.meta.url)));
 
-test('every current terrain/item/resource has an adopted asset and all source/delivery hashes match', () => {
+test('adopted terrain, warrior, building and resource assets have matching source/delivery hashes', () => {
   const entries = indexAssets(manifest, new URL('https://example.test/kingdom/'));
   assert.equal(entries.size, manifest.assets.length);
   for (const id of [...Object.keys(RULESET.terrain).map((id) => `terrain-${id}`), 'building-city', 'building-monument', 'unit-warrior', ...['food', 'production', 'gold', 'science', 'mana', 'religion', 'culture', 'popular-support'].map((id) => `icon-${id}`)]) assert.ok(entries.has(id), id);

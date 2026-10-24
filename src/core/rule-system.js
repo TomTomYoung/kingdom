@@ -5,7 +5,7 @@ import { processTurnStart } from './turn-engine.js';
 import { completeItem, validateProductionSelection } from '../systems/production-system.js';
 import { getTerritoryCandidates, tilePurchaseCost } from '../systems/territory-system.js';
 import { updateDerivedCapabilities } from '../models/kingdom.js';
-import { createParty, validateFormation, isActiveUnit, hasActiveUnits } from '../models/party.js';
+import { createParty, validateFormation, isActiveUnit, hasActiveUnits, occupiesMapTile } from '../models/party.js';
 import { validateCommand } from './command-validation.js';
 import { validatePartyPath } from '../systems/movement-system.js';
 import { validateGuardOrder } from '../systems/damage-grid.js';
@@ -68,7 +68,7 @@ export class RuleSystem {
       if (units.some((unit) => unit.location !== command.payload.location)) return reject('同じ場所にいるUnitだけを編成できます');
       const tile = Object.hasOwn(state.world.tiles, command.payload.location) && state.world.tiles[command.payload.location];
       if (!tile || tile.terrainId === 'void') return reject('Partyを編成できない場所です');
-      if (Object.values(state.parties).some((party) => party.location === tile.key)) return reject('他のPartyが占有しています。先に移動してください');
+      if (Object.values(state.parties).some((party) => occupiesMapTile(party) && party.location === tile.key)) return reject('他のPartyが占有しています。先に移動してください');
       const partyId = `party-${state.nextIds.party++}`;
       state.parties[partyId] = createParty(partyId, command.playerId, unitIds, command.payload.location);
       units.forEach((unit) => { unit.partyId = partyId; });
@@ -106,7 +106,7 @@ export class RuleSystem {
       const attacker = state.parties[command.payload.attackerPartyId]; const defender = state.parties[command.payload.defenderPartyId];
       if (!attacker || attacker.ownerId !== command.playerId) return reject('このPartyを操作できません');
       if (!defender || defender.ownerId === command.playerId) return reject('敵Partyを指定してください');
-      const combat = resolvePartyAttack(state, attacker, defender, command.payload.attackType, events);
+      const combat = resolvePartyAttack(state, attacker, defender, command.payload.attackType, events, undefined, command.payload.targeting);
       if (!combat.ok) return reject(combat.reason);
     } else if (command.type === COMMAND_TYPES.END_TURN) {
       if (state.phase !== 'PLAYER_ACTION') return reject('行動フェーズではありません');

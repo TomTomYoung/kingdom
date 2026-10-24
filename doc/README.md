@@ -1,26 +1,18 @@
 # Kingdom 開発資料
 
-確認・更新日: 2026-10-18
+確認・更新日: 2026-10-24
 
-目標: Civilization VI 型の帝国運営、Party・Formation、Dungeon探索を統合したターン制ストラテジー
-
-2026-10-18 引き継ぎ: main / 6303da9319711786e9313476a1b5ab927e31caa3 と前回の全ファイルが一致することを確認。K-09の保存構造・参照整合性検証と、音声fetchの呼出し先修正を追加しました。Node標準56テスト、全52 JavaScriptファイルの構文検査、30素材の整合性・復号、Chromium 153で通常時・全音声HTTP 404時の実操作に成功しました。PC幅1440pxと390pxで表示を確認。音声は実AudioContextの復号・再生開始・停止を確認し、人による聴取と利用端末での再確認は未実施です。 [検証記録](ASSET_INTEGRATION_QA.md)。
-
-2026-10-18 戦闘・護衛追加（開始基準: main / a2e53449664ef50fa1b7041ffc0634b6b74e9ae9）: K-08の重複建物生産と購入後のキューを修正。二国交互操作、敵選択、攻撃予測、単体Guard／Intercept、戦闘ログをUIへ接続しました。新規SE2点と既存戦闘BGMを接続し、素材は32点すべて接続済みです。Node標準68テスト、全57 JavaScriptファイルの構文、32素材の検査とChromiumで通常音声／全音声404の操作に成功。人による聴取は未実施です。[戦闘操作](COMBAT_OPERATIONS.md)・[検証記録](ASSET_INTEGRATION_QA.md)。
+目標はCivilization VI型の帝国運営、Party・Formation、Dungeon探索を統合したターン制ストラテジーです。現行はM1都市運営とM2のParty・移動・近接／遠隔戦闘の途中です。
 
 ## 現在地と読み方
 
-第3段階（2026-10-17）は331セルのマップと初期戦士部隊、待機Unitの表示・選択、セル/Unit詳細、指定編成、経路移動、カメラ・全体図を実装しました。[操作と確認範囲](MAP_OPERATIONS.md)を参照してください。下の第2段階の記録も保持しています。
+今回、弓兵・弩砲、各国5体の遠隔二国対戦、通常・狙い射ち・精密射撃・横列・縦列・十字・貫通、Taunt／Cover、照準と予測、敗北後の占有解消を追加しました。従来duel・旧37セル保存を維持します。両国を人が操作し、AI・勝利・都市別作業・Dungeonは未実装です。
 
-第2段階の開始基準は main / a9e66eaad5290c366c96eeacd07b1fce497b5dee です。音声読み込み失敗の復旧・再試行、K-01〜K-04修正、既存戦士画像を使う3×3配置編集を追加しました。2026-10-17 第2段階: Node標準44テスト、全45 JavaScriptファイルの構文検査、30素材の整合性・復号に成功しました。実UIのDOM/Canvas検証では3×3配置の移動・交換・保存復元、全音声ファイルがHTTP 404の場合の再合成、再試行後のBGM重複防止を確認しました。実ブラウザのCSS・音声出力と人による聴取は未確認です。 以降の2026-10-16の記載は前回調査記録です。M1都市運営は実装済み、M2はParty・移動・基本戦闘の途中です。23テスト成功を確認しましたが、現行不具合と未実装項目が残っています。今回のブラウザ実操作確認は未実施です。2026-10-16に既存23テスト、構文確認、K-01〜K-05の一時診断を再実行しました。調査時点のブランチはmainのみ、open PR・open issueは各0件です。
+まず[現行実装](CURRENT_IMPLEMENTATION.md)、[課題](STATUS.md)、[次作業](HANDOFF.md)を確認してください。操作は[戦闘操作](COMBAT_OPERATIONS.md)と[地図操作](MAP_OPERATIONS.md)、定義・配分・保存互換は[遠隔仕様](RANGED_COMBAT.md)にあります。次の優先事項はK-05と都市別領土・市民作業です。
 
-まずCURRENT_IMPLEMENTATIONで現行の実挙動、STATUSで実装段階と未修正課題、HANDOFFで次作業を確認してください。画面から使える機能とcore APIだけの機能を区別します。
+起動は `npm run dev`、検証は `npm test`、`npm run check`、`npm run check:assets`。Canvas 2D／DOM・ES Modules・Node標準テストを使い、Phaser／Vite／Vitestは使いません。プレイヤー向け名称・費用・操作は[Kingdom Wiki](../wiki/README.md)で確認できます。
 
-SPECIFICATIONと各システム仕様は目標です。記載された機能・受入条件がすべて実装済みとは限りません。旧一枚HTMLの調査と旧P0はLEGACY_IMPLEMENTATIONへ保存しました。
-
-起動はリポジトリルートで `npm run dev`、確認は `npm test` と `npm run check` です。現行はCanvas 2D／DOMとES Modulesで、Phaser／Vite／Vitestは使っていません。
-
-プレイヤー向けの用語・効果・費用・ルールは [Kingdom Wiki](../wiki/README.md) にまとめています。リソース・ユニット・区画・建物・地形の一覧から個別項目を参照できます。
+目標仕様の受入条件は実装完了の宣言ではありません。旧Phaser版の調査は[保存資料](LEGACY_IMPLEMENTATION.md)です。過去のテスト・素材記録はSTATUSと素材QAの各日付の節に保持しています。
 
 ## 文書
 
@@ -41,7 +33,8 @@ SPECIFICATIONと各システム仕様は目標です。記載された機能・�
 15. [ASSET_AUDIT.md](./ASSET_AUDIT.md): 既存を含む全必要素材、制作・適用順、最新進捗
 16. [ASSET_INTEGRATION_QA.md](./ASSET_INTEGRATION_QA.md): 接続32点の動作検証と残る聴取確認
 
-17. [COMBAT_OPERATIONS.md](COMBAT_OPERATIONS.md): 二国交互操作・護衛・予測と現行配分規則
+17. [COMBAT_OPERATIONS.md](COMBAT_OPERATIONS.md): 二国交互操作・遠隔照準・護衛・予測
+18. [RANGED_COMBAT.md](RANGED_COMBAT.md): 新兵種・7攻撃定義・payload・命中・範囲配分・保存互換
 
 ## 確定した目標方針（実装完了を意味しません）
 
@@ -68,6 +61,6 @@ SPECIFICATIONと各システム仕様は目標です。記載された機能・�
 21. UnitはIndividual、Detachment、Construct、Monster、Swarmの尺度を持ちます。
 22. 通常攻撃は原則命中し、近接攻撃は相互Damage、Named CharacterはHP0で原則Downedになります。
 
-## 今回の確認範囲（2026-10-16）
+## 過去の調査記録（2026-10-16）
 
 既存doc・Wikiと現行ソースを照合し、現在地・課題・再開手順を更新しました。ゲーム本体、目標ルール、素材は変更していません。既存資料にある画像の目視・音声解析結果は過去の制作記録であり、今回素材検査を再実行したわけではありません。
