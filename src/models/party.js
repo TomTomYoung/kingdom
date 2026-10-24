@@ -3,6 +3,8 @@ export const FORMATION_COLUMNS = Object.freeze(['left', 'center', 'right']);
 export const FORMATION_SLOTS = Object.freeze(FORMATION_ROWS.flatMap((row) => FORMATION_COLUMNS.map((column) => `${row}-${column}`)));
 
 export const isActiveUnit = (unit) => Boolean(unit && unit.currentHp > 0 && unit.status === 'active');
+// Defeated parties remain as history, but no longer reserve a world tile.
+export const occupiesMapTile = (party) => party?.status === 'active';
 export const hasActiveUnits = (state, party) => party.unitIds.some((id) => isActiveUnit(state.units[id]));
 
 export function createParty(id, ownerId, unitIds, location, leaderUnitId = unitIds[0]) {

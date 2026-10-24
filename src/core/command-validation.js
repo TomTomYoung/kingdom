@@ -33,5 +33,6 @@ export function validateCommand(state, command) {
   if (command.type === COMMAND_TYPES.MOVE_PARTY && (!Array.isArray(payload.path) || !payload.path.every(identifier))) return '移動経路はタイルIDの配列で指定してください';
   if (command.type === COMMAND_TYPES.SET_FORMATION && !record(payload.formation)) return '配置はslotとUnitの対応で指定してください';
   if (command.type === COMMAND_TYPES.SET_GUARD_ORDER && payload.mode !== 'off' && !identifier(payload.targetUnitId)) return '護衛対象のUnit IDが必要です';
+  if (command.type === COMMAND_TYPES.ATTACK_PARTY && Object.hasOwn(payload, 'targeting') && !record(payload.targeting)) return '照準はオブジェクトで指定してください';
   return null;
 }

@@ -1,7 +1,11 @@
 import { previewPartyAttack } from '../systems/combat-system.js';
+import { ATTACK_DEFINITIONS } from '../systems/combat-attacks.js';
 import { validateGuardOrder } from '../systems/damage-grid.js';
+import { FORMATION_ROWS, FORMATION_COLUMNS, FORMATION_SLOTS, isActiveUnit } from '../models/party.js';
 import { partyName, unitName } from './inspection.js';
 
+const rowNames = { front: '前列', middle: '中列', rear: '後列' }, columnNames = { left: '左', center: '中央', right: '右' };
+const slotName = (slot) => { const [row, column] = slot.split('-'); return `${rowNames[row]}・${columnNames[column]}`; };
 const node = (tag, text, className) => { const element = document.createElement(tag); if (text !== undefined) element.textContent = text; if (className) element.className = className; return element; };
 function select(id, values, selected) {
   const element = node('select'); element.id = id;
@@ -10,16 +14,30 @@ function select(id, values, selected) {
 }
 function field(label, control) { const element = node('label', label); element.htmlFor = control.id; element.append(control); return element; }
 function eventText(event) {
-  if (event.type === 'CombatDamage') return `${event.counter ? '反撃' : '攻撃'}: ${event.targetUnitId} HP −${event.damage} → ${event.remainingHp}${event.role === 'guard' ? '（肩代わり）' : event.role === 'intercept' ? '（割り込み）' : ''}`;
+  if (event.type === 'CombatDamage') return `${event.counter ? '反撃' : event.attackName ?? '攻撃'}: ${event.targetUnitId} HP −${event.damage} → ${event.remainingHp}${event.role === 'guard' ? '（肩代わり）' : event.role === 'intercept' ? '（割り込み）' : ''}`;
   if (event.type === 'CombatGuard') return `${event.guardUnitId} が ${event.targetUnitId} を護衛: ${event.amount}を肩代わり、残り容量${event.capacityRemaining}`;
   if (event.type === 'CombatIntercept') return `${event.guardUnitId} が ${event.targetUnitId} への攻撃に割り込み、残り反応${event.reactionCharges}`;
+  if (event.type === 'CombatMiss') return `${event.attackName ?? '狙い撃ち'}: ${event.targetUnitId} への命中に失敗`;
+  if (event.type === 'CombatCover') return `${event.coverUnitId ?? event.targetUnitId} が遮蔽となり、外れた射撃を受けます`;
+  if (event.type === 'CombatTaunt') return `${event.tauntUnitId ?? event.unitId ?? event.targetUnitId} の挑発が照準に影響`;
   if (event.type === 'PartyLeaderChanged') return `${event.partyId}: ${event.leaderUnitId} が指揮を継承`;
   if (event.type === 'PartyDefeated') return `${event.partyId} が敗北`;
   return null;
 }
 
 export class CombatPanel {
-  constructor(root, callbacks) { this.root = root; this.callbacks = callbacks; this.attackType = 'melee'; this.guardId = null; }
+  constructor(root, callbacks) { this.root = root; this.callbacks = callbacks; this.reset(); }
+  reset() { this.attackType = 'melee'; this.attackId = 'normal'; this.targetKind = 'unit'; this.targetUnitId = null; this.targetSlot = 'front-center'; this.targetRow = 'front'; this.targetColumn = 'center'; this.guardId = null; }
+  targeting(target, state) {
+    if (['aimed', 'precise'].includes(this.attackId)) {
+      if (!target.unitIds.includes(this.targetUnitId) || !isActiveUnit(state.units[this.targetUnitId])) this.targetUnitId = target.unitIds.find(id => isActiveUnit(state.units[id])) ?? '';
+      return { attackId: this.attackId, [this.targetKind === 'unit' ? 'targetUnitId' : 'targetSlot']: this.targetKind === 'unit' ? this.targetUnitId : this.targetSlot };
+    }
+    if (this.attackId === 'row') return { attackId: this.attackId, targetRow: this.targetRow };
+    if (['column', 'pierce'].includes(this.attackId)) return { attackId: this.attackId, targetColumn: this.targetColumn };
+    if (this.attackId === 'area') return { attackId: this.attackId, targetSlot: this.targetSlot };
+    return { attackId: 'normal' };
+  }
   render(state, partyId, targetId) {
     const root = this.root, party = state.parties[partyId], target = state.parties[targetId];
     root.replaceChildren(node('h2', '戦闘と護衛'));
@@ -32,23 +50,50 @@ export class CombatPanel {
     if (party?.ownerId === state.activePlayerId) {
       root.append(node('p', `${partyName(party)} · 攻撃 ${party.attacksRemaining}/${party.attacksMaximum} · 割り込み残数 ${party.reactionCharges}`, 'hint'));
       if (target) {
+        const rerender = () => this.render(state, partyId, targetId);
+        const type = select('attack-type', [['melee', '近接（反撃あり）'], ['ranged', '遠隔（標準反撃なし）']], this.attackType);
+        type.onchange = () => { this.attackType = type.value; if (this.attackType === 'melee') this.attackId = 'normal'; rerender(); }; root.append(field('攻撃方式', type));
+        const profile = select('attack-profile', Object.entries(ATTACK_DEFINITIONS).filter(([id]) => this.attackType === 'ranged' || id === 'normal').map(([id, definition]) => [id, definition.name]), this.attackId);
+        profile.onchange = () => { this.attackId = profile.value; rerender(); }; root.append(field('攻撃内容', profile));
+        const options = this.targeting(target, state);
+        const control = (id, label, values, property) => { const input = select(id, values, this[property]); input.onchange = () => { this[property] = input.value; rerender(); }; root.append(field(label, input)); };
+        if (['aimed', 'precise'].includes(this.attackId)) {
+          control('attack-target-kind', '照準の指定', [['unit', 'Unitを狙う'], ['slot', '配置枠を狙う']], 'targetKind');
+          if (this.targetKind === 'unit') control('attack-target-unit', '狙うUnit', target.unitIds.filter(id => isActiveUnit(state.units[id])).map(id => [id, `${unitName(state.units[id])} ${id}`]), 'targetUnitId');
+          else control('attack-target-slot', '狙う枠', FORMATION_SLOTS.map(slot => [slot, slotName(slot)]), 'targetSlot');
+        } else if (this.attackId === 'row') control('attack-target-row', '狙う横列', FORMATION_ROWS.map(row => [row, rowNames[row]]), 'targetRow');
+        else if (['column', 'pierce'].includes(this.attackId)) control('attack-target-column', '狙う縦列', FORMATION_COLUMNS.map(column => [column, columnNames[column]]), 'targetColumn');
+        else if (this.attackId === 'area') control('attack-target-slot', '十字の中心枠', FORMATION_SLOTS.map(slot => [slot, slotName(slot)]), 'targetSlot');
+        const preview = previewPartyAttack(state, partyId, targetId, this.attackType, options);
         root.append(node('h3', `${partyName(target)}の配置とHP`));
         const grid = node('div', undefined, 'enemy-grid');
-        for (const row of ['front', 'middle', 'rear']) for (const column of ['left', 'center', 'right']) {
-          const unit = state.units[target.formation[`${row}-${column}`]], cell = node('div', unit ? `${unitName(unit)} ${unit.id}\nHP ${unit.currentHp}/${unit.maxHp}` : '空');
-          if (unit?.currentHp === 0) cell.className = 'defeated'; grid.append(cell);
+        for (const slot of FORMATION_SLOTS) {
+          const unit = state.units[target.formation[slot]], cell = node('button', `${slotName(slot)}\n${unit ? `${unitName(unit)} ${unit.id}\nHP ${unit.currentHp}/${unit.maxHp}` : '空'}`);
+          cell.type = 'button'; cell.dataset.enemySlot = slot; cell.title = `${slotName(slot)}を照準に指定`;
+          if (unit?.currentHp === 0) cell.classList.add('defeated');
+          if (preview.targetSlots?.includes(slot)) cell.classList.add('attack-area');
+          if (preview.damage?.[unit?.id]?.max > 0) cell.classList.add('damage-target');
+          if ([...(preview.guards ?? []), ...(preview.intercepts ?? []), ...(preview.covers ?? [])].includes(unit?.id)) cell.classList.add('support-target');
+          cell.onclick = () => {
+            const [row, column] = slot.split('-');
+            if (['aimed', 'precise'].includes(this.attackId) && this.targetKind === 'unit') { if (!isActiveUnit(unit)) return; this.targetUnitId = unit.id; }
+            this.targetSlot = slot; this.targetRow = row; this.targetColumn = column; rerender();
+          };
+          grid.append(cell);
         }
-        root.append(grid);
-        const type = select('attack-type', [['melee', '近接（反撃あり）'], ['ranged', '遠隔（標準反撃なし）']], this.attackType);
-        type.onchange = () => { this.attackType = type.value; this.render(state, partyId, targetId); }; root.append(field('攻撃方式', type));
-        const preview = previewPartyAttack(state, partyId, targetId, this.attackType), forecast = node('div', undefined, 'combat-forecast'); forecast.id = 'combat-forecast';
+        root.append(grid, node('p', '金の枠：攻撃範囲 ／ 赤：HP損失の可能性 ／ 青：護衛・遮蔽。枠を選ぶと照準を変更できます。', 'hint'));
+        const forecast = node('div', undefined, 'combat-forecast'); forecast.id = 'combat-forecast'; forecast.setAttribute('aria-live', 'polite');
         if (preview.ok) {
           forecast.append(node('p', `予測HP損失 · 反撃${{ none: 'なし', certain: 'あり', possible: 'の可能性あり' }[preview.counter]}`));
-          for (const [id, range] of Object.entries(preview.damage).filter(([, range]) => range.max > 0)) forecast.append(node('p', `${state.units[id].ownerId === state.activePlayerId ? '自軍' : '敵軍'} ${id}: ${range.min}〜${range.max}${preview.guards.includes(id) ? ' · 護衛' : ''}${preview.intercepts.includes(id) ? ' · 割り込み' : ''}`));
-          forecast.append(node('small', '攻撃すると攻撃回数を1消費し、この部隊の行動を終了します。'));
+          if (['aimed', 'precise'].includes(this.attackId)) forecast.append(node('p', `狙った対象への命中率 ${Math.round(preview.hitChance * 100)}%`));
+          if (preview.primaryTargetId) forecast.append(node('p', `主対象: ${unitName(state.units[preview.primaryTargetId])} ${preview.primaryTargetId}`));
+          if (preview.covers?.length) forecast.append(node('p', `遮蔽: ${preview.covers.join('、')}。前にいるUnitが狙い撃ちに影響します。`));
+          if (preview.taunts?.length) forecast.append(node('p', `挑発: ${preview.taunts.join('、')}。${this.attackId === 'normal' ? '通常攻撃の対象を引きつけます。' : '指定した対象は変わらず、狙い撃ちの命中率へ影響します。'}`));
+          for (const [id, range] of Object.entries(preview.damage).filter(([, range]) => range.max > 0)) forecast.append(node('p', `${state.units[id].ownerId === state.activePlayerId ? '自軍' : '敵軍'} ${id}: ${range.min}〜${range.max}${preview.guards.includes(id) ? ' · 護衛' : ''}${preview.intercepts.includes(id) ? ' · 割り込み' : ''}${preview.covers?.includes(id) ? ' · 遮蔽' : ''}`));
+          forecast.append(node('small', '命中・失敗・護衛を含む範囲です。攻撃回数を1消費し、この部隊の行動を終了します。'));
         } else forecast.append(node('p', preview.reason));
         const attack = node('button', '攻撃する'); attack.id = 'attack-party'; attack.disabled = !preview.ok;
-        attack.onclick = () => this.callbacks.onAttack(targetId, this.attackType); root.append(forecast, attack);
+        attack.onclick = () => this.callbacks.onAttack(targetId, this.attackType, options); root.append(forecast, attack);
       } else root.append(node('p', '自軍部隊を選び、敵の駒か上の一覧で攻撃対象を指定してください。', 'hint'));
       if (party.unitIds.length > 1 && party.status === 'active') {
         root.append(node('h3', '護衛の設定'));
@@ -62,7 +107,7 @@ export class CombatPanel {
         const apply = node('button', '護衛設定を適用', 'secondary'); apply.id = 'set-guard';
         apply.onclick = () => this.callbacks.onGuard(party.id, guard.value, protect.value, mode.value); root.append(apply);
         const guardUnit = state.units[this.guardId];
-        root.append(node('p', `このUnitの護衛範囲は縦横${guardUnit.guardRange ?? 1}枠以内、肩代わり${Math.round(guardUnit.guardRate * 100)}%、容量${guardUnit.guardCapacityRemaining}/${guardUnit.guardCapacityMax}です。割り込みは攻撃全体を受け、部隊の反応を1使います。範囲外や戦闘不能では発動しません。`, 'hint'));
+        root.append(node('p', `このUnitの護衛範囲は縦横${guardUnit.guardRange ?? 1}枠以内、肩代わり${Math.round(guardUnit.guardRate * 100)}%、容量${guardUnit.guardCapacityRemaining}/${guardUnit.guardCapacityMax}です。割り込みは部隊の反応を1使います。範囲攻撃の護衛は主対象に1回だけ発動します。直撃と肩代わりは合算して装甲を1回適用します。範囲外や戦闘不能では発動しません。`, 'hint'));
         for (const [id, rule] of Object.entries(party.guardOrders ?? {})) {
           const inactive = validateGuardOrder(state, party, id, rule.targetUnitId, rule.mode);
           root.append(node('p', `${id} → ${rule.targetUnitId}: ${rule.mode === 'share' ? '肩代わり' : '割り込み'}${inactive ? `（${inactive}）` : ''}`, 'guard-order'));

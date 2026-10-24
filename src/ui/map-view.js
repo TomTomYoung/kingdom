@@ -1,5 +1,6 @@
 import { Hex } from '../world/hex.js';
 import { RULESET } from '../core/ruleset.js';
+import { occupiesMapTile } from '../models/party.js';
 import { MapCamera, HEX_SIZE, hexPosition } from './map-camera.js';
 
 function hexPath(ctx, x, y, size) {
@@ -134,7 +135,12 @@ export class MapView {
       ctx.beginPath(); ctx.ellipse(x, y + 19 * scale, 22 * scale, 8 * scale, 0, 0, Math.PI * 2);
       ctx.fillStyle = ownerId === playerId ? (marker.kind === 'unit' ? '#6c5941' : '#355c69') : '#803f47'; ctx.fill();
       ctx.strokeStyle = targeted ? '#ff9a86' : selected ? '#fff1b5' : '#a3b8ac'; ctx.lineWidth = selected ? 3 : 1; ctx.stroke(); ctx.globalAlpha = active ? 1 : 0.45;
-      if (!assets.draw(ctx, `unit-${units[0]?.typeId ?? 'warrior'}`, x, y, scale)) { ctx.fillStyle = '#bd9262'; ctx.fillRect(x - 10 * scale, y - 10 * scale, 20 * scale, 20 * scale); }
+      const typeId = (marker.kind === 'party' ? state.units[state.parties[marker.id]?.leaderUnitId]?.typeId : units[0]?.typeId) ?? 'warrior';
+      if (!assets.draw(ctx, `unit-${typeId}`, x, y, scale)) {
+        ctx.fillStyle = '#527561'; ctx.fillRect(x - 12 * scale, y - 12 * scale, 24 * scale, 24 * scale);
+        const symbol = { archer: '弓', ballista: '弩' }[typeId];
+        if (symbol) { ctx.fillStyle = '#fff0c9'; ctx.font = `700 ${18 * scale}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(symbol, x, y); }
+      }
       ctx.globalAlpha = 1; ctx.fillStyle = '#101d1b'; ctx.fillRect(x + 4 * scale, y + 8 * scale, 27 * scale, 17 * scale);
       ctx.fillStyle = '#fff0c9'; ctx.font = `700 ${11 * scale}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(badge, x + 17 * scale, y + 17 * scale);
       const hp = units.reduce((sum, u) => sum + u.currentHp, 0), maximum = units.reduce((sum, u) => sum + u.maxHp, 0);
@@ -142,7 +148,7 @@ export class MapView {
       ctx.fillStyle = '#a3c77c'; ctx.fillRect(x - 18 * scale, y + 28 * scale, 36 * scale * Math.max(0, Math.min(1, hp / (maximum || 1))), 4 * scale);
       this.markers.push({ ...marker, x, y, unitIds: units.map((u) => u.id) });
     };
-    for (const party of Object.values(state.parties)) {
+    for (const party of Object.values(state.parties).filter(occupiesMapTile)) {
       const others = [...waiting.values()].some((units) => units[0].location === party.location);
       drawMarker({ kind: 'party', id: party.id, location: party.location }, party.unitIds.map((id) => state.units[id]).filter(Boolean), party.ownerId, String(party.unitIds.length), party.status === 'active', others || state.world.tiles[party.location]?.cityId ? -18 : 0);
     }
@@ -166,7 +172,7 @@ export class MapView {
       const p = hexPosition(tile), x = minimap.width / 2 + p.x * scale, y = minimap.height / 2 + p.y * scale;
       hexPath(ctx, x, y, HEX_SIZE * scale); ctx.fillStyle = tile.ownerId ? '#cab36c' : RULESET.terrain[tile.terrainId].color; ctx.fill();
     }
-    for (const unit of Object.values(state.units)) { const tile = state.world.tiles[unit.location]; if (!tile) continue; const p = hexPosition(tile); ctx.fillStyle = '#fff'; ctx.fillRect(minimap.width / 2 + p.x * scale - 2, minimap.height / 2 + p.y * scale - 2, 4, 4); }
+    for (const unit of Object.values(state.units)) { if (unit.partyId && !occupiesMapTile(state.parties[unit.partyId])) continue; const tile = state.world.tiles[unit.location]; if (!tile) continue; const p = hexPosition(tile); ctx.fillStyle = '#fff'; ctx.fillRect(minimap.width / 2 + p.x * scale - 2, minimap.height / 2 + p.y * scale - 2, 4, 4); }
     ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.strokeRect(minimap.width / 2 + (camera.x - width / (2 * camera.zoom)) * scale, minimap.height / 2 + (camera.y - height / (2 * camera.zoom)) * scale, width / camera.zoom * scale, height / camera.zoom * scale);
     this.miniLayout = { scale };
   }

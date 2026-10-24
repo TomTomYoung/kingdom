@@ -1,14 +1,16 @@
 # Kingdom 目標仕様
 
-更新日: 2026-10-18（実装状況のみ更新。目標ルールは維持）
+更新日: 2026-10-24（現行実装の区分のみ更新。目標仕様は維持）
 
 仕様状態: 基本構造確定、数値バランスと一部マルチプレイ規則は暫定
 
 ## 0. 現行実装との区分
 
-この文書は目標仕様です。実装済みの判定は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md) と [STATUS.md](./STATUS.md) を正本とします。開始基準はmain / a2e53449664ef50fa1b7041ffc0634b6b74e9ae9。331セルの広域マップ・セル/Unit詳細・指定編成と経路移動を実装済み。現行セーブの構造検証と音声取得修正を追加しました。
+この文書は目標仕様です。実装済みの判定は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md) と [STATUS.md](./STATUS.md) を正本とします。今回の開始基準はmain / f3ca8a5ee0f7e9619ec8e7fa5ccd6ec4344fe1cb。331セルの広域マップ、M1都市運営、Party作成・経路移動・3×3配置、固定二国の交互操作、戦闘・護衛UIを実装済みです。
 
-現行はM1都市運営とM2のParty作成・移動・基本単体戦闘までです。Canvas 2D／DOMで表示し、複数王国の手番・配置変更・攻撃はcoreにありますが、配置編集はUIから利用できます。固定二国の交互操作と戦闘UI、単体Guard／Intercept、予測・ログを追加しました。AI、Dungeon、職業・Ability実行、加入・個別loyalty、Taunt／Cover・狙い撃ち・範囲配分、勝利、オンライン通信は未実装です。
+2026-10-24に、弓兵・弩砲の生産購入と各国5体の遠隔部隊対戦を追加しました。通常、狙い射ち、精密射撃、横列、縦列、十字、貫通の7攻撃定義を共通のCommand・Resolver・予測・ログへ接続しています。Unit／Slot／行／列の照準、限定的なTaunt／Cover、Guard／Interceptを処理し、予測はRNGを参照・更新しません。K-10を修正し、敗北Party・Unit・配置を記録に残したまま地図の占有と駒表示から除外します。
+
+表示はCanvas 2D／DOMです。AI、Dungeon、職業・汎用Ability実行、加入・個別loyalty、都市別領土・作業、勝利、オンライン通信は未実装です。全ての目標攻撃パターンや方向・可視性規則を完成させたものではありません。[遠隔戦闘の現行規則](RANGED_COMBAT.md)を参照してください。
 
 以下のGameStateフィールドは目標モデルです。実装の実キー・省略項目・暫定式はCURRENT_IMPLEMENTATIONを参照してください。現行の独立ランダム地形、平均戦闘力、固定移動力、簡略HP0を目標仕様へ逆輸入しません。
 

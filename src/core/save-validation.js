@@ -1,5 +1,5 @@
 import { RULESET } from './ruleset.js';
-import { validateFormation } from '../models/party.js';
+import { validateFormation, occupiesMapTile, hasActiveUnits } from '../models/party.js';
 
 const invalid = (path) => { throw new Error(`セーブデータが不正です: ${path}`); };
 const check = (condition, path) => { if (!condition) invalid(path); };
@@ -37,6 +37,8 @@ export function migrateAndValidateSave(state) {
     defaultMissing(unit, 'guardCapacityRemaining', unit.guardCapacityMax);
     defaultMissing(unit, 'status', unit.currentHp > 0 ? 'active' : unit.scaleClass === 'individual' ? 'downed' : 'shattered');
     defaultMissing(unit, 'statusEffects', []);
+    // Old saves predate probabilistic aiming; keep their neutral combat values.
+    for (const [key, fallback] of Object.entries({ accuracy: 1, evasion: 0, tauntStrength: 0, coverPower: 0 })) defaultMissing(unit, key, fallback);
     defaultMissing(unit, 'guardRange', 1);
   }
   for (const [id, party] of Object.entries(state.parties)) {
@@ -133,7 +135,16 @@ export function migrateAndValidateSave(state) {
     check(['individual', 'detachment', 'construct', 'monster', 'swarm'].includes(unit.scaleClass), `units.${id}.scaleClass`);
     fields(unit, ['meleeStrength', 'rangedStrength', 'magicStrength', 'defenseStrength', 'resistance', 'armor', 'range', 'guardRate', 'guardCapacityMax', 'moraleContribution', 'commandContribution'], `units.${id}`);
     number(unit.guardCapacityRemaining, `units.${id}.guardCapacityRemaining`, 0, unit.guardCapacityMax);
-    array(unit.statusEffects, `units.${id}.statusEffects`);
+    for (const key of ['accuracy', 'evasion', 'tauntStrength', 'coverPower']) number(unit[key], `units.${id}.${key}`, 0, 1);
+    for (const effect of array(unit.statusEffects, `units.${id}.statusEffects`)) {
+      const path = `units.${id}.statusEffects`;
+      if (typeof effect === 'string') text(effect, path);
+      else {
+        object(effect, path);
+        check(Object.hasOwn(effect, 'type') || Object.hasOwn(effect, 'id'), path);
+        for (const key of ['type', 'id']) if (Object.hasOwn(effect, key)) text(effect[key], `${path}.${key}`);
+      }
+    }
     integer(unit.guardRange, `units.${id}.guardRange`, 0, 4);
     if (unit.partyId !== null) check(array(reference(state.parties, unit.partyId, `units.${id}.partyId`).unitIds, `units.${id}.partyId.unitIds`).includes(id), `units.${id}.partyId`);
   }
@@ -141,7 +152,9 @@ export function migrateAndValidateSave(state) {
   for (const [id, party] of Object.entries(state.parties)) {
     check(party.id === id, `parties.${id}.id`); reference(state.kingdoms, party.ownerId, `parties.${id}.ownerId`);
     location(party.location, `parties.${id}.location`);
-    check(!occupied.has(party.location), `parties.${id}.location: 占有が重複しています`); occupied.add(party.location);
+    if (occupiesMapTile(party)) {
+      check(!occupied.has(party.location), `parties.${id}.location: 占有が重複しています`); occupied.add(party.location);
+    }
     ids(party.unitIds, `parties.${id}.unitIds`); check(party.unitIds.length >= 1 && party.unitIds.length <= 5, `parties.${id}.unitIds`);
     for (const unitId of party.unitIds) {
       const unit = reference(state.units, unitId, `parties.${id}.unitIds`);
@@ -159,6 +172,7 @@ export function migrateAndValidateSave(state) {
     number(party.movementRemaining, `parties.${id}.movementRemaining`, 0, party.movementMaximum);
     integer(party.attacksRemaining, `parties.${id}.attacksRemaining`, 0, party.attacksMaximum);
     check(['active', 'defeated'].includes(party.status), `parties.${id}.status`);
+    if (party.status === 'defeated') check(!hasActiveUnits(state, party), `parties.${id}.status: 敗北部隊に活動中のUnitがあります`);
     check(['ready', 'ended'].includes(party.activationState), `parties.${id}.activationState`);
     for (const key of ['hasMoved', 'hasAttacked']) check(typeof party[key] === 'boolean', `parties.${id}.${key}`);
   }

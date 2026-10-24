@@ -31,11 +31,18 @@ export function validateGuardOrder(state, party, guardId, targetId, mode) {
   return null;
 }
 
+export function isProtectionDisabled(unit) {
+  return (Array.isArray(unit?.statusEffects) ? unit.statusEffects : []).some(effect => {
+    const identifier = typeof effect === 'string' ? effect : typeof effect?.type === 'string' ? effect.type : typeof effect?.id === 'string' ? effect.id : null;
+    return identifier !== null && ['stun', 'break', 'fear'].includes(identifier.toLowerCase());
+  });
+}
+
 export function allocateSingleDamage(state, party, primary, incoming, events) {
   const orders = Object.entries(party.guardOrders ?? {}).filter(([id, order]) => {
     const guard = state.units[id];
     if (order.targetUnitId !== primary.id || validateGuardOrder(state, party, id, primary.id, order.mode)) return false;
-    if (guard.statusEffects.some((effect) => ['stun', 'break', 'fear'].includes(String(typeof effect === 'string' ? effect : effect?.type ?? effect?.id).toLowerCase()))) return false;
+    if (isProtectionDisabled(guard)) return false;
     return order.mode === 'intercept' ? party.reactionCharges > 0 : order.mode === 'share' && guard.guardCapacityRemaining > 0;
   }).sort(([a, x], [b, y]) => Number(y.mode === 'intercept') - Number(x.mode === 'intercept') || slotDistance(party, a, primary.id) - slotDistance(party, b, primary.id) || a.localeCompare(b));
   if (!orders.length) return [{ unit: primary, amount: incoming, role: 'primary' }];

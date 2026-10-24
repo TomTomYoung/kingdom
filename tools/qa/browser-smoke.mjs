@@ -162,6 +162,24 @@ try {
     assert.ok(state.eventLog.some(e => e.type === 'PartyLeaderChanged'), 'leadership succession is reachable');
     assert.equal(Object.keys(state.parties['party-1'].formation).length, 3, 'casualties do not rearrange the formation');
     await page.click('#load'); assert.deepEqual(await save(), state, 'defeat and reactions survive loading');
+    const defeated = Object.values(state.parties).find(p => p.status === 'defeated');
+    const winner = Object.values(state.parties).find(p => p.status === 'active');
+    for (let turn = 0; turn < 4 && (state.activePlayerId !== winner.ownerId || state.parties[winner.id].movementRemaining === 0 || state.parties[winner.id].activationState === 'ended'); turn++) {
+      await page.click('#end-turn'); state = await save();
+    }
+    assert.equal(state.activePlayerId, winner.ownerId);
+    await page.click(`[data-select-party="${winner.id}"]`);
+    const record = structuredClone({ party: state.parties[defeated.id], units: defeated.unitIds.map(id => state.units[id]) });
+    await tileClick(state.world.tiles[defeated.location]);
+    assert.match(await page.locator('#cell-content').innerText(), /敗北記録（占有なし）/);
+    assert.match(await page.locator('#cell-content').innerText(), /駐留部隊 0/);
+    assert.equal(await page.locator('#map-move').isDisabled(), false, 'defeated tile is reachable');
+    await page.click('#map-move'); state = await save();
+    assert.equal(state.parties[winner.id].location, defeated.location);
+    assert.deepEqual({ party: state.parties[defeated.id], units: defeated.unitIds.map(id => state.units[id]) }, record, 'movement preserves the defeat record');
+    assert.match(await page.locator('#cell-content').innerText(), /駐留部隊 1/);
+    await page.locator('#cell-content').screenshot({ path: path.join(output, missingAudio ? 'defeated-cell-fallback.png' : 'defeated-cell.png') });
+    await page.click('#load'); assert.deepEqual(await save(), state, 'active party and defeat record can share a tile after loading');
     // Return to a fresh battle for the desktop/mobile layout screenshots.
     await page.click('#reset'); await page.selectOption('#combat-target', 'party-2');
     await page.evaluate(() => window.scrollTo(0, 0));
@@ -180,7 +198,7 @@ try {
     await context.close();
   }
   const report = { date: new Date().toISOString(), browser: await browser.version(), realBrowser: true, humanListening: false,
-    checks: ['331-cell map', 'waiting unit and party selection', 'two-cell route and right-click movement', '3x3 formation edit', 'drag suppresses click', 'zoom and minimap', 'save/load', 'invalid load preserves game, selection and zoom', '37-cell save compatibility', 'new game', '390px layout', 'native audio decoding/playback nodes', '404 Worker synthesis', 'retry without overlapping BGM', 'mute stops sources', 'two-kingdom hotseat setup and city ownership', 'enemy selection retains attacker', 'RNG-free forecast', 'Guard/Intercept and counter', 'battle music and SE', 'action exhaustion', 'invalid ranged attack disabled', 'leadership succession and defeat', 'combat save/load'], results };
+    checks: ['331-cell map', 'waiting unit and party selection', 'two-cell route and right-click movement', '3x3 formation edit', 'drag suppresses click', 'zoom and minimap', 'save/load', 'invalid load preserves game, selection and zoom', '37-cell save compatibility', 'new game', '390px layout', 'native audio decoding/playback nodes', '404 Worker synthesis', 'retry without overlapping BGM', 'mute stops sources', 'two-kingdom hotseat setup and city ownership', 'enemy selection retains attacker', 'RNG-free forecast', 'Guard/Intercept and counter', 'battle music and SE', 'action exhaustion', 'invalid ranged attack disabled', 'leadership succession and defeat', 'combat save/load', 'defeated tile movement preserves casualty records', 'active and defeated co-location save/load'], results };
   await fs.writeFile(path.join(output, 'report.json'), JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report));
 } finally { await browser?.close(); server.close(); }
