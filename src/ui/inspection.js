@@ -24,7 +24,7 @@ export class InspectionView {
   }
   clear() { this.draft.clear(); this.draftLocation = null; this.lastUnitId = null; }
   render(options) {
-    const { state, playerId, tileKey, unitId, partyId, reachable } = options;
+    const { state, playerId, tileKey, unitId, partyId, reachable, cityId } = options;
     const tile = state.world.tiles[tileKey], unit = state.units[unitId], party = state.parties[partyId];
     this.tileRoot.replaceChildren(); this.unitRoot.replaceChildren();
     if (!tile) { this.tileRoot.append(node('p', '地図のセルを選択すると、地形・産出・駐留部隊を確認できます。', 'hint')); }
@@ -39,7 +39,7 @@ export class InspectionView {
       if (unitId !== this.lastUnitId && this.draft.size < 5 && eligible.some((u) => u.id === unitId)) this.draft.add(unitId);
       this.lastUnitId = unitId;
       const title = node('div', undefined, 'inspection-heading'); title.append(this.assets.icon(`terrain-${tile.terrainId}`, 'terrain-art'), node('div', `${terrain.name} · (${tile.q}, ${tile.r}, ${tile.s})`)); this.tileRoot.append(title);
-      this.tileRoot.append(facts([['所有', state.kingdoms[tile.ownerId]?.name ?? '未所有'], ['都市', city?.name ?? 'なし'], ['進入コスト', terrainMovementCost(tile.terrainId) ?? '進入不可']]));
+      this.tileRoot.append(facts([['所有国', state.kingdoms[tile.ownerId]?.name ?? '未所有'], ['所属都市', state.cities[tile.territoryCityId]?.name ?? 'なし'], ['都市中心', city?.name ?? 'なし'], ['収集時の作業', Object.values(state.cities).filter(c => c.workedTiles.includes(tile.key)).map(c => c.name).join('、') || 'なし'], ['進入コスト', terrainMovementCost(tile.terrainId) ?? '進入不可']]));
       const yields = node('div', undefined, 'yield-row');
       for (const [name, value] of Object.entries(terrain.yields).filter(([, value]) => value > 0)) { const entry = node('span'); entry.append(this.assets.icon(`icon-${name}`), `${resourceLabels[name]} +${value}`); yields.append(entry); }
       this.tileRoot.append(node('h3', '地形の基本産出'), yields.childNodes.length ? yields : node('p', '産出なし', 'hint'));
@@ -49,11 +49,12 @@ export class InspectionView {
         this.tileRoot.append(move);
         this.tileRoot.append(node('p', route ? `${route.path.length}セルの経路。現在のターン内に移動します。` : tile.key === party.location ? 'この部隊の現在位置です。' : tile.terrainId === 'void' ? '虚無には進入できません。' : occupants.length ? '他の部隊が占有しています。' : 'このターンの移動範囲外です。ターン終了で移動力が回復します。', 'hint'));
       }
-      const capital = state.cities[state.kingdoms[playerId].cityIds[0]], cost = tilePurchaseCost(state, capital, tile);
-      const candidate = getTerritoryCandidates(state, capital).some((t) => t.key === tile.key);
+      const selectedCity = state.cities[cityId] ?? state.cities[state.kingdoms[playerId].cityIds[0]], cost = tilePurchaseCost(state, selectedCity, tile);
+      const candidate = getTerritoryCandidates(state, selectedCity).some((t) => t.key === tile.key);
       const affordable = state.kingdoms[playerId].stockpiles.gold >= cost;
       const purchase = button(tile.ownerId ? '所有済み' : candidate ? `このセルを購入 · Gold ${cost}` : '購入できないセル', () => this.callbacks.onPurchase(tile.key)); purchase.id = 'purchase-tile';
       purchase.disabled = !candidate || !affordable || state.activePlayerId !== playerId; this.tileRoot.append(purchase);
+      this.tileRoot.append(node('p', `領土購入先: ${selectedCity.name}。この都市の領土に隣接する未所有セルを取得できます。`, 'hint'));
       if (candidate && !affordable) this.tileRoot.append(node('p', `購入にはGold ${cost}が必要です。`, 'hint'));
       this.tileRoot.append(node('h3', `駐留部隊 ${occupants.length} · Unit記録 ${units.length}`));
       for (const p of parties) {

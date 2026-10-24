@@ -78,4 +78,4 @@ K-10: active Partyだけが地図を占有します。敗北Party・Unit・HP・
 
 保存はaccuracy／evasion／tauntStrength／coverPowerの0〜1有限値とstatusEffectsの文字列・type/id識別子を検証します。不正なオブジェクトを文字列へ強制変換しません。
 
-検証: [戦闘テスト](../tests/ranged-combat.test.js)、[占有テスト](../tests/defeated-occupancy.test.js)、[遠隔ブラウザQA](../assets/qa/browser-ranged-2026-10-24.json)、[従来操作と敗北QA](../assets/qa/browser-grid-2026-10-24.json)。側面・背面攻撃、射線・地形Cover、汎用Ability、AI、勝利、都市別作業、Dungeonは後続です。
+検証: [戦闘テスト](../tests/ranged-combat.test.js)、[占有テスト](../tests/defeated-occupancy.test.js)、[遠隔ブラウザQA](../assets/qa/browser-ranged-2026-10-24.json)、[従来操作と敗北QA](../assets/qa/browser-grid-2026-10-24.json)。側面・背面攻撃、射線・地形Cover、汎用Ability、AI、勝利、FoundCity、Dungeonは後続です。都市別作業は[CITY_MANAGEMENT.md](CITY_MANAGEMENT.md)で対応しました。

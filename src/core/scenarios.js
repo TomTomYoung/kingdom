@@ -1,10 +1,18 @@
-import { addKingdom, createInitialGameState } from './game-state.js';
+import { addCity, addKingdom, createInitialGameState } from './game-state.js';
 import { createUnit } from '../models/unit.js';
 import { createParty } from '../models/party.js';
 import { updateDerivedCapabilities } from '../models/kingdom.js';
 
 export const createDuelGameState = (seed = 117) => createDuel(seed, false);
 export const createRangedDuelGameState = (seed = 117) => createDuel(seed, true);
+
+export function createTwoCityGameState(seed = 117) {
+  const state = createInitialGameState(seed, { startingParty: true });
+  state.scenarioId = 'two-cities';
+  state.world.tiles['4,-4,0'].terrainId = 'plains';
+  addCity(state, { ownerId: 'kingdom-1', id: 'city-2', name: '東都', centerHex: '4,-4,0' });
+  return state;
+}
 
 function createDuel(seed, ranged) {
   const state = createInitialGameState(seed);

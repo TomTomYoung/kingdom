@@ -4,6 +4,7 @@ import { RULESET } from './ruleset.js';
 import { processTurnStart } from './turn-engine.js';
 import { completeItem, validateProductionSelection } from '../systems/production-system.js';
 import { getTerritoryCandidates, tilePurchaseCost } from '../systems/territory-system.js';
+import { claimTileForCity } from '../systems/city-territory.js';
 import { updateDerivedCapabilities } from '../models/kingdom.js';
 import { createParty, validateFormation, isActiveUnit, hasActiveUnits, occupiesMapTile } from '../models/party.js';
 import { validateCommand } from './command-validation.js';
@@ -54,9 +55,9 @@ export class RuleSystem {
       const tile = Object.hasOwn(state.world.tiles, command.payload.tileKey) && state.world.tiles[command.payload.tileKey];
       if (!tile || tile.terrainId === 'void') return reject('購入できないタイルです');
       if (tile.ownerId !== null) return reject('所有済みまたは他国領です');
-      const candidates = getTerritoryCandidates(state, city); if (!candidates.some(({ key }) => key === tile.key)) return reject('領土に隣接していません');
+      const candidates = getTerritoryCandidates(state, city); if (!candidates.some(({ key }) => key === tile.key)) return reject('この都市の領土に隣接していません');
       const cost = tilePurchaseCost(state, city, tile); const kingdom = state.kingdoms[command.playerId]; if (kingdom.stockpiles.gold < cost) return reject('goldが不足しています');
-      kingdom.stockpiles.gold -= cost; tile.ownerId = kingdom.id; events.push({ type: 'TerritoryExpanded', cityId: city.id, tileKey: tile.key, source: 'gold', cost }); updateDerivedCapabilities(kingdom, state);
+      kingdom.stockpiles.gold -= cost; claimTileForCity(state, city, tile); events.push({ type: 'TerritoryExpanded', cityId: city.id, tileKey: tile.key, source: 'gold', cost }); updateDerivedCapabilities(kingdom, state);
     } else if (command.type === COMMAND_TYPES.CREATE_PARTY) {
       if (state.phase !== 'PLAYER_ACTION') return reject('行動フェーズではありません');
       const unitIds = command.payload.unitIds;

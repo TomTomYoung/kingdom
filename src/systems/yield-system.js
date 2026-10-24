@@ -1,10 +1,11 @@
 import { RULESET } from '../core/ruleset.js';
+import { getCityTerritoryTiles } from './city-territory.js';
 const YIELDS = ['food', 'production', 'gold', 'science', 'mana', 'religion', 'culture'];
 export const emptyYields = () => Object.fromEntries(YIELDS.map((key) => [key, 0]));
 
 export function assignWorkedTiles(state, city) {
-  const owned = Object.values(state.world.tiles)
-    .filter((tile) => tile.ownerId === city.ownerId && tile.terrainId !== 'void')
+  const owned = getCityTerritoryTiles(state, city)
+    .filter((tile) => tile.terrainId !== 'void')
     .sort((a, b) => {
       const ay = RULESET.terrain[a.terrainId].yields; const by = RULESET.terrain[b.terrainId].yields;
       const score = (y) => y.food * 3 + y.production * 2 + y.gold + y.science + y.mana + y.religion + y.culture;
@@ -27,9 +28,14 @@ export function calculateCityYields(state, city) {
     return { buildingId, yields };
   });
   total.food += 2; total.production += 1; total.gold += 2; total.science += 1; total.culture += 1;
-  YIELDS.forEach((name) => { total[name] += city.yieldModifiers?.[name] ?? 0; });
+  const modifiers = {};
+  YIELDS.forEach((name) => {
+    const before = total[name];
+    total[name] = Math.max(0, before + (city.yieldModifiers?.[name] ?? 0));
+    if (Object.hasOwn(city.yieldModifiers ?? {}, name)) modifiers[name] = total[name] - before;
+  });
   const center = { food: 2, production: 1, gold: 2, science: 1, culture: 1 };
   city.yieldSummary = total;
-  city.lastYieldBreakdown = { tiles, buildings, center, total: { ...total } };
+  city.lastYieldBreakdown = { tiles, buildings, center, modifiers, total: { ...total } };
   return city.lastYieldBreakdown;
 }
