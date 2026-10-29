@@ -23,7 +23,7 @@ export function validateScenarioSave(state) {
   const record = value => value !== null && typeof value === 'object' && !Array.isArray(value);
   const hasObjective = Object.hasOwn(state, 'scenarioObjective'), hasResult = Object.hasOwn(state, 'gameResult');
   if (!hasObjective && !hasResult) {
-    if (state.phase === 'GAME_OVER' || state.scenarioId === 'ai-skirmish') invalid('missing objective');
+    if (state.phase === 'GAME_OVER' || ['ai-skirmish', 'ai-reinforcements'].includes(state.scenarioId)) invalid('missing objective');
     return;
   }
   const objective = state.scenarioObjective;

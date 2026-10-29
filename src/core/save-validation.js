@@ -125,6 +125,7 @@ export function migrateAndValidateSave(state) {
     object(kingdom, `kingdoms.${id}`); check(kingdom.id === id, `kingdoms.${id}.id`); text(kingdom.name, `kingdoms.${id}.name`);
     defaultMissing(kingdom, 'controllerType', 'human');
     check(['human', 'ai'].includes(kingdom.controllerType), `kingdoms.${id}.controllerType`);
+    if (Object.hasOwn(kingdom, 'aiPolicy')) check(['tactical', 'reinforcements'].includes(kingdom.aiPolicy), `kingdoms.${id}.aiPolicy`);
     for (const [name, records] of [['cityIds', state.cities], ['unitIds', state.units]]) {
       ids(kingdom[name], `kingdoms.${id}.${name}`);
       for (const entityId of kingdom[name]) check(reference(records, entityId, `kingdoms.${id}.${name}`).ownerId === id, `kingdoms.${id}.${name}.ownerId`);
@@ -251,6 +252,7 @@ export function migrateAndValidateSave(state) {
       fields(kingdom.derived, ['militaryPower', 'governanceCapacity', 'governanceLoad'], `kingdoms.${kingdom.id}.derived`);
     }
   }
+  if (state.scenarioId === 'ai-reinforcements') check(Object.values(state.kingdoms).some(kingdom => kingdom.controllerType === 'ai' && kingdom.aiPolicy === 'reinforcements'), 'scenario.aiPolicy');
   validateScenarioSave(state);
   return state;
 }

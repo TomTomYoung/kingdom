@@ -2,6 +2,7 @@ export const RULESET_VERSION = 'm1.0';
 
 export const RULESET = Object.freeze({
   mapRadius: 10,
+  aiRecruitment: Object.freeze({ maxCombatUnits: 15, goldReserve: 24, purchasesPerCityPerTurn: 1, composition: Object.freeze({ warrior: 2, archer: 2, ballista: 1 }) }),
   founding: Object.freeze({ minimumCityDistance: 4, minimumMovement: 1, initialPopulation: 1, terrainIds: Object.freeze(['plains', 'grassland', 'forest', 'hills', 'arcane']) }),
   growthFoodBase: 12,
   growthFoodPerPopulation: 6,

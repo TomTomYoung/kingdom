@@ -1,4 +1,5 @@
 import { attackParty, moveParty, endTurn } from './commands.js';
+import { chooseCityExitCommand, chooseDeploymentCommand, chooseSupplyCommand } from './ai-economy.js';
 import { RuleSystem } from './rule-system.js';
 import { validatePartyAttack } from '../systems/combat-system.js';
 import { participatingUnits } from '../systems/combat-attacks.js';
@@ -46,6 +47,11 @@ export class AIController {
     const id = `ai-${this.playerId}-${state.currentTurn}-${state.commandLog.length + 1}`;
     const finish = () => endTurn(this.playerId, state.currentTurn, id);
     if (forceEnd) return finish();
+    const recruits = state.kingdoms[this.playerId].aiPolicy === 'reinforcements';
+    if (recruits) {
+      const command = chooseCityExitCommand(state, this.playerId, id) ?? chooseDeploymentCommand(state, this.playerId, id);
+      if (command) return command;
+    }
     const parties = ordered(state.parties), enemies = parties.filter(p => p.ownerId !== this.playerId && p.status === 'active' && hasActiveUnits(state, p));
     const own = parties.filter(p => p.ownerId === this.playerId && p.status === 'active' && p.activationState === 'ready' && p.attacksRemaining > 0 && hasActiveUnits(state, p));
     for (const party of own) for (const enemy of enemies) {
@@ -55,6 +61,10 @@ export class AIController {
     for (const party of own) {
       const path = approachPath(state, party, enemies);
       if (path) return moveParty(this.playerId, state.currentTurn, party.id, path, id);
+    }
+    if (recruits) {
+      const command = chooseSupplyCommand(state, this.playerId, id);
+      if (command) return command;
     }
     return finish();
   }

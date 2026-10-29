@@ -66,3 +66,5 @@ select:focus-visible{outline:2px solid #fff1be;outline-offset:3px}
 #city-work-panel{border-top:1px solid #53634c;margin:12px 0;padding-top:10px;font-size:12px;line-height:1.7}#city-work-panel summary{cursor:pointer;color:#d9cdab}#city-work-panel h3{font-size:12px;font-weight:500;color:#c7c9a3;margin:12px 0 6px}.city-work-tile{display:block;width:100%;text-align:left;margin:5px 0;line-height:1.6;overflow-wrap:anywhere}.city-yield-line,.city-yield-total{overflow-wrap:anywhere;margin:8px 0}.city-yield-total{border-top:1px solid #53634c;padding-top:8px}#city-territory,#production-city{font-size:12px}.map-toolbar>span:last-child{line-height:1.7}
 
 .scenario-status{border:1px solid #bcab6f;background:#25392c;padding:14px;margin:12px 0}.scenario-status[hidden]{display:none}.scenario-status h2{font-size:18px;margin:0 0 8px}.scenario-status p{font-size:13px;line-height:1.7;margin:0;overflow-wrap:anywhere}
+
+#ai-activity{border-top:1px solid #728560;margin-top:10px;padding-top:8px;color:#d9cdab}

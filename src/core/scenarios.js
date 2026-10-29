@@ -37,6 +37,13 @@ export function createAiSkirmishGameState(seed = 117) {
   return state;
 }
 
+export function createAiReinforcementGameState(seed = 117) {
+  const state = createAiSkirmishGameState(seed);
+  state.scenarioId = 'ai-reinforcements';
+  state.kingdoms['kingdom-2'].aiPolicy = 'reinforcements';
+  return state;
+}
+
 function createDuel(seed, ranged) {
   const state = createInitialGameState(seed);
   state.scenarioId = ranged ? 'ranged-duel' : 'duel';

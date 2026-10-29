@@ -2,11 +2,11 @@
 
 確認・更新日: 2026-10-30
 
-開始基準: main / 78cd40667526181b4de51c194458a952667926c5（PR #6マージ後）。戦術AI、「AIとの遭遇戦」、部隊撃破による勝敗と40ターン期限、終了状態の保存・操作制御を追加しました。現行規則と制約は[AI_SCENARIOS.md](AI_SCENARIOS.md)、検証範囲は[STATUS.md](STATUS.md)に記載しています。
+開始基準: main / 78cd40667526181b4de51c194458a952667926c5（PR #6マージ後）。戦術AI、「AIとの遭遇戦」、勝敗と40ターン期限、終了状態の保存・操作制御を追加しました。PR #7の0820eaeから、兵の生産・購入・編成を行う「AIとの増援戦」を追加しています。現行規則と制約は[AI_SCENARIOS.md](AI_SCENARIOS.md)、検証範囲は[STATUS.md](STATUS.md)に記載しています。
 
 ## 1. 範囲と現在地
 
-現在の実装はM1の都市運営ループと、M2の複数都市運営・Party作成・移動・近接・遠隔・照準・範囲戦闘、戦術AIと遭遇戦の勝敗です。画面から使える範囲とcore APIだけの範囲を分けて記録します。「内部実装済み」は目標仕様の全受入条件を満たした意味ではありません。
+現在の実装はM1の都市運営ループと、M2の複数都市運営・Party作成・移動・近接・遠隔・照準・範囲戦闘、戦術AI、兵の生産・購入・増援編成、遭遇戦の勝敗です。画面から使える範囲とcore APIだけの範囲を分けて記録します。「内部実装済み」は目標仕様の全受入条件を満たした意味ではありません。
 
 目標仕様は [SPECIFICATION.md](./SPECIFICATION.md)、未修正課題と検証結果は [STATUS.md](./STATUS.md)、次作業は [HANDOFF.md](./HANDOFF.md) を参照してください。旧Phaser版は [LEGACY_IMPLEMENTATION.md](./LEGACY_IMPLEMENTATION.md) に保存しています。
 
@@ -55,6 +55,8 @@ npm run check
 
 「二国対戦（交互操作）」を選んで新規開始すると、二国・各1都市・戦士3体ずつの隣接部隊から始まります。「遠隔部隊の二国対戦」は戦士2・弓兵2・弩砲1の5体ずつです。攻撃内容とUnit／枠／行／列の照準を選び、命中率・範囲・予測被害を表示します。ターン終了で操作王国と首都が切り替わり、双方を人が操作します。別の「AIとの遭遇戦」では夕映王国が移動・攻撃・手番終了を自動実行し、全敵活動部隊撃破または40ターンで終了します。[戦闘操作](COMBAT_OPERATIONS.md)を参照してください。
 
+「AIとの増援戦」は遭遇戦と同じ開始配置・終了条件で、敵が兵の生産・購入・編成も行います。直近のAI手番の行動回数を地図上部で確認できます。全敵活動部隊撃破で即終了するため、未編成の兵や都市が残っていても復活しません。
+
 「二都市運営」は同一王国の暁都（0,0,0）と東都（4,-4,0）で始まります。「操作する都市」で表示と生産・購入・領土取得先を切り替えます。地図は選択都市の領土を緑の内枠、収集時の作業を緑点で示します。セル詳細は所有国・所属都市・都市中心・作業記録を分けます。選択都市は表示状態で、ロード成功後は現在手番の先頭都市へ戻り、ロード失敗では都市選択も維持します。
 
 「開拓者と護衛」は戦士1・開拓者1の部隊で始まります。開拓者入り部隊の都市建設欄で、現在地の可否と拒否理由を確認し、開拓者を選んで建設します。成功時は新都市へ選択を移し、人口1、収入未収集で表示します。開拓者単独の部隊も使えます。詳細は[CITY_MANAGEMENT.md](CITY_MANAGEMENT.md)。
@@ -79,7 +81,7 @@ RuleSystem.execute(original, command)は成功時に複製したstateとevents�
 10. SetGuardOrder（modeはoff／share／intercept）
 11. FoundCity（partyId・settlerUnitIdを指定）
 
-HumanControllerは上記のCommandを生成します。AIControllerは合法な通常遠隔／近接攻撃、射程内への経路移動、EndTurnを選び、共通RuleSystemで実行します。次のRNGを読まず、同じ入力に同じCommandを返します。RemoteController、ReplayController、汎用の合法手一覧APIはありません。[AIの判断・制約](AI_SCENARIOS.md)。
+HumanControllerは上記のCommandを生成します。AIControllerは合法な通常遠隔／近接攻撃、射程内への経路移動、EndTurnを選び、共通RuleSystemで実行します。次のRNGを読まず、同じ入力に同じCommandを返します。reinforcements方針では都市の出口確保、CreateParty、空の都市のSetCityProduction、予備費と購入回数を守るPurchaseCityItemも選びます。RemoteController、ReplayController、汎用の合法手一覧APIはありません。[AIの判断・制約](AI_SCENARIOS.md)。
 
 addKingdomは別王国とその都市、addCityは同一王国の都市を追加するセットアップ用関数です。createTwoCityGameStateで同一王国の暁都・東都を配置し、画面で切り替えて運営できます。ゲーム中の都市建設はFoundCityを通し、開拓者だけを消費します。セットアップ関数は最低距離などのCommand条件を代替しません。任意プレイヤー設定は未実装です。
 
@@ -178,7 +180,7 @@ HP0ではindividualならdowned、他はshatteredです。現行定義はdetachm
 
 ## 11. セーブと検証範囲
 
-遭遇戦はscenarioObjective（eliminate-parties・参加2国・期限40）とgameResultを保存します。GAME_OVERでは全Commandを原状保持で拒否します。目標・結果・phase・生存部隊・期限・手番の整合性を復元時に検証します。旧モードには目標や結果を追加せず、欠落したcontrollerTypeだけhumanへ補完します。AI手番のロードは人の表示を維持して自動再開し、新規開始・別保存のロード・ページ離脱で旧タイマーを取り消します。
+遭遇戦はscenarioObjective（eliminate-parties・参加2国・期限40）とgameResultを保存します。GAME_OVERでは全Commandを原状保持で拒否します。目標・結果・phase・生存部隊・期限・手番の整合性を復元時に検証します。旧モードには目標や結果を追加せず、欠落したcontrollerTypeだけhumanへ補完します。aiPolicyの省略は戦術AIとして維持し、存在する不正値や増援戦なのに増援AIがない保存は拒否します。AI手番のロードは人の表示を維持して自動再開し、新規開始・別保存のロード・ページ離脱で旧タイマーを取り消します。
 
 serializeGameState／restoreGameStateでJSON化・復元します。nextIds.cityを保存し、欠落した旧形式は既存city-Nの最大N+1（該当なしは1）で補完します。存在する不正値・既存都市IDとの衝突は拒否します。UIはlocalStorageのkingdom-m1-save一枠を使用します。save-validation.jsで必須構造・数値範囲・地形と都市・所属の双方向参照・3×3配置・次ID・手番・RNGを検証し、復元成功後だけstateを置換します。guardOrders・guardRangeの欠落は空指示・距離1で補完し、既存の率0・容量0は維持します。accuracy欠落は1、evasion／tauntStrength／coverPower欠落は0で補完し、全確率を0〜1の有限値で検証します。statusEffectsは空でない文字列、またはtype/idに空でない文字列を持つ辞書に限ります。活動中Partyの重複占有と、生存Unitを含む偽の敗北Partyを拒否し、敗北記録と生存Partyの同座標を許可します。既知M1のParty・turnOrder・戦闘フィールドの欠落を補完し、旧37セルを再生成せず維持します。nullや不明参照を既定値で隠さず、未知版を拒否します。失敗時は現在の対局・選択・カメラ倍率を維持します。
 
