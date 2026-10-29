@@ -38,19 +38,20 @@ export class CombatPanel {
     if (this.attackId === 'area') return { attackId: this.attackId, targetSlot: this.targetSlot };
     return { attackId: 'normal' };
   }
-  render(state, partyId, targetId) {
+  render(state, partyId, targetId, viewerId = state.activePlayerId) {
+    const canAct = state.phase === 'PLAYER_ACTION' && state.activePlayerId === viewerId && state.kingdoms[viewerId].controllerType !== 'ai';
     const root = this.root, party = state.parties[partyId], target = state.parties[targetId];
     root.replaceChildren(node('h2', '戦闘と護衛'));
-    const enemies = Object.values(state.parties).filter(p => p.ownerId !== state.activePlayerId);
+    const enemies = Object.values(state.parties).filter(p => p.ownerId !== viewerId);
     if (!enemies.length) root.append(node('p', '敵部隊はいません。二国対戦を新規開始すると、交互操作で戦闘できます。', 'hint'));
     else {
       const targetControl = select('combat-target', [['', '敵部隊を選択'], ...enemies.map(p => [p.id, `${state.kingdoms[p.ownerId].name} · ${partyName(p)}${p.status === 'defeated' ? '（敗北）' : ''}`])], targetId ?? '');
       targetControl.onchange = () => this.callbacks.onTarget(targetControl.value); root.append(field('攻撃対象', targetControl));
     }
-    if (party?.ownerId === state.activePlayerId) {
+    if (party?.ownerId === viewerId) {
       root.append(node('p', `${partyName(party)} · 攻撃 ${party.attacksRemaining}/${party.attacksMaximum} · 割り込み残数 ${party.reactionCharges}`, 'hint'));
       if (target) {
-        const rerender = () => this.render(state, partyId, targetId);
+        const rerender = () => this.render(state, partyId, targetId, viewerId);
         const type = select('attack-type', [['melee', '近接（反撃あり）'], ['ranged', '遠隔（標準反撃なし）']], this.attackType);
         type.onchange = () => { this.attackType = type.value; if (this.attackType === 'melee') this.attackId = 'normal'; rerender(); }; root.append(field('攻撃方式', type));
         const profile = select('attack-profile', Object.entries(ATTACK_DEFINITIONS).filter(([id]) => this.attackType === 'ranged' || id === 'normal').map(([id, definition]) => [id, definition.name]), this.attackId);
@@ -89,22 +90,22 @@ export class CombatPanel {
           if (preview.primaryTargetId) forecast.append(node('p', `主対象: ${unitName(state.units[preview.primaryTargetId])} ${preview.primaryTargetId}`));
           if (preview.covers?.length) forecast.append(node('p', `遮蔽: ${preview.covers.join('、')}。前にいるUnitが狙い撃ちに影響します。`));
           if (preview.taunts?.length) forecast.append(node('p', `挑発: ${preview.taunts.join('、')}。${this.attackId === 'normal' ? '通常攻撃の対象を引きつけます。' : '指定した対象は変わらず、狙い撃ちの命中率へ影響します。'}`));
-          for (const [id, range] of Object.entries(preview.damage).filter(([, range]) => range.max > 0)) forecast.append(node('p', `${state.units[id].ownerId === state.activePlayerId ? '自軍' : '敵軍'} ${id}: ${range.min}〜${range.max}${preview.guards.includes(id) ? ' · 護衛' : ''}${preview.intercepts.includes(id) ? ' · 割り込み' : ''}${preview.covers?.includes(id) ? ' · 遮蔽' : ''}`));
+          for (const [id, range] of Object.entries(preview.damage).filter(([, range]) => range.max > 0)) forecast.append(node('p', `${state.units[id].ownerId === viewerId ? '自軍' : '敵軍'} ${id}: ${range.min}〜${range.max}${preview.guards.includes(id) ? ' · 護衛' : ''}${preview.intercepts.includes(id) ? ' · 割り込み' : ''}${preview.covers?.includes(id) ? ' · 遮蔽' : ''}`));
           forecast.append(node('small', '命中・失敗・護衛を含む範囲です。攻撃回数を1消費し、この部隊の行動を終了します。'));
         } else forecast.append(node('p', preview.reason));
-        const attack = node('button', '攻撃する'); attack.id = 'attack-party'; attack.disabled = !preview.ok;
+        const attack = node('button', '攻撃する'); attack.id = 'attack-party'; attack.disabled = !canAct || !preview.ok;
         attack.onclick = () => this.callbacks.onAttack(targetId, this.attackType, options); root.append(forecast, attack);
       } else root.append(node('p', '自軍部隊を選び、敵の駒か上の一覧で攻撃対象を指定してください。', 'hint'));
       if (party.unitIds.length > 1 && party.status === 'active') {
         root.append(node('h3', '護衛の設定'));
         if (!party.unitIds.includes(this.guardId)) this.guardId = Object.keys(party.guardOrders ?? {})[0] ?? party.unitIds[0];
         const guard = select('guard-unit', party.unitIds.map(id => [id, `${id} · 容量 ${state.units[id].guardCapacityRemaining}/${state.units[id].guardCapacityMax}`]), this.guardId);
-        guard.onchange = () => { this.guardId = guard.value; this.render(state, partyId, targetId); };
+        guard.onchange = () => { this.guardId = guard.value; this.render(state, partyId, targetId, viewerId); };
         const order = party.guardOrders?.[this.guardId];
         const protect = select('guard-target', party.unitIds.filter(id => id !== this.guardId).map(id => [id, id]), order?.targetUnitId);
         const mode = select('guard-mode', [['off', '護衛なし'], ['share', '肩代わり'], ['intercept', '割り込み（反応1）']], order?.mode ?? 'off');
         root.append(field('護衛するUnit', guard), field('守るUnit', protect), field('護衛方式', mode));
-        const apply = node('button', '護衛設定を適用', 'secondary'); apply.id = 'set-guard';
+        const apply = node('button', '護衛設定を適用', 'secondary'); apply.id = 'set-guard'; apply.disabled = !canAct;
         apply.onclick = () => this.callbacks.onGuard(party.id, guard.value, protect.value, mode.value); root.append(apply);
         const guardUnit = state.units[this.guardId];
         root.append(node('p', `このUnitの護衛範囲は縦横${guardUnit.guardRange ?? 1}枠以内、肩代わり${Math.round(guardUnit.guardRate * 100)}%、容量${guardUnit.guardCapacityRemaining}/${guardUnit.guardCapacityMax}です。割り込みは部隊の反応を1使います。範囲攻撃の護衛は主対象に1回だけ発動します。直撃と肩代わりは合算して装甲を1回適用します。範囲外や戦闘不能では発動しません。`, 'hint'));

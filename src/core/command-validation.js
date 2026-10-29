@@ -14,6 +14,7 @@ const fields = {
 
 // Check untrusted command structure before any payload dereference or state clone.
 export function validateCommand(state, command) {
+  if (state.gameResult || state.phase === 'GAME_OVER') return '対局は終了しています。新規開始で次の対局を始めてください';
   if (!record(command) || !identifier(command.commandId)) return 'commandIdが必要です';
   if (!Object.values(COMMAND_TYPES).includes(command.type)) return '不明なCommandです';
   if (!identifier(command.playerId) || !Object.hasOwn(state.kingdoms, command.playerId)) return '不明なプレイヤーです';

@@ -11,6 +11,7 @@ import { validateCommand } from './command-validation.js';
 import { validatePartyPath } from '../systems/movement-system.js';
 import { validateGuardOrder } from '../systems/damage-grid.js';
 import { resolvePartyAttack } from '../systems/combat-system.js';
+import { resolveScenario } from '../systems/scenario-system.js';
 import { resolveFoundCity } from '../systems/founding-system.js';
 
 const fail = (reason) => ({ ok: false, reason });
@@ -116,10 +117,15 @@ export class RuleSystem {
     } else if (command.type === COMMAND_TYPES.END_TURN) {
       if (state.phase !== 'PLAYER_ACTION') return reject('行動フェーズではありません');
       events.push({ type: 'PlayerTurnEnded', turn: command.turn, playerId: command.playerId });
-      state.activePlayerIndex = (state.activePlayerIndex + 1) % state.turnOrder.length; state.activePlayerId = state.turnOrder[state.activePlayerIndex];
-      if (state.activePlayerIndex === 0) { state.phase = 'TURN_END'; state.currentTurn += 1; events.push({ type: 'TurnEnded', turn: command.turn }); processTurnStart(state, events); }
+      const roundComplete = state.activePlayerIndex === state.turnOrder.length - 1;
+      resolveScenario(state, events, { roundComplete });
+      if (!state.gameResult) {
+        state.activePlayerIndex = (state.activePlayerIndex + 1) % state.turnOrder.length; state.activePlayerId = state.turnOrder[state.activePlayerIndex];
+        if (roundComplete) { state.phase = 'TURN_END'; state.currentTurn += 1; events.push({ type: 'TurnEnded', turn: command.turn }); processTurnStart(state, events); }
+      }
     } else return reject('不明なCommandです');
 
+    resolveScenario(state, events);
     state.commandLog.push(structuredClone(command)); state.eventLog.push(...events.map((event) => ({ turn: state.currentTurn, ...event })));
     return { ok: true, state, events };
   }

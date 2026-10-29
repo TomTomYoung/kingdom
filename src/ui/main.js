@@ -1,7 +1,8 @@
-import { createDuelGameState, createRangedDuelGameState, createTwoCityGameState, createSettlementGameState } from '../core/scenarios.js';
+import { createDuelGameState, createRangedDuelGameState, createTwoCityGameState, createSettlementGameState, createAiSkirmishGameState } from '../core/scenarios.js';
 import { CombatPanel } from './combat-panel.js';
 import { createInitialGameState, restoreGameState, serializeGameState } from '../core/game-state.js';
 import { HumanController } from '../core/human-controller.js';
+import { executeAiStep, AI_TURN_COMMAND_LIMIT } from '../core/ai-controller.js';
 import { RuleSystem } from '../core/rule-system.js';
 import { RULESET } from '../core/ruleset.js';
 import { getTerritoryCandidates, tilePurchaseCost } from '../systems/territory-system.js';
@@ -18,8 +19,12 @@ const controller = new HumanController('kingdom-1'), assets = new AssetStore();
 let storage;
 try { storage = window.localStorage; } catch { /* The game is playable without persistence. */ }
 const audio = new GameAudio(assets, { storage, onStatus: (text) => { $('#audio-status').textContent = text; } });
-function newGame(mode = 'single') { controller.playerId = 'kingdom-1'; const initial = mode === 'settlement' ? createSettlementGameState(117) : mode === 'two-cities' ? createTwoCityGameState(117) : mode === 'ranged-duel' ? createRangedDuelGameState(117) : mode === 'duel' ? createDuelGameState(117) : createInitialGameState(117, { startingParty: true }); return RuleSystem.execute(initial, controller.startTurn(initial)).state; }
+function newGame(mode = 'single') { controller.playerId = 'kingdom-1'; const initial = mode === 'ai-skirmish' ? createAiSkirmishGameState(117) : mode === 'settlement' ? createSettlementGameState(117) : mode === 'two-cities' ? createTwoCityGameState(117) : mode === 'ranged-duel' ? createRangedDuelGameState(117) : mode === 'duel' ? createDuelGameState(117) : createInitialGameState(117, { startingParty: true }); return RuleSystem.execute(initial, controller.startTurn(initial)).state; }
 let state = newGame(), selectedPartyId = 'party-1', selectedUnitId = 'unit-1', selectedTileKey = '0,0,0', hoveredKey = null, reachable = new Map(), selectedEnemyId = null, selectedCityId = 'city-1';
+let aiTimer = null, aiGeneration = 0, aiError = null;
+const isAiTurn = () => !state.gameResult && state.phase === 'PLAYER_ACTION' && state.kingdoms[state.activePlayerId].controllerType === 'ai';
+const canAct = () => !state.gameResult && state.phase === 'PLAYER_ACTION' && state.activePlayerId === controller.playerId && !isAiTurn();
+const viewerId = () => state.kingdoms[state.activePlayerId].controllerType === 'ai' ? state.turnOrder.find(id => state.kingdoms[id].controllerType === 'human') ?? state.activePlayerId : state.activePlayerId;
 const currentCity = () => state.cities[state.kingdoms[controller.playerId].cityIds.includes(selectedCityId) ? selectedCityId : state.kingdoms[controller.playerId].cityIds[0]];
 const labels = { food: '食料', production: '生産', gold: 'Gold', science: '科学', mana: 'Mana', religion: '宗教', culture: '文化', popularSupport: '人心' };
 const assetId = (name) => `icon-${name === 'popularSupport' ? 'popular-support' : name}`;
@@ -53,19 +58,53 @@ const combatPanel = new CombatPanel($('#combat-panel'), {
 });
 
 function run(command, success) {
-  const result = RuleSystem.execute(state, command); void audio.play(soundForResult(result, command));
+  if (!canAct()) { const reason = state.gameResult ? '対局は終了しています。新規開始で次の対局を始めてください。' : 'AIの手番です。完了するまでお待ちください。'; reject(reason); return { ok: false, reason, state, events: [] }; }
+  return applyResult(RuleSystem.execute(state, command), command, success);
+}
+function applyResult(result, command, success) {
+  void audio.play(soundForResult(result, command));
   if (!result.ok) { show(result.reason); return result; }
-  const previousPlayer = state.activePlayerId;
+  const previousPlayer = controller.playerId;
   state = result.state;
-  if (state.activePlayerId !== previousPlayer) {
-    controller.playerId = state.activePlayerId; selectedCityId = state.kingdoms[controller.playerId].cityIds[0]; selectedPartyId = Object.values(state.parties).find(p => p.ownerId === controller.playerId && p.status === 'active')?.id ?? null;
+  if (viewerId() !== previousPlayer) {
+    controller.playerId = viewerId(); selectedCityId = state.kingdoms[controller.playerId].cityIds[0]; selectedPartyId = Object.values(state.parties).find(p => p.ownerId === controller.playerId && p.status === 'active')?.id ?? null;
     selectedUnitId = state.parties[selectedPartyId]?.leaderUnitId ?? null; selectedEnemyId = null; selectedTileKey = state.parties[selectedPartyId]?.location ?? currentCity().centerHex;
     formationPanel.clear(); inspection.clear(); hoveredKey = null;
   }
   show(typeof success === 'function' ? success() : success); render();
   if (result.events.some(event => event.type === 'CombatDamage')) map.playCombat(result.events);
-  if (state.activePlayerId !== previousPlayer) map.focus(selectedTileKey);
-  return result;
+  if (controller.playerId !== previousPlayer) map.focus(selectedTileKey);
+  scheduleAi(); return result;
+}
+function cancelAi() { clearTimeout(aiTimer); aiTimer = null; aiGeneration++; aiError = null; }
+function scheduleAi() {
+  if (aiTimer !== null || aiError || !isAiTurn()) return;
+  const generation = aiGeneration;
+  aiTimer = setTimeout(() => {
+    aiTimer = null;
+    if (generation !== aiGeneration || !isAiTurn()) return;
+    try {
+      const count = state.commandLog.filter(command => command.playerId === state.activePlayerId && command.turn === state.currentTurn).length;
+      const result = executeAiStep(state, { forceEnd: count >= AI_TURN_COMMAND_LIMIT });
+      if (!result.ok) throw new Error(result.reason);
+      applyResult(result, result.command, result.command.type === 'EndTurn' ? 'AIの手番が終了しました。あなたの手番です。' : result.command.type === 'AttackParty' ? 'AIが攻撃しました。戦闘ログで結果を確認できます。' : 'AIが部隊を移動しました。');
+    } catch (error) { aiError = error.message; show(`AIを停止しました: ${aiError}`); render(); }
+  }, 180);
+}
+function renderScenario() {
+  $('#scenario-status').hidden = !state.scenarioObjective;
+  const result = state.gameResult;
+  if (result) {
+    $('#scenario-title').textContent = result.outcome === 'draw' ? '引き分け' : result.winnerId === controller.playerId ? '勝利' : '敗北';
+    const reason = result.reason === 'turn-limit' ? '制限ターンに到達しました。'
+      : result.winnerId ? `${state.kingdoms[result.winnerId].name}が敵部隊をすべて撃破しました。` : '両軍の部隊が全滅しました。';
+    $('#scenario-detail').textContent = `${reason} ターン ${result.turn}で終了。地図・戦闘ログの確認とセーブができます。次の対局は「新規開始」から。`;
+  } else {
+    $('#scenario-title').textContent = aiError ? 'AIを停止しました' : isAiTurn() ? 'AIが行動中' : 'AIとの遭遇戦';
+    const status = aiError ?? (isAiTurn() ? 'AIの手番中も地図の確認とセーブができます。' : 'ターン終了でAIが行動します。');
+    $('#scenario-detail').textContent = `敵の全活動部隊を撃破すると勝利。都市・待機Unitは勝敗の対象外です。${state.scenarioObjective?.turnLimit ?? 40}ターン終了で引き分け。 ${status}`;
+  }
+  $('#ai-resume').hidden = !aiError || !isAiTurn();
 }
 function reject(message) { show(message); void audio.play('se-ui-error'); }
 function selectParty(id, focus = true) {
@@ -190,7 +229,7 @@ function renderFounding() {
   if (!settlers.length) return;
   const validity = validateFoundCity(state, controller.playerId, party.id, selector.value);
   $('#founding-site').textContent = `建設地点: 部隊の現在地 (${party.location})。既存都市から${RULESET.founding.minimumCityDistance}ヘクス以上離れた未所有の土地に建設できます。`;
-  $('#found-city').disabled = !validity.ok;
+  $('#found-city').disabled = !canAct() || !validity.ok;
   $('#founding-status').textContent = validity.ok ? '開拓者1体を消費し、同行部隊の行動を終了します。新都市は人口1で始まり、収入は次のターン開始からです。' : validity.reason;
 }
 
@@ -202,8 +241,9 @@ function render() {
   if (!state.units[selectedUnitId]) selectedUnitId = null;
   if (!state.world.tiles[selectedTileKey]) selectedTileKey = city.centerHex;
   const party = state.parties[selectedPartyId];
-  reachable = party?.ownerId === controller.playerId && state.activePlayerId === controller.playerId ? getReachablePartyPaths(state, party) : new Map();
-  $('#active-kingdom').textContent = `${k.name}の手番`;
+  reachable = party?.ownerId === controller.playerId && canAct() ? getReachablePartyPaths(state, party) : new Map();
+  $('#active-kingdom').textContent = state.gameResult ? '対局終了' : `${state.kingdoms[state.activePlayerId].name}の手番${isAiTurn() ? '（AI）' : ''}`;
+  $('#end-turn').disabled = !canAct(); renderScenario();
   $('#turn').textContent = state.currentTurn; $('#seed').textContent = `固定シード ${state.seed} · ${Object.keys(state.world.tiles).length}セル`;
   $('#city-name').textContent = city.name; $('#population').textContent = `人口 ${city.population}`;
   $('#resources').replaceChildren(...Object.entries({ ...k.stockpiles, science: k.progress.science, culture: k.progress.culture }).map(([name, value]) => stat(name, value)));
@@ -223,9 +263,9 @@ function render() {
   $('#deselect-party').disabled = !party && !selectedUnitId; $('#focus-party').disabled = !party && !selectedUnitId;
   $('#map-mode').textContent = party ? `${partyName(party)} 選択中` : selectedUnitId ? '待機Unit 選択中' : 'セル確認';
   renderFounding(); renderRoster(); formationPanel.render(state, party); renderInspection(); updateHover(); drawMap();
-  combatPanel.render(state, selectedPartyId, selectedEnemyId);
+  combatPanel.render(state, selectedPartyId, selectedEnemyId, controller.playerId);
   void audio.setMusic(state.parties[selectedEnemyId]?.status === 'active' ? 'bgm-battle' : 'bgm-overworld');
-  document.querySelectorAll('[data-produce],[data-buy]').forEach(button => { const id = button.dataset.produce ?? button.dataset.buy; button.disabled = RULESET.items[id].category === 'building' && city.buildings.includes(id); });
+  document.querySelectorAll('[data-produce],[data-buy]').forEach(button => { const id = button.dataset.produce ?? button.dataset.buy; button.disabled = !canAct() || RULESET.items[id].category === 'building' && city.buildings.includes(id); });
 }
 
 const gesture = () => { void audio.unlock(); };
@@ -265,14 +305,15 @@ $('#load').onclick = () => {
     const save = storage?.getItem('kingdom-m1-save'); if (!save) return reject('セーブデータがありません');
     const restored = restoreGameState(save);
     if (!restored.turnOrder.every(id => restored.cities[restored.kingdoms[id].cityIds[0]])) throw new Error('このセーブは現在の画面に対応していません');
-    state = restored; controller.playerId = state.activePlayerId; selectedCityId = state.kingdoms[controller.playerId].cityIds[0]; selectedEnemyId = null; $('#game-mode').value = state.scenarioId === 'settlement' ? 'settlement' : state.scenarioId === 'two-cities' ? 'two-cities' : state.scenarioId === 'ranged-duel' ? 'ranged-duel' : state.turnOrder.length > 1 ? 'duel' : 'single'; selectedPartyId = null; selectedUnitId = null; selectedTileKey = currentCity().centerHex; hoveredKey = null;
-    formationPanel.clear(); inspection.clear(); combatPanel.reset(); map.camera.zoom = 1; render(); map.focus(selectedTileKey); show('セーブをロードしました'); void audio.play('se-load');
+    cancelAi(); state = restored; controller.playerId = viewerId(); selectedCityId = state.kingdoms[controller.playerId].cityIds[0]; selectedEnemyId = null; $('#game-mode').value = state.scenarioId === 'ai-skirmish' ? 'ai-skirmish' : state.scenarioId === 'settlement' ? 'settlement' : state.scenarioId === 'two-cities' ? 'two-cities' : state.scenarioId === 'ranged-duel' ? 'ranged-duel' : state.turnOrder.length > 1 ? 'duel' : 'single'; selectedPartyId = null; selectedUnitId = null; selectedTileKey = currentCity().centerHex; hoveredKey = null;
+    formationPanel.clear(); inspection.clear(); combatPanel.reset(); map.camera.zoom = 1; render(); map.focus(selectedTileKey); show('セーブをロードしました'); void audio.play('se-load'); scheduleAi();
   } catch (error) { state = before; ({ selectedCityId, selectedPartyId, selectedUnitId, selectedTileKey, hoveredKey, selectedEnemyId } = selection); controller.playerId = selection.playerId; render(); reject(error.message || 'セーブをロードできませんでした'); }
 };
 $('#reset').onclick = () => {
-  state = newGame($('#game-mode').value); selectedCityId = state.kingdoms[controller.playerId].cityIds[0]; selectedEnemyId = null; selectedPartyId = 'party-1'; selectedUnitId = 'unit-1'; selectedTileKey = state.parties[selectedPartyId].location; hoveredKey = null;
-  formationPanel.clear(); inspection.clear(); combatPanel.reset(); map.camera.zoom = 1; audio.stop(); void audio.startMusic(); render(); map.focus(selectedTileKey); show(state.scenarioId === 'settlement' ? '開拓者と護衛で開始しました。部隊を既存都市から4ヘクス以上離れた未所有の土地へ移動し、移動力を1以上残して都市を建設してください。' : state.scenarioId === 'two-cities' ? '二都市の運営を開始しました。操作都市を切り替えると、生産・購入・領土取得の対象が変わります。' : state.turnOrder.length > 1 ? '二国対戦を開始しました。敵部隊を選んで攻撃できます。ターン終了で操作する王国を交代します。' : '331セルの新規マップで開始しました。最初の部隊を操作できます。'); void audio.play('se-turn-start');
+  cancelAi(); state = newGame($('#game-mode').value); selectedCityId = state.kingdoms[controller.playerId].cityIds[0]; selectedEnemyId = null; selectedPartyId = 'party-1'; selectedUnitId = 'unit-1'; selectedTileKey = state.parties[selectedPartyId].location; hoveredKey = null;
+  formationPanel.clear(); inspection.clear(); combatPanel.reset(); map.camera.zoom = 1; audio.stop(); void audio.startMusic(); render(); map.focus(selectedTileKey); show(state.scenarioId === 'ai-skirmish' ? 'AIとの遭遇戦を開始しました。敵の全活動部隊を撃破すると勝利です。ターン終了でAIが行動します。' : state.scenarioId === 'settlement' ? '開拓者と護衛で開始しました。部隊を既存都市から4ヘクス以上離れた未所有の土地へ移動し、移動力を1以上残して都市を建設してください。' : state.scenarioId === 'two-cities' ? '二都市の運営を開始しました。操作都市を切り替えると、生産・購入・領土取得の対象が変わります。' : state.turnOrder.length > 1 ? '二国対戦を開始しました。敵部隊を選んで攻撃できます。ターン終了で操作する王国を交代します。' : '331セルの新規マップで開始しました。最初の部隊を操作できます。'); void audio.play('se-turn-start');
 };
+$('#ai-resume').onclick = () => { aiError = null; render(); scheduleAi(); };
 function updateAudioControls() {
   $('#audio-toggle').textContent = audio.muted ? '音声をオン' : '音声をオフ'; $('#audio-toggle').setAttribute('aria-pressed', String(!audio.muted));
   $('#volume').value = Math.round(audio.volume * 100); $('#volume-value').textContent = `${Math.round(audio.volume * 100)}%`;
@@ -280,7 +321,7 @@ function updateAudioControls() {
 $('#audio-toggle').onclick = () => { void audio.setMuted(!audio.muted); updateAudioControls(); };
 $('#audio-retry').onclick = () => { void audio.retry(); };
 $('#volume').oninput = (event) => { audio.setVolume(Number(event.target.value) / 100); updateAudioControls(); };
-document.addEventListener('visibilitychange', () => audio.setHidden(document.hidden)); window.addEventListener('pagehide', () => audio.stop()); window.addEventListener('resize', () => map.draw());
+document.addEventListener('visibilitychange', () => audio.setHidden(document.hidden)); window.addEventListener('pagehide', () => { cancelAi(); audio.stop(); }); window.addEventListener('pageshow', scheduleAi); window.addEventListener('resize', () => map.draw());
 updateAudioControls(); render();
 let repaint;
 void assets.load({ onProgress: () => { cancelAnimationFrame(repaint); repaint = requestAnimationFrame(render); } }).then(() => {

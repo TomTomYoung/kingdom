@@ -26,6 +26,17 @@ export function createSettlementGameState(seed = 117) {
   return state;
 }
 
+export function createAiSkirmishGameState(seed = 117) {
+  const state = createDuel(seed, true);
+  state.scenarioId = 'ai-skirmish'; state.kingdoms['kingdom-2'].controllerType = 'ai';
+  const enemy = state.parties['party-2']; enemy.location = '6,-6,0';
+  enemy.unitIds.forEach(id => { state.units[id].location = enemy.location; });
+  for (let q = 1; q <= 6; q++) state.world.tiles[`${q},${-q},0`].terrainId = 'plains';
+  state.scenarioObjective = { type: 'eliminate-parties', participantIds: [...state.turnOrder], turnLimit: 40 };
+  state.gameResult = null;
+  return state;
+}
+
 function createDuel(seed, ranged) {
   const state = createInitialGameState(seed);
   state.scenarioId = ranged ? 'ranged-duel' : 'duel';

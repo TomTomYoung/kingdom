@@ -1,3 +1,4 @@
+import { validateScenarioSave } from '../systems/scenario-system.js';
 import { RULESET } from './ruleset.js';
 import { validateFormation, occupiesMapTile, hasActiveUnits } from '../models/party.js';
 import { assignLegacyCityTerritories } from '../systems/city-territory.js';
@@ -65,7 +66,7 @@ export function migrateAndValidateSave(state) {
 
   integer(state.currentTurn, 'currentTurn', 1);
   integer(state.lastProcessedTurn, 'lastProcessedTurn', 0, state.currentTurn);
-  check(['PLAYER_ACTION', 'TURN_END'].includes(state.phase), 'phase');
+  check(['PLAYER_ACTION', 'TURN_END', 'GAME_OVER'].includes(state.phase), 'phase');
   check(state.turnOrder.length > 0 && state.turnOrder.length === Object.keys(state.kingdoms).length, 'turnOrder');
   state.turnOrder.forEach((id) => reference(state.kingdoms, id, 'turnOrder'));
   integer(state.activePlayerIndex, 'activePlayerIndex', 0, state.turnOrder.length - 1);
@@ -122,6 +123,8 @@ export function migrateAndValidateSave(state) {
   const location = (key, path) => { const tile = reference(tiles, key, path); check(tile.terrainId !== 'void', path); return tile; };
   for (const [id, kingdom] of Object.entries(state.kingdoms)) {
     object(kingdom, `kingdoms.${id}`); check(kingdom.id === id, `kingdoms.${id}.id`); text(kingdom.name, `kingdoms.${id}.name`);
+    defaultMissing(kingdom, 'controllerType', 'human');
+    check(['human', 'ai'].includes(kingdom.controllerType), `kingdoms.${id}.controllerType`);
     for (const [name, records] of [['cityIds', state.cities], ['unitIds', state.units]]) {
       ids(kingdom[name], `kingdoms.${id}.${name}`);
       for (const entityId of kingdom[name]) check(reference(records, entityId, `kingdoms.${id}.${name}`).ownerId === id, `kingdoms.${id}.${name}.ownerId`);
@@ -248,5 +251,6 @@ export function migrateAndValidateSave(state) {
       fields(kingdom.derived, ['militaryPower', 'governanceCapacity', 'governanceLoad'], `kingdoms.${kingdom.id}.derived`);
     }
   }
+  validateScenarioSave(state);
   return state;
 }

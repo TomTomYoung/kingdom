@@ -1,0 +1,297 @@
+{
+  "date": "2026-10-29T22:51:12.462Z",
+  "baseCommit": "78cd40667526181b4de51c194458a952667926c5",
+  "result": "passed",
+  "saves": 48,
+  "scope": "Actual prior-main saves restore without any state changes or added victory conditions",
+  "checks": [
+    {
+      "seed": 1,
+      "mode": "small",
+      "stage": "initial",
+      "tiles": 37
+    },
+    {
+      "seed": 1,
+      "mode": "small",
+      "stage": "two-rounds",
+      "tiles": 37
+    },
+    {
+      "seed": 1,
+      "mode": "single",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "single",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "duel",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "duel",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "ranged",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "ranged",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "cities",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "cities",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "settlement",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "settlement",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "small",
+      "stage": "initial",
+      "tiles": 37
+    },
+    {
+      "seed": 42,
+      "mode": "small",
+      "stage": "two-rounds",
+      "tiles": 37
+    },
+    {
+      "seed": 42,
+      "mode": "single",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "single",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "duel",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "duel",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "ranged",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "ranged",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "cities",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "cities",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "settlement",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "settlement",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "small",
+      "stage": "initial",
+      "tiles": 37
+    },
+    {
+      "seed": 117,
+      "mode": "small",
+      "stage": "two-rounds",
+      "tiles": 37
+    },
+    {
+      "seed": 117,
+      "mode": "single",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "single",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "duel",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "duel",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "ranged",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "ranged",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "cities",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "cities",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "settlement",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "settlement",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "small",
+      "stage": "initial",
+      "tiles": 37
+    },
+    {
+      "seed": 1001,
+      "mode": "small",
+      "stage": "two-rounds",
+      "tiles": 37
+    },
+    {
+      "seed": 1001,
+      "mode": "single",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "single",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "duel",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "duel",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "ranged",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "ranged",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "cities",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "cities",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "settlement",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "settlement",
+      "stage": "two-rounds",
+      "tiles": 331
+    }
+  ]
+}

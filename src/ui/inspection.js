@@ -45,7 +45,7 @@ export class InspectionView {
       this.tileRoot.append(node('h3', '地形の基本産出'), yields.childNodes.length ? yields : node('p', '産出なし', 'hint'));
       if (party) {
         const route = reachable.get(tile.key), move = button(route ? `${partyName(party)}をここへ移動 · 移動力 ${route.cost}` : 'ここへ移動', () => this.callbacks.onMove(tile.key)); move.id = 'move-party';
-        move.disabled = !route || party.ownerId !== playerId || state.activePlayerId !== playerId;
+        move.disabled = !route || party.ownerId !== playerId || (state.activePlayerId !== playerId || state.phase !== 'PLAYER_ACTION' || state.kingdoms[playerId].controllerType === 'ai');
         this.tileRoot.append(move);
         this.tileRoot.append(node('p', route ? `${route.path.length}セルの経路。現在のターン内に移動します。` : tile.key === party.location ? 'この部隊の現在位置です。' : tile.terrainId === 'void' ? '虚無には進入できません。' : occupants.length ? '他の部隊が占有しています。' : 'このターンの移動範囲外です。ターン終了で移動力が回復します。', 'hint'));
       }
@@ -53,7 +53,7 @@ export class InspectionView {
       const candidate = getTerritoryCandidates(state, selectedCity).some((t) => t.key === tile.key);
       const affordable = state.kingdoms[playerId].stockpiles.gold >= cost;
       const purchase = button(tile.ownerId ? '所有済み' : candidate ? `このセルを購入 · Gold ${cost}` : '購入できないセル', () => this.callbacks.onPurchase(tile.key)); purchase.id = 'purchase-tile';
-      purchase.disabled = !candidate || !affordable || state.activePlayerId !== playerId; this.tileRoot.append(purchase);
+      purchase.disabled = !candidate || !affordable || (state.activePlayerId !== playerId || state.phase !== 'PLAYER_ACTION' || state.kingdoms[playerId].controllerType === 'ai'); this.tileRoot.append(purchase);
       this.tileRoot.append(node('p', `領土購入先: ${selectedCity.name}。この都市の領土に隣接する未所有セルを取得できます。`, 'hint'));
       if (candidate && !affordable) this.tileRoot.append(node('p', `購入にはGold ${cost}が必要です。`, 'hint'));
       this.tileRoot.append(node('h3', `駐留部隊 ${occupants.length} · Unit記録 ${units.length}`));
@@ -80,7 +80,7 @@ export class InspectionView {
       if (eligible.length) {
         const create = button('', () => this.callbacks.onCreate([...this.draft], tile.key)); create.id = 'form-party';
         const selectAll = button('待機Unitを最大5体選択', () => { this.draft = new Set(eligible.slice(0, 5).map((u) => u.id)); updateDraft(); }); selectAll.id = 'select-waiting';
-        function updateButton() { create.textContent = `選択した${this.draft.size}体で部隊を作成`; create.disabled = !this.draft.size || occupants.length > 0 || state.activePlayerId !== playerId; }
+        function updateButton() { create.textContent = `選択した${this.draft.size}体で部隊を作成`; create.disabled = !this.draft.size || occupants.length > 0 || (state.activePlayerId !== playerId || state.phase !== 'PLAYER_ACTION' || state.kingdoms[playerId].controllerType === 'ai'); }
         updateDraft = () => { for (const input of checkboxes) { input.checked = this.draft.has(input.dataset.formUnit); input.disabled = !input.checked && this.draft.size >= 5; } updateButton.call(this); };
         updateDraft(); this.tileRoot.append(selectAll, create);
         this.tileRoot.append(node('p', occupants.length ? 'このセルの部隊を先に移動すると、新しい部隊を作れます。' : 'チェックで1〜5体を選びます。待機Unitは部隊に編成すると移動できます。', 'hint'));
@@ -102,7 +102,7 @@ export class InspectionView {
       this.unitRoot.append(button('所属部隊を選択', () => this.callbacks.onParty(unitParty.id)));
     } else if (unit.ownerId === playerId) {
       const deploy = button('このUnitで部隊を作成', () => this.callbacks.onCreate([unit.id], unit.location)); deploy.id = 'deploy-unit';
-      deploy.disabled = !isActiveUnit(unit) || Object.values(state.parties).some((p) => occupiesMapTile(p) && p.location === unit.location) || state.activePlayerId !== playerId;
+      deploy.disabled = !isActiveUnit(unit) || Object.values(state.parties).some((p) => occupiesMapTile(p) && p.location === unit.location) || (state.activePlayerId !== playerId || state.phase !== 'PLAYER_ACTION' || state.kingdoms[playerId].controllerType === 'ai');
       this.unitRoot.append(deploy);
     }
     this.unitRoot.append(button('地図でこのUnitを見る', () => this.callbacks.onFocus(unit.location)));

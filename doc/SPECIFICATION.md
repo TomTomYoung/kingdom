@@ -6,13 +6,13 @@
 
 ## 0. 現行実装との区分
 
-この文書は目標仕様です。実装済みの判定は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md) と [STATUS.md](./STATUS.md) を正本とします。今回の開始基準はmain / d3f79162e0a6254dc36ed8f580a8a1d90c8f5761。331セルの広域マップ、M1都市運営、Party作成・経路移動・3×3配置、固定二国の交互操作、戦闘・護衛UIを実装済みです。
+この文書は目標仕様です。実装済みの判定は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md) と [STATUS.md](./STATUS.md) を正本とします。今回の開始基準はmain / 78cd40667526181b4de51c194458a952667926c5（PR #6マージ後）。331セルの広域マップ、M1都市運営、Party作成・経路移動・3×3配置、固定二国の交互操作、戦闘・護衛UIを実装済みです。
 
 2026-10-24に、弓兵・弩砲の生産購入と各国5体の遠隔部隊対戦を追加しました。通常、狙い射ち、精密射撃、横列、縦列、十字、貫通の7攻撃定義を共通のCommand・Resolver・予測・ログへ接続しています。Unit／Slot／行／列の照準、限定的なTaunt／Cover、Guard／Interceptを処理し、予測はRNGを参照・更新しません。K-10を修正し、敗北Party・Unit・配置を記録に残したまま地図の占有と駒表示から除外します。
 
 K-05は都市別の領土所属と市民作業で修正しました。文化取得・Gold購入を実行都市の境界へ限定し、二都市運営・都市切替・収集内訳と旧保存移行を実装しています。[都市運営の現行規則](CITY_MANAGEMENT.md)を参照してください。
 
-表示はCanvas 2D／DOMです。AI、Dungeon、職業・汎用Ability実行、加入・個別loyalty、勝利、オンライン通信は未実装です。全ての目標攻撃パターンや方向・可視性規則を完成させたものではありません。[遠隔戦闘の現行規則](RANGED_COMBAT.md)を参照してください。
+表示はCanvas 2D／DOMです。戦術AIと遭遇戦の部隊撃破・期限による終了判定を追加しました。都市運営AI、Dungeon、職業・汎用Ability実行、加入・個別loyalty、Domination・Dungeon勝利・Score、オンライン通信は未実装です。[現行AI・シナリオ規則](AI_SCENARIOS.md)を参照してください。全ての目標攻撃パターンや方向・可視性規則を完成させたものではありません。[遠隔戦闘の現行規則](RANGED_COMBAT.md)を参照してください。
 
 以下のGameStateフィールドは目標モデルです。実装の実キー・省略項目・暫定式はCURRENT_IMPLEMENTATIONを参照してください。現行の独立ランダム地形、平均戦闘力、固定移動力、簡略HP0を目標仕様へ逆輸入しません。
 
