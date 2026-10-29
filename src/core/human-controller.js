@@ -1,4 +1,4 @@
-import { attackParty, createParty, endTurn, foundCity, moveParty, purchaseCityItem, purchaseTile, setCityProduction, setFormation, setGuardOrder, startTurn } from './commands.js';
+import { reinforceParty, mergeParties, splitParty, attackParty, createParty, endTurn, foundCity, moveParty, purchaseCityItem, purchaseTile, setCityProduction, setFormation, setGuardOrder, startTurn } from './commands.js';
 export class HumanController {
   constructor(playerId) { this.playerId = playerId; }
   nextId(state) { return `${this.playerId}-${state.currentTurn}-${state.commandLog.length + 1}`; }
@@ -12,5 +12,8 @@ export class HumanController {
   attackParty(state, attackerPartyId, defenderPartyId, attackType = 'melee', targeting = {}) { return attackParty(this.playerId, state.currentTurn, attackerPartyId, defenderPartyId, attackType, this.nextId(state), targeting); }
   setGuardOrder(state, partyId, guardUnitId, targetUnitId, mode) { return setGuardOrder(this.playerId, state.currentTurn, partyId, guardUnitId, targetUnitId, mode, this.nextId(state)); }
   foundCity(state, partyId, settlerUnitId) { return foundCity(this.playerId, state.currentTurn, partyId, settlerUnitId, this.nextId(state)); }
+  reinforceParty(state, partyId, unitIds) { return reinforceParty(this.playerId, state.currentTurn, partyId, unitIds, this.nextId(state)); }
+  mergeParties(state, sourcePartyId, targetPartyId) { return mergeParties(this.playerId, state.currentTurn, sourcePartyId, targetPartyId, this.nextId(state)); }
+  splitParty(state, partyId, unitIds, location) { return splitParty(this.playerId, state.currentTurn, partyId, unitIds, location, this.nextId(state)); }
   endTurn(state) { return endTurn(this.playerId, state.currentTurn, this.nextId(state)); }
 }

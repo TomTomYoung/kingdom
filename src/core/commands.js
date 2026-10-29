@@ -1,4 +1,4 @@
-export const COMMAND_TYPES = Object.freeze({ START_TURN: 'StartTurn', SET_CITY_PRODUCTION: 'SetCityProduction', PURCHASE_CITY_ITEM: 'PurchaseCityItem', PURCHASE_TILE: 'PurchaseTile', END_TURN: 'EndTurn', CREATE_PARTY: 'CreateParty', SET_FORMATION: 'SetFormation', MOVE_PARTY: 'MoveParty', ATTACK_PARTY: 'AttackParty', SET_GUARD_ORDER: 'SetGuardOrder', FOUND_CITY: 'FoundCity' });
+export const COMMAND_TYPES = Object.freeze({ START_TURN: 'StartTurn', SET_CITY_PRODUCTION: 'SetCityProduction', PURCHASE_CITY_ITEM: 'PurchaseCityItem', PURCHASE_TILE: 'PurchaseTile', END_TURN: 'EndTurn', CREATE_PARTY: 'CreateParty', SET_FORMATION: 'SetFormation', MOVE_PARTY: 'MoveParty', ATTACK_PARTY: 'AttackParty', SET_GUARD_ORDER: 'SetGuardOrder', FOUND_CITY: 'FoundCity', REINFORCE_PARTY: 'ReinforceParty', MERGE_PARTIES: 'MergeParties', SPLIT_PARTY: 'SplitParty' });
 export function command(type, playerId, turn, payload = {}, commandId) { return { commandId, type, playerId, turn, phase: type === COMMAND_TYPES.START_TURN ? 'TURN_START' : 'PLAYER_ACTION', payload }; }
 export const startTurn = (playerId, turn, commandId) => command(COMMAND_TYPES.START_TURN, playerId, turn, {}, commandId);
 export const setCityProduction = (playerId, turn, cityId, itemId, queue = [], commandId) => command(COMMAND_TYPES.SET_CITY_PRODUCTION, playerId, turn, { cityId, itemId, queue }, commandId);
@@ -14,3 +14,7 @@ export const attackParty = (playerId, turn, attackerPartyId, defenderPartyId, at
 export const setGuardOrder = (playerId, turn, partyId, guardUnitId, targetUnitId, mode, commandId) => command(COMMAND_TYPES.SET_GUARD_ORDER, playerId, turn, { partyId, guardUnitId, targetUnitId, mode }, commandId);
 
 export const foundCity = (playerId, turn, partyId, settlerUnitId, commandId) => command(COMMAND_TYPES.FOUND_CITY, playerId, turn, { partyId, settlerUnitId }, commandId);
+
+export const reinforceParty = (playerId, turn, partyId, unitIds, commandId) => command(COMMAND_TYPES.REINFORCE_PARTY, playerId, turn, { partyId, unitIds }, commandId);
+export const mergeParties = (playerId, turn, sourcePartyId, targetPartyId, commandId) => command(COMMAND_TYPES.MERGE_PARTIES, playerId, turn, { sourcePartyId, targetPartyId }, commandId);
+export const splitParty = (playerId, turn, partyId, unitIds, location, commandId) => command(COMMAND_TYPES.SPLIT_PARTY, playerId, turn, { partyId, unitIds, location }, commandId);

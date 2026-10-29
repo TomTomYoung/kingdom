@@ -3,10 +3,11 @@ import assert from 'node:assert/strict';
 import { createAiReinforcementGameState, createAiSkirmishGameState } from '../src/core/scenarios.js';
 import { addCity, restoreGameState, serializeGameState } from '../src/core/game-state.js';
 import { AIController, runAiTurn, executeAiStep } from '../src/core/ai-controller.js';
-import { chooseSupplyCommand, chooseDeploymentCommand, chooseCityExitCommand, recruitmentNeeds } from '../src/core/ai-economy.js';
+import { chooseSupplyCommand, chooseDeploymentCommand, chooseCityExitCommand, chooseReinforcementCommand, chooseMergeCommand, recruitmentNeeds } from '../src/core/ai-economy.js';
 import { HumanController } from '../src/core/human-controller.js';
 import { RuleSystem } from '../src/core/rule-system.js';
 import { RULESET } from '../src/core/ruleset.js';
+import { createParty } from '../src/models/party.js';
 import { createUnit } from '../src/models/unit.js';
 import { Hex } from '../src/world/hex.js';
 
@@ -193,4 +194,49 @@ test('both reinforcement AIs complete bounded turns and a reproducible match acr
     assert.ok(direct.commands.length <= 129); state = direct.state;
   }
   assert.equal(state.phase, 'GAME_OVER'); assert.ok(state.gameResult.turn <= 40);
+});
+
+function smallParty(state, count = 2) {
+  const party = state.parties['party-2'];
+  for (const id of party.unitIds.splice(count)) { delete state.units[id]; state.kingdoms[player].unitIds = state.kingdoms[player].unitIds.filter(key => key !== id); }
+  party.formation = Object.fromEntries(Object.entries(party.formation).filter(([, id]) => party.unitIds.includes(id)));
+  party.guardOrders = {}; return party;
+}
+function secondParty(state, location, type = 'warrior') {
+  const unit = recruit(state, type, location), id = `party-${state.nextIds.party++}`;
+  const party = createParty(id, player, [unit.id], location); state.parties[id] = party; unit.partyId = id;
+  state.world.tiles[location].terrainId = 'plains'; return party;
+}
+
+test('reinforcement AI fills existing parties before evacuating the city, ending actions without healing', () => {
+  const state = aiTurn(), party = smallParty(state); relocate(state, party.id, capital);
+  const civilian = recruit(state, 'settler'), first = recruit(state, 'archer'), second = recruit(state);
+  first.hp = first.currentHp = 9; second.guardCapacityRemaining = 1;
+  const snapshot = structuredClone(state), next = ai.nextCommand(state);
+  assert.equal(next.type, 'ReinforceParty'); assert.deepEqual(next.payload.unitIds, [first.id, second.id].sort()); assert.deepEqual(state, snapshot);
+  const after = apply(state, next); assert.equal(after.parties[party.id].activationState, 'ended'); assert.equal(after.parties[party.id].reactionCharges, 0);
+  assert.equal(after.units[first.id].currentHp, 9); assert.equal(after.units[second.id].guardCapacityRemaining, 1); assert.equal(after.units[civilian.id].partyId, null);
+  assert.equal(chooseReinforcementCommand(after, player, 'again'), null); assert.deepEqual(roundTrip(after), after);
+  assert.deepEqual(runAiTurn(roundTrip(after)), runAiTurn(after));
+});
+
+test('reinforcement AI merges adjacent small military parties before approach but gives immediate attacks priority', () => {
+  const state = aiTurn(), target = smallParty(state); relocate(state, target.id, '4,-3,-1'); relocate(state, 'party-1', '-4,4,0');
+  const source = secondParty(state, '5,-4,-1');
+  const snapshot = structuredClone(state), next = ai.nextCommand(state);
+  assert.equal(next.type, 'MergeParties'); assert.equal(next.payload.sourcePartyId, source.id); assert.equal(next.payload.targetPartyId, target.id); assert.deepEqual(state, snapshot);
+  const after = apply(state, next); assert.equal(after.parties[source.id], undefined); assert.equal(after.parties[target.id].unitIds.length, 3);
+  assert.deepEqual(roundTrip(after), after); assert.deepEqual(runAiTurn(roundTrip(after)), runAiTurn(after));
+  relocate(state, 'party-1', '3,-3,0'); assert.equal(ai.nextCommand(state).type, 'AttackParty');
+  state.kingdoms[player].aiPolicy = 'tactical'; relocate(state, 'party-1', '-4,4,0'); assert.equal(ai.nextCommand(state).type, 'MoveParty');
+});
+
+test('AI reorganization validates capacity and civilian exclusions without reading RNG or looping', () => {
+  const state = aiTurn(); smallParty(state, 3); relocate(state, 'party-2', '4,-3,-1'); relocate(state, 'party-1', '-4,4,0');
+  const source = secondParty(state, '5,-4,-1', 'settler');
+  assert.equal(chooseMergeCommand(state, player, 'civilian'), null);
+  const original = state.units[source.unitIds[0]]; state.units[original.id] = { ...createUnit(original.id, player, 'warrior', source.location), partyId: source.id };
+  Object.defineProperty(state, 'rng', { get() { throw new Error('reorganization planning must not read RNG'); }, configurable: true });
+  const a = ai.nextCommand(state), b = ai.nextCommand(state); assert.deepEqual(a, b); assert.equal(a.type, 'MergeParties');
+  state.parties[source.id].activationState = 'ended'; assert.equal(chooseMergeCommand(state, player, 'exhausted'), null);
 });

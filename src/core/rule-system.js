@@ -12,6 +12,7 @@ import { validatePartyPath } from '../systems/movement-system.js';
 import { validateGuardOrder } from '../systems/damage-grid.js';
 import { resolvePartyAttack } from '../systems/combat-system.js';
 import { resolveScenario } from '../systems/scenario-system.js';
+import { resolveReinforceParty, resolveMergeParties, resolveSplitParty } from '../systems/party-reorganization.js';
 import { resolveFoundCity } from '../systems/founding-system.js';
 
 const fail = (reason) => ({ ok: false, reason });
@@ -76,6 +77,12 @@ export class RuleSystem {
       state.parties[partyId] = createParty(partyId, command.playerId, unitIds, command.payload.location);
       units.forEach((unit) => { unit.partyId = partyId; });
       events.push({ type: 'PartyCreated', partyId, unitIds: [...unitIds], location: command.payload.location });
+    } else if ([COMMAND_TYPES.REINFORCE_PARTY, COMMAND_TYPES.MERGE_PARTIES, COMMAND_TYPES.SPLIT_PARTY].includes(command.type)) {
+      const p = command.payload;
+      const result = command.type === COMMAND_TYPES.REINFORCE_PARTY ? resolveReinforceParty(state, command.playerId, p.partyId, p.unitIds, events)
+        : command.type === COMMAND_TYPES.MERGE_PARTIES ? resolveMergeParties(state, command.playerId, p.sourcePartyId, p.targetPartyId, events)
+        : resolveSplitParty(state, command.playerId, p.partyId, p.unitIds, p.location, events);
+      if (!result.ok) return reject(result.reason);
     } else if (command.type === COMMAND_TYPES.FOUND_CITY) {
       const founded = resolveFoundCity(state, command.playerId, command.payload.partyId, command.payload.settlerUnitId, events);
       if (!founded.ok) return reject(founded.reason);

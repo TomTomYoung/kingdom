@@ -7,6 +7,7 @@ const fields = {
   SetCityProduction: ['cityId', 'itemId'],
   PurchaseCityItem: ['cityId', 'itemId', 'currency'],
   PurchaseTile: ['cityId', 'tileKey'],
+  ReinforceParty: ['partyId'], MergeParties: ['sourcePartyId', 'targetPartyId'], SplitParty: ['partyId', 'location'],
   CreateParty: ['location'], FoundCity: ['partyId', 'settlerUnitId'],
   SetFormation: ['partyId'], MoveParty: ['partyId'],
   AttackParty: ['attackerPartyId', 'defenderPartyId', 'attackType'],
@@ -30,7 +31,7 @@ export function validateCommand(state, command) {
     if (!Object.hasOwn(payload, field) || !identifier(payload[field])) return `${field}が必要です`;
   }
   if (command.type === COMMAND_TYPES.SET_CITY_PRODUCTION && (!Array.isArray(payload.queue) || !payload.queue.every(identifier))) return '生産キューは対象IDの配列で指定してください';
-  if (command.type === COMMAND_TYPES.CREATE_PARTY && (!Array.isArray(payload.unitIds) || !payload.unitIds.every(identifier))) return 'UnitのIDを配列で指定してください';
+  if ([COMMAND_TYPES.CREATE_PARTY, COMMAND_TYPES.REINFORCE_PARTY, COMMAND_TYPES.SPLIT_PARTY].includes(command.type) && (!Array.isArray(payload.unitIds) || !payload.unitIds.every(identifier))) return 'UnitのIDを配列で指定してください';
   if (command.type === COMMAND_TYPES.MOVE_PARTY && (!Array.isArray(payload.path) || !payload.path.every(identifier))) return '移動経路はタイルIDの配列で指定してください';
   if (command.type === COMMAND_TYPES.SET_FORMATION && !record(payload.formation)) return '配置はslotとUnitの対応で指定してください';
   if (command.type === COMMAND_TYPES.SET_GUARD_ORDER && payload.mode !== 'off' && !identifier(payload.targetUnitId)) return '護衛対象のUnit IDが必要です';

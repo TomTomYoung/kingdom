@@ -2,7 +2,7 @@
 
 確認・更新日: 2026-10-30
 
-開始基準: main / 78cd40667526181b4de51c194458a952667926c5（PR #6マージ後）。戦術AI、「AIとの遭遇戦」、勝敗と40ターン期限、終了状態の保存・操作制御を追加しました。PR #7の0820eaeから、兵の生産・購入・編成を行う「AIとの増援戦」を追加しています。現行規則と制約は[AI_SCENARIOS.md](AI_SCENARIOS.md)、検証範囲は[STATUS.md](STATUS.md)に記載しています。
+開始基準: main / 78cd40667526181b4de51c194458a952667926c5（PR #6マージ後）。戦術AI、「AIとの遭遇戦」、勝敗と40ターン期限、終了状態の保存・操作制御を追加しました。PR #7の0820eaeから、兵の生産・購入・編成を行う「AIとの増援戦」を追加しています。現行規則と制約は[AI_SCENARIOS.md](AI_SCENARIOS.md)、検証範囲は[STATUS.md](STATUS.md)に記載しています。 PR #7の97285c1から、待機兵の補充・隣接部隊の合流・分割と増援AIの補充・合流判断を追加しました。[部隊再編の規則](PARTY_MANAGEMENT.md)を参照してください。
 
 ## 1. 範囲と現在地
 
@@ -65,9 +65,9 @@ npm run check
 
 GameStateはschemaVersion 1、rulesetVersion m1.0、cityTerritoryVersion 1です。主な実キーはphase、world、turnOrder、activePlayerId、activePlayerIndex、kingdoms、cities、units、parties、rng、nextIds、commandLog、eventLogです。目標文書のcurrentPhase、worldMap、playerSlots等と同名とは限りません。
 
-RuleSystem.execute(original, command)は成功時に複製したstateとeventsを返し、検証で拒否した場合は元stateを返します。commandIdの重複、playerId、手番、turnを共通検証します。全11Commandの種別・phase・必須payload・配列と辞書の型を事前検証し、参照先・所有者を処理前に確認します。拒否時は元stateと空eventsを返し、RNG・資源・ID・ログを変更しません。保存読込時のGameState構造検証はK-09で実装済みです。
+RuleSystem.execute(original, command)は成功時に複製したstateとeventsを返し、検証で拒否した場合は元stateを返します。commandIdの重複、playerId、手番、turnを共通検証します。全14Commandの種別・phase・必須payload・配列と辞書の型を事前検証し、参照先・所有者を処理前に確認します。拒否時は元stateと空eventsを返し、RNG・資源・ID・ログを変更しません。保存読込時のGameState構造検証はK-09で実装済みです。
 
-現在のCommandは11種類です。
+現在のCommandは14種類です。
 
 1. StartTurn
 2. SetCityProduction
@@ -80,6 +80,9 @@ RuleSystem.execute(original, command)は成功時に複製したstateとevents�
 9. AttackParty（attackTypeはmeleeまたはranged。targetingで攻撃定義と照準を指定）
 10. SetGuardOrder（modeはoff／share／intercept）
 11. FoundCity（partyId・settlerUnitIdを指定）
+12. ReinforceParty（partyId・unitIdsを指定）
+13. MergeParties（sourcePartyId・targetPartyIdを指定）
+14. SplitParty（partyId・unitIds・隣接locationを指定）
 
 HumanControllerは上記のCommandを生成します。AIControllerは合法な通常遠隔／近接攻撃、射程内への経路移動、EndTurnを選び、共通RuleSystemで実行します。次のRNGを読まず、同じ入力に同じCommandを返します。reinforcements方針では都市の出口確保、CreateParty、空の都市のSetCityProduction、予備費と購入回数を守るPurchaseCityItemも選びます。RemoteController、ReplayController、汎用の合法手一覧APIはありません。[AIの判断・制約](AI_SCENARIOS.md)。
 
@@ -154,7 +157,7 @@ Capacity不足のPenaltyやUnitの徴募・登用はありません。人的資�
 
 CreatePartyは同じ場所の自国未所属Unitを1〜5体まとめます。実キーはid、unitIds、formation、movementMaximum、attacksMaximumです。formationはfront/middle/rearとleft/center/rightを組み合わせたSlotIdからunitIdへの辞書です。初期配置はfront-left、front-center、front-right、middle-left、middle-centerの順です。
 
-SetFormationは9Slotへの全構成Unitの一度ずつの配置を検証します。作成時に既存の非Voidタイル・他のactive Party非占有・UnitのHPとactive状態を検証します。敗北・全員戦闘不能のPartyは移動と配置変更を拒否します。3×3配置編集UIは実装済みです。解散・分割・合流、Leader手動変更、敵隣接時の編成制限はありません。
+SetFormationは9Slotへの全構成Unitの一度ずつの配置を検証します。作成時に既存の非Voidタイル・他のactive Party非占有・UnitのHPとactive状態を検証します。敗北・全員戦闘不能のPartyは移動と配置変更を拒否します。3×3配置編集UIは実装済みです。待機兵の補充・隣接部隊の合流・隣接セルへの分割をCommand／UIで実装しました。関係部隊は未終了・移動力1以上とし、合流・分割は進入地形費も検証します。成功時は関係部隊の移動・攻撃・反応を0にして行動終了します。HP・容量を保持し、配置・指揮者・護衛・所属を修復します。詳細は[PARTY_MANAGEMENT.md](PARTY_MANAGEMENT.md)。解散・任意離脱・Leader手動変更・敵隣接による禁止はありません。
 
 Partyは移動力2、攻撃回数1で初期化されます。最も遅い構成員から移動力を計算する処理はありません。移動コストは平原・草原・霊脈1、森林・丘陵2です。指定経路の全段階で隣接性・非Void・他のactive Party占有・必要移動力を検証し、成功時に所属Unitのlocationも更新します。
 

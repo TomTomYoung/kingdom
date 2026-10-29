@@ -1,8 +1,9 @@
-import { COMMAND_TYPES, createParty, moveParty, purchaseCityItem, setCityProduction } from './commands.js';
+import { COMMAND_TYPES, createParty, moveParty, purchaseCityItem, setCityProduction, reinforceParty, mergeParties } from './commands.js';
 import { RULESET } from './ruleset.js';
 import { isActiveUnit, hasActiveUnits, occupiesMapTile } from '../models/party.js';
 import { getReachablePartyPaths } from '../systems/movement-system.js';
 import { Hex } from '../world/hex.js';
+import { validateReinforceParty, validateMergeParties } from '../systems/party-reorganization.js';
 
 const ordered = records => Object.values(records).sort((a, b) => a.id.localeCompare(b.id));
 const combatUnit = unit => isActiveUnit(unit) && !RULESET.unitTypes[unit.typeId].civilian;
@@ -10,6 +11,25 @@ const waiting = (state, playerId) => ordered(state.units).filter(unit => unit.ow
 const cities = (state, playerId) => ordered(state.cities).filter(city => city.ownerId === playerId);
 const occupant = (state, location) => Object.values(state.parties).find(party => occupiesMapTile(party) && party.location === location);
 const purchaseCount = (state, playerId, cityId) => state.commandLog.filter(command => command.playerId === playerId && command.turn === state.currentTurn && command.type === COMMAND_TYPES.PURCHASE_CITY_ITEM && command.payload.cityId === cityId).length;
+
+export function chooseReinforcementCommand(state, playerId, commandId) {
+  const recruits = waiting(state, playerId);
+  for (const party of ordered(state.parties).filter(p => p.ownerId === playerId && p.unitIds.some(id => combatUnit(state.units[id])))) {
+    const ids = recruits.filter(unit => unit.location === party.location).slice(0, Math.max(0, 5 - party.unitIds.length)).map(unit => unit.id);
+    if (validateReinforceParty(state, playerId, party.id, ids).ok) return reinforceParty(playerId, state.currentTurn, party.id, ids, commandId);
+  }
+  return null;
+}
+
+export function chooseMergeCommand(state, playerId, commandId) {
+  const parties = ordered(state.parties).filter(p => p.ownerId === playerId && p.unitIds.every(id => !RULESET.unitTypes[state.units[id].typeId].civilian));
+  const targets = [...parties].sort((a, b) => b.unitIds.length - a.unitIds.length || a.id.localeCompare(b.id));
+  const sources = [...parties].sort((a, b) => a.unitIds.length - b.unitIds.length || a.id.localeCompare(b.id));
+  for (const target of targets) for (const source of sources) {
+    if (validateMergeParties(state, playerId, source.id, target.id).ok) return mergeParties(playerId, state.currentTurn, source.id, target.id, commandId);
+  }
+  return null;
+}
 
 // Count live units AND reserved production across all cities before committing
 // shared funds or another queue slot. No private AI state or random look-ahead.
