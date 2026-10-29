@@ -1,0 +1,15 @@
+{
+  "verifiedAt": "2026-10-29T21:36:58.926Z",
+  "browser": "141.0.7390.37",
+  "checks": [
+    "scenario, read-only settler selection, movement, city spacing and exhausted-action feedback",
+    "founding consumes one settler, keeps escort, grants no immediate resources and selects the new city",
+    "new city collects once per turn and produces a new settler at its own center",
+    "save/load preserves scenario and city IDs; purchase uses the selected city and full cost",
+    "colliding city ID rejects load without replacing the current game or city selection",
+    "solo settlement removes stale UI selections and remains playable after reload",
+    "1440px and 390px city views render without horizontal overflow"
+  ],
+  "pageErrors": [],
+  "httpFailures": []
+}

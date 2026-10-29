@@ -1,3 +1,4 @@
+import { RULESET } from '../core/ruleset.js';
 import { FORMATION_ROWS, FORMATION_COLUMNS, FORMATION_SLOTS, isActiveUnit } from '../models/party.js';
 import { exposedUnits, isProtectionDisabled } from './damage-grid.js';
 
@@ -29,6 +30,7 @@ export function attackDefinition(attackType, options = {}) {
 
 export function participatingUnits(state, party, kind = 'melee', distance = 1, definition = ATTACK_DEFINITIONS.normal) {
   return party.unitIds.map(id => state.units[id]).filter(unit => isActiveUnit(unit)
+    && (kind === 'defense' || !RULESET.unitTypes[unit.typeId]?.civilian)
     && (!definition.unitTypes || definition.unitTypes.includes(unit.typeId))
     && (kind !== 'ranged' || (unit.rangedStrength > 0 && unit.range >= distance)));
 }

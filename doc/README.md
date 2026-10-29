@@ -1,14 +1,14 @@
 # Kingdom 開発資料
 
-確認・更新日: 2026-10-24
+確認・更新日: 2026-10-30
 
 目標はCivilization VI型の帝国運営、Party・Formation、Dungeon探索を統合したターン制ストラテジーです。現行はM1都市運営とM2の複数都市・Party・移動・近接／遠隔戦闘の途中です。
 
 ## 現在地と読み方
 
-今回はK-05を修正し、都市別の領土・市民作業・文化／Gold取得、二都市運営と都市切替・産出内訳を追加しました。弓兵・弩砲と7攻撃、敗北非占有、旧37セル保存を維持します。FoundCity・Settler、AI、勝利、Dungeonは未実装です。
+今回は開拓者の生産・購入、都市建設、護衛の維持、新都市選択と保存互換を追加しました。都市別の領土・市民作業・文化／Gold取得、二都市運営と都市切替・産出内訳も利用できます。弓兵・弩砲と7攻撃、敗北非占有、旧37セル保存を維持します。AI、勝利、Dungeonは未実装です。
 
-まず[現行実装](CURRENT_IMPLEMENTATION.md)、[課題](STATUS.md)、[次作業](HANDOFF.md)を確認してください。操作は[戦闘操作](COMBAT_OPERATIONS.md)と[地図操作](MAP_OPERATIONS.md)、定義・配分・保存互換は[遠隔仕様](RANGED_COMBAT.md)にあります。都市操作・所属・保存移行は[CITY_MANAGEMENT.md](CITY_MANAGEMENT.md)、次の優先事項はSettler／FoundCityです。
+まず[現行実装](CURRENT_IMPLEMENTATION.md)、[課題](STATUS.md)、[次作業](HANDOFF.md)を確認してください。操作は[戦闘操作](COMBAT_OPERATIONS.md)と[地図操作](MAP_OPERATIONS.md)、定義・配分・保存互換は[遠隔仕様](RANGED_COMBAT.md)にあります。都市操作・所属・保存移行は[CITY_MANAGEMENT.md](CITY_MANAGEMENT.md)、次の優先事項はAIControllerとシナリオ勝敗です。
 
 起動は `npm run dev`、検証は `npm test`、`npm run check`、`npm run check:assets`。Canvas 2D／DOM・ES Modules・Node標準テストを使い、Phaser／Vite／Vitestは使いません。プレイヤー向け名称・費用・操作は[Kingdom Wiki](../wiki/README.md)で確認できます。
 

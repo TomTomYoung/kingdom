@@ -1,4 +1,4 @@
-export const COMMAND_TYPES = Object.freeze({ START_TURN: 'StartTurn', SET_CITY_PRODUCTION: 'SetCityProduction', PURCHASE_CITY_ITEM: 'PurchaseCityItem', PURCHASE_TILE: 'PurchaseTile', END_TURN: 'EndTurn', CREATE_PARTY: 'CreateParty', SET_FORMATION: 'SetFormation', MOVE_PARTY: 'MoveParty', ATTACK_PARTY: 'AttackParty', SET_GUARD_ORDER: 'SetGuardOrder' });
+export const COMMAND_TYPES = Object.freeze({ START_TURN: 'StartTurn', SET_CITY_PRODUCTION: 'SetCityProduction', PURCHASE_CITY_ITEM: 'PurchaseCityItem', PURCHASE_TILE: 'PurchaseTile', END_TURN: 'EndTurn', CREATE_PARTY: 'CreateParty', SET_FORMATION: 'SetFormation', MOVE_PARTY: 'MoveParty', ATTACK_PARTY: 'AttackParty', SET_GUARD_ORDER: 'SetGuardOrder', FOUND_CITY: 'FoundCity' });
 export function command(type, playerId, turn, payload = {}, commandId) { return { commandId, type, playerId, turn, phase: type === COMMAND_TYPES.START_TURN ? 'TURN_START' : 'PLAYER_ACTION', payload }; }
 export const startTurn = (playerId, turn, commandId) => command(COMMAND_TYPES.START_TURN, playerId, turn, {}, commandId);
 export const setCityProduction = (playerId, turn, cityId, itemId, queue = [], commandId) => command(COMMAND_TYPES.SET_CITY_PRODUCTION, playerId, turn, { cityId, itemId, queue }, commandId);
@@ -12,3 +12,5 @@ export const moveParty = (playerId, turn, partyId, path, commandId) => command(C
 export const attackParty = (playerId, turn, attackerPartyId, defenderPartyId, attackType = 'melee', commandId, targeting = {}) => command(COMMAND_TYPES.ATTACK_PARTY, playerId, turn, { attackerPartyId, defenderPartyId, attackType, targeting }, commandId);
 
 export const setGuardOrder = (playerId, turn, partyId, guardUnitId, targetUnitId, mode, commandId) => command(COMMAND_TYPES.SET_GUARD_ORDER, playerId, turn, { partyId, guardUnitId, targetUnitId, mode }, commandId);
+
+export const foundCity = (playerId, turn, partyId, settlerUnitId, commandId) => command(COMMAND_TYPES.FOUND_CITY, playerId, turn, { partyId, settlerUnitId }, commandId);

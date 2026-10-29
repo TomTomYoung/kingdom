@@ -1,8 +1,8 @@
 # Kingdom 現行実装仕様
 
-確認・更新日: 2026-10-24
+確認・更新日: 2026-10-30
 
-開始基準: main / d3f79162e0a6254dc36ed8f580a8a1d90c8f5761（PR #4）。K-05の重複市民作業を修正し、都市別の領土・文化取得・Gold購入、都市切替と産出内訳、二都市運営モードを追加しました。操作・モデル・保存移行は[CITY_MANAGEMENT.md](CITY_MANAGEMENT.md)を参照してください。前回の弓兵・弩砲、7攻撃、K-10の敗北非占有も維持しています。
+開始基準: main / 3273d5a6eb34ad04fa3055e063fcff2da4fdf995（PR #5）。開拓者の生産・購入、FoundCity、都市建設UIと「開拓者と護衛」、都市IDの保存移行を追加しました。条件・暫定数値・操作は[CITY_MANAGEMENT.md](CITY_MANAGEMENT.md)、検証範囲は[STATUS.md](STATUS.md)に記載しています。
 
 ## 1. 範囲と現在地
 
@@ -14,7 +14,7 @@
 
 エントリーは [index.html](../index.html) です。標準Canvas 2DとDOMを使い、PhaserやCDNを読み込みません。外部npm依存、ビルド工程、バックエンドはありません。
 
-assets/には画像17点、SE13点、BGM2曲の32点があり、すべてUIへ接続済みです。既存30点に命中・護衛のSE2点を追加し、戦闘BGMを接続しました。AssetStoreがmanifestの採用パスから画像を取得し、読み込めなければ地形色・城文字・部隊記号で継続します。画像は整数倍・等方拡大、音声はWeb Audioでユーザー操作後に開始します。弓兵・弩砲は専用画像が未制作のため「弓」「弩」バッジで識別します。専用射撃SEはありません。初期ミュート、主音量・設定保存、非表示停止、連打制限、BGM切替時の遅延読込取消があります。WAV/OggのHTTP失敗・デコード失敗・8秒タイムアウト時は、src/audioに同梱した採用音符15件と固定版AIMusicからPCMを合成します。Workerが使えなければ同じ合成器で処理します。全15件の再合成WAVは制作時のWAVのSHA-256と一致します。音声設定の再読み込みでキャッシュを消して再試行できます。tools/assets/は制作専用でゲーム実行時の依存ではありません。[ASSET_AUDIT.md](ASSET_AUDIT.md) が最新台帳です。
+assets/には画像17点、SE13点、BGM2曲の32点があり、すべてUIへ接続済みです。既存30点に命中・護衛のSE2点を追加し、戦闘BGMを接続しました。AssetStoreがmanifestの採用パスから画像を取得し、読み込めなければ地形色・城文字・部隊記号で継続します。画像は整数倍・等方拡大、音声はWeb Audioでユーザー操作後に開始します。弓兵・弩砲・開拓者は専用画像が未制作のため「弓」「弩」「拓」バッジで識別します。専用射撃SEはありません。初期ミュート、主音量・設定保存、非表示停止、連打制限、BGM切替時の遅延読込取消があります。WAV/OggのHTTP失敗・デコード失敗・8秒タイムアウト時は、src/audioに同梱した採用音符15件と固定版AIMusicからPCMを合成します。Workerが使えなければ同じ合成器で処理します。全15件の再合成WAVは制作時のWAVのSHA-256と一致します。音声設定の再読み込みでキャッシュを消して再試行できます。tools/assets/は制作専用でゲーム実行時の依存ではありません。[ASSET_AUDIT.md](ASSET_AUDIT.md) が最新台帳です。
 
 リポジトリルートで次を実行し、http://localhost:4173/ を開きます。
 
@@ -49,7 +49,7 @@ npm run check
 
 画面には王領地図、国庫と研究・文化進捗、軍事力・統治力と負荷、都市人口とYield、食料と領土文化、都市生産、Party、ターン終了、セーブ・ロード・新規開始があります。
 
-戦士・弓兵・弩砲とモニュメントの生産・Gold購入、未所有の合法タイル購入、選択セルの未編成Unitを1〜5体指定してParty化し、現在の移動力で到達できるセルまで経路移動できます。待機Unitも地図に表示され、一覧と地図の両方から選択できます。
+戦士・弓兵・弩砲・開拓者とモニュメントの生産・Gold購入、未所有の合法タイル購入、選択セルの未編成Unitを1〜5体指定してParty化し、現在の移動力で到達できるセルまで経路移動できます。待機Unitも地図に表示され、一覧と地図の両方から選択できます。
 
 左クリックはセル・駒の詳細確認です。クリックだけでは移動・購入を実行しません。部隊選択後に目的地を選び「ここへ移動」、または目的地を右クリックすると移動します。領土はセル詳細の購入ボタンで購入します。到達可能セルの点線、経路と消費移動力、所有地の金枠を表示します。解除ボタン・Escで部隊とUnitを解除し、ロードでも解除、新規開始では初期部隊を選択します。セル詳細は座標・地形・所有・都市・基本産出・移動費・駐留一覧、Unit詳細はHP・状態・近接/遠隔・防御/装甲・射程・所属・配置・指揮者・部隊行動値を表示します。Party欄の3×3配置で、Unitを選んで空き枠へ移動・他Unitと交換できます。指揮者とHPを表示し、変更はSetFormationを通します。二国交互操作、敵選択、近接・遠隔の合法性表示、予測・攻撃、護衛設定、戦闘ログを利用できます。生産キュー編集、JSONファイル入出力、任意プレイヤー設定のUIはありません。ドラッグ・矢印キーによるカメラ移動、1/2/3倍の等方整数ズーム、クリックで移動する全体図、選択都市・選択Unitへのフォーカス、部隊の順送りがあります。旧版の文章イベント窓は未移植です。操作は[MAP_OPERATIONS.md](MAP_OPERATIONS.md)を参照してください。
 
@@ -57,13 +57,15 @@ npm run check
 
 「二都市運営」は同一王国の暁都（0,0,0）と東都（4,-4,0）で始まります。「操作する都市」で表示と生産・購入・領土取得先を切り替えます。地図は選択都市の領土を緑の内枠、収集時の作業を緑点で示します。セル詳細は所有国・所属都市・都市中心・作業記録を分けます。選択都市は表示状態で、ロード成功後は現在手番の先頭都市へ戻り、ロード失敗では都市選択も維持します。
 
+「開拓者と護衛」は戦士1・開拓者1の部隊で始まります。開拓者入り部隊の都市建設欄で、現在地の可否と拒否理由を確認し、開拓者を選んで建設します。成功時は新都市へ選択を移し、人口1、収入未収集で表示します。開拓者単独の部隊も使えます。詳細は[CITY_MANAGEMENT.md](CITY_MANAGEMENT.md)。
+
 ## 4. GameStateとCommand
 
 GameStateはschemaVersion 1、rulesetVersion m1.0、cityTerritoryVersion 1です。主な実キーはphase、world、turnOrder、activePlayerId、activePlayerIndex、kingdoms、cities、units、parties、rng、nextIds、commandLog、eventLogです。目標文書のcurrentPhase、worldMap、playerSlots等と同名とは限りません。
 
-RuleSystem.execute(original, command)は成功時に複製したstateとeventsを返し、検証で拒否した場合は元stateを返します。commandIdの重複、playerId、手番、turnを共通検証します。全10Commandの種別・phase・必須payload・配列と辞書の型を事前検証し、参照先・所有者を処理前に確認します。拒否時は元stateと空eventsを返し、RNG・資源・ID・ログを変更しません。保存読込時のGameState構造検証はK-09で実装済みです。
+RuleSystem.execute(original, command)は成功時に複製したstateとeventsを返し、検証で拒否した場合は元stateを返します。commandIdの重複、playerId、手番、turnを共通検証します。全11Commandの種別・phase・必須payload・配列と辞書の型を事前検証し、参照先・所有者を処理前に確認します。拒否時は元stateと空eventsを返し、RNG・資源・ID・ログを変更しません。保存読込時のGameState構造検証はK-09で実装済みです。
 
-現在のCommandは10種類です。
+現在のCommandは11種類です。
 
 1. StartTurn
 2. SetCityProduction
@@ -75,10 +77,11 @@ RuleSystem.execute(original, command)は成功時に複製したstateとevents�
 8. MoveParty
 9. AttackParty（attackTypeはmeleeまたはranged。targetingで攻撃定義と照準を指定）
 10. SetGuardOrder（modeはoff／share／intercept）
+11. FoundCity（partyId・settlerUnitIdを指定）
 
 HumanControllerは上記のCommandを生成します。AIController、RemoteController、ReplayController、合法手一覧APIはありません。
 
-addKingdomは別王国とその都市、addCityは同一王国の都市を追加するセットアップ用関数です。createTwoCityGameStateで同一王国の暁都・東都を配置し、画面で切り替えて運営できます。Command経由のFoundCity・Settler消費・任意プレイヤー設定は未実装です。
+addKingdomは別王国とその都市、addCityは同一王国の都市を追加するセットアップ用関数です。createTwoCityGameStateで同一王国の暁都・東都を配置し、画面で切り替えて運営できます。ゲーム中の都市建設はFoundCityを通し、開拓者だけを消費します。セットアップ関数は最低距離などのCommand条件を代替しません。任意プレイヤー設定は未実装です。
 
 ## 5. ターン
 
@@ -117,7 +120,7 @@ Yieldはfood、production、gold、science、mana、religion、cultureです。�
 
 Productionは都市ローカルです。currentItemId、queue、progressByItemを持ち、費用到達時に完成、余剰を次キューへ投入し、キューが空なら余剰を捨てます。対象切替で途中進捗を保持します。
 
-生産可能な定義はwarrior（Production 12／Gold 48）、archer（18／72）、ballista（28／112）、monument（20／80）です。Unitは都市中心へ生成されます。Gold購入は全額即時払いで、生産進捗を減額・返金しません。
+生産可能な定義はwarrior（Production 12／Gold 48）、archer（18／72）、ballista（28／112）、settler（30／120）、monument（20／80）です。Unitは都市中心へ生成されます。Gold購入は全額即時払いで、生産進捗を減額・返金しません。
 
 建設済み建物の生産・購入、現在の対象とキュー内の重複建物を拒否します。Unitの連続生産は許可します。建物購入後は、その建物を現在の生産・キューから取り除き、その建物の進捗だけ0へ戻します。返金・Unitへの無料進捗はありません。旧キューの完成済み・重複建物も生産投入前に除き、二重完成イベントを出しません。
 
@@ -133,7 +136,7 @@ Kingdom.stockpilesはgold、mana、popularSupport、progressはscience、culture
 militaryPower =
   floor(scienceProgress / 5) + totalCityProduction
   + floor(gold / 25) + floor(mana / 5)
-  + militaryHumanResources * 2 + ownedUnitCount * 4
+  + militaryHumanResources * 2 + ownedNonCivilianUnitCount * 4
 
 governanceCapacity =
   floor(cultureProgress / 5) + institutions * 3
@@ -159,15 +162,15 @@ Unitにはcharges、abilityStates、loyalty、supportUpkeep、statusEffects等�
 
 AttackPartyは敵Partyへのmelee／rangedを扱います。targetingで通常・狙い射ち・精密射撃・横列・縦列・十字・貫通を選びます。UIは二国交互操作、敵配置とHP、照準・予測HP損失・命中率・反撃・護衛設定・最新18件の戦闘ログに対応します。詳しい定義とpayloadは[RANGED_COMBAT.md](RANGED_COMBAT.md)にあります。
 
-Party戦闘力は戦闘可能Unitの対象能力の算術平均×(0.5＋cohesion/200)。遠隔ではその攻撃定義に対応し、自分の射程で届くUnitだけを集約します。Leader・Formation・補給・地形等を含む目標PartyParameterの完全な集約ではありません。
+攻撃参加と軍事力のUnit数加算から民間の開拓者を除外します。開拓者は防御対象になり、護衛で守れます。開拓者だけの部隊は攻撃・反撃しません。Party戦闘力は戦闘可能Unitの対象能力の算術平均×(0.5＋cohesion/200)。遠隔ではその攻撃定義に対応し、自分の射程で届くUnitだけを集約します。Leader・Formation・補給・地形等を含む目標PartyParameterの完全な集約ではありません。
 
 基礎Damageは30×exp(0.04×戦闘力差)×seed乱数0.85〜1.15を1〜90へ制限して丸めます。通常攻撃は露出UnitのTauntを優先し、同率は前寄り・中央・左・右順。狙い撃ちの命中率は射手accuracy・対象evasion・同列前方Cover・露出Tauntで求めます。明示照準をTauntで強制変更しません。狙い射ちの失敗はCoverへ、精密射撃の失敗は被害なしです。
 
 範囲の対象集合は攻撃前に固定し、倍率を掛け切り捨てます。横列0.5、縦列0.65、十字0.5、貫通1→0.6→0.36。空き枠とHP0は貫通深度を消費せず、別列に流しません。Guard／Interceptは主対象に1回だけ適用し、直撃と肩代わり・割り込みをUnitごとに合算して装甲を1回引きます。正の配分は最低1Damage、配分0は被害なし。実HP損失は残りHPまでです。
 
-攻撃後は攻撃回数1消費・移動力0・行動終了です。狙い撃ちが外れても消費します。近接では生き残った防御Partyが反撃し、遠隔には標準反撃がありません。予測はRNGを参照せず、整数Damage・命中／失敗・HP0・護衛・反撃分岐を試算したUnit別HP損失範囲です。公開状態だけを扱い、霧・隠された能力はありません。
+攻撃後は攻撃回数1消費・移動力0・行動終了です。狙い撃ちが外れても消費します。近接では攻撃可能な非民間Unitが生き残った防御Partyが反撃し、遠隔には標準反撃がありません。予測はRNGを参照せず、整数Damage・命中／失敗・HP0・護衛・反撃分岐を試算したUnit別HP損失範囲です。公開状態だけを扱い、霧・隠された能力はありません。
 
-HP0ではindividualならdowned、他はshatteredです。現行定義はdetachmentの戦士・弓兵とconstructの弩砲。指揮官を失うと生存UnitのcommandContribution降順・ID昇順で継承し、moraleを追加で10下げます。全員戦闘不能ならPartyはdefeatedです。
+HP0ではindividualならdowned、他はshatteredです。現行定義はdetachmentの戦士・弓兵・開拓者とconstructの弩砲。指揮官を失うと生存UnitのcommandContribution降順・ID昇順で継承し、moraleを追加で10下げます。全員戦闘不能ならPartyはdefeatedです。
 
 新規戦士のGuardは率50％・容量50・縦横距離1。肩代わりは装甲前Damageの最大70％・残り容量まで。割り込みは反応1を使い全量を受けます。複数候補は割り込み→距離→ID順で1体、連鎖なし。stun／break／fearはGuard・Taunt・Coverを無効化します。状態を付与するAbilityは未実装です。
 
@@ -175,7 +178,7 @@ HP0ではindividualならdowned、他はshatteredです。現行定義はdetachm
 
 ## 11. セーブと検証範囲
 
-serializeGameState／restoreGameStateでJSON化・復元します。UIはlocalStorageのkingdom-m1-save一枠を使用します。save-validation.jsで必須構造・数値範囲・地形と都市・所属の双方向参照・3×3配置・次ID・手番・RNGを検証し、復元成功後だけstateを置換します。guardOrders・guardRangeの欠落は空指示・距離1で補完し、既存の率0・容量0は維持します。accuracy欠落は1、evasion／tauntStrength／coverPower欠落は0で補完し、全確率を0〜1の有限値で検証します。statusEffectsは空でない文字列、またはtype/idに空でない文字列を持つ辞書に限ります。活動中Partyの重複占有と、生存Unitを含む偽の敗北Partyを拒否し、敗北記録と生存Partyの同座標を許可します。既知M1のParty・turnOrder・戦闘フィールドの欠落を補完し、旧37セルを再生成せず維持します。nullや不明参照を既定値で隠さず、未知版を拒否します。失敗時は現在の対局・選択・カメラ倍率を維持します。
+serializeGameState／restoreGameStateでJSON化・復元します。nextIds.cityを保存し、欠落した旧形式は既存city-Nの最大N+1（該当なしは1）で補完します。存在する不正値・既存都市IDとの衝突は拒否します。UIはlocalStorageのkingdom-m1-save一枠を使用します。save-validation.jsで必須構造・数値範囲・地形と都市・所属の双方向参照・3×3配置・次ID・手番・RNGを検証し、復元成功後だけstateを置換します。guardOrders・guardRangeの欠落は空指示・距離1で補完し、既存の率0・容量0は維持します。accuracy欠落は1、evasion／tauntStrength／coverPower欠落は0で補完し、全確率を0〜1の有限値で検証します。statusEffectsは空でない文字列、またはtype/idに空でない文字列を持つ辞書に限ります。活動中Partyの重複占有と、生存Unitを含む偽の敗北Partyを拒否し、敗北記録と生存Partyの同座標を許可します。既知M1のParty・turnOrder・戦闘フィールドの欠落を補完し、旧37セルを再生成せず維持します。nullや不明参照を既定値で隠さず、未知版を拒否します。失敗時は現在の対局・選択・カメラ倍率を維持します。
 
 2026-10-17 第2段階: Node標準44テスト、全45 JavaScriptファイルの構文検査、30素材の整合性・復号に成功しました。実UIのDOM/Canvas検証では3×3配置の移動・交換・保存復元、全音声ファイルがHTTP 404の場合の再合成、再試行後のBGM重複防止を確認しました。実ブラウザのCSS・音声出力と人による聴取は未確認です。 保存に失敗しても進行を継続でき、不正ロードは元のstateへ戻します。この第2段階時点ではK-09は未実装でした。現行の対応は本節冒頭とSTATUSを参照してください。詳細は[検証記録](ASSET_INTEGRATION_QA.md)。
 

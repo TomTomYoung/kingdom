@@ -6,7 +6,7 @@
 
 この文書は2026-09-08の参照調査とKingdomとして採用する方針を保存したものです。2026-09-13の更新ではリポジトリ内の名称・規範・実装区分を照合しました。外部参照ページの再検証や、Civ6の全例外の検証は実施していません。
 
-現行コード確認基準はmain / e0dcb3fc2e6162547d7499fdd913aaaa0b9f10c7です。都市生産、Gold購入、文化領土取得、Party移動、基本攻撃は基盤があります。District、Builder、Settler、AI、Dungeon、オンラインマルチプレイは未実装です。詳細は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md) と [STATUS.md](./STATUS.md) を参照してください。
+現行コード確認基準はmain / e0dcb3fc2e6162547d7499fdd913aaaa0b9f10c7です。都市生産、Gold購入、文化領土取得、Party移動、基本攻撃は基盤があります。この基準時点ではDistrict、Builder、Settler、AI、Dungeon、オンラインマルチプレイは未実装でした。Settler／FoundCityは2026-10-30に追加しています。詳細は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md) と [STATUS.md](./STATUS.md) を参照してください。
 
 ## 1. 目的
 

@@ -41,7 +41,7 @@
 | 戦士 | warrior | [近接と護衛を担当する部隊](./units/warrior.md) |
 | 弓兵 | archer | [射程2の狙い撃ち・横列射撃](./units/archer.md) |
 | 弩砲 | ballista | [射程3の縦列・十字・貫通](./units/ballista.md) |
-| 開拓者 | Settler | [都市建設役の予定](./units/settler.md) |
+| 開拓者 | Settler | [都市建設・消費と条件](./units/settler.md) |
 | 労働者 | Builder | [改善建設・修理役の予定](./units/builder.md) |
 | 尺度 | scaleClass | [個人・部隊・兵器・魔物・群体の区分](./units/README.md) |
 | パーティー | Party | [最大5ユニットの運用集団](./rules/parties.md) |

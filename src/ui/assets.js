@@ -51,7 +51,7 @@ export class AssetStore {
     node.className = className;
     node.setAttribute('aria-hidden', 'true');
     if (this.images.has(id)) node.append(this.images.get(id).cloneNode());
-    else if (['unit-archer', 'unit-ballista'].includes(id)) { node.classList.add('unit-type-badge'); node.textContent = id === 'unit-archer' ? '弓' : '弩'; }
+    else if (['unit-archer', 'unit-ballista', 'unit-settler'].includes(id)) { node.classList.add('unit-type-badge'); node.textContent = { 'unit-archer': '弓', 'unit-ballista': '弩', 'unit-settler': '拓' }[id]; }
     return node;
   }
 }

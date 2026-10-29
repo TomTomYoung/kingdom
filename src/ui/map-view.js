@@ -147,7 +147,7 @@ export class MapView {
       const typeId = (marker.kind === 'party' ? state.units[state.parties[marker.id]?.leaderUnitId]?.typeId : units[0]?.typeId) ?? 'warrior';
       if (!assets.draw(ctx, `unit-${typeId}`, x, y, scale)) {
         ctx.fillStyle = '#527561'; ctx.fillRect(x - 12 * scale, y - 12 * scale, 24 * scale, 24 * scale);
-        const symbol = { archer: '弓', ballista: '弩' }[typeId];
+        const symbol = { archer: '弓', ballista: '弩', settler: '拓' }[typeId];
         if (symbol) { ctx.fillStyle = '#fff0c9'; ctx.font = `700 ${18 * scale}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(symbol, x, y); }
       }
       ctx.globalAlpha = 1; ctx.fillStyle = '#101d1b'; ctx.fillRect(x + 4 * scale, y + 8 * scale, 27 * scale, 17 * scale);
