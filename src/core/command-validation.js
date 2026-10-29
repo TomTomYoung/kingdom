@@ -7,7 +7,7 @@ const fields = {
   SetCityProduction: ['cityId', 'itemId'],
   PurchaseCityItem: ['cityId', 'itemId', 'currency'],
   PurchaseTile: ['cityId', 'tileKey'],
-  CreateParty: ['location'],
+  CreateParty: ['location'], FoundCity: ['partyId', 'settlerUnitId'],
   SetFormation: ['partyId'], MoveParty: ['partyId'],
   AttackParty: ['attackerPartyId', 'defenderPartyId', 'attackType'],
 };

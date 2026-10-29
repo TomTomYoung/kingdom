@@ -21,7 +21,7 @@ export function createInitialGameState(seed = 117, { radius = RULESET.mapRadius,
     schemaVersion: 1, rulesetVersion: RULESET_VERSION, cityTerritoryVersion: 1, seed, currentTurn: 1, phase: 'PLAYER_ACTION', lastProcessedTurn: 0,
     activePlayerId: kingdom.id, activePlayerIndex: 0, turnOrder: [kingdom.id], kingdoms: { [kingdom.id]: kingdom }, cities: { [city.id]: city }, units: {}, parties: {}, world,
     rng: { territory: { seed: (seed ^ 0x9e3779b9) >>> 0, state: (seed ^ 0x9e3779b9) >>> 0 }, combat: { seed: (seed ^ 0x85ebca6b) >>> 0, state: (seed ^ 0x85ebca6b) >>> 0 } },
-    nextIds: { unit: 1, party: 1, command: 1 }, commandLog: [], eventLog: [],
+    nextIds: { city: 2, unit: 1, party: 1, command: 1 }, commandLog: [], eventLog: [],
   };
   if (startingParty) {
     const unit = createUnit('unit-1', kingdom.id, 'warrior', center.key);
@@ -51,6 +51,7 @@ export function addKingdom(state, { id, name, cityId, cityName, centerHex, contr
     const tile = state.world.tiles[hex.key]; if (tile?.ownerId === null && tile.terrainId !== 'void') { tile.ownerId = id; tile.territoryCityId = cityId; }
   }
   centerTile.cityId = cityId; state.kingdoms[id] = kingdom; state.cities[cityId] = city; state.turnOrder.push(id);
+  advanceCityId(state, cityId);
   calculateCityYields(state, city); updateDerivedCapabilities(kingdom, state); return state;
 }
 
@@ -63,7 +64,7 @@ export function addCity(state, { ownerId, id, name = '新都', centerHex }) {
   if (!tile || tile.terrainId === 'void' || tile.cityId !== null || tile.territoryCityId !== null
     || (tile.ownerId !== null && tile.ownerId !== ownerId)) throw new Error('都市を配置できないHexです');
   const city = createCity(ownerId, center.key, id, name);
-  state.cities[id] = city; kingdom.cityIds.push(id);
+  state.cities[id] = city; kingdom.cityIds.push(id); advanceCityId(state, id);
   claimTileForCity(state, city, tile); tile.cityId = id;
   for (let direction = 0; direction < 6; direction++) {
     const neighbor = state.world.tiles[center.neighbor(direction).key];
@@ -71,4 +72,9 @@ export function addCity(state, { ownerId, id, name = '新都', centerHex }) {
   }
   calculateCityYields(state, city); updateDerivedCapabilities(kingdom, state);
   return state;
+}
+
+function advanceCityId(state, id) {
+  const match = id.match(/^city-(\d+)$/);
+  if (match) state.nextIds.city = Math.max(state.nextIds.city, Number(match[1]) + 1);
 }

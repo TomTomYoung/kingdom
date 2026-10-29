@@ -37,6 +37,10 @@ export function migrateAndValidateSave(state) {
   defaultMissing(state, 'turnOrder', Object.keys(state.kingdoms)); ids(state.turnOrder, 'turnOrder');
   defaultMissing(state, 'activePlayerIndex', state.turnOrder.indexOf(state.activePlayerId));
   defaultMissing(state.nextIds, 'party', 1);
+  if (!Object.hasOwn(state.nextIds, 'city')) {
+    const numbers = Object.keys(state.cities).map(id => /^city-(\d+)$/.exec(id)).filter(Boolean).map(match => Number(match[1]));
+    state.nextIds.city = numbers.reduce((next, value) => Math.max(next, value + 1), 1);
+  }
   for (const [id, unit] of Object.entries(state.units)) {
     object(unit, `units.${id}`);
     const definition = reference(RULESET.unitTypes, unit.typeId, `units.${id}.typeId`);
@@ -70,8 +74,8 @@ export function migrateAndValidateSave(state) {
     object(state.rng[name], `rng.${name}`);
     for (const key of ['seed', 'state']) integer(state.rng[name][key], `rng.${name}.${key}`, 0, 0xffffffff);
   }
-  for (const name of ['unit', 'party', 'command']) integer(state.nextIds[name], `nextIds.${name}`, 1);
-  for (const [kind, records] of [['unit', state.units], ['party', state.parties]]) {
+  for (const name of ['city', 'unit', 'party', 'command']) integer(state.nextIds[name], `nextIds.${name}`, 1);
+  for (const [kind, records] of [['city', state.cities], ['unit', state.units], ['party', state.parties]]) {
     for (const id of Object.keys(records)) {
       const match = id.match(new RegExp(`^${kind}-(\\d+)$`));
       if (match) check(Number(match[1]) < state.nextIds[kind], `nextIds.${kind}`);

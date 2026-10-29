@@ -11,6 +11,7 @@ import { validateCommand } from './command-validation.js';
 import { validatePartyPath } from '../systems/movement-system.js';
 import { validateGuardOrder } from '../systems/damage-grid.js';
 import { resolvePartyAttack } from '../systems/combat-system.js';
+import { resolveFoundCity } from '../systems/founding-system.js';
 
 const fail = (reason) => ({ ok: false, reason });
 function context(state, command) {
@@ -74,6 +75,9 @@ export class RuleSystem {
       state.parties[partyId] = createParty(partyId, command.playerId, unitIds, command.payload.location);
       units.forEach((unit) => { unit.partyId = partyId; });
       events.push({ type: 'PartyCreated', partyId, unitIds: [...unitIds], location: command.payload.location });
+    } else if (command.type === COMMAND_TYPES.FOUND_CITY) {
+      const founded = resolveFoundCity(state, command.playerId, command.payload.partyId, command.payload.settlerUnitId, events);
+      if (!founded.ok) return reject(founded.reason);
     } else if (command.type === COMMAND_TYPES.SET_FORMATION) {
       if (state.phase !== 'PLAYER_ACTION') return reject('行動フェーズではありません');
       const party = state.parties[command.payload.partyId];

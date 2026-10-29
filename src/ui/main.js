@@ -1,4 +1,4 @@
-import { createDuelGameState, createRangedDuelGameState, createTwoCityGameState } from '../core/scenarios.js';
+import { createDuelGameState, createRangedDuelGameState, createTwoCityGameState, createSettlementGameState } from '../core/scenarios.js';
 import { CombatPanel } from './combat-panel.js';
 import { createInitialGameState, restoreGameState, serializeGameState } from '../core/game-state.js';
 import { HumanController } from '../core/human-controller.js';
@@ -6,6 +6,7 @@ import { RuleSystem } from '../core/rule-system.js';
 import { RULESET } from '../core/ruleset.js';
 import { getTerritoryCandidates, tilePurchaseCost } from '../systems/territory-system.js';
 import { getReachablePartyPaths, terrainMovementCost } from '../systems/movement-system.js';
+import { validateFoundCity } from '../systems/founding-system.js';
 import { AssetStore } from './assets.js';
 import { GameAudio, soundForResult } from './audio.js';
 import { FormationPanel } from './formation.js';
@@ -17,7 +18,7 @@ const controller = new HumanController('kingdom-1'), assets = new AssetStore();
 let storage;
 try { storage = window.localStorage; } catch { /* The game is playable without persistence. */ }
 const audio = new GameAudio(assets, { storage, onStatus: (text) => { $('#audio-status').textContent = text; } });
-function newGame(mode = 'single') { controller.playerId = 'kingdom-1'; const initial = mode === 'two-cities' ? createTwoCityGameState(117) : mode === 'ranged-duel' ? createRangedDuelGameState(117) : mode === 'duel' ? createDuelGameState(117) : createInitialGameState(117, { startingParty: true }); return RuleSystem.execute(initial, controller.startTurn(initial)).state; }
+function newGame(mode = 'single') { controller.playerId = 'kingdom-1'; const initial = mode === 'settlement' ? createSettlementGameState(117) : mode === 'two-cities' ? createTwoCityGameState(117) : mode === 'ranged-duel' ? createRangedDuelGameState(117) : mode === 'duel' ? createDuelGameState(117) : createInitialGameState(117, { startingParty: true }); return RuleSystem.execute(initial, controller.startTurn(initial)).state; }
 let state = newGame(), selectedPartyId = 'party-1', selectedUnitId = 'unit-1', selectedTileKey = '0,0,0', hoveredKey = null, reachable = new Map(), selectedEnemyId = null, selectedCityId = 'city-1';
 const currentCity = () => state.cities[state.kingdoms[controller.playerId].cityIds.includes(selectedCityId) ? selectedCityId : state.kingdoms[controller.playerId].cityIds[0]];
 const labels = { food: '食料', production: '生産', gold: 'Gold', science: '科学', mana: 'Mana', religion: '宗教', culture: '文化', popularSupport: '人心' };
@@ -176,6 +177,23 @@ function renderCityDetails(city) {
   add('p', `収集合計: ${describe(city.yieldSummary)}`, 'city-yield-total');
 }
 
+function renderFounding() {
+  const party = state.parties[selectedPartyId], selector = $('#founding-settler');
+  const settlers = party?.ownerId === controller.playerId ? party.unitIds.map(id => state.units[id]).filter(unit => unit.typeId === 'settler') : [];
+  $('#founding-panel').hidden = !settlers.length;
+  const selected = settlers.some(unit => unit.id === selectedUnitId) ? selectedUnitId : selector.value;
+  selector.replaceChildren();
+  for (const unit of settlers) {
+    const option = document.createElement('option'); option.value = unit.id; option.textContent = `${unitName(unit)} ${unit.id} · HP ${unit.currentHp}/${unit.maxHp}`; selector.append(option);
+  }
+  if (settlers.some(unit => unit.id === selected)) selector.value = selected;
+  if (!settlers.length) return;
+  const validity = validateFoundCity(state, controller.playerId, party.id, selector.value);
+  $('#founding-site').textContent = `建設地点: 部隊の現在地 (${party.location})。既存都市から${RULESET.founding.minimumCityDistance}ヘクス以上離れた未所有の土地に建設できます。`;
+  $('#found-city').disabled = !validity.ok;
+  $('#founding-status').textContent = validity.ok ? '開拓者1体を消費し、同行部隊の行動を終了します。新都市は人口1で始まり、収入は次のターン開始からです。' : validity.reason;
+}
+
 function render() {
   const k = state.kingdoms[controller.playerId], city = currentCity();
   selectedCityId = city.id;
@@ -204,7 +222,7 @@ function render() {
   else { $('#party-status').textContent = selectedUnitId ? `${unitName(state.units[selectedUnitId])} ${selectedUnitId} · 待機中` : '部隊・Unitを選択してください'; $('#party-detail').textContent = '地図の駒または上の一覧から選べます。'; }
   $('#deselect-party').disabled = !party && !selectedUnitId; $('#focus-party').disabled = !party && !selectedUnitId;
   $('#map-mode').textContent = party ? `${partyName(party)} 選択中` : selectedUnitId ? '待機Unit 選択中' : 'セル確認';
-  renderRoster(); formationPanel.render(state, party); renderInspection(); updateHover(); drawMap();
+  renderFounding(); renderRoster(); formationPanel.render(state, party); renderInspection(); updateHover(); drawMap();
   combatPanel.render(state, selectedPartyId, selectedEnemyId);
   void audio.setMusic(state.parties[selectedEnemyId]?.status === 'active' ? 'bgm-battle' : 'bgm-overworld');
   document.querySelectorAll('[data-produce],[data-buy]').forEach(button => { const id = button.dataset.produce ?? button.dataset.buy; button.disabled = RULESET.items[id].category === 'building' && city.buildings.includes(id); });
@@ -215,6 +233,16 @@ document.addEventListener('pointerdown', gesture, { capture: true });
 document.addEventListener('keydown', (event) => { gesture(); if (event.key === 'Escape') deselect(); });
 document.querySelectorAll('[data-produce]').forEach((button) => { button.onclick = () => run(controller.setProduction(state, currentCity().id, button.dataset.produce), `${RULESET.items[button.dataset.produce].name}の生産を開始しました`); });
 document.querySelectorAll('[data-buy]').forEach((button) => { const item = RULESET.items[button.dataset.buy]; button.textContent = `${item.name}を購入 · ${item.purchaseOptions.gold}`; button.onclick = () => run(controller.purchaseItem(state, currentCity().id, button.dataset.buy), item.category === 'unit' ? `${item.name}を購入しました。${currentCity().name}の待機Unitに追加しました` : `${item.name}を建設しました。生産キューを更新しました`); });
+$('#founding-settler').onchange = event => { selectedUnitId = event.target.value; renderInspection(); renderFounding(); };
+$('#found-city').onclick = () => {
+  const result = run(controller.foundCity(state, selectedPartyId, $('#founding-settler').value), '都市を建設しました');
+  if (result.ok) {
+    const event = result.events.find(event => event.type === 'CityFounded');
+    selectedUnitId = state.parties[selectedPartyId]?.leaderUnitId ?? null;
+    formationPanel.clear(); inspection.clear(); selectCity(event.cityId);
+    show(`${state.cities[event.cityId].name}を建設しました。収入は次のターン開始から発生します。`);
+  }
+};
 $('#city-select').onchange = event => selectCity(event.target.value);
 $('#deselect-party').onclick = deselect;
 $('#map-move').onclick = () => moveTo(selectedTileKey);
@@ -237,13 +265,13 @@ $('#load').onclick = () => {
     const save = storage?.getItem('kingdom-m1-save'); if (!save) return reject('セーブデータがありません');
     const restored = restoreGameState(save);
     if (!restored.turnOrder.every(id => restored.cities[restored.kingdoms[id].cityIds[0]])) throw new Error('このセーブは現在の画面に対応していません');
-    state = restored; controller.playerId = state.activePlayerId; selectedCityId = state.kingdoms[controller.playerId].cityIds[0]; selectedEnemyId = null; $('#game-mode').value = state.scenarioId === 'two-cities' ? 'two-cities' : state.scenarioId === 'ranged-duel' ? 'ranged-duel' : state.turnOrder.length > 1 ? 'duel' : 'single'; selectedPartyId = null; selectedUnitId = null; selectedTileKey = currentCity().centerHex; hoveredKey = null;
+    state = restored; controller.playerId = state.activePlayerId; selectedCityId = state.kingdoms[controller.playerId].cityIds[0]; selectedEnemyId = null; $('#game-mode').value = state.scenarioId === 'settlement' ? 'settlement' : state.scenarioId === 'two-cities' ? 'two-cities' : state.scenarioId === 'ranged-duel' ? 'ranged-duel' : state.turnOrder.length > 1 ? 'duel' : 'single'; selectedPartyId = null; selectedUnitId = null; selectedTileKey = currentCity().centerHex; hoveredKey = null;
     formationPanel.clear(); inspection.clear(); combatPanel.reset(); map.camera.zoom = 1; render(); map.focus(selectedTileKey); show('セーブをロードしました'); void audio.play('se-load');
   } catch (error) { state = before; ({ selectedCityId, selectedPartyId, selectedUnitId, selectedTileKey, hoveredKey, selectedEnemyId } = selection); controller.playerId = selection.playerId; render(); reject(error.message || 'セーブをロードできませんでした'); }
 };
 $('#reset').onclick = () => {
   state = newGame($('#game-mode').value); selectedCityId = state.kingdoms[controller.playerId].cityIds[0]; selectedEnemyId = null; selectedPartyId = 'party-1'; selectedUnitId = 'unit-1'; selectedTileKey = state.parties[selectedPartyId].location; hoveredKey = null;
-  formationPanel.clear(); inspection.clear(); combatPanel.reset(); map.camera.zoom = 1; audio.stop(); void audio.startMusic(); render(); map.focus(selectedTileKey); show(state.scenarioId === 'two-cities' ? '二都市の運営を開始しました。操作都市を切り替えると、生産・購入・領土取得の対象が変わります。' : state.turnOrder.length > 1 ? '二国対戦を開始しました。敵部隊を選んで攻撃できます。ターン終了で操作する王国を交代します。' : '331セルの新規マップで開始しました。最初の部隊を操作できます。'); void audio.play('se-turn-start');
+  formationPanel.clear(); inspection.clear(); combatPanel.reset(); map.camera.zoom = 1; audio.stop(); void audio.startMusic(); render(); map.focus(selectedTileKey); show(state.scenarioId === 'settlement' ? '開拓者と護衛で開始しました。部隊を既存都市から4ヘクス以上離れた未所有の土地へ移動し、移動力を1以上残して都市を建設してください。' : state.scenarioId === 'two-cities' ? '二都市の運営を開始しました。操作都市を切り替えると、生産・購入・領土取得の対象が変わります。' : state.turnOrder.length > 1 ? '二国対戦を開始しました。敵部隊を選んで攻撃できます。ターン終了で操作する王国を交代します。' : '331セルの新規マップで開始しました。最初の部隊を操作できます。'); void audio.play('se-turn-start');
 };
 function updateAudioControls() {
   $('#audio-toggle').textContent = audio.muted ? '音声をオン' : '音声をオフ'; $('#audio-toggle').setAttribute('aria-pressed', String(!audio.muted));

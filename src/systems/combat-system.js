@@ -50,6 +50,7 @@ function strike(state, sourceParty, targetParty, kind, events, counter = false, 
   const targeting = resolveTargeting(state, sourceParty, targetParty, kind, options, distance);
   if (!targeting.ok) return null;
   const { definition } = targeting;
+  if (!participatingUnits(state, sourceParty, kind, distance, definition).length) return null;
   const metadata = { attackerPartyId: sourceParty.id, defenderPartyId: targetParty.id, attackType: kind, attackId: definition.id, attackName: definition.name, counter };
   const rawDamage = damageRoll(state, partyCombatStrength(state, sourceParty, kind, distance, definition), partyCombatStrength(state, targetParty, 'defense'));
   for (const taunter of targeting.taunts) events.push({ type: 'CombatTaunt', ...metadata, tauntUnitId: taunter.id, targetUnitId: targeting.primary.id });

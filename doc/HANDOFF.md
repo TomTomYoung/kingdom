@@ -1,8 +1,8 @@
 # Kingdom 開発ハンドオフ
 
-確認・更新日: 2026-10-24
+確認・更新日: 2026-10-30
 
-開始基準: main / d3f79162e0a6254dc36ed8f580a8a1d90c8f5761（PR #4）。K-05の重複作業を修正し、都市別領土・市民作業・取得先、二都市運営・都市切替と産出内訳を追加しました。現行挙動は[CURRENT_IMPLEMENTATION.md](CURRENT_IMPLEMENTATION.md)、課題は[STATUS.md](STATUS.md)、目標は[SPECIFICATION.md](SPECIFICATION.md)を正本とします。
+開始基準: main / 3273d5a6eb34ad04fa3055e063fcff2da4fdf995（PR #5）。開拓者の生産・購入、FoundCity、都市建設UIと「開拓者と護衛」、都市IDの保存移行を追加しました。条件・暫定数値・操作は[CITY_MANAGEMENT.md](CITY_MANAGEMENT.md)、検証範囲は[STATUS.md](STATUS.md)に記載しています。
 
 ## 1. 再開位置
 
@@ -45,18 +45,21 @@ Tile.ownerIdは王国、Tile.cityIdは中心、Tile.territoryCityIdは所属都�
 
 cityTerritoryVersion 1と全tile所属を保存します。完全な旧保存だけ最近同国都市・同距離ID順で移行し、複数都市の重複作業・表示集計・派生能力を直します。既収集資源やRNGは動かしません。負の補正後は産出0以上、存在する内訳は型・参照・数値を検証し、省略内訳は表示で捏造しません。
 
-次はSettler／FoundCityです。
+Settler／FoundCityは実装済みです。開拓者は生産30・Gold120、攻撃しない民間Unitです。FoundCityはpartyIdとsettlerUnitIdを受け取り、未所有・非Void・既存都市から4ヘクス以上・他活動中部隊/敵Unitの不在・移動力1以上・未終了を検証します。新都市は人口1で次の全体ターン開始から収入を得ます。これらの数値は今回の暫定設定です。
 
-- セットアップ用addCityをそのままCommand化せず、都市間最低距離、地形、領有、活動中Partyの占有、Settler所属・消費をRuleset／RuleSystemで検証します。
-- 新都市IDの発行・保存互換、初期領土と既存都市の所属維持、初期人口・収入開始時点を決めます。設置時に収入を二重に与えません。
-- 成功後の都市選択・新都市表示、失敗時のUnit／資源／ID／RNGの無変更をテストします。
-- 都市建設後、小さなAIControllerとScenario Objectiveで一戦を完結させ、国家間Dominationへ拡張します。
+開拓者だけを消費し、護衛の配置・HPを保持します。空Partyは削除、残る部隊は行動終了、指揮者と護衛指示の参照を修復します。初期領土は中心と未所有・非Voidの周囲だけで、既存所属を移しません。nextIds.city欠落は旧都市の最大連番+1で補完します。拒否Commandは全状態を保持します。
+
+次は小さなAIControllerとScenario Objectiveで一戦を完結させます。
+
+- 固定二国対戦を出発点に、AIもHumanControllerと同じCommand／RuleSystemを通します。合法手の候補選択と検証・実行を分離し、失敗Commandの無変更保証を維持します。
+- シナリオの全敵部隊撃破を勝敗条件として定義し、国家間Dominationや都市占領と混同しません。終了状態、画面表示、保存復元、終了後の命令拒否をまとめて実装します。
+- 決定論的な移動・攻撃・手番終了と無限ループ防止を確認し、人同士の交互操作も維持します。
 
 都市間移管・手動市民配置、PartyParameter集約、構成員依存移動、汎用Ability、撤退・回復・死傷者・Loot、Builder、研究・mana用途・宗教統治接続、人心・loyalty、Dungeonは後続です。
 
 ## 6. 検証と文書更新
 
-今回の最終検証はNode標準111テスト・JavaScript 65ファイルの構文検査が成功しています。都市操作12チェック群、従来操作26チェック群、遠隔戦闘13チェック群も実ブラウザで再検証しました。
+前回2026-10-24はNode標準111テスト・JavaScript 65ファイルの構文検査と、都市操作12チェック群、従来操作26チェック群、遠隔戦闘13チェック群を実ブラウザで確認しました。今回の検証結果はSTATUSの2026-10-30節を参照してください。
 
 ```sh
 npm test

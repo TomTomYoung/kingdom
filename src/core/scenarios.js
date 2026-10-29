@@ -14,6 +14,18 @@ export function createTwoCityGameState(seed = 117) {
   return state;
 }
 
+export function createSettlementGameState(seed = 117) {
+  const state = createInitialGameState(seed, { startingParty: true });
+  state.scenarioId = 'settlement';
+  const id = `unit-${state.nextIds.unit++}`, party = state.parties['party-1'];
+  state.units[id] = createUnit(id, party.ownerId, 'settler', party.location);
+  state.units[id].partyId = party.id; party.unitIds.push(id);
+  party.formation['rear-center'] = id; state.kingdoms[party.ownerId].unitIds.push(id);
+  for (let q = 1; q <= 4; q++) state.world.tiles[`${q},0,${-q}`].terrainId = 'plains';
+  updateDerivedCapabilities(state.kingdoms[party.ownerId], state);
+  return state;
+}
+
 function createDuel(seed, ranged) {
   const state = createInitialGameState(seed);
   state.scenarioId = ranged ? 'ranged-duel' : 'duel';
