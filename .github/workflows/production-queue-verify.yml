@@ -4,6 +4,9 @@ on:
     branches: ['codex/production-queue-ui-20261030']
 permissions:
   contents: read
+defaults:
+  run:
+    shell: bash
 concurrency:
   group: kingdom-production-queue-integration
   cancel-in-progress: false
@@ -12,7 +15,7 @@ jobs:
     if: github.ref == 'refs/heads/codex/production-queue-ui-20261030'
     permissions:
       contents: write
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
