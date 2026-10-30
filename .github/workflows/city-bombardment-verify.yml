@@ -19,8 +19,6 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/checkout@v4
         with:
           ref: b1368044c0a14f5989a0634b42919d5ad4b39b88
@@ -29,39 +27,31 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify and integrate the exact locally tested patch
+      - name: Correct the browser fixture without relaxing game validation
         run: |
           mkdir -p "$RUNNER_TEMP/kingdom-reports"
           python3 - <<'PY'
-          import hashlib, lzma, os
           from pathlib import Path
-          parts = Path('.github/bombardment-transfer')
-          patch = lzma.decompress(b''.join((parts/f'part-{i:02}.xz').read_bytes() for i in range(1,4)))
-          assert hashlib.sha256(patch).hexdigest() == '061dd2d3a92d03d42ccdefcf03a906e780544a688438771209ec16ef8b845aa9'
-          Path(os.environ['RUNNER_TEMP'],'bombardment.patch').write_bytes(patch)
+          p=Path('tools/qa/browser-city-bombardment.mjs'); s=p.read_text()
+          s=s.replace("const load = async value => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); };", "const load = async (value, valid = true) => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); if (valid) assert.match(await page.locator('#message').innerText(), /セーブをロードしました/); };")
+          s=s.replace("const base = structuredClone(initial); base.kingdoms", "const base = structuredClone(initial); base.scenarioId = 'city-bombardment-qa'; base.kingdoms")
+          s=s.replace('await load(invalid);', 'await load(invalid, false);')
+          s=s.replace("const ai = structuredClone(armed); ai.kingdoms", "const ai = structuredClone(armed); ai.scenarioId = 'ai-conquest'; ai.kingdoms")
+          p.write_text(s)
+          p=Path('tools/qa/browser-city-defense.mjs'); s=p.read_text().replace('new conquest explains one city counter per round and enables defense version 2','new conquest explains one city counter per round alongside version-3 bombardment'); p.write_text(s)
           PY
-          export GIT_INDEX_FILE="$RUNNER_TEMP/verify-bombardment.index"
-          git read-tree b1368044c0a14f5989a0634b42919d5ad4b39b88
-          git apply --cached --unidiff-zero "$RUNNER_TEMP/bombardment.patch"
-          test "$(git write-tree)" = ddcdb95fa5f0b53d110048d7b7d5fb3ac05795be
-          unset GIT_INDEX_FILE
-          if git apply --check --unidiff-zero "$RUNNER_TEMP/bombardment.patch"; then
-            git apply --unidiff-zero "$RUNNER_TEMP/bombardment.patch"
-          else
-            git apply --reverse --check --unidiff-zero "$RUNNER_TEMP/bombardment.patch"
-          fi
       - name: Syntax, Node regressions and historical save continuation
         run: |
           npm run check | tee "$RUNNER_TEMP/kingdom-reports/syntax.log"
           npm test | tee "$RUNNER_TEMP/kingdom-reports/node.log"
           node tools/qa/save-city-bombardment-compat.mjs .qa-baseline assets/qa/save-city-bombardment-compat-2026-10-30.json | tee "$RUNNER_TEMP/kingdom-reports/compat.log"
-      - name: Commit verified implementation on its feature branch
+      - name: Commit verified fixture corrections
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- doc index.html src tests tools/qa wiki assets/qa/save-city-bombardment-compat-2026-10-30.json
+          git add tools/qa/browser-city-bombardment.mjs tools/qa/browser-city-defense.mjs assets/qa/save-city-bombardment-compat-2026-10-30.json
           if ! git diff --cached --quiet; then
-            git commit -m 'feat: implement city bombardment with independent charges and legacy save rules'
+            git commit -m 'test: validate city bombardment fixtures before browser operations'
             git push origin HEAD:refs/heads/codex/city-bombardment-20261030
           fi
           echo "KINGDOM_TESTED_REVISION=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
