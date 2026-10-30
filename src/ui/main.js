@@ -1,3 +1,4 @@
+import { ProductionQueuePanel, queueForSelection } from './production-queue.js';
 import { PartyCarePanel } from './party-care.js';
 import { isActiveUnit } from '../models/party.js';
 import { createDuelGameState, createRangedDuelGameState, createTwoCityGameState, createSettlementGameState, createAiSkirmishGameState, createAiReinforcementGameState, createAiConquestGameState } from '../core/scenarios.js';
@@ -58,6 +59,9 @@ const formationPanel = new FormationPanel($('#formation'), assets, {
   onCancel: () => { void audio.play('se-ui-cancel'); },
 });
 
+const productionQueue = new ProductionQueuePanel($('#production-queue'), {
+  onApply: (cityId, items) => run(controller.setProduction(state, cityId, items[0] ?? null, items.slice(1)), items.length ? '生産キューを確定しました。途中の進捗は保持しています。' : '生産を停止しました。途中の進捗は再選択すると引き継ぎます。'),
+});
 const partyCare = new PartyCarePanel($('#party-care'), {
   onRest: partyId => run(controller.restParty(state, partyId), '休養を開始しました。被害や敵接近がなければ次の全体ターン開始時に回復します。'),
   onRemove: partyId => { const result = run(controller.removeCasualties(state, partyId), '戦闘不能者が部隊から離脱しました。補充は次の全体ターンから行えます。'); if (result.ok) { reorganization.clear(); formationPanel.clear(); inspection.clear(); selectedUnitId = state.parties[partyId].leaderUnitId; render(); } },
@@ -317,6 +321,7 @@ function render() {
   const k = state.kingdoms[controller.playerId], city = currentCity();
   selectedCityId = city?.id ?? null; $('#focus-city').disabled = !city;
   renderCityDetails(city);
+  productionQueue.render(state, city, controller.playerId, canAct());
   $('#city-defense').textContent = cityDefenseLabel(state, city); $('#city-defense').hidden = !hasCityDefense(state) || !city;
   if (!state.parties[selectedPartyId]) selectedPartyId = null;
   if (!state.units[selectedUnitId]) selectedUnitId = null;
@@ -360,7 +365,7 @@ function render() {
 const gesture = () => { void audio.unlock(); };
 document.addEventListener('pointerdown', gesture, { capture: true });
 document.addEventListener('keydown', (event) => { gesture(); if (event.key === 'Escape') deselect(); });
-document.querySelectorAll('[data-produce]').forEach((button) => { button.onclick = () => run(controller.setProduction(state, currentCity()?.id, button.dataset.produce), `${RULESET.items[button.dataset.produce].name}の生産を開始しました`); });
+document.querySelectorAll('[data-produce]').forEach((button) => { button.onclick = () => run(controller.setProduction(state, currentCity()?.id, button.dataset.produce, queueForSelection(currentCity(), button.dataset.produce)), `${RULESET.items[button.dataset.produce].name}の生産を開始しました`); });
 document.querySelectorAll('[data-buy]').forEach((button) => { const item = RULESET.items[button.dataset.buy]; button.textContent = `${item.name}を購入 · ${item.purchaseOptions.gold}`; button.onclick = () => run(controller.purchaseItem(state, currentCity()?.id, button.dataset.buy), item.category === 'unit' ? `${item.name}を購入しました。${currentCity()?.name ?? ''}の待機Unitに追加しました` : `${item.name}を建設しました。生産キューを更新しました`); });
 $('#founding-settler').onchange = event => { selectedUnitId = event.target.value; renderInspection(); renderFounding(); };
 $('#found-city').onclick = () => {

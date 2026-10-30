@@ -46,7 +46,7 @@ export class RuleSystem {
       processTurnStart(state, events);
     } else if (command.type === COMMAND_TYPES.SET_CITY_PRODUCTION) {
       if (state.phase !== 'PLAYER_ACTION') return reject('行動フェーズではありません');
-      if (!Object.hasOwn(RULESET.items, command.payload.itemId)) return reject('不明な生産対象です');
+      if (command.payload.itemId !== null && !Object.hasOwn(RULESET.items, command.payload.itemId)) return reject('不明な生産対象です');
       if (!command.payload.queue.every((id) => Object.hasOwn(RULESET.items, id))) return reject('キューに不明な生産対象があります');
       if (!hasCityDefense(state) && [command.payload.itemId, ...command.payload.queue].includes('walls')) return reject('城壁は新規の都市争奪戦で建設できます');
       const productionError = validateProductionSelection(city, command.payload.itemId, command.payload.queue);
