@@ -1,3 +1,4 @@
+import { hasCityRetaliation, cityEntryError } from '../models/city-defense.js';
 import { COMMAND_TYPES, createParty, moveParty, purchaseCityItem, setCityProduction, reinforceParty, mergeParties } from './commands.js';
 import { RULESET } from './ruleset.js';
 import { isActiveUnit, hasActiveUnits, occupiesMapTile } from '../models/party.js';
@@ -70,7 +71,7 @@ export function chooseCityExitCommand(state, playerId, commandId) {
 export function chooseDeploymentCommand(state, playerId, commandId) {
   const recruits = waiting(state, playerId), locations = [...new Set(recruits.map(unit => unit.location))].sort();
   for (const location of locations) {
-    if (occupant(state, location) || !state.world.tiles[location] || state.world.tiles[location].terrainId === 'void') continue;
+    if (cityEntryError(state, playerId, location) || occupant(state, location) || !state.world.tiles[location] || state.world.tiles[location].terrainId === 'void') continue;
     const ids = recruits.filter(unit => unit.location === location).slice(0, 5).map(unit => unit.id);
     return createParty(playerId, state.currentTurn, ids, location, commandId);
   }
@@ -78,6 +79,7 @@ export function chooseDeploymentCommand(state, playerId, commandId) {
 }
 
 export function chooseSupplyCommand(state, playerId, commandId) {
+  const defense = chooseCityDefenseCommand(state, playerId, commandId); if (defense) return defense;
   const needs = recruitmentNeeds(state, playerId);
   if (needs.total >= RULESET.aiRecruitment.maxCombatUnits) return null;
   const ownCities = cities(state, playerId), recruits = waiting(state, playerId);
@@ -92,5 +94,19 @@ export function chooseSupplyCommand(state, playerId, commandId) {
     const type = purchaseType(state, playerId, city, needs);
     if (type) return purchaseCityItem(playerId, state.currentTurn, city.id, type, 'gold', commandId);
   }
+  return null;
+}
+
+export function chooseCityDefenseCommand(state, playerId, commandId) {
+  if (!hasCityRetaliation(state)) return null;
+  const live = Object.values(state.units).filter(unit => unit.ownerId === playerId && combatUnit(unit));
+  if (live.length < RULESET.aiCityDefense.minimumCombatUnits || !Object.values(state.parties).some(party => party.ownerId === playerId && occupiesMapTile(party) && party.unitIds.some(id => combatUnit(state.units[id])))) return null;
+  const enemies = Object.values(state.parties).filter(party => party.ownerId !== playerId && occupiesMapTile(party) && party.unitIds.some(id => combatUnit(state.units[id])));
+  const threatened = cities(state, playerId).filter(city => !city.buildings.includes('walls') && (!occupant(state, city.centerHex) || occupant(state, city.centerHex).ownerId === playerId)
+    && enemies.some(party => Hex.fromKey(party.location).distance(Hex.fromKey(city.centerHex)) <= RULESET.aiCityDefense.threatRange));
+  for (const city of threatened) if (state.kingdoms[playerId].stockpiles.gold - RULESET.aiRecruitment.goldReserve >= RULESET.items.walls.purchaseOptions.gold && purchaseCount(state, playerId, city.id) < RULESET.aiRecruitment.purchasesPerCityPerTurn) {
+    return purchaseCityItem(playerId, state.currentTurn, city.id, 'walls', 'gold', commandId);
+  }
+  for (const city of threatened) if (!city.production.currentItemId && !city.production.queue.length) return setCityProduction(playerId, state.currentTurn, city.id, 'walls', [], commandId);
   return null;
 }

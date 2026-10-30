@@ -1,3 +1,4 @@
+import { hasCityDefense } from '../models/city-defense.js';
 import { Hex } from '../world/hex.js';
 import { RULESET } from '../core/ruleset.js';
 import { occupiesMapTile } from '../models/party.js';
@@ -120,7 +121,7 @@ export class MapView {
       if (tile.key === selectedTileKey || tile.key === hoveredKey) { ctx.strokeStyle = tile.key === selectedTileKey ? '#ffffff' : '#fff1be'; ctx.lineWidth = tile.key === selectedTileKey ? 3 : 2; ctx.stroke(); }
       if (tile.cityId) {
         const city = state.cities[tile.cityId];
-        if (state.cityDefenseVersion === 1) {
+        if (hasCityDefense(state)) {
           const barY = p.y - 31 * scale; ctx.fillStyle = '#172432'; ctx.fillRect(p.x - 20 * scale, barY, 40 * scale, 8 * scale);
           ctx.fillStyle = '#eebf68'; ctx.fillRect(p.x - 20 * scale, barY, 40 * scale * city.defense.hp / RULESET.cityDefense.maximumHp, 4 * scale);
           ctx.fillStyle = '#a0c4db'; ctx.fillRect(p.x - 20 * scale, barY + 4 * scale, 40 * scale * city.defense.wallHp / RULESET.cityDefense.wallHp, 4 * scale);

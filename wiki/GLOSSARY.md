@@ -75,3 +75,5 @@
 | セーブ・ロード | Save / Load | [ブラウザ内の保存と復元](./rules/turns.md) |
 
 各項目の根拠となるコード・設計文書は、リンク先の末尾に記載しています。
+
+都市反撃（City Counterattack）: 新規都市争奪戦で近接攻城後も防御が残る都市が行う全体ターン1回の反撃。[戦闘](rules/combat.md)・[詳細](../doc/CITY_RETALIATION.md)。

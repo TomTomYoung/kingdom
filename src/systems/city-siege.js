@@ -1,3 +1,4 @@
+import { canCityCounterattack, resolveCityCounterattack } from './city-retaliation.js';
 import { RULESET } from '../core/ruleset.js';
 import { Hex } from '../world/hex.js';
 import { hasCityDefense, isCityDefended } from '../models/city-defense.js';
@@ -32,17 +33,22 @@ export function previewCityAttack(state, playerId, partyId, cityId, attackType =
   const valid = validateCityAttack(state, playerId, partyId, cityId, attackType); if (!valid.ok) return valid;
   const city = state.cities[cityId], party = state.parties[partyId], strength = partyCombatStrength(state, party, attackType, valid.distance), multiplier = siegeMultiplier(city, attackType, valid.units);
   const ranges = [RULESET.combat.randomMinimum, RULESET.combat.randomMaximum].map(random => damageParts(city, boundedDamage(strength, RULESET.cityDefense.strength, random), multiplier));
-  return { ok: true, wallDamage: { min: ranges[0].wallDamage, max: ranges[1].wallDamage }, cityDamage: { min: ranges[0].cityDamage, max: ranges[1].cityDamage }, participantIds: valid.units.map(unit => unit.id), multiplier };
+  const retaliation = previewRetaliation(state, party, city, attackType, strength);
+  return { ...retaliation, ok: true, wallDamage: { min: ranges[0].wallDamage, max: ranges[1].wallDamage }, cityDamage: { min: ranges[0].cityDamage, max: ranges[1].cityDamage }, participantIds: valid.units.map(unit => unit.id), multiplier };
 }
-export function resolveCityAttack(state, playerId, partyId, cityId, attackType, events) {
+export function resolveCityAttack(state, playerId, partyId, cityId, attackType, events, damageRoll = rollDamage) {
   const valid = validateCityAttack(state, playerId, partyId, cityId, attackType); if (!valid.ok) return valid;
   const party = state.parties[partyId], city = state.cities[cityId], multiplier = siegeMultiplier(city, attackType, valid.units);
-  const rawDamage = rollDamage(state, partyCombatStrength(state, party, attackType, valid.distance), RULESET.cityDefense.strength);
+  const rawDamage = damageRoll(state, partyCombatStrength(state, party, attackType, valid.distance), RULESET.cityDefense.strength);
   const { wallDamage, cityDamage } = damageParts(city, rawDamage, multiplier);
   city.defense.wallHp -= wallDamage; city.defense.hp -= cityDamage; city.defense.lastDamagedTurn = state.currentTurn;
-  party.attacksRemaining = 0; party.movementRemaining = 0; party.reactionCharges = 0; party.hasAttacked = true; party.activationState = 'ended';
+  party.attacksRemaining = 0; party.movementRemaining = 0; party.hasAttacked = true; party.activationState = 'ended';
   events.push({ type: 'CityDamaged', cityId, partyId, attackType, rawDamage, multiplier, wallDamage, cityDamage, remainingHp: city.defense.hp, remainingWallHp: city.defense.wallHp });
   if (!isCityDefended(state, city)) events.push({ type: 'CityBreached', cityId, partyId });
+  // The attacker may use its remaining intercept during the immediate counter;
+  // the siege activation closes all reactions after that exchange.
+  resolveCityCounterattack(state, city, party, attackType, events, damageRoll);
+  party.reactionCharges = 0;
   return { ok: true };
 }
 export function recoverCityDefense(state, city, events) {
@@ -53,4 +59,22 @@ export function recoverCityDefense(state, city, events) {
   if (!hp && !wallHp) return;
   city.defense.hp += hp; city.defense.wallHp += wallHp;
   events.push({ type: 'CityDefenseRecovered', cityId: city.id, hp, wallHp });
+}
+
+function previewRetaliation(state, party, city, attackType, strength) {
+  const damage = Object.fromEntries(party.unitIds.map(id => [id, { min: 0, max: 0 }]));
+  if (!canCityCounterattack(state, city, attackType)) return { counter: 'none', damage, guards: [], intercepts: [] };
+  for (const range of Object.values(damage)) range.min = Infinity;
+  const minimum = boundedDamage(strength, RULESET.cityDefense.strength, RULESET.combat.randomMinimum), maximum = boundedDamage(strength, RULESET.cityDefense.strength, RULESET.combat.randomMaximum);
+  const guards = new Set(), intercepts = new Set(); let counters = 0, simulations = 0;
+  for (let raw = minimum; raw <= maximum; raw++) for (const random of [RULESET.combat.randomMinimum, RULESET.combat.randomMaximum]) {
+    const clone = { cityDefenseVersion: state.cityDefenseVersion, phase: state.phase, activePlayerId: state.activePlayerId, currentTurn: state.currentTurn,
+      cities: { [city.id]: structuredClone(city) }, parties: { [party.id]: structuredClone(party) }, units: structuredClone(state.units) }, events = [];
+    let first = true;
+    resolveCityAttack(clone, party.ownerId, party.id, city.id, attackType, events, (_state, attack, defense) => { if (first) { first = false; return raw; } return boundedDamage(attack, defense, random); });
+    simulations++; if (events.some(event => event.type === 'CityCounterattacked')) counters++;
+    for (const event of events) { if (event.type === 'CombatGuard') guards.add(event.guardUnitId); if (event.type === 'CombatIntercept') intercepts.add(event.guardUnitId); }
+    for (const id of party.unitIds) { const loss = state.units[id].currentHp - clone.units[id].currentHp; damage[id].min = Math.min(damage[id].min, loss); damage[id].max = Math.max(damage[id].max, loss); }
+  }
+  return { counter: counters === 0 ? 'none' : counters === simulations ? 'certain' : 'possible', damage, guards: [...guards], intercepts: [...intercepts] };
 }

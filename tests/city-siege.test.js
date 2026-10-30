@@ -15,13 +15,13 @@ const execute = (s, c) => { const r = RuleSystem.execute(s, c); assert.equal(r.o
 const trip = s => { const restored = restoreGameState(serializeGameState(s)); assert.deepEqual(restored, s); return restored; };
 function unchanged(s, c) { const before = structuredClone(s), r = RuleSystem.execute(s, c); assert.equal(r.ok, false); assert.equal(r.state, s); assert.deepEqual(r.events, []); assert.deepEqual(s, before); }
 function relocate(s, id, location) { const p = s.parties[id]; p.location = location; p.unitIds.forEach(id => { s.units[id].location = location; }); s.world.tiles[location].terrainId = 'plains'; }
-function ready(seed = 117) { let s = createAiConquestGameState(seed); s = execute(s, human.startTurn(s)); relocate(s, 'party-1', '3,-3,0'); relocate(s, 'party-2', '-6,6,0'); return s; }
+function ready(seed = 117) { let s = createAiConquestGameState(seed); s.cityDefenseVersion = 1; Object.values(s.cities).forEach(city => { delete city.defense.counterattacksRemaining; }); s = execute(s, human.startTurn(s)); relocate(s, 'party-1', '3,-3,0'); relocate(s, 'party-2', '-6,6,0'); return s; }
 const attack = (s, kind = 'ranged') => human.attackCity(s, 'party-1', 'city-2', kind);
 const round = s => execute(execute(s, human.endTurn(s)), enemy.endTurn(s));
 function unit(s, owner, type, location, partyId = null) { const id = `unit-${s.nextIds.unit++}`; s.units[id] = createUnit(id, owner, type, location); s.units[id].partyId = partyId; s.kingdoms[owner].unitIds.push(id); return id; }
 
 // Old conquest behavior is covered separately in city-capture.test.js.
-test('fresh conquest initializes defense on every city and preserves other scenarios', () => {
+test('version-1 conquest preserves defense on every city and preserves other scenarios', () => {
   const s = ready(); assert.equal(s.cityDefenseVersion, 1);
   for (const c of Object.values(s.cities)) assert.deepEqual(c.defense, { hp: 100, wallHp: 0, lastDamagedTurn: null });
   trip(s); const old = createAiReinforcementGameState(); assert.equal(old.cityDefenseVersion, undefined); assert.equal(old.cities['city-1'].defense, undefined);

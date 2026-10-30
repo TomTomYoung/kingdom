@@ -2,8 +2,9 @@ export const RULESET_VERSION = 'm1.0';
 
 export const RULESET = Object.freeze({
   mapRadius: 10,
-  cityDefense: Object.freeze({ maximumHp: 100, wallHp: 60, strength: 20, recoveryHp: 10, recoveryWallHp: 5, capturedHp: 25, ballistaWallBonus: 0.5 }),
+  cityDefense: Object.freeze({ maximumHp: 100, wallHp: 60, strength: 20, recoveryHp: 10, recoveryWallHp: 5, capturedHp: 25, ballistaWallBonus: 0.5, counterStrength: 20, counterattacksPerRound: 1 }),
   aiRecruitment: Object.freeze({ maxCombatUnits: 15, goldReserve: 24, purchasesPerCityPerTurn: 1, composition: Object.freeze({ warrior: 2, archer: 2, ballista: 1 }) }),
+  aiCityDefense: Object.freeze({ minimumCombatUnits: 5, threatRange: 3 }),
   founding: Object.freeze({ minimumCityDistance: 4, minimumMovement: 1, initialPopulation: 1, terrainIds: Object.freeze(['plains', 'grassland', 'forest', 'hills', 'arcane']) }),
   growthFoodBase: 12,
   growthFoodPerPopulation: 6,

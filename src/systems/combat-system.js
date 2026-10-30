@@ -74,6 +74,10 @@ function strike(state, sourceParty, targetParty, kind, events, counter = false, 
       accumulated.amount += part.amount; accumulated.roles.add(part.role); allocations.set(part.unit.id, accumulated);
     }
   }
+  return applyPartyDamage(state, targetParty, primary, allocations, rawDamage, events, metadata);
+}
+
+export function applyPartyDamage(state, targetParty, primary, allocations, rawDamage, events, metadata) {
   let total = 0;
   for (const { unit, amount, roles } of allocations.values()) {
     const damage = applyDamage(unit, amount); total += damage;

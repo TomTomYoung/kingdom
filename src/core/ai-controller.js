@@ -1,18 +1,26 @@
-import { hasCityDefense, isCityDefended, cityEntryError } from '../models/city-defense.js';
-import { validateCityAttack } from '../systems/city-siege.js';
+import { hasCityRetaliation, hasCityDefense, isCityDefended, cityEntryError } from '../models/city-defense.js';
+import { previewCityAttack, validateCityAttack } from '../systems/city-siege.js';
 import { attackCity, captureCity, attackParty, moveParty, endTurn } from './commands.js';
 import { chooseCityExitCommand, chooseDeploymentCommand, chooseSupplyCommand, chooseReinforcementCommand, chooseMergeCommand } from './ai-economy.js';
 import { RuleSystem } from './rule-system.js';
 import { validatePartyAttack } from '../systems/combat-system.js';
 import { participatingUnits } from '../systems/combat-attacks.js';
 import { terrainMovementCost, validatePartyPath } from '../systems/movement-system.js';
-import { occupiesMapTile, hasActiveUnits } from '../models/party.js';
+import { isActiveUnit, occupiesMapTile, hasActiveUnits } from '../models/party.js';
 import { hasCityObjective, validateCaptureCity } from '../systems/city-capture.js';
 import { Hex } from '../world/hex.js';
 
 export const AI_TURN_COMMAND_LIMIT = 128;
 const ordered = records => Object.values(records).sort((a, b) => a.id.localeCompare(b.id));
-const cityAttackTypeAt = (state, party, city) => ['ranged', 'melee'].find(kind => validateCityAttack({ ...state, parties: { ...state.parties, [party.id]: party } }, party.ownerId, party.id, city.id, kind).ok);
+function cityAttackTypeAt(state, party, city) {
+  const planned = { ...state, parties: { ...state.parties, [party.id]: party } };
+  return ['ranged', 'melee'].find(kind => {
+    if (!validateCityAttack(planned, party.ownerId, party.id, city.id, kind).ok) return false;
+    if (kind !== 'melee' || !hasCityRetaliation(state)) return true;
+    const preview = previewCityAttack(planned, party.ownerId, party.id, city.id, kind);
+    return !party.unitIds.filter(id => isActiveUnit(state.units[id])).every(id => preview.damage[id].min >= state.units[id].currentHp);
+  });
+}
 const attackTypeAt = (state, party, enemy) => ['ranged', 'melee'].find(kind => validatePartyAttack(state, party, enemy, kind).ok);
 
 // Search the whole map for a firing position, then take the affordable prefix.

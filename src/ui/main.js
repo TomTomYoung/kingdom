@@ -1,5 +1,5 @@
 import { createDuelGameState, createRangedDuelGameState, createTwoCityGameState, createSettlementGameState, createAiSkirmishGameState, createAiReinforcementGameState, createAiConquestGameState } from '../core/scenarios.js';
-import { hasCityDefense, cityDefenseLabel } from '../models/city-defense.js';
+import { hasCityRetaliation, hasCityDefense, cityDefenseLabel } from '../models/city-defense.js';
 import { SiegePanel } from './siege-panel.js';
 import { CombatPanel } from './combat-panel.js';
 import { createInitialGameState, restoreGameState, serializeGameState } from '../core/game-state.js';
@@ -137,6 +137,8 @@ function renderAiActivity() {
     const count = recent.filter(command => command.type === type).length;
     return count ? `${label} ${count}回` : null;
   }).filter(Boolean);
+  const walls = recent.filter(command => ['SetCityProduction', 'PurchaseCityItem'].includes(command.type) && command.payload.itemId === 'walls').length;
+  if (walls) actions.push(`城壁発注 ${walls}回`);
   $('#ai-activity').textContent = actions.length ? `AIの直近の手番（ターン ${turn}）：${actions.join(' · ')}` : '';
   $('#ai-activity').hidden = !actions.length;
 }
@@ -152,7 +154,7 @@ function renderScenario() {
     $('#scenario-detail').textContent = `${reason} ターン ${result.turn}で終了。地図・戦闘ログの確認とセーブができます。次の対局は「新規開始」から。`;
   } else {
     $('#scenario-title').textContent = aiError ? 'AIを停止しました' : isAiTurn() ? 'AIが行動中' : hasCityObjective(state) ? 'AIとの都市争奪戦' : state.scenarioId === 'ai-reinforcements' ? 'AIとの増援戦' : 'AIとの遭遇戦';
-    const status = aiError ?? (isAiTurn() ? 'AIの手番中も地図の確認とセーブができます。' : hasCityObjective(state) ? (hasCityDefense(state) ? '城壁と都市耐久を0にし、中心へ軍事部隊を進めて占領します。AIも増援・攻城・占領を行います。' : '旧ルールの都市争奪戦です。敵都市中心へ進入して占領します。攻城を使う場合は新規開始してください。') : state.scenarioId === 'ai-reinforcements' ? 'AIは都市で兵を生産・購入し、増援を編成します。ターン終了でAIが行動します。' : 'ターン終了でAIが行動します。');
+    const status = aiError ?? (isAiTurn() ? 'AIの手番中も地図の確認とセーブができます。' : hasCityObjective(state) ? (hasCityDefense(state) ? (hasCityRetaliation(state) ? '城壁と都市耐久を0にして占領します。都市は近接攻城に全体ターン1回反撃し、AIも脅威に応じて城壁を建設します。' : '反撃のない旧攻城ルールです。反撃と城壁建設AIを使う場合は新規開始してください。') : '旧ルールの都市争奪戦です。敵都市中心へ進入して占領します。攻城を使う場合は新規開始してください。') : state.scenarioId === 'ai-reinforcements' ? 'AIは都市で兵を生産・購入し、増援を編成します。ターン終了でAIが行動します。' : 'ターン終了でAIが行動します。');
     const goal = hasCityObjective(state) ? `全都市を支配すると勝利。部隊を失っても都市があれば継続します。${state.turnOrder.map(id => `${state.kingdoms[id].name} ${state.kingdoms[id].cityIds.length}都市`).join(' · ')}。` : '敵の全活動部隊を撃破すると勝利。都市・待機Unitは勝敗の対象外です。';
     $('#scenario-detail').textContent = `${goal}${state.scenarioObjective?.turnLimit ?? 40}ターン終了で引き分け。 ${status}`;
   }

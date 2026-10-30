@@ -1,0 +1,18 @@
+{
+  "verifiedAt": "2026-10-30T01:44:57.549Z",
+  "browser": "141.0.7390.37",
+  "checks": [
+    "new conquest explains one city counter per round and enables defense version 2",
+    "melee forecast is read-only; real retaliation shares damage with guard and replays identically after reload",
+    "actual guard controls enable interception before siege activation closes remaining reactions",
+    "ranged siege and a guaranteed breach show no counter and preserve unit HP and city reaction charge",
+    "lethal city counter defeats the attacking party while city-control play and saving remain usable",
+    "spent city reactions survive loading, reset at the full round and reject corrupted saves atomically",
+    "AI buys threatened-city walls with reserve intact, preserves military orders and resumes without duplicate spending",
+    "AI chooses wall production without purchase funds and prioritizes military rebuilding when its army is depleted",
+    "version-1 siege and capture-only historical saves retain their respective rules",
+    "390px counter prediction and detailed loss log render without horizontal overflow"
+  ],
+  "pageErrors": [],
+  "httpFailures": []
+}

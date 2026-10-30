@@ -2,7 +2,7 @@
 
 確認・更新日: 2026-10-30
 
-開始基準: main / 78cd40667526181b4de51c194458a952667926c5（PR #6マージ後）。戦術AI、「AIとの遭遇戦」、勝敗と40ターン期限、終了状態の保存・操作制御を追加しました。PR #7の0820eaeから、兵の生産・購入・編成を行う「AIとの増援戦」を追加しています。現行規則と制約は[AI_SCENARIOS.md](AI_SCENARIOS.md)、検証範囲は[STATUS.md](STATUS.md)に記載しています。 PR #7の97285c1から、待機兵の補充・隣接部隊の合流・分割と増援AIの補充・合流判断を追加しました。[部隊再編の規則](PARTY_MANAGEMENT.md)を参照してください。 PR #7のfa0c260から都市占領と「AIとの都市争奪戦」を追加しました。[占領・都市支配の規則](CITY_CONQUEST.md)を参照してください。 PR #7の624be34から、新規都市争奪戦の都市耐久・城壁・攻城・自然修復・AI攻城を追加しました。[攻城規則と保存互換](CITY_SIEGE.md)を参照してください。
+開始基準: main / 78cd40667526181b4de51c194458a952667926c5（PR #6マージ後）。戦術AI、「AIとの遭遇戦」、勝敗と40ターン期限、終了状態の保存・操作制御を追加しました。PR #7の0820eaeから、兵の生産・購入・編成を行う「AIとの増援戦」を追加しています。現行規則と制約は[AI_SCENARIOS.md](AI_SCENARIOS.md)、検証範囲は[STATUS.md](STATUS.md)に記載しています。 PR #7の97285c1から、待機兵の補充・隣接部隊の合流・分割と増援AIの補充・合流判断を追加しました。[部隊再編の規則](PARTY_MANAGEMENT.md)を参照してください。 PR #7のfa0c260から都市占領と「AIとの都市争奪戦」を追加しました。[占領・都市支配の規則](CITY_CONQUEST.md)を参照してください。 PR #7の624be34から、新規都市争奪戦の都市耐久・城壁・攻城・自然修復・AI攻城を追加しました。[攻城規則と保存互換](CITY_SIEGE.md)を参照してください。 PR #7の7ce65acから新規都市争奪戦に近接攻城への都市反撃と脅威に応じた城壁建設AIを追加しました。[反撃・建設AIの規則](CITY_RETALIATION.md)を参照してください。
 
 ## 1. 範囲と現在地
 
@@ -84,7 +84,7 @@ RuleSystem.execute(original, command)は成功時に複製したstateとevents�
 13. MergeParties（sourcePartyId・targetPartyIdを指定）
 14. SplitParty（partyId・unitIds・隣接locationを指定）
 15. CaptureCity（partyId・cityIdを指定。都市支配目標の対局のみ）
-16. AttackCity（partyId・cityId・attackTypeを指定。cityDefenseVersion 1のみ）
+16. AttackCity（partyId・cityId・attackTypeを指定。cityDefenseVersion 1／2のみ）
 
 HumanControllerは上記のCommandを生成します。AIControllerは合法な通常遠隔／近接攻撃、射程内への経路移動、EndTurnを選び、共通RuleSystemで実行します。次のRNGを読まず、同じ入力に同じCommandを返します。reinforcements方針では都市の出口確保、CreateParty、空の都市のSetCityProduction、予備費と購入回数を守るPurchaseCityItemも選びます。RemoteController、ReplayController、汎用の合法手一覧APIはありません。[AIの判断・制約](AI_SCENARIOS.md)。
 
@@ -99,7 +99,7 @@ processTurnStartの現行順序は次です。
 1. 王国人心の維持費支払いと収入加算
 2. 都市Yieldの計算
 3. foodStorage加算と最大1回の人口成長
-4. 条件を満たす都市防御を修復し、都市Production投入と完成・overflow処理
+4. 条件を満たす都市防御を修復し、版2の都市反撃回数を1へ更新、都市Production投入と完成・overflow処理
 5. Gold・mana備蓄、science・culture進捗への加算
 6. localCultureProgress加算と自然領土取得
 7. Partyの移動力、攻撃回数、reactionCharges、行動状態とUnitのGuard容量の回復
@@ -183,7 +183,7 @@ HP0ではindividualならdowned、他はshatteredです。現行定義はdetachm
 
 敗北Partyは盤上を占有せず、駒・ミニマップから除外します。Unit・Party・配置・HP・位置の記録は保持し、セル詳細で確認できます。撃破地点へ移動・通過・新Party作成が可能です。自動前進・射線・撤退・回復・捕虜・Lootは未実装です。遭遇戦だけ全活動部隊の撃破をゲーム終了判定へ使います。
 
-都市争奪戦では敵都市中心にいる軍事部隊がCaptureCityを実行し、都市・所属領土を移管します。生産予約・進捗を解除し、人口・建物・食料・文化・Unitを保持します。収入は次の全体ターン開始からです。全都市を失うと即敗北し、部隊全滅だけなら継続します。都市0の敗者の表示・保存復元も対応します。新規対局は耐久100・城壁最大60を削ってから進入占領します。攻城・自然修復・プレビュー・AI・保存版1を追加し、版なし旧都市争奪戦は即時占領のまま再開します。[占領](CITY_CONQUEST.md)・[攻城](CITY_SIEGE.md)。
+都市争奪戦では敵都市中心にいる軍事部隊がCaptureCityを実行し、都市・所属領土を移管します。生産予約・進捗を解除し、人口・建物・食料・文化・Unitを保持します。収入は次の全体ターン開始からです。全都市を失うと即敗北し、部隊全滅だけなら継続します。都市0の敗者の表示・保存復元も対応します。新規対局は耐久100・城壁最大60を削ってから進入占領します。攻城・自然修復・プレビュー・AIを追加し、新規の保存版2では都市反撃・城壁建設AIも有効です。旧版1は反撃・城壁AIなし、版なし旧都市争奪戦は即時占領のまま再開します。[占領](CITY_CONQUEST.md)・[攻城](CITY_SIEGE.md)。
 
 ## 11. セーブと検証範囲
 

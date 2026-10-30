@@ -1,3 +1,4 @@
+import { hasCityRetaliation } from '../models/city-defense.js';
 import { recoverCityDefense } from '../systems/city-siege.js';
 import { RULESET } from './ruleset.js';
 import { calculateCityYields } from '../systems/yield-system.js';
@@ -19,6 +20,7 @@ export function processTurnStart(state, events) {
       const foodCost = RULESET.growthFoodBase + city.population * RULESET.growthFoodPerPopulation;
       if (city.foodStorage >= foodCost) { city.foodStorage -= foodCost; city.population += 1; kingdom.humanResources.native += 1; events.push({ type: 'CityGrew', cityId, population: city.population }); }
       recoverCityDefense(state, city, events);
+      if (hasCityRetaliation(state)) city.defense.counterattacksRemaining = RULESET.cityDefense.counterattacksPerRound;
       applyProduction(state, city, city.yieldSummary.production, events);
       kingdom.stockpiles.gold += city.yieldSummary.gold; kingdom.stockpiles.mana += city.yieldSummary.mana;
       kingdom.progress.science += city.yieldSummary.science; kingdom.progress.culture += city.yieldSummary.culture;
