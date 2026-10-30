@@ -1,0 +1,26 @@
+{
+  "verifiedAt": "2026-10-30T05:52:14.840409+00:00",
+  "baselineRevision": "8534535422972c04f958a437fee8df5dbf12c9ef",
+  "workflowRunId": "41010652190",
+  "testedRevision": "180ed8aa4b67154084a6bb976b46acb431720a29",
+  "browser": "141.0.7390.37",
+  "nodeTests": 274,
+  "syntaxFiles": 97,
+  "saveSnapshots": 144,
+  "continuationCommands": 576,
+  "browserCheckGroups": 104,
+  "suites": {
+    "production-queue": 11,
+    "party-care": 10,
+    "city-defense": 10,
+    "siege": 10,
+    "conquest": 10,
+    "ai": 13,
+    "cities": 12,
+    "ranged": 13,
+    "founding": 7,
+    "reorganization": 8
+  },
+  "pageErrors": [],
+  "httpFailures": []
+}

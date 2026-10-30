@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-30T05:51:47.244Z",
+  "browser": "141.0.7390.37",
+  "realBrowser": true,
+  "result": "passed",
+  "checks": [
+    "human turn -> AI move/attack/end -> human; own-city viewpoint and mutation controls stay correct",
+    "mid-AI save resumes identically, including command IDs and RNG",
+    "reset and load cancel old scheduled AI commands",
+    "victory from actual attack; finished-state lock/save/load and forged winner rejection",
+    "AI victory shows human defeat and stops before EndTurn",
+    "round deadline produces and restores a draw without extra income",
+    "390px result screen has no horizontal overflow",
+    "legacy hotseat still switches human viewpoint without auto-playing",
+    "reinforcement mode selects enemy-city production and explains AI actions without changing the human city",
+    "AI clears its city, buys within budget, forms reinforcements and moves/attacks with them",
+    "reinforcement policy and mid-turn progress restore identically; missing policy rejects without replacing state",
+    "turn-start production supplies troops that the AI deploys on a later turn",
+    "390px reinforcement status and activity summary render without overflow"
+  ],
+  "errors": [],
+  "failures": []
+}
