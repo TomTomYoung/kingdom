@@ -6,17 +6,23 @@
 
 ## 0. 現行実装との区分
 
-この文書は目標仕様です。実装済みの判定は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md) と [STATUS.md](./STATUS.md) を正本とします。今回の開始基準はmain / d3f79162e0a6254dc36ed8f580a8a1d90c8f5761。331セルの広域マップ、M1都市運営、Party作成・経路移動・3×3配置、固定二国の交互操作、戦闘・護衛UIを実装済みです。
+この文書は目標仕様です。実装済みの判定は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md) と [STATUS.md](./STATUS.md) を正本とします。今回の開始基準はmain / 78cd40667526181b4de51c194458a952667926c5（PR #6マージ後）。331セルの広域マップ、M1都市運営、Party作成・経路移動・3×3配置、固定二国の交互操作、戦闘・護衛UIを実装済みです。
 
 2026-10-24に、弓兵・弩砲の生産購入と各国5体の遠隔部隊対戦を追加しました。通常、狙い射ち、精密射撃、横列、縦列、十字、貫通の7攻撃定義を共通のCommand・Resolver・予測・ログへ接続しています。Unit／Slot／行／列の照準、限定的なTaunt／Cover、Guard／Interceptを処理し、予測はRNGを参照・更新しません。K-10を修正し、敗北Party・Unit・配置を記録に残したまま地図の占有と駒表示から除外します。
 
 K-05は都市別の領土所属と市民作業で修正しました。文化取得・Gold購入を実行都市の境界へ限定し、二都市運営・都市切替・収集内訳と旧保存移行を実装しています。[都市運営の現行規則](CITY_MANAGEMENT.md)を参照してください。
 
-表示はCanvas 2D／DOMです。AI、Dungeon、職業・汎用Ability実行、加入・個別loyalty、勝利、オンライン通信は未実装です。全ての目標攻撃パターンや方向・可視性規則を完成させたものではありません。[遠隔戦闘の現行規則](RANGED_COMBAT.md)を参照してください。
+表示はCanvas 2D／DOMです。戦術AIと遭遇戦の部隊撃破・期限による終了判定を追加しました。AIの兵の生産・購入・増援編成も別モードに追加しました。都市拡張・城壁以外の建物の戦略AI、Dungeon、職業・汎用Ability実行、加入・個別loyalty、Domination・Dungeon勝利・Score、オンライン通信は未実装です。[現行AI・シナリオ規則](AI_SCENARIOS.md)を参照してください。全ての目標攻撃パターンや方向・可視性規則を完成させたものではありません。[遠隔戦闘の現行規則](RANGED_COMBAT.md)を参照してください。
 
 以下のGameStateフィールドは目標モデルです。実装の実キー・省略項目・暫定式はCURRENT_IMPLEMENTATIONを参照してください。現行の独立ランダム地形、平均戦闘力、固定移動力、簡略HP0を目標仕様へ逆輸入しません。
 
 2026-10-30: 開拓者の生産・購入とFoundCityを追加しました。距離4以上、移動力1以上、未所有地、人口1と翌ターン収入は現行の暫定値です。目標本文の規則を縮小せず、[現行の都市建設規則](CITY_MANAGEMENT.md)へ記録します。
+
+2026-10-30: ReinforceParty／MergeParties／SplitPartyを追加しました。関係部隊の移動・攻撃・反応を終了し、HP・容量・所属と配置を維持します。隣接・地形費・5体上限・護衛の扱いなど暫定規則は[部隊再編](PARTY_MANAGEMENT.md)を参照してください。
+
+2026-10-30: 都市争奪戦でCaptureCityと全都市支配のScenario Objectiveを追加しました。新規対局の都市HP・城壁・攻城・修復も追加しました。暫定値と旧保存の維持条件は[攻城規則](CITY_SIEGE.md)に記載します。近接攻城への都市反撃と城壁建設AIも追加しました。[暫定規則](CITY_RETALIATION.md)を参照してください。能動的な都市砲撃・降伏は未実装で、Domination全体の完成ではありません。[現行の占領規則](CITY_CONQUEST.md)を参照してください。
+
+2026-10-30: 新規対局のRestParty／RemoveCasualties、HP回復・離脱・AI判断・保存検証を追加しました。回復量・安全条件・旧保存の維持は[現行の休養規則](PARTY_RECOVERY.md)へ記録し、以下の目標本文は変更しません。
 
 ## 1. ゲームの定義
 

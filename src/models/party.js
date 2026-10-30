@@ -1,3 +1,4 @@
+export const hasPartyRecovery = state => state.partyRecoveryVersion === 1;
 export const FORMATION_ROWS = Object.freeze(['front', 'middle', 'rear']);
 export const FORMATION_COLUMNS = Object.freeze(['left', 'center', 'right']);
 export const FORMATION_SLOTS = Object.freeze(FORMATION_ROWS.flatMap((row) => FORMATION_COLUMNS.map((column) => `${row}-${column}`)));

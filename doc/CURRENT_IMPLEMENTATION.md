@@ -2,11 +2,11 @@
 
 確認・更新日: 2026-10-30
 
-開始基準: main / 3273d5a6eb34ad04fa3055e063fcff2da4fdf995（PR #5）。開拓者の生産・購入、FoundCity、都市建設UIと「開拓者と護衛」、都市IDの保存移行を追加しました。条件・暫定数値・操作は[CITY_MANAGEMENT.md](CITY_MANAGEMENT.md)、検証範囲は[STATUS.md](STATUS.md)に記載しています。
+開始基準: main / 78cd40667526181b4de51c194458a952667926c5（PR #6マージ後）。戦術AI、「AIとの遭遇戦」、勝敗と40ターン期限、終了状態の保存・操作制御を追加しました。PR #7の0820eaeから、兵の生産・購入・編成を行う「AIとの増援戦」を追加しています。現行規則と制約は[AI_SCENARIOS.md](AI_SCENARIOS.md)、検証範囲は[STATUS.md](STATUS.md)に記載しています。 PR #7の97285c1から、待機兵の補充・隣接部隊の合流・分割と増援AIの補充・合流判断を追加しました。[部隊再編の規則](PARTY_MANAGEMENT.md)を参照してください。 PR #7のfa0c260から都市占領と「AIとの都市争奪戦」を追加しました。[占領・都市支配の規則](CITY_CONQUEST.md)を参照してください。 PR #7の624be34から、新規都市争奪戦の都市耐久・城壁・攻城・自然修復・AI攻城を追加しました。[攻城規則と保存互換](CITY_SIEGE.md)を参照してください。 PR #7の7ce65acから新規都市争奪戦に近接攻城への都市反撃と脅威に応じた城壁建設AIを追加しました。[反撃・建設AIの規則](CITY_RETALIATION.md)を参照してください。 PR #7の54934b2から、新規対局の休養・HP回復・戦闘不能者の離脱とAI判断を追加しました。[休養・離脱の規則](PARTY_RECOVERY.md)を参照してください。
 
 ## 1. 範囲と現在地
 
-現在の実装はM1の都市運営ループと、M2の複数都市運営・Party作成・移動・近接・遠隔・照準・範囲戦闘です。画面から使える範囲とcore APIだけの範囲を分けて記録します。「内部実装済み」は目標仕様の全受入条件を満たした意味ではありません。
+現在の実装はM1の都市運営ループと、M2の複数都市運営・Party作成・移動・近接・遠隔・照準・範囲戦闘、戦術AI、兵の生産・購入・増援編成、遭遇戦の勝敗です。画面から使える範囲とcore APIだけの範囲を分けて記録します。「内部実装済み」は目標仕様の全受入条件を満たした意味ではありません。
 
 目標仕様は [SPECIFICATION.md](./SPECIFICATION.md)、未修正課題と検証結果は [STATUS.md](./STATUS.md)、次作業は [HANDOFF.md](./HANDOFF.md) を参照してください。旧Phaser版は [LEGACY_IMPLEMENTATION.md](./LEGACY_IMPLEMENTATION.md) に保存しています。
 
@@ -33,10 +33,10 @@ npm run check
 
 テストはNode.js標準のnode:testです。Vite、Vitestは導入されていません。確認環境はNode.js v24.19.0、npm 11.9.0、Python 3.12.14です。最低対応バージョンの宣言はまだありません。
 
-1. src/core: GameState、Ruleset、Command、RuleSystem、ターン、HumanController、RNG
+1. src/core: GameState、Ruleset、Command、RuleSystem、ターン、HumanController／AIController、RNG
 2. src/models: Kingdom、City、Unit、Party
 3. src/world: Hex座標、共通Edge key、固定seedマップ
-4. src/systems: Yield、生産、領土、移動、戦闘
+4. src/systems: Yield、生産、領土、移動、戦闘、シナリオ勝敗
 5. src/ui: Canvas描画とDOM入力
 6. src/uiにはmap-camera・map-view・inspectionによる表示専用状態もあります。カメラと選択をGameStateへ混入しません。
 7. src/audio: 採用音符・固定版AIMusicのPCM合成とWorker
@@ -53,7 +53,9 @@ npm run check
 
 左クリックはセル・駒の詳細確認です。クリックだけでは移動・購入を実行しません。部隊選択後に目的地を選び「ここへ移動」、または目的地を右クリックすると移動します。領土はセル詳細の購入ボタンで購入します。到達可能セルの点線、経路と消費移動力、所有地の金枠を表示します。解除ボタン・Escで部隊とUnitを解除し、ロードでも解除、新規開始では初期部隊を選択します。セル詳細は座標・地形・所有・都市・基本産出・移動費・駐留一覧、Unit詳細はHP・状態・近接/遠隔・防御/装甲・射程・所属・配置・指揮者・部隊行動値を表示します。Party欄の3×3配置で、Unitを選んで空き枠へ移動・他Unitと交換できます。指揮者とHPを表示し、変更はSetFormationを通します。二国交互操作、敵選択、近接・遠隔の合法性表示、予測・攻撃、護衛設定、戦闘ログを利用できます。生産キュー編集、JSONファイル入出力、任意プレイヤー設定のUIはありません。ドラッグ・矢印キーによるカメラ移動、1/2/3倍の等方整数ズーム、クリックで移動する全体図、選択都市・選択Unitへのフォーカス、部隊の順送りがあります。旧版の文章イベント窓は未移植です。操作は[MAP_OPERATIONS.md](MAP_OPERATIONS.md)を参照してください。
 
-「二国対戦（交互操作）」を選んで新規開始すると、二国・各1都市・戦士3体ずつの隣接部隊から始まります。「遠隔部隊の二国対戦」は戦士2・弓兵2・弩砲1の5体ずつです。攻撃内容とUnit／枠／行／列の照準を選び、命中率・範囲・予測被害を表示します。ターン終了で操作王国と首都が切り替わり、双方を人が操作します。AIはありません。[戦闘操作](COMBAT_OPERATIONS.md)を参照してください。
+「二国対戦（交互操作）」を選んで新規開始すると、二国・各1都市・戦士3体ずつの隣接部隊から始まります。「遠隔部隊の二国対戦」は戦士2・弓兵2・弩砲1の5体ずつです。攻撃内容とUnit／枠／行／列の照準を選び、命中率・範囲・予測被害を表示します。ターン終了で操作王国と首都が切り替わり、双方を人が操作します。別の「AIとの遭遇戦」では夕映王国が移動・攻撃・手番終了を自動実行し、全敵活動部隊撃破または40ターンで終了します。[戦闘操作](COMBAT_OPERATIONS.md)を参照してください。
+
+「AIとの増援戦」は遭遇戦と同じ開始配置・終了条件で、敵が兵の生産・購入・編成も行います。直近のAI手番の行動回数を地図上部で確認できます。全敵活動部隊撃破で即終了するため、未編成の兵や都市が残っていても復活しません。
 
 「二都市運営」は同一王国の暁都（0,0,0）と東都（4,-4,0）で始まります。「操作する都市」で表示と生産・購入・領土取得先を切り替えます。地図は選択都市の領土を緑の内枠、収集時の作業を緑点で示します。セル詳細は所有国・所属都市・都市中心・作業記録を分けます。選択都市は表示状態で、ロード成功後は現在手番の先頭都市へ戻り、ロード失敗では都市選択も維持します。
 
@@ -61,11 +63,11 @@ npm run check
 
 ## 4. GameStateとCommand
 
-GameStateはschemaVersion 1、rulesetVersion m1.0、cityTerritoryVersion 1です。主な実キーはphase、world、turnOrder、activePlayerId、activePlayerIndex、kingdoms、cities、units、parties、rng、nextIds、commandLog、eventLogです。目標文書のcurrentPhase、worldMap、playerSlots等と同名とは限りません。
+GameStateはschemaVersion 1、rulesetVersion m1.0、cityTerritoryVersion 1、新規対局はpartyRecoveryVersion 1です。主な実キーはphase、world、turnOrder、activePlayerId、activePlayerIndex、kingdoms、cities、units、parties、rng、nextIds、commandLog、eventLogです。目標文書のcurrentPhase、worldMap、playerSlots等と同名とは限りません。
 
-RuleSystem.execute(original, command)は成功時に複製したstateとeventsを返し、検証で拒否した場合は元stateを返します。commandIdの重複、playerId、手番、turnを共通検証します。全11Commandの種別・phase・必須payload・配列と辞書の型を事前検証し、参照先・所有者を処理前に確認します。拒否時は元stateと空eventsを返し、RNG・資源・ID・ログを変更しません。保存読込時のGameState構造検証はK-09で実装済みです。
+RuleSystem.execute(original, command)は成功時に複製したstateとeventsを返し、検証で拒否した場合は元stateを返します。commandIdの重複、playerId、手番、turnを共通検証します。全18Commandの種別・phase・必須payload・配列と辞書の型を事前検証し、参照先・所有者を処理前に確認します。拒否時は元stateと空eventsを返し、RNG・資源・ID・ログを変更しません。保存読込時のGameState構造検証はK-09で実装済みです。
 
-現在のCommandは11種類です。
+現在のCommandは18種類です。
 
 1. StartTurn
 2. SetCityProduction
@@ -78,8 +80,15 @@ RuleSystem.execute(original, command)は成功時に複製したstateとevents�
 9. AttackParty（attackTypeはmeleeまたはranged。targetingで攻撃定義と照準を指定）
 10. SetGuardOrder（modeはoff／share／intercept）
 11. FoundCity（partyId・settlerUnitIdを指定）
+12. ReinforceParty（partyId・unitIdsを指定）
+13. MergeParties（sourcePartyId・targetPartyIdを指定）
+14. SplitParty（partyId・unitIds・隣接locationを指定）
+15. CaptureCity（partyId・cityIdを指定。都市支配目標の対局のみ）
+16. AttackCity（partyId・cityId・attackTypeを指定。cityDefenseVersion 1／2のみ）
+17. RestParty（partyIdを指定。partyRecoveryVersion 1のみ）
+18. RemoveCasualties（partyIdを指定。partyRecoveryVersion 1のみ）
 
-HumanControllerは上記のCommandを生成します。AIController、RemoteController、ReplayController、合法手一覧APIはありません。
+HumanControllerは上記のCommandを生成します。AIControllerは合法な通常遠隔／近接攻撃、射程内への経路移動、EndTurnを選び、共通RuleSystemで実行します。次のRNGを読まず、同じ入力に同じCommandを返します。reinforcements方針では都市の出口確保、CreateParty、空の都市のSetCityProduction、予備費と購入回数を守るPurchaseCityItemも選びます。RemoteController、ReplayController、汎用の合法手一覧APIはありません。[AIの判断・制約](AI_SCENARIOS.md)。
 
 addKingdomは別王国とその都市、addCityは同一王国の都市を追加するセットアップ用関数です。createTwoCityGameStateで同一王国の暁都・東都を配置し、画面で切り替えて運営できます。ゲーム中の都市建設はFoundCityを通し、開拓者だけを消費します。セットアップ関数は最低距離などのCommand条件を代替しません。任意プレイヤー設定は未実装です。
 
@@ -89,16 +98,17 @@ addKingdomは別王国とその都市、addCityは同一王国の都市を追加
 
 processTurnStartの現行順序は次です。
 
-1. 王国人心の維持費支払いと収入加算
-2. 都市Yieldの計算
-3. foodStorage加算と最大1回の人口成長
-4. 都市Production投入と完成・overflow処理
-5. Gold・mana備蓄、science・culture進捗への加算
-6. localCultureProgress加算と自然領土取得
-7. Partyの移動力、攻撃回数、reactionCharges、行動状態とUnitのGuard容量の回復
-8. 軍事力・統治力・統治負荷の再計算
+1. 全Partyの前ターンの休養予約を同じ開始時点の安全条件で解決（都市中心HP+30／他の自国・未所有地+20）
+2. 王国人心の維持費支払いと収入加算
+3. 都市Yieldの計算
+4. foodStorage加算と最大1回の人口成長
+5. 条件を満たす都市防御を修復し、版2の都市反撃回数を1へ更新、都市Production投入と完成・overflow処理
+6. Gold・mana備蓄、science・culture進捗への加算
+7. localCultureProgress加算と自然領土取得
+8. Partyの移動力、攻撃回数、reactionCharges、行動状態とUnitのGuard容量の回復
+9. 軍事力・統治力・統治負荷の再計算
 
-Dungeon・World Resolution、勝利判定、オートセーブ、自然HP回復、継続Status Effectの解決はありません。敗北Partyや戦闘可能構成員がいないPartyの移動・攻撃・reactionChargesは0、activationStateはendedのままです。UnitのGuard容量は戦闘可能な構成員だけ回復します。
+Dungeon・World Resolution、Domination・Dungeon勝利・Score、オートセーブ、Unitの自然HP回復、継続Status Effectの解決はありません。敗北Partyや戦闘可能構成員がいないPartyの移動・攻撃・reactionChargesは0、activationStateはendedのままです。UnitのGuard容量は戦闘可能な構成員だけ回復します。
 
 ## 6. マップ・領土
 
@@ -120,7 +130,7 @@ Yieldはfood、production、gold、science、mana、religion、cultureです。�
 
 Productionは都市ローカルです。currentItemId、queue、progressByItemを持ち、費用到達時に完成、余剰を次キューへ投入し、キューが空なら余剰を捨てます。対象切替で途中進捗を保持します。
 
-生産可能な定義はwarrior（Production 12／Gold 48）、archer（18／72）、ballista（28／112）、settler（30／120）、monument（20／80）です。Unitは都市中心へ生成されます。Gold購入は全額即時払いで、生産進捗を減額・返金しません。
+生産可能な定義はwarrior（Production 12／Gold 48）、archer（18／72）、ballista（28／112）、settler（30／120）、monument（20／80）、walls（30／120、新規都市争奪戦のみ）です。Unitは都市中心へ生成されます。Gold購入は全額即時払いで、生産進捗を減額・返金しません。
 
 建設済み建物の生産・購入、現在の対象とキュー内の重複建物を拒否します。Unitの連続生産は許可します。建物購入後は、その建物を現在の生産・キューから取り除き、その建物の進捗だけ0へ戻します。返金・Unitへの無料進捗はありません。旧キューの完成済み・重複建物も生産投入前に除き、二重完成イベントを出しません。
 
@@ -136,7 +146,7 @@ Kingdom.stockpilesはgold、mana、popularSupport、progressはscience、culture
 militaryPower =
   floor(scienceProgress / 5) + totalCityProduction
   + floor(gold / 25) + floor(mana / 5)
-  + militaryHumanResources * 2 + ownedNonCivilianUnitCount * 4
+  + militaryHumanResources * 2 + ownedActiveNonCivilianUnitCount * 4
 
 governanceCapacity =
   floor(cultureProgress / 5) + institutions * 3
@@ -146,13 +156,15 @@ governanceLoad =
   ownedTileCount + cityCount * 2 + totalPopulation + buildingCount
 ```
 
+新規partyRecoveryVersion 1ではUnit数加算はHP>0・active・非民間だけです。旧版なし保存は従来のHP0を含む登録非民間Unit数を維持します。戦闘のHP0と離脱後には派生値を再計算します。
+
 Capacity不足のPenaltyやUnitの徴募・登用はありません。人的資源はnative、military、governance、specialists、heroes、affiliates、migrantsのフィールドを持ちますが、現在自動増加するのは人口成長時のnativeだけです。数値係数の一部はRulesetでなくコードに固定されています。
 
 ## 9. Party・Formation・移動
 
 CreatePartyは同じ場所の自国未所属Unitを1〜5体まとめます。実キーはid、unitIds、formation、movementMaximum、attacksMaximumです。formationはfront/middle/rearとleft/center/rightを組み合わせたSlotIdからunitIdへの辞書です。初期配置はfront-left、front-center、front-right、middle-left、middle-centerの順です。
 
-SetFormationは9Slotへの全構成Unitの一度ずつの配置を検証します。作成時に既存の非Voidタイル・他のactive Party非占有・UnitのHPとactive状態を検証します。敗北・全員戦闘不能のPartyは移動と配置変更を拒否します。3×3配置編集UIは実装済みです。解散・分割・合流、Leader手動変更、敵隣接時の編成制限はありません。
+SetFormationは9Slotへの全構成Unitの一度ずつの配置を検証します。作成時に既存の非Voidタイル・他のactive Party非占有・UnitのHPとactive状態を検証します。敗北・全員戦闘不能のPartyは移動と配置変更を拒否します。3×3配置編集UIは実装済みです。待機兵の補充・隣接部隊の合流・隣接セルへの分割をCommand／UIで実装しました。関係部隊は未終了・移動力1以上とし、合流・分割は進入地形費も検証します。成功時は関係部隊の移動・攻撃・反応を0にして行動終了します。HP・容量を保持し、配置・指揮者・護衛・所属を修復します。詳細は[PARTY_MANAGEMENT.md](PARTY_MANAGEMENT.md)。生存者の任意離脱・解散・Leader手動変更は未実装です。補充・合流・分割に敵隣接による禁止はありません。別の休養・戦闘不能者離脱には安全条件が必要です。
 
 Partyは移動力2、攻撃回数1で初期化されます。最も遅い構成員から移動力を計算する処理はありません。移動コストは平原・草原・霊脈1、森林・丘陵2です。指定経路の全段階で隣接性・非Void・他のactive Party占有・必要移動力を検証し、成功時に所属Unitのlocationも更新します。
 
@@ -174,9 +186,17 @@ HP0ではindividualならdowned、他はshatteredです。現行定義はdetachm
 
 新規戦士のGuardは率50％・容量50・縦横距離1。肩代わりは装甲前Damageの最大70％・残り容量まで。割り込みは反応1を使い全量を受けます。複数候補は割り込み→距離→ID順で1体、連鎖なし。stun／break／fearはGuard・Taunt・Coverを無効化します。状態を付与するAbilityは未実装です。
 
-敗北Partyは盤上を占有せず、駒・ミニマップから除外します。Unit・Party・配置・HP・位置の記録は保持し、セル詳細で確認できます。撃破地点へ移動・通過・新Party作成が可能です。自動前進・射線・撤退・回復・捕虜・Loot・勝利は未実装です。
+敗北Partyは盤上を占有せず、駒・ミニマップから除外します。Unit・Party・配置・HP・位置の記録は保持し、セル詳細で確認できます。撃破地点へ移動・通過・新Party作成が可能です。生存者の休養とHP0の離脱は新規対局で利用できます。自動前進・射線・撤退・復活・捕虜・Lootは未実装です。遭遇戦だけ全活動部隊の撃破をゲーム終了判定へ使います。
+
+都市争奪戦では敵都市中心にいる軍事部隊がCaptureCityを実行し、都市・所属領土を移管します。生産予約・進捗を解除し、人口・建物・食料・文化・Unitを保持します。収入は次の全体ターン開始からです。全都市を失うと即敗北し、部隊全滅だけなら継続します。都市0の敗者の表示・保存復元も対応します。新規対局は耐久100・城壁最大60を削ってから進入占領します。攻城・自然修復・プレビュー・AIを追加し、新規の保存版2では都市反撃・城壁建設AIも有効です。旧版1は反撃・城壁AIなし、版なし旧都市争奪戦は即時占領のまま再開します。[占領](CITY_CONQUEST.md)・[攻城](CITY_SIEGE.md)。
+
+休養・離脱は移動攻撃前の未使用の行動を使い、移動・攻撃・反応を0にします。RestPartyは次の全体ターン開始にHP+20（自国都市中心+30）。HP被害・敵軍接近・敵領化で中止し、HP0は復活しません。RemoveCasualtiesは生存者がいる部隊のHP0を離脱させ、Unit記録を消さずに配置・指揮者・護衛参照を修復します。AIも合法な離脱とHP50%以下の休養を選択します。予測・理由・結果ログ・離脱記録を画面で確認できます。[詳細](PARTY_RECOVERY.md)。
 
 ## 11. セーブと検証範囲
+
+遭遇戦はscenarioObjective（eliminate-parties・参加2国・期限40）とgameResultを保存します。GAME_OVERでは全Commandを原状保持で拒否します。目標・結果・phase・生存部隊・期限・手番の整合性を復元時に検証します。旧モードには目標や結果を追加せず、欠落したcontrollerTypeだけhumanへ補完します。aiPolicyの省略は戦術AIとして維持し、存在する不正値や増援戦なのに増援AIがない保存は拒否します。AI手番のロードは人の表示を維持して自動再開し、新規開始・別保存のロード・ページ離脱で旧タイマーを取り消します。
+
+partyRecoveryVersionのない旧保存は休養・離脱・新AI判断を追加せず保持します。新規版1のrestOrderはターン・位置・安全・生存負傷者・未移動未攻撃・行動終了と全行動0を検証し、不正値や部分欠落を拒否します。
 
 serializeGameState／restoreGameStateでJSON化・復元します。nextIds.cityを保存し、欠落した旧形式は既存city-Nの最大N+1（該当なしは1）で補完します。存在する不正値・既存都市IDとの衝突は拒否します。UIはlocalStorageのkingdom-m1-save一枠を使用します。save-validation.jsで必須構造・数値範囲・地形と都市・所属の双方向参照・3×3配置・次ID・手番・RNGを検証し、復元成功後だけstateを置換します。guardOrders・guardRangeの欠落は空指示・距離1で補完し、既存の率0・容量0は維持します。accuracy欠落は1、evasion／tauntStrength／coverPower欠落は0で補完し、全確率を0〜1の有限値で検証します。statusEffectsは空でない文字列、またはtype/idに空でない文字列を持つ辞書に限ります。活動中Partyの重複占有と、生存Unitを含む偽の敗北Partyを拒否し、敗北記録と生存Partyの同座標を許可します。既知M1のParty・turnOrder・戦闘フィールドの欠落を補完し、旧37セルを再生成せず維持します。nullや不明参照を既定値で隠さず、未知版を拒否します。失敗時は現在の対局・選択・カメラ倍率を維持します。
 

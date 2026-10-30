@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-29T22:51:24.750Z",
+  "browser": "141.0.7390.37",
+  "realBrowser": true,
+  "result": "passed",
+  "checks": [
+    "human turn -> AI move/attack/end -> human; own-city viewpoint and mutation controls stay correct",
+    "mid-AI save resumes identically, including command IDs and RNG",
+    "reset and load cancel old scheduled AI commands",
+    "victory from actual attack; finished-state lock/save/load and forged winner rejection",
+    "AI victory shows human defeat and stops before EndTurn",
+    "round deadline produces and restores a draw without extra income",
+    "390px result screen has no horizontal overflow",
+    "legacy hotseat still switches human viewpoint without auto-playing"
+  ],
+  "errors": [],
+  "failures": []
+}

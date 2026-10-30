@@ -1,3 +1,5 @@
+import { partyCareSafetyError } from '../systems/party-care.js';
+import { validateScenarioSave } from '../systems/scenario-system.js';
 import { RULESET } from './ruleset.js';
 import { validateFormation, occupiesMapTile, hasActiveUnits } from '../models/party.js';
 import { assignLegacyCityTerritories } from '../systems/city-territory.js';
@@ -28,6 +30,8 @@ function yieldRecord(value, path, negative = false) {
 // errors, not invitations to regenerate a map, an army, or its random streams.
 export function migrateAndValidateSave(state) {
   object(state, 'root');
+  const recovery = Object.hasOwn(state, 'partyRecoveryVersion');
+  if (recovery) check(state.partyRecoveryVersion === 1, 'partyRecoveryVersion');
   const legacyTerritory = !Object.hasOwn(state, 'cityTerritoryVersion');
   if (!legacyTerritory) check(state.cityTerritoryVersion === 1, 'cityTerritoryVersion');
   for (const name of ['kingdoms', 'cities', 'units', 'world', 'rng', 'nextIds']) object(state[name], name);
@@ -65,7 +69,7 @@ export function migrateAndValidateSave(state) {
 
   integer(state.currentTurn, 'currentTurn', 1);
   integer(state.lastProcessedTurn, 'lastProcessedTurn', 0, state.currentTurn);
-  check(['PLAYER_ACTION', 'TURN_END'].includes(state.phase), 'phase');
+  check(['PLAYER_ACTION', 'TURN_END', 'GAME_OVER'].includes(state.phase), 'phase');
   check(state.turnOrder.length > 0 && state.turnOrder.length === Object.keys(state.kingdoms).length, 'turnOrder');
   state.turnOrder.forEach((id) => reference(state.kingdoms, id, 'turnOrder'));
   integer(state.activePlayerIndex, 'activePlayerIndex', 0, state.turnOrder.length - 1);
@@ -85,6 +89,7 @@ export function migrateAndValidateSave(state) {
   for (const entry of array(state.commandLog, 'commandLog')) {
     object(entry, 'commandLog'); text(entry.commandId, 'commandLog.commandId');
     check(!commandIds.has(entry.commandId), 'commandLog.commandId'); commandIds.add(entry.commandId);
+    if (!recovery) check(!['RestParty', 'RemoveCasualties'].includes(entry.type), 'commandLog: 休養・離脱の版がありません');
     text(entry.type, 'commandLog.type'); object(entry.payload, 'commandLog.payload');
     reference(state.kingdoms, entry.playerId, 'commandLog.playerId'); integer(entry.turn, 'commandLog.turn', 1, state.currentTurn);
   }
@@ -122,6 +127,9 @@ export function migrateAndValidateSave(state) {
   const location = (key, path) => { const tile = reference(tiles, key, path); check(tile.terrainId !== 'void', path); return tile; };
   for (const [id, kingdom] of Object.entries(state.kingdoms)) {
     object(kingdom, `kingdoms.${id}`); check(kingdom.id === id, `kingdoms.${id}.id`); text(kingdom.name, `kingdoms.${id}.name`);
+    defaultMissing(kingdom, 'controllerType', 'human');
+    check(['human', 'ai'].includes(kingdom.controllerType), `kingdoms.${id}.controllerType`);
+    if (Object.hasOwn(kingdom, 'aiPolicy')) check(['tactical', 'reinforcements'].includes(kingdom.aiPolicy), `kingdoms.${id}.aiPolicy`);
     for (const [name, records] of [['cityIds', state.cities], ['unitIds', state.units]]) {
       ids(kingdom[name], `kingdoms.${id}.${name}`);
       for (const entityId of kingdom[name]) check(reference(records, entityId, `kingdoms.${id}.${name}`).ownerId === id, `kingdoms.${id}.${name}.ownerId`);
@@ -132,6 +140,8 @@ export function migrateAndValidateSave(state) {
     fields(kingdom.derived, ['militaryPower', 'governanceCapacity', 'governanceLoad'], `kingdoms.${id}.derived`);
     fields(kingdom, ['institutions', 'supportIncome', 'supportUpkeep'], `kingdoms.${id}`);
   }
+  const defended = Object.hasOwn(state, 'cityDefenseVersion');
+  if (defended) check([1, 2].includes(state.cityDefenseVersion) && state.scenarioObjective?.type === 'control-cities', 'cityDefenseVersion');
   const worked = new Set();
   for (const [id, city] of Object.entries(state.cities)) {
     object(city, `cities.${id}`); check(city.id === id, `cities.${id}.id`); text(city.name, `cities.${id}.name`);
@@ -172,9 +182,18 @@ export function migrateAndValidateSave(state) {
     for (const [key, value] of Object.entries(city.yieldModifiers)) { check(yields.includes(key), `cities.${id}.yieldModifiers`); number(value, `cities.${id}.yieldModifiers.${key}`, -Number.MAX_SAFE_INTEGER); }
     ids(city.buildings, `cities.${id}.buildings`);
     city.buildings.forEach((item) => check(reference(RULESET.items, item, `cities.${id}.buildings`).category === 'building', `cities.${id}.buildings`));
+    if (defended) {
+      const path = `cities.${id}.defense`, defense = object(city.defense, path);
+      integer(defense.hp, `${path}.hp`, 0, RULESET.cityDefense.maximumHp);
+      integer(defense.wallHp, `${path}.wallHp`, 0, city.buildings.includes('walls') ? RULESET.cityDefense.wallHp : 0);
+      if (state.cityDefenseVersion === 2) integer(defense.counterattacksRemaining, `${path}.counterattacksRemaining`, 0, RULESET.cityDefense.counterattacksPerRound);
+      else check(!Object.hasOwn(defense, 'counterattacksRemaining'), `${path}.counterattacksRemaining: 都市反撃の版がありません`);
+      if (defense.lastDamagedTurn !== null) integer(defense.lastDamagedTurn, `${path}.lastDamagedTurn`, 1, state.currentTurn);
+    } else check(!Object.hasOwn(city, 'defense') && !city.buildings.includes('walls'), `cities.${id}.defense: 都市防御の版がありません`);
     const production = object(city.production, `cities.${id}.production`);
     if (production.currentItemId !== null) reference(RULESET.items, production.currentItemId, `cities.${id}.production.currentItemId`);
     array(production.queue, `cities.${id}.production.queue`).forEach((item) => reference(RULESET.items, item, `cities.${id}.production.queue`));
+    if (!defended) check(![production.currentItemId, ...production.queue, ...Object.keys(production.progressByItem ?? {})].includes('walls'), `cities.${id}.production: 城壁は都市防御の版が必要です`);
     object(production.progressByItem, `cities.${id}.production.progressByItem`);
     for (const [item, progress] of Object.entries(production.progressByItem)) number(progress, `cities.${id}.production.progressByItem.${item}`, 0, reference(RULESET.items, item, `cities.${id}.production.progressByItem`).productionCost);
   }
@@ -229,7 +248,18 @@ export function migrateAndValidateSave(state) {
     if (party.status === 'defeated') check(!hasActiveUnits(state, party), `parties.${id}.status: 敗北部隊に活動中のUnitがあります`);
     check(['ready', 'ended'].includes(party.activationState), `parties.${id}.activationState`);
     for (const key of ['hasMoved', 'hasAttacked']) check(typeof party[key] === 'boolean', `parties.${id}.${key}`);
+    if (Object.hasOwn(party, 'restOrder')) {
+      const path = `parties.${id}.restOrder`;
+      check(recovery, `${path}: 休養の版がありません`);
+      const order = object(party.restOrder, path);
+      check(order.turn === state.currentTurn && state.lastProcessedTurn === state.currentTurn, `${path}.turn`);
+      check(order.location === party.location, `${path}.location`);
+      check(party.status === 'active' && hasActiveUnits(state, party) && party.activationState === 'ended', path);
+      check(!party.hasMoved && !party.hasAttacked && party.movementRemaining === 0 && party.attacksRemaining === 0 && party.reactionCharges === 0, `${path}.actions`);
+      check(party.unitIds.some(unitId => state.units[unitId].status === 'active' && state.units[unitId].currentHp > 0 && state.units[unitId].currentHp < state.units[unitId].maxHp), `${path}.wounded`);
+    }
   }
+  for (const party of Object.values(state.parties)) if (party.restOrder) check(!partyCareSafetyError(state, party), `parties.${party.id}.restOrder.safety`);
   if (legacyTerritory) {
     // Validate the whole historical save before repairing its known K-05
     // snapshots. Never collect income, progress production, or consume RNG.
@@ -248,5 +278,7 @@ export function migrateAndValidateSave(state) {
       fields(kingdom.derived, ['militaryPower', 'governanceCapacity', 'governanceLoad'], `kingdoms.${kingdom.id}.derived`);
     }
   }
+  if (['ai-reinforcements', 'ai-conquest'].includes(state.scenarioId)) check(Object.values(state.kingdoms).some(kingdom => kingdom.controllerType === 'ai' && kingdom.aiPolicy === 'reinforcements'), 'scenario.aiPolicy');
+  validateScenarioSave(state);
   return state;
 }

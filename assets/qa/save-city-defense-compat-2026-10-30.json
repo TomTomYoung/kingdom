@@ -1,0 +1,777 @@
+{
+  "date": "2026-10-30T01:46:00.140Z",
+  "baseCommit": "7ce65ace7147f75df8d8d72992c7b166b13e4454",
+  "result": "passed",
+  "saves": 128,
+  "scope": "Prior PR #7 saves retain all state, including version-1 city durability without retaliation. Tactical, reinforcement and version-1 siege AI continuations match. Queued/built walls, siege damage and captured cities replay identical commands; reorganization saves are unchanged.",
+  "checks": [
+    {
+      "seed": 1,
+      "mode": "small",
+      "stage": "initial",
+      "tiles": 37
+    },
+    {
+      "seed": 1,
+      "mode": "small",
+      "stage": "two-rounds",
+      "tiles": 37
+    },
+    {
+      "seed": 1,
+      "mode": "single",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "single",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "duel",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "duel",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "ranged",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "ranged",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "cities",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "cities",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "settlement",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "settlement",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "aiSkirmish",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "aiSkirmish",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "aiReinforcements",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "aiReinforcements",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "createAiConquestGameState",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "createAiConquestGameState",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "small",
+      "stage": "initial",
+      "tiles": 37
+    },
+    {
+      "seed": 42,
+      "mode": "small",
+      "stage": "two-rounds",
+      "tiles": 37
+    },
+    {
+      "seed": 42,
+      "mode": "single",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "single",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "duel",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "duel",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "ranged",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "ranged",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "cities",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "cities",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "settlement",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "settlement",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "aiSkirmish",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "aiSkirmish",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "aiReinforcements",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "aiReinforcements",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "createAiConquestGameState",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "createAiConquestGameState",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "small",
+      "stage": "initial",
+      "tiles": 37
+    },
+    {
+      "seed": 117,
+      "mode": "small",
+      "stage": "two-rounds",
+      "tiles": 37
+    },
+    {
+      "seed": 117,
+      "mode": "single",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "single",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "duel",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "duel",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "ranged",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "ranged",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "cities",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "cities",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "settlement",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "settlement",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "aiSkirmish",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "aiSkirmish",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "aiReinforcements",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "aiReinforcements",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "createAiConquestGameState",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "createAiConquestGameState",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "small",
+      "stage": "initial",
+      "tiles": 37
+    },
+    {
+      "seed": 1001,
+      "mode": "small",
+      "stage": "two-rounds",
+      "tiles": 37
+    },
+    {
+      "seed": 1001,
+      "mode": "single",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "single",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "duel",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "duel",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "ranged",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "ranged",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "cities",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "cities",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "settlement",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "settlement",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "aiSkirmish",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "aiSkirmish",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "aiReinforcements",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "aiReinforcements",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "createAiConquestGameState",
+      "stage": "initial",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "createAiConquestGameState",
+      "stage": "two-rounds",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "tactical",
+      "stage": "mid-turn-and-continuation",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "tactical",
+      "stage": "finished",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "reinforcements",
+      "stage": "mid-turn-and-continuation",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "reinforcements",
+      "stage": "finished",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "conquest",
+      "stage": "mid-turn-and-continuation",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "conquest",
+      "stage": "finished",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "tactical",
+      "stage": "mid-turn-and-continuation",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "tactical",
+      "stage": "finished",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "reinforcements",
+      "stage": "mid-turn-and-continuation",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "reinforcements",
+      "stage": "finished",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "conquest",
+      "stage": "mid-turn-and-continuation",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "conquest",
+      "stage": "finished",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "tactical",
+      "stage": "mid-turn-and-continuation",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "tactical",
+      "stage": "finished",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "reinforcements",
+      "stage": "mid-turn-and-continuation",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "reinforcements",
+      "stage": "finished",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "conquest",
+      "stage": "mid-turn-and-continuation",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "conquest",
+      "stage": "finished",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "tactical",
+      "stage": "mid-turn-and-continuation",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "tactical",
+      "stage": "finished",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "reinforcements",
+      "stage": "mid-turn-and-continuation",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "reinforcements",
+      "stage": "finished",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "conquest",
+      "stage": "mid-turn-and-continuation",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "conquest",
+      "stage": "finished",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "reorganization",
+      "stage": "reinforced",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "reorganization",
+      "stage": "split",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "reorganization",
+      "stage": "merged",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "reorganization",
+      "stage": "next-round",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "reorganization",
+      "stage": "reinforced",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "reorganization",
+      "stage": "split",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "reorganization",
+      "stage": "merged",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "reorganization",
+      "stage": "next-round",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "reorganization",
+      "stage": "reinforced",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "reorganization",
+      "stage": "split",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "reorganization",
+      "stage": "merged",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "reorganization",
+      "stage": "next-round",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "reorganization",
+      "stage": "reinforced",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "reorganization",
+      "stage": "split",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "reorganization",
+      "stage": "merged",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "reorganization",
+      "stage": "next-round",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "siege-version-1",
+      "stage": "wall-queued",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "siege-version-1",
+      "stage": "wall-built",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "siege-version-1",
+      "stage": "siege-damaged",
+      "tiles": 331
+    },
+    {
+      "seed": 1,
+      "mode": "siege-version-1",
+      "stage": "captured",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "siege-version-1",
+      "stage": "wall-queued",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "siege-version-1",
+      "stage": "wall-built",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "siege-version-1",
+      "stage": "siege-damaged",
+      "tiles": 331
+    },
+    {
+      "seed": 42,
+      "mode": "siege-version-1",
+      "stage": "captured",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "siege-version-1",
+      "stage": "wall-queued",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "siege-version-1",
+      "stage": "wall-built",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "siege-version-1",
+      "stage": "siege-damaged",
+      "tiles": 331
+    },
+    {
+      "seed": 117,
+      "mode": "siege-version-1",
+      "stage": "captured",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "siege-version-1",
+      "stage": "wall-queued",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "siege-version-1",
+      "stage": "wall-built",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "siege-version-1",
+      "stage": "siege-damaged",
+      "tiles": 331
+    },
+    {
+      "seed": 1001,
+      "mode": "siege-version-1",
+      "stage": "captured",
+      "tiles": 331
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import { hasPartyRecovery, isActiveUnit } from './party.js';
 import { RULESET } from '../core/ruleset.js';
 
 export function createKingdom(id = 'kingdom-1', name = '黎明王国', cityIds = ['city-1'], controllerType = 'human') {
@@ -17,7 +18,7 @@ export function updateDerivedCapabilities(kingdom, state) {
   const buildings = cities.reduce((sum, city) => sum + city.buildings.length, 0);
   const population = cities.reduce((sum, city) => sum + city.population, 0);
   const territory = Object.values(state.world.tiles).filter((tile) => tile.ownerId === kingdom.id).length;
-  kingdom.derived.militaryPower = Math.floor(kingdom.progress.science / 5) + production + Math.floor(kingdom.stockpiles.gold / 25) + Math.floor(kingdom.stockpiles.mana / 5) + kingdom.humanResources.military * 2 + kingdom.unitIds.filter(id => !RULESET.unitTypes[state.units[id]?.typeId]?.civilian).length * 4;
+  kingdom.derived.militaryPower = Math.floor(kingdom.progress.science / 5) + production + Math.floor(kingdom.stockpiles.gold / 25) + Math.floor(kingdom.stockpiles.mana / 5) + kingdom.humanResources.military * 2 + kingdom.unitIds.filter(id => !RULESET.unitTypes[state.units[id]?.typeId]?.civilian && (!hasPartyRecovery(state) || isActiveUnit(state.units[id]))).length * 4;
   kingdom.derived.governanceCapacity = Math.floor(kingdom.progress.culture / 5) + kingdom.institutions * 3 + kingdom.humanResources.governance * 2 + buildings;
   kingdom.derived.governanceLoad = territory + cities.length * 2 + population + buildings;
 }

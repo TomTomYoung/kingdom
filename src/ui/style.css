@@ -64,3 +64,18 @@ select:focus-visible{outline:2px solid #fff1be;outline-offset:3px}
 /* City selection is view state; the collection details are a recorded snapshot. */
 .city-card>label{font-size:12px;color:#c8cbaa}.city-card .city-heading{margin-top:14px;gap:8px}.city-card .hint{text-align:left;line-height:1.6}.city-section-label{font-size:12px;font-weight:500;color:#c7c9a3;margin:14px 0 4px}
 #city-work-panel{border-top:1px solid #53634c;margin:12px 0;padding-top:10px;font-size:12px;line-height:1.7}#city-work-panel summary{cursor:pointer;color:#d9cdab}#city-work-panel h3{font-size:12px;font-weight:500;color:#c7c9a3;margin:12px 0 6px}.city-work-tile{display:block;width:100%;text-align:left;margin:5px 0;line-height:1.6;overflow-wrap:anywhere}.city-yield-line,.city-yield-total{overflow-wrap:anywhere;margin:8px 0}.city-yield-total{border-top:1px solid #53634c;padding-top:8px}#city-territory,#production-city{font-size:12px}.map-toolbar>span:last-child{line-height:1.7}
+
+.scenario-status{border:1px solid #bcab6f;background:#25392c;padding:14px;margin:12px 0}.scenario-status[hidden]{display:none}.scenario-status h2{font-size:18px;margin:0 0 8px}.scenario-status p{font-size:13px;line-height:1.7;margin:0;overflow-wrap:anywhere}
+
+#ai-activity{border-top:1px solid #728560;margin-top:10px;padding-top:8px;color:#d9cdab}
+
+.reorganization-panel{border-top:1px solid #53634c;margin-top:14px;padding-top:8px}.reorganization-panel h3{font-size:14px}.reorganization-panel fieldset{min-width:0;margin:12px 0;padding:10px;border:1px solid #53634c}.reorganization-panel legend{font-size:12px;color:#d9cdab}.reorganization-panel .hint,.reorganization-panel p{font-size:12px;line-height:1.6;text-align:left;overflow-wrap:anywhere}.reorganization-panel button{width:100%;margin-top:8px}.reorg-unit{display:flex;align-items:center;gap:8px;margin:8px 0;font-size:12px;line-height:1.6;overflow-wrap:anywhere}.reorg-unit input{width:18px;height:18px;flex:none;accent-color:#d5b466}
+[data-produce][hidden], [data-buy][hidden] { display: none; }
+#siege-panel { border-bottom: 1px solid #53634c; padding-bottom: 14px; margin-bottom: 14px; }
+#siege-defense { color: #f0cf8f; font-weight: 700; }
+#siege-panel select { width: 100%; margin: 6px 0; }
+#siege-log p { overflow-wrap: anywhere; }
+
+.party-care-panel { border-top: 1px solid var(--border, #454b50); margin-top: 1rem; padding-top: .75rem; overflow-wrap: anywhere; }
+.party-care-log { padding-left: 1.3rem; font-size: .85rem; line-height: 1.6; }
+.party-care-log li + li { margin-top: .4rem; }

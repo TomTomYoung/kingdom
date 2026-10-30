@@ -1,16 +1,18 @@
 # Kingdom Party・Formation仕様
 
-更新日: 2026-10-24（現行実装の区分のみ更新。目標仕様は維持）
+更新日: 2026-10-30（現行実装の区分のみ更新。目標仕様は維持）
 
 ## 0. 現行実装との区分
 
-本文は目標モデルです。現行実装は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md)、未修正課題は [STATUS.md](./STATUS.md) を参照してください。今回の開始基準はmain / f3ca8a5ee0f7e9619ec8e7fa5ccd6ec4344fe1cb。2026-10-24の遠隔戦闘・敗北占有修正を含みます。
+本文は目標モデルです。現行実装は [CURRENT_IMPLEMENTATION.md](./CURRENT_IMPLEMENTATION.md)、未修正課題は [STATUS.md](./STATUS.md) を参照してください。開始基準はmain / 78cd406（PR #6）とPR #7の97285c1です。遠隔戦闘・敗北非占有・開拓者・AIに加え、補充・合流・分割を追加しました。
 
 CreateParty、SetFormation、MoveParty、AttackParty、SetGuardOrderを実装しています。作成Commandは同じ場所の自国未編成Unitを1〜5体に制限します。実キーはid、unitIds、formation、movementMaximum、attacksMaximumで、本文のpartyId／memberUnitIds等と同名ではありません。
 
-UIは選択セルの未編成Unitを1〜5体選んで作成、部隊・Unit選択、経路移動、3×3配置編集、詳細表示、敵選択・照準・予測・攻撃・護衛設定・ログに対応します。戦士・弓兵・弩砲を生産購入でき、各国5体の遠隔対戦から7攻撃定義を試せます。Unit／Slot指定、横列・縦列・十字・貫通とTaunt／Coverを実装し、正面・公開配置を前提とします。既存部隊のメンバー追加・削除、分割・合流・解散、手動Leader設定、Inventory／Supplies／Expeditionは未実装です。
+UIは選択セルの未編成Unitを1〜5体選んで作成、部隊・Unit選択、経路移動、3×3配置編集、詳細表示、敵選択・照準・予測・攻撃・護衛設定・ログに対応します。戦士・弓兵・弩砲を生産購入でき、各国5体の遠隔対戦から7攻撃定義を試せます。Unit／Slot指定、横列・縦列・十字・貫通とTaunt／Coverを実装し、正面・公開配置を前提とします。待機兵の補充・合流・分割を実装しました。解散・任意離脱・手動Leader設定・Inventory／Supplies／Expeditionは未実装です。
 
 最大移動力は固定2、攻撃回数は1です。能力集約は参加Unitの平均×cohesionで、遠隔は攻撃定義の兵種と各Unit自身の射程を検証します。Leader・軍師・Formation・loyalty・補給などによる目標の相乗効果は未実装です。K-10を修正し、活動中Partyだけが地図を占有します。敗北PartyはUnit・HP0・所属・配置・位置を保持した履歴となり、同じセルへの進入・通過・新規部隊作成を妨げません。死者復活・自動進軍・戦利品取得は追加していません。
+
+2026-10-30: ReinforceParty／MergeParties／SplitPartyを追加しました。関係部隊の移動・攻撃・反応を終了し、HP・容量・所属と配置を維持します。隣接・地形費・5体上限・護衛の扱いなど暫定規則は[部隊再編](PARTY_MANAGEMENT.md)を参照してください。
 
 ## 1. 定義
 

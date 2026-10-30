@@ -1,6 +1,7 @@
+import { hasCityDefense } from '../models/city-defense.js';
 import { Hex } from '../world/hex.js';
 import { RULESET } from '../core/ruleset.js';
-import { occupiesMapTile } from '../models/party.js';
+import { occupiesMapTile, hasPartyRecovery, isActiveUnit } from '../models/party.js';
 import { MapCamera, HEX_SIZE, hexPosition } from './map-camera.js';
 
 function hexPath(ctx, x, y, size) {
@@ -119,6 +120,12 @@ export class MapView {
       hexPath(ctx, p.x, p.y, size - 2);
       if (tile.key === selectedTileKey || tile.key === hoveredKey) { ctx.strokeStyle = tile.key === selectedTileKey ? '#ffffff' : '#fff1be'; ctx.lineWidth = tile.key === selectedTileKey ? 3 : 2; ctx.stroke(); }
       if (tile.cityId) {
+        const city = state.cities[tile.cityId];
+        if (hasCityDefense(state)) {
+          const barY = p.y - 31 * scale; ctx.fillStyle = '#172432'; ctx.fillRect(p.x - 20 * scale, barY, 40 * scale, 8 * scale);
+          ctx.fillStyle = '#eebf68'; ctx.fillRect(p.x - 20 * scale, barY, 40 * scale * city.defense.hp / RULESET.cityDefense.maximumHp, 4 * scale);
+          ctx.fillStyle = '#a0c4db'; ctx.fillRect(p.x - 20 * scale, barY + 4 * scale, 40 * scale * city.defense.wallHp / RULESET.cityDefense.wallHp, 4 * scale);
+        }
         if (!assets.draw(ctx, 'building-city', p.x, p.y - 11 * scale, scale)) { ctx.fillStyle = '#ffe2a0'; ctx.font = `${24 * scale}px serif`; ctx.textAlign = 'center'; ctx.fillText('城', p.x, p.y); }
         if (state.cities[tile.cityId]?.buildings.includes('monument')) assets.draw(ctx, 'building-monument', p.x + 17 * scale, p.y - 8 * scale, scale);
       }
@@ -131,7 +138,7 @@ export class MapView {
     }
     this.markers = [];
     const waiting = new Map();
-    for (const unit of Object.values(state.units).filter((u) => !u.partyId)) {
+    for (const unit of Object.values(state.units).filter((u) => !u.partyId && (!hasPartyRecovery(state) || isActiveUnit(u)))) {
       const key = `${unit.location}:${unit.ownerId}`;
       if (!waiting.has(key)) waiting.set(key, []); waiting.get(key).push(unit);
     }

@@ -1,0 +1,18 @@
+{
+  "verifiedAt": "2026-10-30T02:47:18.718Z",
+  "browser": "141.0.7390.37",
+  "checks": [
+    "explicit conquest mode explains city survival and shows occupation controls",
+    "actual map movement then CaptureCity transfers ownership, selects the city, cancels production and grants no income",
+    "captured-city production and save/load work; partial territory transfer rejects atomically",
+    "captured city collects once for its new owner and starts new production at the next full round",
+    "garrison blocks entry; defeating the last army does not end a city-survival scenario",
+    "last-city capture wins with surviving enemy armies and locks actions across reload",
+    "AI capture produces human cityless defeat; city/map panels, read-only inspection, save/load and forged-result rejection remain usable",
+    "390px capture and cityless panels render without horizontal overflow",
+    "AI path to an unguarded city and mid-move save resume produce identical capture and victory",
+    "existing reinforcement mode retains army-elimination victory and hides capture controls"
+  ],
+  "pageErrors": [],
+  "httpFailures": []
+}

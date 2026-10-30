@@ -25,8 +25,10 @@
 | 都市・暁都・東都 | City | [人口・産出・生産を持つ拠点](./rules/cities.md) |
 | 王国・黎明王国 | Kingdom | [備蓄・都市・人材を持つ勢力](./rules/turns.md) |
 | 区画 | District | [都市で建設する予定の分類](./districts/README.md) |
-| 建物・建造物 | Building | [現在はモニュメント1種類](./buildings/README.md) |
+| 建物・建造物 | Building | [モニュメントと城壁](./buildings/README.md) |
 | モニュメント | monument | [文化+2の建物](./buildings/monument.md) |
+| 城壁 | walls | [新規都市争奪戦の城壁HP60](./buildings/walls.md) |
+| 都市耐久・攻城 | City Defense / AttackCity | [都市を削り、進入して占領](./rules/cities.md) |
 | タイル改善 | Improvement | [労働者が建設・修理する予定の施設](./units/builder.md) |
 | 領土 | Territory | [王国が所有し、一つの都市に所属するHex](./rules/territory.md) |
 | 所属都市・都市中心 | territoryCityId / cityId | [作業・拡張を担当する都市と、中心施設の区別](./rules/territory.md) |
@@ -73,3 +75,9 @@
 | セーブ・ロード | Save / Load | [ブラウザ内の保存と復元](./rules/turns.md) |
 
 各項目の根拠となるコード・設計文書は、リンク先の末尾に記載しています。
+
+都市反撃（City Counterattack）: 新規都市争奪戦で近接攻城後も防御が残る都市が行う全体ターン1回の反撃。[戦闘](rules/combat.md)・[詳細](../doc/CITY_RETALIATION.md)。
+
+休養（RestParty）: 行動前に予約し、次の全体ターン開始に生存負傷者のHPを回復する操作。[休養と離脱](rules/recovery.md)。
+
+戦闘不能者の離脱（RemoveCasualties）: HP0の記録を保持して部隊の枠を空ける操作。全滅部隊は対象外。[休養と離脱](rules/recovery.md)。

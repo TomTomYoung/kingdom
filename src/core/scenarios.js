@@ -1,3 +1,4 @@
+import { initializeCityDefense } from '../models/city-defense.js';
 import { addCity, addKingdom, createInitialGameState } from './game-state.js';
 import { createUnit } from '../models/unit.js';
 import { createParty } from '../models/party.js';
@@ -23,6 +24,31 @@ export function createSettlementGameState(seed = 117) {
   party.formation['rear-center'] = id; state.kingdoms[party.ownerId].unitIds.push(id);
   for (let q = 1; q <= 4; q++) state.world.tiles[`${q},0,${-q}`].terrainId = 'plains';
   updateDerivedCapabilities(state.kingdoms[party.ownerId], state);
+  return state;
+}
+
+export function createAiSkirmishGameState(seed = 117) {
+  const state = createDuel(seed, true);
+  state.scenarioId = 'ai-skirmish'; state.kingdoms['kingdom-2'].controllerType = 'ai';
+  const enemy = state.parties['party-2']; enemy.location = '6,-6,0';
+  enemy.unitIds.forEach(id => { state.units[id].location = enemy.location; });
+  for (let q = 1; q <= 6; q++) state.world.tiles[`${q},${-q},0`].terrainId = 'plains';
+  state.scenarioObjective = { type: 'eliminate-parties', participantIds: [...state.turnOrder], turnLimit: 40 };
+  state.gameResult = null;
+  return state;
+}
+
+export function createAiReinforcementGameState(seed = 117) {
+  const state = createAiSkirmishGameState(seed);
+  state.scenarioId = 'ai-reinforcements';
+  state.kingdoms['kingdom-2'].aiPolicy = 'reinforcements';
+  return state;
+}
+
+export function createAiConquestGameState(seed = 117) {
+  const state = createAiReinforcementGameState(seed);
+  state.scenarioId = 'ai-conquest'; state.scenarioObjective.type = 'control-cities';
+  state.cityDefenseVersion = 2; Object.values(state.cities).forEach(city => initializeCityDefense(state, city));
   return state;
 }
 

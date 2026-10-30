@@ -1,3 +1,6 @@
+import { processPartyRest } from '../systems/party-care.js';
+import { hasCityRetaliation } from '../models/city-defense.js';
+import { recoverCityDefense } from '../systems/city-siege.js';
 import { RULESET } from './ruleset.js';
 import { calculateCityYields } from '../systems/yield-system.js';
 import { applyProduction } from '../systems/production-system.js';
@@ -7,6 +10,9 @@ import { isActiveUnit, hasActiveUnits } from '../models/party.js';
 
 export function processTurnStart(state, events) {
   if (state.lastProcessedTurn === state.currentTurn) return;
+  // Resolve all rest orders against the same round boundary before any city
+  // expands territory; kingdom iteration order must not decide recovery.
+  for (const party of Object.values(state.parties)) processPartyRest(state, party, events);
   for (const kingdom of Object.values(state.kingdoms)) {
     const paid = Math.min(kingdom.stockpiles.popularSupport, kingdom.supportUpkeep);
     kingdom.stockpiles.popularSupport = Math.min(RULESET.popularSupportCap, kingdom.stockpiles.popularSupport - paid + kingdom.supportIncome);
@@ -17,6 +23,8 @@ export function processTurnStart(state, events) {
       city.foodStorage += city.yieldSummary.food;
       const foodCost = RULESET.growthFoodBase + city.population * RULESET.growthFoodPerPopulation;
       if (city.foodStorage >= foodCost) { city.foodStorage -= foodCost; city.population += 1; kingdom.humanResources.native += 1; events.push({ type: 'CityGrew', cityId, population: city.population }); }
+      recoverCityDefense(state, city, events);
+      if (hasCityRetaliation(state)) city.defense.counterattacksRemaining = RULESET.cityDefense.counterattacksPerRound;
       applyProduction(state, city, city.yieldSummary.production, events);
       kingdom.stockpiles.gold += city.yieldSummary.gold; kingdom.stockpiles.mana += city.yieldSummary.mana;
       kingdom.progress.science += city.yieldSummary.science; kingdom.progress.culture += city.yieldSummary.culture;

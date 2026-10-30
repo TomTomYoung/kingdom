@@ -25,3 +25,5 @@
 雇用、補給、ユニット別維持費、昇格費用などは予定です。現在の標準ゲームでは戦士を保有しただけで毎ターンGold維持費が発生することはありません。
 
 根拠: [初期備蓄・軍事力](../../src/models/kingdom.js)、[費用](../../src/core/ruleset.js)、[購入](../../src/core/rule-system.js)、[領土価格](../../src/systems/territory-system.js)。
+
+新規都市争奪戦では[城壁](../buildings/walls.md)をGold120で購入できます。既存の建物と同様に生産途中の予約・進捗を解除し、再購入はできません。

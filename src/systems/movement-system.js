@@ -1,3 +1,4 @@
+import { cityEntryError } from '../models/city-defense.js';
 import { Hex } from '../world/hex.js';
 import { hasActiveUnits, occupiesMapTile } from '../models/party.js';
 
@@ -13,6 +14,7 @@ export function validatePartyPath(state, party, path) {
     if (!next || next.terrainId === 'void') return { ok: false, reason: '進入できないタイルです' };
     if (previous.distance(Hex.fromKey(key)) !== 1) return { ok: false, reason: '移動経路が連続していません' };
     if (Object.values(state.parties).some((other) => other.id !== party.id && occupiesMapTile(other) && other.location === key)) return { ok: false, reason: '他のPartyが占有しています' };
+    const entryError = cityEntryError(state, party.ownerId, key); if (entryError) return { ok: false, reason: entryError };
     cost += terrainMovementCost(next.terrainId);
     previous = Hex.fromKey(key);
   }

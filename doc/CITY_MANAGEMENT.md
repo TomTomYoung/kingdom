@@ -85,4 +85,4 @@ nextIds.cityを保存し、旧保存の欠落時は既存city-Nの最大N+1を�
 
 ## 後続
 
-次はAIControllerとシナリオ勝敗です。都市移管・占領・破壊、手動作業、AI、勝利条件、Dungeonは後続です。目標仕様は[SPECIFICATION.md](SPECIFICATION.md)、次作業は[HANDOFF.md](HANDOFF.md)を参照してください。
+AIと遭遇戦の勝敗、都市争奪戦のCaptureCityによる所有権移管を実装しました。占領では都市所属領土も移し、人口・食料・文化・建物を保持、生産を解除します。都市0の敗者も保存・表示できます。[都市占領の規則](CITY_CONQUEST.md)。都市間の任意移管・破壊、手動作業、都市建設AI、Domination全体、Dungeonは後続です。目標仕様は[SPECIFICATION.md](SPECIFICATION.md)、次作業は[HANDOFF.md](HANDOFF.md)を参照してください。

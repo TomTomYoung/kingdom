@@ -1,3 +1,4 @@
+import { cancelPartyRest } from './party-care.js';
 import { RULESET } from '../core/ruleset.js';
 import { SeededRng } from '../core/rng.js';
 import { Hex } from '../world/hex.js';
@@ -15,12 +16,12 @@ export function partyCombatStrength(state, party, kind = 'melee', distance = 1, 
 
 export function selectPrimaryTarget(state, party) { return automaticTarget(state, party); }
 
-function boundedDamage(attackStrength, defenseStrength, random) {
+export function boundedDamage(attackStrength, defenseStrength, random) {
   const rules = RULESET.combat;
   return Math.round(Math.min(rules.maximumDamage, Math.max(rules.minimumDamage, rules.baseDamage * Math.exp(rules.strengthExponent * (attackStrength - defenseStrength)) * random)));
 }
 
-function rollDamage(state, attackStrength, defenseStrength) {
+export function rollDamage(state, attackStrength, defenseStrength) {
   const rules = RULESET.combat, rng = SeededRng.fromJSON(state.rng.combat);
   const random = rules.randomMinimum + rng.next() * (rules.randomMaximum - rules.randomMinimum);
   state.rng.combat = rng.toJSON();
@@ -74,12 +75,17 @@ function strike(state, sourceParty, targetParty, kind, events, counter = false, 
       accumulated.amount += part.amount; accumulated.roles.add(part.role); allocations.set(part.unit.id, accumulated);
     }
   }
+  return applyPartyDamage(state, targetParty, primary, allocations, rawDamage, events, metadata);
+}
+
+export function applyPartyDamage(state, targetParty, primary, allocations, rawDamage, events, metadata) {
   let total = 0;
   for (const { unit, amount, roles } of allocations.values()) {
     const damage = applyDamage(unit, amount); total += damage;
     const role = roles.has('intercept') ? 'intercept' : roles.has('guard') ? 'guard' : roles.has('primary') ? 'primary' : 'area';
     events.push({ type: 'CombatDamage', ...metadata, targetUnitId: unit.id, primaryTargetUnitId: primary.id, targetSlot: Object.keys(targetParty.formation).find(slot => targetParty.formation[slot] === unit.id), rawDamage, allocatedDamage: amount, damage, role, roles: [...roles], remainingHp: unit.currentHp });
   }
+  if (total > 0) cancelPartyRest(targetParty, events, '戦闘で被害を受けたため');
   targetParty.morale = Math.max(0, targetParty.morale - Math.ceil(total * RULESET.combat.moraleDamageRate));
   inheritLeadership(state, targetParty, events);
   return { target: primary, damage: total };
