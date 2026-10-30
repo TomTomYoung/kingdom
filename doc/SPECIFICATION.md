@@ -20,7 +20,7 @@ K-05は都市別の領土所属と市民作業で修正しました。文化取�
 
 2026-10-30: ReinforceParty／MergeParties／SplitPartyを追加しました。関係部隊の移動・攻撃・反応を終了し、HP・容量・所属と配置を維持します。隣接・地形費・5体上限・護衛の扱いなど暫定規則は[部隊再編](PARTY_MANAGEMENT.md)を参照してください。
 
-2026-10-30: 都市争奪戦でCaptureCityと全都市支配のScenario Objectiveを追加しました。都市HP・城壁・降伏は未実装で、Domination全体の完成ではありません。[現行の占領規則](CITY_CONQUEST.md)を参照してください。
+2026-10-30: 都市争奪戦でCaptureCityと全都市支配のScenario Objectiveを追加しました。新規対局の都市HP・城壁・攻城・修復も追加しました。暫定値と旧保存の維持条件は[攻城規則](CITY_SIEGE.md)に記載します。都市砲撃・反撃・降伏は未実装で、Domination全体の完成ではありません。[現行の占領規則](CITY_CONQUEST.md)を参照してください。
 
 ## 1. ゲームの定義
 

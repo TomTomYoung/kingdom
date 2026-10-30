@@ -27,3 +27,5 @@
 関連: [都市と生産](../rules/cities.md)・[建物一覧](../buildings/README.md)。
 
 根拠: [生産費・地形産出](../../src/core/ruleset.js)、[進捗と超過分](../../src/systems/production-system.js)、[生産選択・購入](../../src/core/rule-system.js)。
+
+新規都市争奪戦では[城壁](../buildings/walls.md)も生産30で建設できます。完成時に城壁HP60を獲得します。

@@ -1,3 +1,5 @@
+import { hasCityDefense, isCityDefended } from '../models/city-defense.js';
+import { RULESET } from '../core/ruleset.js';
 import { occupiesMapTile } from '../models/party.js';
 import { participatingUnits } from './combat-attacks.js';
 import { emptyYields } from './yield-system.js';
@@ -14,6 +16,7 @@ export function validateCaptureCity(state, playerId, partyId, cityId) {
   if (!city || city.ownerId === playerId) return reject('敵国の都市を選択してください');
   if (!party || party.ownerId !== playerId || party.status !== 'active' || !participatingUnits(state, party).length) return reject('生存する軍事Unitを含む自国部隊が必要です');
   if (party.activationState !== 'ready' || party.attacksRemaining < 1) return reject('占領には未終了の行動と攻撃回数1が必要です');
+  if (isCityDefended(state, city)) return reject('都市占領には城壁と都市耐久を0にする必要があります');
   if (party.location !== city.centerHex) return reject('敵都市の中心へ部隊を移動してください');
   if (Object.values(state.parties).some(other => other.id !== party.id && occupiesMapTile(other) && other.location === city.centerHex)) return reject('都市中心を他の活動部隊が占有しています');
   return { ok: true };
@@ -24,6 +27,7 @@ export function resolveCaptureCity(state, playerId, partyId, cityId, events) {
   const city = state.cities[cityId], party = state.parties[partyId], previousOwnerId = city.ownerId;
   state.kingdoms[previousOwnerId].cityIds = state.kingdoms[previousOwnerId].cityIds.filter(id => id !== cityId);
   state.kingdoms[playerId].cityIds.push(cityId); city.ownerId = playerId;
+  if (hasCityDefense(state)) city.defense = { hp: RULESET.cityDefense.capturedHp, wallHp: 0, lastDamagedTurn: state.currentTurn };
   const territoryKeys = [];
   for (const tile of Object.values(state.world.tiles)) if (tile.territoryCityId === cityId) { tile.ownerId = playerId; territoryKeys.push(tile.key); }
   // Capturing neither collects income nor refunds/reuses the old owner's orders.

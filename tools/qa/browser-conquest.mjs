@@ -36,7 +36,8 @@ try {
   await page.waitForFunction(() => document.querySelector('#resources img'));
   const save = async () => { await page.click('#save'); return page.evaluate(() => JSON.parse(localStorage.getItem('kingdom-m1-save'))); };
   const load = async value => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await page.click('#load'); };
-  const fresh = async () => { await page.selectOption('#game-mode', 'ai-conquest'); await page.click('#reset'); return save(); };
+  // This regression suite exercises historical conquest; browser-siege covers new games.
+  const fresh = async () => { await page.selectOption('#game-mode', 'ai-conquest'); await page.click('#reset'); const value = await save(); delete value.cityDefenseVersion; Object.values(value.cities).forEach(city => { delete city.defense; }); await load(value); return save(); };
   const tileClick = async tile => {
     await page.locator('#map').scrollIntoViewIfNeeded();
     const point = await page.locator('#map').evaluate((canvas, tile) => {

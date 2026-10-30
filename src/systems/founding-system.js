@@ -1,5 +1,6 @@
 import { RULESET } from '../core/ruleset.js';
 import { Hex } from '../world/hex.js';
+import { initializeCityDefense } from '../models/city-defense.js';
 import { createCity } from '../models/city.js';
 import { isActiveUnit, hasActiveUnits, occupiesMapTile } from '../models/party.js';
 import { updateDerivedCapabilities } from '../models/kingdom.js';
@@ -36,6 +37,7 @@ export function resolveFoundCity(state, playerId, partyId, settlerUnitId, events
   city.population = RULESET.founding.initialPopulation;
   // Leave collection snapshots empty. The next global turn start collects once.
   state.nextIds.city += 1;
+  initializeCityDefense(state, city);
   state.cities[city.id] = city; kingdom.cityIds.push(city.id);
   const center = Hex.fromKey(city.centerHex), tile = state.world.tiles[center.key], claimedTileKeys = [];
   for (const hex of [center, ...Array.from({ length: 6 }, (_, direction) => center.neighbor(direction))]) {

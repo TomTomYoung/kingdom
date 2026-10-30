@@ -2,6 +2,7 @@ export const RULESET_VERSION = 'm1.0';
 
 export const RULESET = Object.freeze({
   mapRadius: 10,
+  cityDefense: Object.freeze({ maximumHp: 100, wallHp: 60, strength: 20, recoveryHp: 10, recoveryWallHp: 5, capturedHp: 25, ballistaWallBonus: 0.5 }),
   aiRecruitment: Object.freeze({ maxCombatUnits: 15, goldReserve: 24, purchasesPerCityPerTurn: 1, composition: Object.freeze({ warrior: 2, archer: 2, ballista: 1 }) }),
   founding: Object.freeze({ minimumCityDistance: 4, minimumMovement: 1, initialPopulation: 1, terrainIds: Object.freeze(['plains', 'grassland', 'forest', 'hills', 'arcane']) }),
   growthFoodBase: 12,
@@ -20,6 +21,7 @@ export const RULESET = Object.freeze({
     warrior: Object.freeze({ itemId: 'warrior', name: '戦士', category: 'unit', productionCost: 12, purchaseOptions: { gold: 48 } }),
     archer: Object.freeze({ itemId: 'archer', name: '弓兵', category: 'unit', productionCost: 18, purchaseOptions: { gold: 72 } }),
     ballista: Object.freeze({ itemId: 'ballista', name: '弩砲', category: 'unit', productionCost: 28, purchaseOptions: { gold: 112 } }),
+    walls: Object.freeze({ itemId: 'walls', name: '城壁', category: 'building', productionCost: 30, purchaseOptions: { gold: 120 } }),
     monument: Object.freeze({ itemId: 'monument', name: 'モニュメント', category: 'building', productionCost: 20, purchaseOptions: { gold: 80 } }),
   }),
   terrain: Object.freeze({

@@ -1,4 +1,6 @@
-import { captureCity, attackParty, moveParty, endTurn } from './commands.js';
+import { hasCityDefense, isCityDefended, cityEntryError } from '../models/city-defense.js';
+import { validateCityAttack } from '../systems/city-siege.js';
+import { attackCity, captureCity, attackParty, moveParty, endTurn } from './commands.js';
 import { chooseCityExitCommand, chooseDeploymentCommand, chooseSupplyCommand, chooseReinforcementCommand, chooseMergeCommand } from './ai-economy.js';
 import { RuleSystem } from './rule-system.js';
 import { validatePartyAttack } from '../systems/combat-system.js';
@@ -10,6 +12,7 @@ import { Hex } from '../world/hex.js';
 
 export const AI_TURN_COMMAND_LIMIT = 128;
 const ordered = records => Object.values(records).sort((a, b) => a.id.localeCompare(b.id));
+const cityAttackTypeAt = (state, party, city) => ['ranged', 'melee'].find(kind => validateCityAttack({ ...state, parties: { ...state.parties, [party.id]: party } }, party.ownerId, party.id, city.id, kind).ok);
 const attackTypeAt = (state, party, enemy) => ['ranged', 'melee'].find(kind => validatePartyAttack(state, party, enemy, kind).ok);
 
 // Search the whole map for a firing position, then take the affordable prefix.
@@ -37,7 +40,7 @@ export function pathToward(state, party, isGoal, { preserveGoal = false } = {}) 
     const hex = Hex.fromKey(current.key);
     for (let direction = 0; direction < 6; direction++) {
       const key = hex.neighbor(direction).key, tile = state.world.tiles[key];
-      if (!tile || tile.terrainId === 'void' || occupied.has(key) || visited.has(key)) continue;
+      if (!tile || tile.terrainId === 'void' || occupied.has(key) || cityEntryError(state, party.ownerId, key) || visited.has(key)) continue;
       const stepCost = terrainMovementCost(tile.terrainId), cost = current.cost + stepCost;
       if (stepCost > party.movementMaximum || cost >= (costs.get(key) ?? Infinity)) continue;
       costs.set(key, cost); queue.push({ key, cost, path: [...current.path, key] });
@@ -69,12 +72,16 @@ export class AIController {
       const kind = attackTypeAt(state, party, enemy);
       if (kind) return attackParty(this.playerId, state.currentTurn, party.id, enemy.id, kind, id);
     }
+    if (hasCityDefense(state)) for (const party of own) for (const city of enemyCities) {
+      const kind = cityAttackTypeAt(state, party, city);
+      if (kind) return attackCity(this.playerId, state.currentTurn, party.id, city.id, kind, id);
+    }
     if (recruits) {
       const command = chooseMergeCommand(state, this.playerId, id);
       if (command) return command;
     }
     for (const party of own) {
-      const path = (conquest ? pathToward(state, party, key => enemyCities.some(city => city.centerHex === key), { preserveGoal: true }) : null) ?? approachPath(state, party, enemies);
+      const path = (conquest ? pathToward(state, party, key => enemyCities.some(city => isCityDefended(state, city) ? cityAttackTypeAt(state, { ...party, location: key }, city) : city.centerHex === key), { preserveGoal: true }) : null) ?? approachPath(state, party, enemies);
       if (path?.length) return moveParty(this.playerId, state.currentTurn, party.id, path, id);
     }
     if (recruits) {

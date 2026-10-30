@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-30T01:11:19.183Z",
+  "browser": "141.0.7390.37",
+  "realBrowser": true,
+  "errors": [],
+  "failures": [],
+  "checks": [
+    "seven attack profiles via UI",
+    "target preview has no state/RNG side effects",
+    "Unit and slot targeting",
+    "invalid empty direct slot",
+    "empty area center",
+    "grid click changes Unit/slot/row/column",
+    "attack footprint and HP forecast",
+    "ranged action exhaustion and no counter",
+    "save/load retains combat and mode",
+    "390px layout",
+    "active-kingdom archer purchase",
+    "ballista production",
+    "legacy melee and invalid ranged"
+  ],
+  "results": [
+    {
+      "profile": "normal",
+      "result": "passed",
+      "forecast": "予測HP損失 · 反撃なし\n\n主対象: 戦士 unit-6\n\n挑発: unit-6。通常攻撃の対象を引きつけます。\n\n敵軍 unit-6: 17〜23\n\n敵軍 unit-7: 16〜22 · 護衛\n\n命中・失敗・護衛を含む範囲です。攻撃回数を1消費し、この部隊の行動を終了します。"
+    },
+    {
+      "profile": "aimed",
+      "result": "passed",
+      "forecast": "予測HP損失 · 反撃なし\n\n狙った対象への命中率 45%\n\n主対象: 弓兵 unit-9\n\n遮蔽: unit-7。前にいるUnitが狙い撃ちに影響します。\n\n挑発: unit-6。指定した対象は変わらず、狙い撃ちの命中率へ影響します。\n\n敵軍 unit-7: 0〜46 · 遮蔽\n\n敵軍 unit-9: 0〜47\n\n命中・失敗・護衛を含む範囲です。攻撃回数を1消費し、この部隊の行動を終了します。"
+    },
+    {
+      "profile": "precise",
+      "result": "passed",
+      "forecast": "予測HP損失 · 反撃なし\n\n狙った対象への命中率 50%\n\n主対象: 弓兵 unit-9\n\n遮蔽: unit-7。前にいるUnitが狙い撃ちに影響します。\n\n挑発: unit-6。指定した対象は変わらず、狙い撃ちの命中率へ影響します。\n\n敵軍 unit-9: 0〜47\n\n命中・失敗・護衛を含む範囲です。攻撃回数を1消費し、この部隊の行動を終了します。"
+    },
+    {
+      "profile": "row",
+      "result": "passed",
+      "forecast": "予測HP損失 · 反撃なし\n\n主対象: 弓兵 unit-9\n\n敵軍 unit-9: 16〜23\n\n敵軍 unit-10: 15〜22\n\n命中・失敗・護衛を含む範囲です。攻撃回数を1消費し、この部隊の行動を終了します。"
+    },
+    {
+      "profile": "column",
+      "result": "passed",
+      "forecast": "予測HP損失 · 反撃なし\n\n主対象: 戦士 unit-6\n\n敵軍 unit-6: 11〜16\n\n敵軍 unit-7: 11〜15 · 護衛\n\n敵軍 unit-8: 25〜34\n\n命中・失敗・護衛を含む範囲です。攻撃回数を1消費し、この部隊の行動を終了します。"
+    },
+    {
+      "profile": "area",
+      "result": "passed",
+      "forecast": "予測HP損失 · 反撃なし\n\n主対象: 弓兵 unit-8\n\n敵軍 unit-6: 18〜25\n\n敵軍 unit-8: 19〜26\n\n命中・失敗・護衛を含む範囲です。攻撃回数を1消費し、この部隊の行動を終了します。"
+    },
+    {
+      "profile": "pierce",
+      "result": "passed",
+      "forecast": "予測HP損失 · 反撃なし\n\n主対象: 戦士 unit-6\n\n敵軍 unit-6: 18〜25\n\n敵軍 unit-7: 18〜25 · 護衛\n\n敵軍 unit-8: 23〜31\n\n命中・失敗・護衛を含む範囲です。攻撃回数を1消費し、この部隊の行動を終了します。"
+    }
+  ]
+}

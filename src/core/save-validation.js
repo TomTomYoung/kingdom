@@ -136,6 +136,8 @@ export function migrateAndValidateSave(state) {
     fields(kingdom.derived, ['militaryPower', 'governanceCapacity', 'governanceLoad'], `kingdoms.${id}.derived`);
     fields(kingdom, ['institutions', 'supportIncome', 'supportUpkeep'], `kingdoms.${id}`);
   }
+  const defended = Object.hasOwn(state, 'cityDefenseVersion');
+  if (defended) check(state.cityDefenseVersion === 1 && state.scenarioObjective?.type === 'control-cities', 'cityDefenseVersion');
   const worked = new Set();
   for (const [id, city] of Object.entries(state.cities)) {
     object(city, `cities.${id}`); check(city.id === id, `cities.${id}.id`); text(city.name, `cities.${id}.name`);
@@ -176,9 +178,16 @@ export function migrateAndValidateSave(state) {
     for (const [key, value] of Object.entries(city.yieldModifiers)) { check(yields.includes(key), `cities.${id}.yieldModifiers`); number(value, `cities.${id}.yieldModifiers.${key}`, -Number.MAX_SAFE_INTEGER); }
     ids(city.buildings, `cities.${id}.buildings`);
     city.buildings.forEach((item) => check(reference(RULESET.items, item, `cities.${id}.buildings`).category === 'building', `cities.${id}.buildings`));
+    if (defended) {
+      const path = `cities.${id}.defense`, defense = object(city.defense, path);
+      integer(defense.hp, `${path}.hp`, 0, RULESET.cityDefense.maximumHp);
+      integer(defense.wallHp, `${path}.wallHp`, 0, city.buildings.includes('walls') ? RULESET.cityDefense.wallHp : 0);
+      if (defense.lastDamagedTurn !== null) integer(defense.lastDamagedTurn, `${path}.lastDamagedTurn`, 1, state.currentTurn);
+    } else check(!Object.hasOwn(city, 'defense') && !city.buildings.includes('walls'), `cities.${id}.defense: 都市防御の版がありません`);
     const production = object(city.production, `cities.${id}.production`);
     if (production.currentItemId !== null) reference(RULESET.items, production.currentItemId, `cities.${id}.production.currentItemId`);
     array(production.queue, `cities.${id}.production.queue`).forEach((item) => reference(RULESET.items, item, `cities.${id}.production.queue`));
+    if (!defended) check(![production.currentItemId, ...production.queue, ...Object.keys(production.progressByItem ?? {})].includes('walls'), `cities.${id}.production: 城壁は都市防御の版が必要です`);
     object(production.progressByItem, `cities.${id}.production.progressByItem`);
     for (const [item, progress] of Object.entries(production.progressByItem)) number(progress, `cities.${id}.production.progressByItem.${item}`, 0, reference(RULESET.items, item, `cities.${id}.production.progressByItem`).productionCost);
   }

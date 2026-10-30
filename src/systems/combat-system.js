@@ -15,12 +15,12 @@ export function partyCombatStrength(state, party, kind = 'melee', distance = 1, 
 
 export function selectPrimaryTarget(state, party) { return automaticTarget(state, party); }
 
-function boundedDamage(attackStrength, defenseStrength, random) {
+export function boundedDamage(attackStrength, defenseStrength, random) {
   const rules = RULESET.combat;
   return Math.round(Math.min(rules.maximumDamage, Math.max(rules.minimumDamage, rules.baseDamage * Math.exp(rules.strengthExponent * (attackStrength - defenseStrength)) * random)));
 }
 
-function rollDamage(state, attackStrength, defenseStrength) {
+export function rollDamage(state, attackStrength, defenseStrength) {
   const rules = RULESET.combat, rng = SeededRng.fromJSON(state.rng.combat);
   const random = rules.randomMinimum + rng.next() * (rules.randomMaximum - rules.randomMinimum);
   state.rng.combat = rng.toJSON();

@@ -1,3 +1,4 @@
+import { cityDefenseLabel } from '../models/city-defense.js';
 import { RULESET } from '../core/ruleset.js';
 import { isActiveUnit, occupiesMapTile } from '../models/party.js';
 import { terrainMovementCost } from '../systems/movement-system.js';
@@ -49,6 +50,7 @@ export class InspectionView {
         this.tileRoot.append(move);
         this.tileRoot.append(node('p', route ? `${route.path.length}セルの経路。現在のターン内に移動します。` : tile.key === party.location ? 'この部隊の現在位置です。' : tile.terrainId === 'void' ? '虚無には進入できません。' : occupants.length ? '他の部隊が占有しています。' : 'このターンの移動範囲外です。ターン終了で移動力が回復します。', 'hint'));
       }
+      if (city && cityDefenseLabel(state, city)) this.tileRoot.append(node('p', cityDefenseLabel(state, city), 'hint'));
       const selectedCity = state.cities[cityId] ?? state.cities[state.kingdoms[playerId].cityIds[0]], cost = selectedCity ? tilePurchaseCost(state, selectedCity, tile) : Infinity;
       const candidate = getTerritoryCandidates(state, selectedCity).some((t) => t.key === tile.key);
       const affordable = state.kingdoms[playerId].stockpiles.gold >= cost;

@@ -34,6 +34,7 @@ export function completeItem(state, city, itemId, source, events) {
   } else {
     if (city.buildings.includes(itemId)) return false;
     city.buildings.push(itemId);
+    if (itemId === 'walls') city.defense.wallHp = RULESET.cityDefense.wallHp;
     if (source === 'purchase') normalizeProduction(city);
     events.push({ type: 'ItemCompleted', cityId: city.id, itemId, source });
   }

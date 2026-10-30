@@ -51,3 +51,7 @@ IndividualはHP0でdowned、他の分類はshatteredになります。以後の�
 根拠: [攻撃定義](../../src/systems/combat-attacks.js)、[現行戦闘処理](../../src/systems/combat-system.js)、[護衛](../../src/systems/damage-grid.js)、[数値設定](../../src/core/ruleset.js)、[戦闘の目標](../../doc/COMBAT_SYSTEM.md)、[Damage Gridの目標](../../doc/DAMAGE_GRID.md)。
 
 部隊の補充・合流・分割後は移動・攻撃・割り込みをそのターン終了します。HPと護衛容量は回復しません。通常の近接反撃と肩代わりは既存の規則で可能です。分割で別部隊になった護衛・対象の指示だけを解除します。[部隊の再編](parties.md)。
+
+## 都市への攻撃
+
+新規都市争奪戦の都市耐久は100、城壁は最大60です。近接は隣接、遠隔は各Unitの射程で攻城し、城壁から先に損害を与えます。攻城後は行動と割り込みを終了します。都市からの反撃は現在ありません。駐屯部隊への通常攻撃とは別の行動です。両HP0にして中心へ進入し、占領Commandで所有権を変えます。[都市](cities.md)・[城壁](../buildings/walls.md)・[詳細](../../doc/CITY_SIEGE.md)。

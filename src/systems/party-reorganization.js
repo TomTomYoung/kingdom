@@ -1,3 +1,4 @@
+import { cityEntryError } from '../models/city-defense.js';
 import { createParty, FORMATION_SLOTS, hasActiveUnits, isActiveUnit, occupiesMapTile } from '../models/party.js';
 import { Hex } from '../world/hex.js';
 import { terrainMovementCost } from './movement-system.js';
@@ -15,6 +16,7 @@ function step(state, party, location) {
   const tile = Object.hasOwn(state.world.tiles, location) && state.world.tiles[location];
   if (!tile || tile.terrainId === 'void') return reject('移動できる隣接セルを指定してください');
   if (Hex.fromKey(party.location).distance(Hex.fromKey(location)) !== 1) return reject('隣接するセルを指定してください');
+  const entryError = cityEntryError(state, party.ownerId, location); if (entryError) return reject(entryError);
   const cost = terrainMovementCost(tile.terrainId);
   if (party.movementRemaining < cost) return reject('移動先の地形に必要な移動力が不足しています');
   return { ok: true, cost };

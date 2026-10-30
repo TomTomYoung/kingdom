@@ -2,6 +2,7 @@ import { RULESET, RULESET_VERSION } from './ruleset.js';
 import { createWorldMap } from '../world/world-map.js';
 import { Hex } from '../world/hex.js';
 import { createKingdom, updateDerivedCapabilities } from '../models/kingdom.js';
+import { initializeCityDefense } from '../models/city-defense.js';
 import { createCity } from '../models/city.js';
 import { calculateCityYields } from '../systems/yield-system.js';
 import { claimTileForCity } from '../systems/city-territory.js';
@@ -50,6 +51,7 @@ export function addKingdom(state, { id, name, cityId, cityName, centerHex, contr
   for (const hex of [center, ...Array.from({ length: 6 }, (_, index) => center.neighbor(index))]) {
     const tile = state.world.tiles[hex.key]; if (tile?.ownerId === null && tile.terrainId !== 'void') { tile.ownerId = id; tile.territoryCityId = cityId; }
   }
+  initializeCityDefense(state, city);
   centerTile.cityId = cityId; state.kingdoms[id] = kingdom; state.cities[cityId] = city; state.turnOrder.push(id);
   advanceCityId(state, cityId);
   calculateCityYields(state, city); updateDerivedCapabilities(kingdom, state); return state;
@@ -64,6 +66,7 @@ export function addCity(state, { ownerId, id, name = '新都', centerHex }) {
   if (!tile || tile.terrainId === 'void' || tile.cityId !== null || tile.territoryCityId !== null
     || (tile.ownerId !== null && tile.ownerId !== ownerId)) throw new Error('都市を配置できないHexです');
   const city = createCity(ownerId, center.key, id, name);
+  initializeCityDefense(state, city);
   state.cities[id] = city; kingdom.cityIds.push(id); advanceCityId(state, id);
   claimTileForCity(state, city, tile); tile.cityId = id;
   for (let direction = 0; direction < 6; direction++) {

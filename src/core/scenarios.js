@@ -1,3 +1,4 @@
+import { initializeCityDefense } from '../models/city-defense.js';
 import { addCity, addKingdom, createInitialGameState } from './game-state.js';
 import { createUnit } from '../models/unit.js';
 import { createParty } from '../models/party.js';
@@ -47,6 +48,7 @@ export function createAiReinforcementGameState(seed = 117) {
 export function createAiConquestGameState(seed = 117) {
   const state = createAiReinforcementGameState(seed);
   state.scenarioId = 'ai-conquest'; state.scenarioObjective.type = 'control-cities';
+  state.cityDefenseVersion = 1; Object.values(state.cities).forEach(city => initializeCityDefense(state, city));
   return state;
 }
 

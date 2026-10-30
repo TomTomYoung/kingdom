@@ -1,3 +1,5 @@
+import { hasCityDefense, cityEntryError } from '../models/city-defense.js';
+import { resolveCityAttack } from '../systems/city-siege.js';
 import { cloneGameState } from './game-state.js';
 import { COMMAND_TYPES } from './commands.js';
 import { RULESET } from './ruleset.js';
@@ -36,7 +38,7 @@ export class RuleSystem {
     const state = cloneGameState(original); const events = [];
     const reject = (reason) => ({ ok: false, reason, state: original, events: [] });
     const city = command.payload?.cityId ? cityFor(state, command) : null;
-    if (command.payload?.cityId && !city && command.type !== COMMAND_TYPES.CAPTURE_CITY) return reject('この都市を操作できません');
+    if (command.payload?.cityId && !city && ![COMMAND_TYPES.CAPTURE_CITY, COMMAND_TYPES.ATTACK_CITY].includes(command.type)) return reject('この都市を操作できません');
 
     if (command.type === COMMAND_TYPES.START_TURN) {
       if (state.lastProcessedTurn === state.currentTurn) return reject('このターンは開始処理済みです');
@@ -45,12 +47,14 @@ export class RuleSystem {
       if (state.phase !== 'PLAYER_ACTION') return reject('行動フェーズではありません');
       if (!Object.hasOwn(RULESET.items, command.payload.itemId)) return reject('不明な生産対象です');
       if (!command.payload.queue.every((id) => Object.hasOwn(RULESET.items, id))) return reject('キューに不明な生産対象があります');
+      if (!hasCityDefense(state) && [command.payload.itemId, ...command.payload.queue].includes('walls')) return reject('城壁は新規の都市争奪戦で建設できます');
       const productionError = validateProductionSelection(city, command.payload.itemId, command.payload.queue);
       if (productionError) return reject(productionError);
       city.production.currentItemId = command.payload.itemId; city.production.queue = [...command.payload.queue];
       events.push({ type: 'ProductionSet', cityId: city.id, itemId: command.payload.itemId, queue: [...command.payload.queue] });
     } else if (command.type === COMMAND_TYPES.PURCHASE_CITY_ITEM) {
       const item = Object.hasOwn(RULESET.items, command.payload.itemId) && RULESET.items[command.payload.itemId]; if (!item) return reject('不明な購入対象です');
+      if (item.itemId === 'walls' && !hasCityDefense(state)) return reject('城壁は新規の都市争奪戦で建設できます');
       const cost = Object.hasOwn(item.purchaseOptions ?? {}, command.payload.currency) ? item.purchaseOptions[command.payload.currency] : undefined; if (cost === undefined) return reject('この対象は指定通貨で購入できません');
       const kingdom = state.kingdoms[command.playerId]; if ((kingdom.stockpiles[command.payload.currency] ?? 0) < cost) return reject(`${command.payload.currency}が不足しています`);
       if (item.category === 'building' && city.buildings.includes(item.itemId)) return reject('建設済みです');
@@ -74,6 +78,7 @@ export class RuleSystem {
       const tile = Object.hasOwn(state.world.tiles, command.payload.location) && state.world.tiles[command.payload.location];
       if (!tile || tile.terrainId === 'void') return reject('Partyを編成できない場所です');
       if (Object.values(state.parties).some((party) => occupiesMapTile(party) && party.location === tile.key)) return reject('他のPartyが占有しています。先に移動してください');
+      const entryError = cityEntryError(state, command.playerId, tile.key); if (entryError) return reject(entryError);
       const partyId = `party-${state.nextIds.party++}`;
       state.parties[partyId] = createParty(partyId, command.playerId, unitIds, command.payload.location);
       units.forEach((unit) => { unit.partyId = partyId; });
@@ -83,6 +88,9 @@ export class RuleSystem {
       const result = command.type === COMMAND_TYPES.REINFORCE_PARTY ? resolveReinforceParty(state, command.playerId, p.partyId, p.unitIds, events)
         : command.type === COMMAND_TYPES.MERGE_PARTIES ? resolveMergeParties(state, command.playerId, p.sourcePartyId, p.targetPartyId, events)
         : resolveSplitParty(state, command.playerId, p.partyId, p.unitIds, p.location, events);
+      if (!result.ok) return reject(result.reason);
+    } else if (command.type === COMMAND_TYPES.ATTACK_CITY) {
+      const p = command.payload, result = resolveCityAttack(state, command.playerId, p.partyId, p.cityId, p.attackType, events);
       if (!result.ok) return reject(result.reason);
     } else if (command.type === COMMAND_TYPES.CAPTURE_CITY) {
       const captured = resolveCaptureCity(state, command.playerId, command.payload.partyId, command.payload.cityId, events);

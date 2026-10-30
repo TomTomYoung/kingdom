@@ -16,7 +16,10 @@ function unchanged(state, input) { const before = structuredClone(state), result
 const trip = state => { const restored = restoreGameState(serializeGameState(state)); assert.deepEqual(restored, state); return restored; };
 function relocate(state, id, location) { const p = state.parties[id]; p.location = location; p.unitIds.forEach(id => { state.units[id].location = location; }); state.world.tiles[location].terrainId = 'plains'; }
 function ready({ extraCity = false, onCity = true } = {}) {
-  let state = createAiConquestGameState(); state = apply(state, human.startTurn(state));
+  let state = createAiConquestGameState();
+  // Historical conquest saves deliberately keep capture without durability.
+  delete state.cityDefenseVersion; Object.values(state.cities).forEach(city => { delete city.defense; });
+  state = apply(state, human.startTurn(state));
   if (onCity) relocate(state, 'party-1', capital);
   if (extraCity) { state.world.tiles['-4,4,0'].terrainId = 'plains'; addCity(state, { ownerId: 'kingdom-2', id: 'city-3', name: '余都', centerHex: '-4,4,0' }); }
   return state;
@@ -28,7 +31,7 @@ function destroy(state, id) {
 }
 function recruit(state, owner = 'kingdom-2', location = capital) { const id = `unit-${state.nextIds.unit++}`; state.units[id] = createUnit(id, owner, 'warrior', location); state.kingdoms[owner].unitIds.push(id); return id; }
 
-test('new conquest scenario is explicit, preserves tactical modes and survives save restoration', () => {
+test('legacy conquest scenario is explicit, preserves tactical modes and survives save restoration', () => {
   const state = ready(); assert.equal(state.scenarioId, 'ai-conquest'); assert.equal(state.scenarioObjective.type, 'control-cities'); assert.equal(state.kingdoms['kingdom-2'].aiPolicy, 'reinforcements'); trip(state);
   const old = createAiReinforcementGameState(); assert.equal(old.scenarioObjective.type, 'eliminate-parties'); unchanged(old, capture(old)); trip(old);
 });
