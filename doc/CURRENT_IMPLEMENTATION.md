@@ -2,7 +2,7 @@
 
 確認・更新日: 2026-10-30
 
-開始基準: main / 78cd40667526181b4de51c194458a952667926c5（PR #6マージ後）。戦術AI、「AIとの遭遇戦」、勝敗と40ターン期限、終了状態の保存・操作制御を追加しました。PR #7の0820eaeから、兵の生産・購入・編成を行う「AIとの増援戦」を追加しています。現行規則と制約は[AI_SCENARIOS.md](AI_SCENARIOS.md)、検証範囲は[STATUS.md](STATUS.md)に記載しています。 PR #7の97285c1から、待機兵の補充・隣接部隊の合流・分割と増援AIの補充・合流判断を追加しました。[部隊再編の規則](PARTY_MANAGEMENT.md)を参照してください。
+開始基準: main / 78cd40667526181b4de51c194458a952667926c5（PR #6マージ後）。戦術AI、「AIとの遭遇戦」、勝敗と40ターン期限、終了状態の保存・操作制御を追加しました。PR #7の0820eaeから、兵の生産・購入・編成を行う「AIとの増援戦」を追加しています。現行規則と制約は[AI_SCENARIOS.md](AI_SCENARIOS.md)、検証範囲は[STATUS.md](STATUS.md)に記載しています。 PR #7の97285c1から、待機兵の補充・隣接部隊の合流・分割と増援AIの補充・合流判断を追加しました。[部隊再編の規則](PARTY_MANAGEMENT.md)を参照してください。 PR #7のfa0c260から都市占領と「AIとの都市争奪戦」を追加しました。[占領・都市支配の規則](CITY_CONQUEST.md)を参照してください。
 
 ## 1. 範囲と現在地
 
@@ -65,9 +65,9 @@ npm run check
 
 GameStateはschemaVersion 1、rulesetVersion m1.0、cityTerritoryVersion 1です。主な実キーはphase、world、turnOrder、activePlayerId、activePlayerIndex、kingdoms、cities、units、parties、rng、nextIds、commandLog、eventLogです。目標文書のcurrentPhase、worldMap、playerSlots等と同名とは限りません。
 
-RuleSystem.execute(original, command)は成功時に複製したstateとeventsを返し、検証で拒否した場合は元stateを返します。commandIdの重複、playerId、手番、turnを共通検証します。全14Commandの種別・phase・必須payload・配列と辞書の型を事前検証し、参照先・所有者を処理前に確認します。拒否時は元stateと空eventsを返し、RNG・資源・ID・ログを変更しません。保存読込時のGameState構造検証はK-09で実装済みです。
+RuleSystem.execute(original, command)は成功時に複製したstateとeventsを返し、検証で拒否した場合は元stateを返します。commandIdの重複、playerId、手番、turnを共通検証します。全15Commandの種別・phase・必須payload・配列と辞書の型を事前検証し、参照先・所有者を処理前に確認します。拒否時は元stateと空eventsを返し、RNG・資源・ID・ログを変更しません。保存読込時のGameState構造検証はK-09で実装済みです。
 
-現在のCommandは14種類です。
+現在のCommandは15種類です。
 
 1. StartTurn
 2. SetCityProduction
@@ -83,6 +83,7 @@ RuleSystem.execute(original, command)は成功時に複製したstateとevents�
 12. ReinforceParty（partyId・unitIdsを指定）
 13. MergeParties（sourcePartyId・targetPartyIdを指定）
 14. SplitParty（partyId・unitIds・隣接locationを指定）
+15. CaptureCity（partyId・cityIdを指定。都市支配目標の対局のみ）
 
 HumanControllerは上記のCommandを生成します。AIControllerは合法な通常遠隔／近接攻撃、射程内への経路移動、EndTurnを選び、共通RuleSystemで実行します。次のRNGを読まず、同じ入力に同じCommandを返します。reinforcements方針では都市の出口確保、CreateParty、空の都市のSetCityProduction、予備費と購入回数を守るPurchaseCityItemも選びます。RemoteController、ReplayController、汎用の合法手一覧APIはありません。[AIの判断・制約](AI_SCENARIOS.md)。
 
@@ -180,6 +181,8 @@ HP0ではindividualならdowned、他はshatteredです。現行定義はdetachm
 新規戦士のGuardは率50％・容量50・縦横距離1。肩代わりは装甲前Damageの最大70％・残り容量まで。割り込みは反応1を使い全量を受けます。複数候補は割り込み→距離→ID順で1体、連鎖なし。stun／break／fearはGuard・Taunt・Coverを無効化します。状態を付与するAbilityは未実装です。
 
 敗北Partyは盤上を占有せず、駒・ミニマップから除外します。Unit・Party・配置・HP・位置の記録は保持し、セル詳細で確認できます。撃破地点へ移動・通過・新Party作成が可能です。自動前進・射線・撤退・回復・捕虜・Lootは未実装です。遭遇戦だけ全活動部隊の撃破をゲーム終了判定へ使います。
+
+都市争奪戦では敵都市中心にいる軍事部隊がCaptureCityを実行し、都市・所属領土を移管します。生産予約・進捗を解除し、人口・建物・食料・文化・Unitを保持します。収入は次の全体ターン開始からです。全都市を失うと即敗北し、部隊全滅だけなら継続します。都市0の敗者の表示・保存復元も対応します。都市HP・城壁は未実装です。[詳細](CITY_CONQUEST.md)。
 
 ## 11. セーブと検証範囲
 

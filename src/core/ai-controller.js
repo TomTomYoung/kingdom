@@ -1,10 +1,11 @@
-import { attackParty, moveParty, endTurn } from './commands.js';
+import { captureCity, attackParty, moveParty, endTurn } from './commands.js';
 import { chooseCityExitCommand, chooseDeploymentCommand, chooseSupplyCommand, chooseReinforcementCommand, chooseMergeCommand } from './ai-economy.js';
 import { RuleSystem } from './rule-system.js';
 import { validatePartyAttack } from '../systems/combat-system.js';
 import { participatingUnits } from '../systems/combat-attacks.js';
 import { terrainMovementCost, validatePartyPath } from '../systems/movement-system.js';
 import { occupiesMapTile, hasActiveUnits } from '../models/party.js';
+import { hasCityObjective, validateCaptureCity } from '../systems/city-capture.js';
 import { Hex } from '../world/hex.js';
 
 export const AI_TURN_COMMAND_LIMIT = 128;
@@ -14,19 +15,24 @@ const attackTypeAt = (state, party, enemy) => ['ranged', 'melee'].find(kind => v
 // Search the whole map for a firing position, then take the affordable prefix.
 // This permits detours around Void and occupied tiles without reading any RNG.
 export function approachPath(state, party, enemies) {
+  return pathToward(state, party, key => enemies.some(enemy => attackTypeAt(state, { ...party, location: key }, enemy)));
+}
+
+export function pathToward(state, party, isGoal, { preserveGoal = false } = {}) {
   if (party.movementRemaining <= 0 || party.activationState !== 'ready' || !participatingUnits(state, party, 'melee').length) return null;
   const occupied = new Set(Object.values(state.parties).filter(other => other.id !== party.id && occupiesMapTile(other)).map(other => other.location));
   const queue = [{ key: party.location, cost: 0, path: [] }], costs = new Map([[party.location, 0]]), visited = new Set();
   while (queue.length) {
     queue.sort((a, b) => a.cost - b.cost || a.key.localeCompare(b.key));
     const current = queue.shift(); if (visited.has(current.key)) continue; visited.add(current.key);
-    if (current.path.length && enemies.some(enemy => attackTypeAt(state, { ...party, location: current.key }, enemy))) {
+    if (current.path.length && isGoal(current.key)) {
       const prefix = []; let budget = party.movementRemaining;
       for (const key of current.path) {
         const cost = terrainMovementCost(state.world.tiles[key].terrainId);
         if (cost > budget) break; prefix.push(key); budget -= cost;
       }
-      return prefix.length && validatePartyPath(state, party, prefix).ok ? prefix : null;
+      if (!prefix.length) return preserveGoal ? [] : null;
+      return validatePartyPath(state, party, prefix).ok ? prefix : null;
     }
     const hex = Hex.fromKey(current.key);
     for (let direction = 0; direction < 6; direction++) {
@@ -47,6 +53,11 @@ export class AIController {
     const id = `ai-${this.playerId}-${state.currentTurn}-${state.commandLog.length + 1}`;
     const finish = () => endTurn(this.playerId, state.currentTurn, id);
     if (forceEnd) return finish();
+    const conquest = hasCityObjective(state);
+    const enemyCities = conquest ? ordered(state.cities).filter(city => city.ownerId !== this.playerId) : [];
+    if (conquest) for (const party of ordered(state.parties)) for (const city of enemyCities) {
+      if (validateCaptureCity(state, this.playerId, party.id, city.id).ok) return captureCity(this.playerId, state.currentTurn, party.id, city.id, id);
+    }
     const recruits = state.kingdoms[this.playerId].aiPolicy === 'reinforcements';
     if (recruits) {
       const command = chooseReinforcementCommand(state, this.playerId, id) ?? chooseCityExitCommand(state, this.playerId, id) ?? chooseDeploymentCommand(state, this.playerId, id);
@@ -63,8 +74,8 @@ export class AIController {
       if (command) return command;
     }
     for (const party of own) {
-      const path = approachPath(state, party, enemies);
-      if (path) return moveParty(this.playerId, state.currentTurn, party.id, path, id);
+      const path = (conquest ? pathToward(state, party, key => enemyCities.some(city => city.centerHex === key), { preserveGoal: true }) : null) ?? approachPath(state, party, enemies);
+      if (path?.length) return moveParty(this.playerId, state.currentTurn, party.id, path, id);
     }
     if (recruits) {
       const command = chooseSupplyCommand(state, this.playerId, id);

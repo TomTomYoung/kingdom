@@ -1,4 +1,4 @@
-import { reinforceParty, mergeParties, splitParty, attackParty, createParty, endTurn, foundCity, moveParty, purchaseCityItem, purchaseTile, setCityProduction, setFormation, setGuardOrder, startTurn } from './commands.js';
+import { captureCity, reinforceParty, mergeParties, splitParty, attackParty, createParty, endTurn, foundCity, moveParty, purchaseCityItem, purchaseTile, setCityProduction, setFormation, setGuardOrder, startTurn } from './commands.js';
 export class HumanController {
   constructor(playerId) { this.playerId = playerId; }
   nextId(state) { return `${this.playerId}-${state.currentTurn}-${state.commandLog.length + 1}`; }
@@ -15,5 +15,6 @@ export class HumanController {
   reinforceParty(state, partyId, unitIds) { return reinforceParty(this.playerId, state.currentTurn, partyId, unitIds, this.nextId(state)); }
   mergeParties(state, sourcePartyId, targetPartyId) { return mergeParties(this.playerId, state.currentTurn, sourcePartyId, targetPartyId, this.nextId(state)); }
   splitParty(state, partyId, unitIds, location) { return splitParty(this.playerId, state.currentTurn, partyId, unitIds, location, this.nextId(state)); }
+  captureCity(state, partyId, cityId) { return captureCity(this.playerId, state.currentTurn, partyId, cityId, this.nextId(state)); }
   endTurn(state) { return endTurn(this.playerId, state.currentTurn, this.nextId(state)); }
 }

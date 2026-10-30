@@ -44,6 +44,12 @@ export function createAiReinforcementGameState(seed = 117) {
   return state;
 }
 
+export function createAiConquestGameState(seed = 117) {
+  const state = createAiReinforcementGameState(seed);
+  state.scenarioId = 'ai-conquest'; state.scenarioObjective.type = 'control-cities';
+  return state;
+}
+
 function createDuel(seed, ranged) {
   const state = createInitialGameState(seed);
   state.scenarioId = ranged ? 'ranged-duel' : 'duel';

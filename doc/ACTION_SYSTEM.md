@@ -16,6 +16,8 @@ Partyの移動力は固定2・攻撃回数1です。攻撃後は命中・失敗�
 
 2026-10-30: ReinforceParty／MergeParties／SplitPartyを追加しました。関係部隊の移動・攻撃・反応を終了し、HP・容量・所属と配置を維持します。隣接・地形費・5体上限・護衛の扱いなど暫定規則は[部隊再編](PARTY_MANAGEMENT.md)を参照してください。
 
+2026-10-30: 都市争奪戦でCaptureCityと全都市支配のScenario Objectiveを追加しました。都市HP・城壁・降伏は未実装で、Domination全体の完成ではありません。[現行の占領規則](CITY_CONQUEST.md)を参照してください。
+
 ## 1. 基本方針
 
 Kingdomの行動システムはCivilization VIの方式に準拠します。

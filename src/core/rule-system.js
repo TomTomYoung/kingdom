@@ -13,6 +13,7 @@ import { validateGuardOrder } from '../systems/damage-grid.js';
 import { resolvePartyAttack } from '../systems/combat-system.js';
 import { resolveScenario } from '../systems/scenario-system.js';
 import { resolveReinforceParty, resolveMergeParties, resolveSplitParty } from '../systems/party-reorganization.js';
+import { resolveCaptureCity } from '../systems/city-capture.js';
 import { resolveFoundCity } from '../systems/founding-system.js';
 
 const fail = (reason) => ({ ok: false, reason });
@@ -35,7 +36,7 @@ export class RuleSystem {
     const state = cloneGameState(original); const events = [];
     const reject = (reason) => ({ ok: false, reason, state: original, events: [] });
     const city = command.payload?.cityId ? cityFor(state, command) : null;
-    if (command.payload?.cityId && !city) return reject('この都市を操作できません');
+    if (command.payload?.cityId && !city && command.type !== COMMAND_TYPES.CAPTURE_CITY) return reject('この都市を操作できません');
 
     if (command.type === COMMAND_TYPES.START_TURN) {
       if (state.lastProcessedTurn === state.currentTurn) return reject('このターンは開始処理済みです');
@@ -83,6 +84,9 @@ export class RuleSystem {
         : command.type === COMMAND_TYPES.MERGE_PARTIES ? resolveMergeParties(state, command.playerId, p.sourcePartyId, p.targetPartyId, events)
         : resolveSplitParty(state, command.playerId, p.partyId, p.unitIds, p.location, events);
       if (!result.ok) return reject(result.reason);
+    } else if (command.type === COMMAND_TYPES.CAPTURE_CITY) {
+      const captured = resolveCaptureCity(state, command.playerId, command.payload.partyId, command.payload.cityId, events);
+      if (!captured.ok) return reject(captured.reason);
     } else if (command.type === COMMAND_TYPES.FOUND_CITY) {
       const founded = resolveFoundCity(state, command.playerId, command.payload.partyId, command.payload.settlerUnitId, events);
       if (!founded.ok) return reject(founded.reason);

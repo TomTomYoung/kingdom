@@ -8,7 +8,7 @@
 
 開拓者の生産・購入、都市建設、護衛の維持、新都市選択と保存互換を利用できます。都市別の領土・市民作業・文化／Gold取得、二都市運営と都市切替・産出内訳も利用できます。弓兵・弩砲と7攻撃、敗北非占有、旧37セル保存を維持します。戦術AIと部隊撃破・40ターン期限の遭遇戦勝敗を追加しました。増援戦のAIは兵の生産・購入・編成も行います。都市拡張・建物の戦略AI、Domination、Dungeonは未実装です。
 
-まず[現行実装](CURRENT_IMPLEMENTATION.md)、[課題](STATUS.md)、[次作業](HANDOFF.md)を確認してください。操作は[戦闘操作](COMBAT_OPERATIONS.md)と[地図操作](MAP_OPERATIONS.md)、定義・配分・保存互換は[遠隔仕様](RANGED_COMBAT.md)にあります。都市操作・所属・保存移行は[CITY_MANAGEMENT.md](CITY_MANAGEMENT.md)、[AIと遭遇戦](AI_SCENARIOS.md)も参照してください。[部隊再編](PARTY_MANAGEMENT.md)の補充・合流・分割とAIの補充・合流判断も実装済みです。次の優先事項は都市占領と都市存続を基準にした別シナリオです。
+まず[現行実装](CURRENT_IMPLEMENTATION.md)、[課題](STATUS.md)、[次作業](HANDOFF.md)を確認してください。操作は[戦闘操作](COMBAT_OPERATIONS.md)と[地図操作](MAP_OPERATIONS.md)、定義・配分・保存互換は[遠隔仕様](RANGED_COMBAT.md)にあります。都市操作・所属・保存移行は[CITY_MANAGEMENT.md](CITY_MANAGEMENT.md)、[AIと遭遇戦](AI_SCENARIOS.md)も参照してください。[部隊再編](PARTY_MANAGEMENT.md)の補充・合流・分割とAIの補充・合流判断も実装済みです。[都市占領と都市争奪戦](CITY_CONQUEST.md)も追加しました。次の優先事項は都市防衛・攻城です。
 
 起動は `npm run dev`、検証は `npm test`、`npm run check`、`npm run check:assets`。Canvas 2D／DOM・ES Modules・Node標準テストを使い、Phaser／Vite／Vitestは使いません。プレイヤー向け名称・費用・操作は[Kingdom Wiki](../wiki/README.md)で確認できます。
 
@@ -39,6 +39,8 @@
 
 20. [AI_SCENARIOS.md](AI_SCENARIOS.md): 戦術AI・増援AI・勝敗と保存
 21. [PARTY_MANAGEMENT.md](PARTY_MANAGEMENT.md): 補充・合流・分割のCommand・行動終了・参照修復
+
+22. [CITY_CONQUEST.md](CITY_CONQUEST.md): 都市占領・所有権移管・都市支配目標・都市0の敗者
 
 ## 確定した目標方針（実装完了を意味しません）
 

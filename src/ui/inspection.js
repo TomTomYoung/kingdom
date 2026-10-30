@@ -49,12 +49,12 @@ export class InspectionView {
         this.tileRoot.append(move);
         this.tileRoot.append(node('p', route ? `${route.path.length}セルの経路。現在のターン内に移動します。` : tile.key === party.location ? 'この部隊の現在位置です。' : tile.terrainId === 'void' ? '虚無には進入できません。' : occupants.length ? '他の部隊が占有しています。' : 'このターンの移動範囲外です。ターン終了で移動力が回復します。', 'hint'));
       }
-      const selectedCity = state.cities[cityId] ?? state.cities[state.kingdoms[playerId].cityIds[0]], cost = tilePurchaseCost(state, selectedCity, tile);
+      const selectedCity = state.cities[cityId] ?? state.cities[state.kingdoms[playerId].cityIds[0]], cost = selectedCity ? tilePurchaseCost(state, selectedCity, tile) : Infinity;
       const candidate = getTerritoryCandidates(state, selectedCity).some((t) => t.key === tile.key);
       const affordable = state.kingdoms[playerId].stockpiles.gold >= cost;
       const purchase = button(tile.ownerId ? '所有済み' : candidate ? `このセルを購入 · Gold ${cost}` : '購入できないセル', () => this.callbacks.onPurchase(tile.key)); purchase.id = 'purchase-tile';
       purchase.disabled = !candidate || !affordable || (state.activePlayerId !== playerId || state.phase !== 'PLAYER_ACTION' || state.kingdoms[playerId].controllerType === 'ai'); this.tileRoot.append(purchase);
-      this.tileRoot.append(node('p', `領土購入先: ${selectedCity.name}。この都市の領土に隣接する未所有セルを取得できます。`, 'hint'));
+      this.tileRoot.append(node('p', selectedCity ? `領土購入先: ${selectedCity.name}。この都市の領土に隣接する未所有セルを取得できます。` : '所有都市がないため領土を購入できません。', 'hint'));
       if (candidate && !affordable) this.tileRoot.append(node('p', `購入にはGold ${cost}が必要です。`, 'hint'));
       this.tileRoot.append(node('h3', `駐留部隊 ${occupants.length} · Unit記録 ${units.length}`));
       for (const p of parties) {

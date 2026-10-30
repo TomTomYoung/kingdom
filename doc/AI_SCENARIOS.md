@@ -42,7 +42,15 @@ UIは約180msごとに1命令を適用します。人の表示国・都市・選
 
 成功Command後に判定するため、近接反撃による攻撃側の敗北も結果へ反映します。終了時は`phase = 'GAME_OVER'`とし、`gameResult`へoutcome（victory/draw）、winnerId（勝者またはnull）、reason（elimination/turn-limit）、turnを保持し、ScenarioFinishedを1回記録します。終了後の全Commandは元state・空eventsで拒否します。画面は勝利・敗北・引き分けを表示し、閲覧・保存・復元・新規開始を許可します。
 
-これは全敵部隊撃破のScenario Objectiveです。都市占領・首都喪失・降伏によるDomination、Dungeon Conquest、Scoreは実装していません。
+これは全敵部隊撃破のScenario Objectiveです。別モードの都市争奪戦には都市占領・全都市支配を追加しました。首都喪失・降伏によるDomination全体、Dungeon Conquest、Scoreは実装していません。
+
+## 都市争奪戦
+
+「AIとの都市争奪戦」は増援戦と同じ配置・予算規則で、目標をcontrol-citiesにします。全都市を支配すると勝利、全都市を失うと敗北し、軍隊を失っても都市から再建できます。期限は40ターンです。王国・部隊・待機Unitの記録を削除せず、都市0の敗者も保存・表示できます。
+
+AIはCaptureCityを最初に選び、その後は補充・都市出口・編成・即時攻撃・合流を判断します。接近は空いた敵都市への地形費付き経路を優先し、経路がなければ敵部隊を目指します。経路があっても残り移動力で次セルへ入れない場合はその場で待ちます。都市中心に入るだけでは占領せず、共通Commandで攻撃回数を使い、所有権移管と勝敗を確定します。最後に生産設定・購入・手番終了を行います。
+
+従来モードの目標とAI判断は変えません。人口・生産・領土・収入・待機Unitの扱い、保存条件、ブラウザ検証は[CITY_CONQUEST.md](CITY_CONQUEST.md)を参照してください。
 
 ## 保存互換と検証
 

@@ -252,7 +252,7 @@ export function migrateAndValidateSave(state) {
       fields(kingdom.derived, ['militaryPower', 'governanceCapacity', 'governanceLoad'], `kingdoms.${kingdom.id}.derived`);
     }
   }
-  if (state.scenarioId === 'ai-reinforcements') check(Object.values(state.kingdoms).some(kingdom => kingdom.controllerType === 'ai' && kingdom.aiPolicy === 'reinforcements'), 'scenario.aiPolicy');
+  if (['ai-reinforcements', 'ai-conquest'].includes(state.scenarioId)) check(Object.values(state.kingdoms).some(kingdom => kingdom.controllerType === 'ai' && kingdom.aiPolicy === 'reinforcements'), 'scenario.aiPolicy');
   validateScenarioSave(state);
   return state;
 }
