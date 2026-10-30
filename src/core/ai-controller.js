@@ -1,8 +1,9 @@
+import { validateCityBombardment } from '../systems/city-bombardment.js';
 import { previewPartyRest, validateRemoveCasualties } from '../systems/party-care.js';
 import { RULESET } from './ruleset.js';
 import { hasCityRetaliation, hasCityDefense, isCityDefended, cityEntryError } from '../models/city-defense.js';
 import { previewCityAttack, validateCityAttack } from '../systems/city-siege.js';
-import { restParty, removeCasualties, attackCity, captureCity, attackParty, moveParty, endTurn } from './commands.js';
+import { bombardParty, restParty, removeCasualties, attackCity, captureCity, attackParty, moveParty, endTurn } from './commands.js';
 import { chooseCityExitCommand, chooseDeploymentCommand, chooseSupplyCommand, chooseReinforcementCommand, chooseMergeCommand } from './ai-economy.js';
 import { RuleSystem } from './rule-system.js';
 import { validatePartyAttack } from '../systems/combat-system.js';
@@ -70,6 +71,14 @@ export class AIController {
     const enemyCities = conquest ? ordered(state.cities).filter(city => city.ownerId !== this.playerId) : [];
     if (conquest) for (const party of ordered(state.parties)) for (const city of enemyCities) {
       if (validateCaptureCity(state, this.playerId, party.id, city.id).ok) return captureCity(this.playerId, state.currentTurn, party.id, city.id, id);
+    }
+    // Capture remains first. City fire spends no garrison action and reads no RNG.
+    for (const city of ordered(state.cities).filter(c => c.ownerId === this.playerId)) {
+      const target = ordered(state.parties).filter(p => validateCityBombardment(state, this.playerId, city.id, p.id).ok)
+        .sort((a, b) => Number(!!participatingUnits(state, b).length) - Number(!!participatingUnits(state, a).length)
+          || Hex.fromKey(a.location).distance(Hex.fromKey(city.centerHex)) - Hex.fromKey(b.location).distance(Hex.fromKey(city.centerHex))
+          || a.id.localeCompare(b.id))[0];
+      if (target) return bombardParty(this.playerId, state.currentTurn, city.id, target.id, id);
     }
     for (const party of ordered(state.parties).filter(p => p.ownerId === this.playerId)) {
       if (validateRemoveCasualties(state, this.playerId, party.id).ok) return removeCasualties(this.playerId, state.currentTurn, party.id, id);

@@ -75,3 +75,7 @@ KINGDOM_QA_MODULES=/path/to/node_modules node tools/qa/browser-ai.mjs /tmp/kingd
 ## 新規対局の休養・戦闘不能者の離脱
 
 partyRecoveryVersion 1では都市占領の次に、自軍PartyをID順で確認します。各Partyで合法なRemoveCasualties、次に生存UnitのいずれかがHP50%以下なら合法なRestPartyを選びます。両方とも一手番を使い、回復場所を求めた撤退は行いません。UIの行動一覧、同じCommandでの拒否・保存再開に対応します。版なし旧保存のAIには追加しません。[規則と互換](PARTY_RECOVERY.md)。
+
+## 版3の都市砲撃
+
+新規cityDefenseVersion 3では合法な占領の直後に、自都市の砲撃を共通BombardPartyで実行します。軍事Unitを含む部隊、近距離、ID順で射程内の敵を選びます。都市ごとに全体ターン1回で、駐屯軍の行動や自動反撃回数は使いません。旧版2・1・版なしのAI判断は維持します。[現行規則](CITY_BOMBARDMENT.md)。

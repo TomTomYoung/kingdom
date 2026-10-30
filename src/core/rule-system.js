@@ -1,3 +1,4 @@
+import { resolveCityBombardment } from '../systems/city-bombardment.js';
 import { resolvePartyRest, resolveRemoveCasualties, cancelPartyRest, partyCareSafetyError } from '../systems/party-care.js';
 import { hasCityDefense, cityEntryError } from '../models/city-defense.js';
 import { resolveCityAttack } from '../systems/city-siege.js';
@@ -93,6 +94,9 @@ export class RuleSystem {
     } else if ([COMMAND_TYPES.REST_PARTY, COMMAND_TYPES.REMOVE_CASUALTIES].includes(command.type)) {
       const resolver = command.type === COMMAND_TYPES.REST_PARTY ? resolvePartyRest : resolveRemoveCasualties;
       const result = resolver(state, command.playerId, command.payload.partyId, events);
+      if (!result.ok) return reject(result.reason);
+    } else if (command.type === COMMAND_TYPES.BOMBARD_PARTY) {
+      const p = command.payload, result = resolveCityBombardment(state, command.playerId, p.cityId, p.defenderPartyId, events);
       if (!result.ok) return reject(result.reason);
     } else if (command.type === COMMAND_TYPES.ATTACK_CITY) {
       const p = command.payload, result = resolveCityAttack(state, command.playerId, p.partyId, p.cityId, p.attackType, events);

@@ -41,7 +41,7 @@ try {
   const select = async (selector, value) => page.locator(selector).evaluate((el, value) => { el.value = value; el.dispatchEvent(new Event('change', { bubbles: true })); }, value);
   const target = async () => { await click('[data-select-party="party-1"]'); await select('#siege-city', 'city-2'); };
   const relocate = (s, id, location) => { const p = s.parties[id]; p.location = location; p.unitIds.forEach(id => { s.units[id].location = location; }); s.world.tiles[location].terrainId = 'plains'; };
-  await select('#game-mode', 'ai-conquest'); await click('#reset'); const legacySiege = await save(); legacySiege.cityDefenseVersion = 1; Object.values(legacySiege.cities).forEach(city => { delete city.defense.counterattacksRemaining; }); await load(legacySiege); const initial = await save();
+  await select('#game-mode', 'ai-conquest'); await click('#reset'); const legacySiege = await save(); legacySiege.cityDefenseVersion = 1; Object.values(legacySiege.cities).forEach(city => { delete city.defense.counterattacksRemaining; delete city.defense.bombardmentsRemaining; }); await load(legacySiege); const initial = await save();
   assert.equal(initial.cityDefenseVersion, 1); assert.equal(initial.cities['city-1'].defense.hp, 100);
   assert.match(await page.locator('#city-defense').innerText(), /都市耐久 100\/100/); assert.equal(await page.locator('#siege-panel').isVisible(), true);
   checks.push('version-1 conquest preserves durability, siege controls and city-defense rules');

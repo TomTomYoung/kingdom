@@ -1,0 +1,22 @@
+{
+  "verifiedAt": "2026-10-30T06:38:04.351999+00:00",
+  "browserWorkflowRunId": "41014553493",
+  "testedSourceRevision": "832140142317fa385500287d50d659c406ac66b9",
+  "nodeTests": 297,
+  "syntaxFiles": 102,
+  "relativeMarkdownLinks": 939,
+  "targetSpecificationBodyUnchanged": true,
+  "visualReview": {
+    "viewports": [
+      1440,
+      390
+    ],
+    "files": [
+      "city-bombardment/bombardment-wide.png",
+      "city-bombardment/bombardment-panel.png",
+      "city-bombardment/bombardment-mobile.png"
+    ],
+    "reviewed": true,
+    "observations": "Target selection, damage forecast, attack button and rules are readable; no horizontal overflow."
+  }
+}
