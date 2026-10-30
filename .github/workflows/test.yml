@@ -2,8 +2,11 @@ name: Kingdom tests
 on:
   pull_request:
   push:
-    branches: [main, 'codex/production-queue-ui-20261030']
+    branches: [main]
   workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
@@ -16,7 +19,7 @@ jobs:
         with:
           node-version: '22'
       - name: Syntax checks
-        run: find src tests tools -type f \( -name '*.js' -o -name '*.mjs' \) -print0 | xargs -0 -n1 node --check
+        run: npm run check
       - name: Node regression tests
         run: node --test tests/*.test.js
       - name: Package reproducible test source
