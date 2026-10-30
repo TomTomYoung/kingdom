@@ -7,103 +7,69 @@ permissions:
 defaults:
   run:
     shell: bash
-concurrency:
-  group: kingdom-city-bombardment-integration
-  cancel-in-progress: false
 jobs:
-  verify:
+  finalize:
     if: github.ref == 'refs/heads/codex/city-bombardment-20261030'
     permissions:
       contents: write
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
         with:
-          ref: b1368044c0a14f5989a0634b42919d5ad4b39b88
-          path: .qa-baseline
-          persist-credentials: false
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Correct the browser fixture without relaxing game validation
+      - name: Preserve the tested implementation and rerun regressions
         run: |
-          mkdir -p "$RUNNER_TEMP/kingdom-reports"
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('tools/qa/browser-city-bombardment.mjs'); s=p.read_text()
-          s=s.replace("const load = async value => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); };", "const load = async (value, valid = true) => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); if (valid) assert.match(await page.locator('#message').innerText(), /セーブをロードしました/); };")
-          s=s.replace("const base = structuredClone(initial); base.kingdoms", "const base = structuredClone(initial); base.scenarioId = 'city-bombardment-qa'; base.kingdoms")
-          s=s.replace('await load(invalid);', 'await load(invalid, false);')
-          s=s.replace("const ai = structuredClone(armed); ai.kingdoms", "const ai = structuredClone(armed); ai.scenarioId = 'ai-conquest'; ai.kingdoms")
-          p.write_text(s)
-          p=Path('tools/qa/browser-city-defense.mjs'); s=p.read_text().replace('new conquest explains one city counter per round and enables defense version 2','new conquest explains one city counter per round alongside version-3 bombardment'); p.write_text(s)
-          PY
-      - name: Syntax, Node regressions and historical save continuation
-        run: |
-          npm run check | tee "$RUNNER_TEMP/kingdom-reports/syntax.log"
-          npm test | tee "$RUNNER_TEMP/kingdom-reports/node.log"
-          node tools/qa/save-city-bombardment-compat.mjs .qa-baseline assets/qa/save-city-bombardment-compat-2026-10-30.json | tee "$RUNNER_TEMP/kingdom-reports/compat.log"
-      - name: Commit verified fixture corrections
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add tools/qa/browser-city-bombardment.mjs tools/qa/browser-city-defense.mjs assets/qa/save-city-bombardment-compat-2026-10-30.json
-          if ! git diff --cached --quiet; then
-            git commit -m 'test: validate city bombardment fixtures before browser operations'
-            git push origin HEAD:refs/heads/codex/city-bombardment-20261030
-          fi
-          echo "KINGDOM_TESTED_REVISION=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
-      - name: Install isolated browser QA runtime
-        run: |
-          mkdir -p "$RUNNER_TEMP/kingdom-qa"
-          printf '{"private":true}\n' > "$RUNNER_TEMP/kingdom-qa/package.json"
-          npm install --prefix "$RUNNER_TEMP/kingdom-qa" --no-save --package-lock=false playwright@1.56.1
-          "$RUNNER_TEMP/kingdom-qa/node_modules/.bin/playwright" install --with-deps chromium
-          echo "KINGDOM_QA_MODULES=$RUNNER_TEMP/kingdom-qa" >> "$GITHUB_ENV"
-      - name: Verify bombardment and all existing browser regressions
-        run: |
-          for suite in city-bombardment production-queue party-care city-defense siege conquest ai cities ranged founding reorganization; do
-            node "tools/qa/browser-$suite.mjs" "$RUNNER_TEMP/kingdom-reports/$suite" 2>&1 | tee "$RUNNER_TEMP/kingdom-reports/$suite.log"
-            report="$RUNNER_TEMP/kingdom-reports/$suite/report.json"
-            if [ ! -f "$report" ]; then cp "$RUNNER_TEMP/kingdom-reports/$suite/results.json" "$report"; fi
-            cp "$report" "assets/qa/browser-city-bombardment-$suite-2026-10-30.json"
-          done
-      - name: Record actual verification results
+          git diff --exit-code 832140142317fa385500287d50d659c406ac66b9 -- src index.html tests tools/qa
+          npm run check
+          npm test
+      - name: Finalize documentation and source links
         run: |
           python3 - <<'PY'
-          import json, os, re
+          import json, re
           from pathlib import Path
           from datetime import datetime, timezone
-          root = Path(os.environ['RUNNER_TEMP'])/'kingdom-reports'
-          suites = ['city-bombardment','production-queue','party-care','city-defense','siege','conquest','ai','cities','ranged','founding','reorganization']
-          reports = {s:json.loads((root/s/'report.json').read_text()) for s in suites}
-          for report in reports.values():
-              for field in ['error','pageErrors','httpFailures','errors','failures']: assert not report.get(field), report
-              assert isinstance(report['checks'],list) and report['checks'], report
-          counts = {s:len(r['checks']) for s,r in reports.items()}
-          node = (root/'node.log').read_text()
-          tests = int(re.search(r'# tests (\d+)',node)[1]); passed = int(re.search(r'# pass (\d+)',node)[1]); failed = int(re.search(r'# fail (\d+)',node)[1])
-          assert tests == passed and failed == 0
-          syntax = int(re.search(r'Syntax checked (\d+) JavaScript files',(root/'syntax.log').read_text())[1])
-          compat = json.loads(Path('assets/qa/save-city-bombardment-compat-2026-10-30.json').read_text())
-          result = {'verifiedAt':datetime.now(timezone.utc).isoformat(),'baselineRevision':'b1368044c0a14f5989a0634b42919d5ad4b39b88','workflowRunId':os.environ['GITHUB_RUN_ID'],'testedRevision':os.environ['KINGDOM_TESTED_REVISION'],'browser':reports['city-bombardment']['browser'],'nodeTests':tests,'syntaxFiles':syntax,'saveSnapshots':compat['snapshots'],'continuationCommands':compat['continuationCommands'],'browserCheckGroups':sum(counts.values()),'suites':counts,'pageErrors':[],'httpFailures':[]}
-          Path('assets/qa/city-bombardment-summary-2026-10-30.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
-          p=Path('doc/CITY_BOMBARDMENT.md'); text=p.read_text(); text=text.replace('実ブラウザ検証は未完了です。結果を確認してからこの段落を更新します。',f"Chromium {result['browser']}で全{result['browserCheckGroups']}チェック群が成功しました。新規砲撃{counts['city-bombardment']}群と既存の生産キュー・休養・都市反撃・攻城・占領・AI・都市・遠隔・開拓・再編を含み、画面例外・HTTP失敗は0です。[検証概要](../assets/qa/city-bombardment-summary-2026-10-30.json)・[旧保存検証](../assets/qa/save-city-bombardment-compat-2026-10-30.json)。1440px／390pxの画面画像をActionsの検証成果物に保存しました。画像の目視確認は別途記録します。"); p.write_text(text)
-          print(json.dumps(result,ensure_ascii=False,indent=2))
+          from urllib.parse import unquote
+          result = json.loads(Path('assets/qa/city-bombardment-summary-2026-10-30.json').read_text())
+          assert result['workflowRunId'] == '41014553493'
+          assert result['nodeTests'] == 297 and result['syntaxFiles'] == 102
+          assert result['saveSnapshots'] == 164 and result['continuationCommands'] == 656
+          assert result['browserCheckGroups'] == 115 and result['suites']['city-bombardment'] == 11
+          assert result['pageErrors'] == [] and result['httpFailures'] == []
+          p = Path('doc/STATUS.md'); text = p.read_text()
+          old = '実ブラウザ検証は未完了です。'
+          assert text.count(old) == 1
+          text = text.replace(old, 'Chromium 141.0.7390.37で砲撃11群を含む全115チェック群が成功し、画面例外・HTTP失敗は0です。1440px／390pxの砲撃パネル・損害予測・ボタンを目視確認しました。[検証概要](../assets/qa/city-bombardment-summary-2026-10-30.json)。')
+          p.write_text(text)
+          p = Path('doc/CITY_BOMBARDMENT.md'); text = p.read_text()
+          old = '画像の目視確認は別途記録します。'
+          assert text.count(old) == 1
+          text = text.replace(old, '1440px／390pxの画面画像を目視し、砲撃対象・損害予測・実行ボタン・説明が読み取れることと横はみ出しがないことを確認しました。ソースは実ブラウザ検証時から変更していません。')
+          p.write_text(text)
+          count = 0
+          for folder in ['doc','wiki']:
+              for source in Path(folder).rglob('*.md'):
+                  for target in re.findall(r'\]\(([^)]+)\)', source.read_text()):
+                      if target.startswith(('#','https:','http:','mailto:','data:')): continue
+                      path = unquote(target.split('#')[0])
+                      if not path: continue
+                      assert (source.parent/path).exists(), (str(source), target)
+                      count += 1
+          baseline = Path('doc/SPECIFICATION.md').read_text().split('\n## 1.',1)[-1]
+          import subprocess
+          before = subprocess.check_output(['git','show','b1368044c0a14f5989a0634b42919d5ad4b39b88:doc/SPECIFICATION.md']).decode().split('\n## 1.',1)[-1]
+          assert baseline == before
+          review = {'verifiedAt':datetime.now(timezone.utc).isoformat(),'browserWorkflowRunId':'41014553493','testedSourceRevision':result['testedRevision'],'nodeTests':297,'syntaxFiles':102,'relativeMarkdownLinks':count,'targetSpecificationBodyUnchanged':True,'visualReview':{'viewports':[1440,390],'files':['city-bombardment/bombardment-wide.png','city-bombardment/bombardment-panel.png','city-bombardment/bombardment-mobile.png'],'reviewed':True,'observations':'Target selection, damage forecast, attack button and rules are readable; no horizontal overflow.'}}
+          Path('assets/qa/city-bombardment-final-review-2026-10-30.json').write_text(json.dumps(review,ensure_ascii=False,indent=2)+'\n')
+          print(json.dumps(review,ensure_ascii=False,indent=2))
           PY
-          git add assets/qa/browser-city-bombardment-*-2026-10-30.json assets/qa/city-bombardment-summary-2026-10-30.json doc/CITY_BOMBARDMENT.md
-          git commit -m 'test: record city bombardment browser and save compatibility checks'
+          git diff --check
+          git rm .github/bombardment-transfer/part-01.xz .github/bombardment-transfer/part-02.xz .github/bombardment-transfer/part-03.xz
+          git add doc/STATUS.md doc/CITY_BOMBARDMENT.md assets/qa/city-bombardment-final-review-2026-10-30.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'docs: finalize city bombardment QA and remove transfer payloads'
           git push origin HEAD:refs/heads/codex/city-bombardment-20261030
-      - name: Package exact tested source
-        if: always()
-        run: |
-          mkdir -p "$RUNNER_TEMP/kingdom-reports"
-          git archive --format=tar.gz -o "$RUNNER_TEMP/kingdom-reports/kingdom-tested-source.tar.gz" HEAD
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: kingdom-city-bombardment-verification
-          path: ${{ runner.temp }}/kingdom-reports
-          retention-days: 7
