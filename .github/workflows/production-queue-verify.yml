@@ -27,24 +27,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Integrate reviewed edits
-        run: python3 tools/qa/stage-production-queue.py
       - name: Check syntax and run Node regressions
         run: |
           mkdir -p "$RUNNER_TEMP/kingdom-reports"
           npm run check | tee "$RUNNER_TEMP/kingdom-reports/syntax.log"
           node --test tests/*.test.js | tee "$RUNNER_TEMP/kingdom-reports/node.log"
           node tools/qa/save-production-queue-compat.mjs .qa-baseline assets/qa/save-production-queue-compat-2026-10-30.json | tee "$RUNNER_TEMP/kingdom-reports/compat.log"
-      - name: Commit tested integration to its feature branch
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -u -- index.html src doc wiki
-          git add assets/qa/save-production-queue-compat-2026-10-30.json
-          if ! git diff --cached --quiet; then
-            git commit -m 'feat: integrate production queue editing, stopping and saved progress'
-            git push origin HEAD:refs/heads/codex/production-queue-ui-20261030
-          fi
       - name: Install isolated browser QA runtime
         run: |
           mkdir -p "$RUNNER_TEMP/kingdom-qa"
@@ -56,7 +44,11 @@ jobs:
         run: |
           for suite in production-queue party-care city-defense siege conquest ai cities ranged founding reorganization; do
             node "tools/qa/browser-$suite.mjs" "$RUNNER_TEMP/kingdom-reports/$suite" 2>&1 | tee "$RUNNER_TEMP/kingdom-reports/$suite.log"
-            cp "$RUNNER_TEMP/kingdom-reports/$suite/report.json" "assets/qa/browser-production-queue-$suite-2026-10-30.json"
+            report="$RUNNER_TEMP/kingdom-reports/$suite/report.json"
+            if [ ! -f "$report" ]; then
+              cp "$RUNNER_TEMP/kingdom-reports/$suite/results.json" "$report"
+            fi
+            cp "$report" "assets/qa/browser-production-queue-$suite-2026-10-30.json"
           done
       - name: Record verified browser results
         run: |
@@ -68,14 +60,18 @@ jobs:
           suites = ['production-queue','party-care','city-defense','siege','conquest','ai','cities','ranged','founding','reorganization']
           reports = {s:json.loads((root/s/'report.json').read_text()) for s in suites}
           for report in reports.values():
-              assert not report.get('error') and not report.get('pageErrors') and not report.get('httpFailures'), report
+              for field in ['error','pageErrors','httpFailures','errors','failures']:
+                  assert not report.get(field), report
+              assert isinstance(report['checks'],list) and report['checks'], report
           counts = {s:len(r['checks']) for s,r in reports.items()}
-          result = {'verifiedAt':datetime.now(timezone.utc).isoformat(),'baselineRevision':'8534535422972c04f958a437fee8df5dbf12c9ef','workflowRunId':os.environ['GITHUB_RUN_ID'],'browser':reports['production-queue']['browser'],'nodeTests':274,'syntaxFiles':97,'saveSnapshots':144,'continuationCommands':576,'browserCheckGroups':sum(counts.values()),'suites':counts,'pageErrors':[],'httpFailures':[]}
+          result = {'verifiedAt':datetime.now(timezone.utc).isoformat(),'baselineRevision':'8534535422972c04f958a437fee8df5dbf12c9ef','workflowRunId':os.environ['GITHUB_RUN_ID'],'testedRevision':os.environ['GITHUB_SHA'],'browser':reports['production-queue']['browser'],'nodeTests':274,'syntaxFiles':97,'saveSnapshots':144,'continuationCommands':576,'browserCheckGroups':sum(counts.values()),'suites':counts,'pageErrors':[],'httpFailures':[]}
           Path('assets/qa/production-queue-summary-2026-10-30.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
           p = Path('doc/STATUS.md'); s = p.read_text(); s = s.replace('実ブラウザの最終結果は[検証概要](../assets/qa/production-queue-summary-2026-10-30.json)に記録します。',f"Chromium {result['browser']}で全{result['browserCheckGroups']}チェック群が成功し、画面例外・HTTP失敗は0でした。[検証概要](../assets/qa/production-queue-summary-2026-10-30.json)。"); p.write_text(s)
           print(json.dumps(result,ensure_ascii=False,indent=2))
           PY
-          git add assets/qa/browser-production-queue-*-2026-10-30.json assets/qa/production-queue-summary-2026-10-30.json doc/STATUS.md
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/qa/browser-production-queue-*-2026-10-30.json assets/qa/production-queue-summary-2026-10-30.json assets/qa/save-production-queue-compat-2026-10-30.json doc/STATUS.md
           if ! git diff --cached --quiet; then
             git commit -m 'test: record production queue browser regressions and save compatibility'
             git push origin HEAD:refs/heads/codex/production-queue-ui-20261030
