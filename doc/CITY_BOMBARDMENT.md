@@ -34,6 +34,6 @@ AIは合法な都市占領を最優先した後、自都市ID順で砲撃可能�
 
 Node標準297テスト（新規23件）とJavaScript 102ファイルの構文検査が成功しました。旧mainの実ソースから164保存を生成し、全stateとJSONの一致、656継続Commandの結果一致を確認しました。新規テストでは射程、原子的な拒否、Guard・Intercept、Taunt、指揮継承、休養中止、反撃との独立、都市追加・建設・占領、壁修復、破損保存、予測、AI判断、4seedのAI対局完走を確認しています。
 
-実ブラウザ検証は未完了です。結果を確認してからこの段落を更新します。
+Chromium 141.0.7390.37で全115チェック群が成功しました。新規砲撃11群と既存の生産キュー・休養・都市反撃・攻城・占領・AI・都市・遠隔・開拓・再編を含み、画面例外・HTTP失敗は0です。[検証概要](../assets/qa/city-bombardment-summary-2026-10-30.json)・[旧保存検証](../assets/qa/save-city-bombardment-compat-2026-10-30.json)。1440px／390pxの画面画像をActionsの検証成果物に保存しました。画像の目視確認は別途記録します。
 
 実装は[src/systems/city-bombardment.js](../src/systems/city-bombardment.js)、[UI](../src/ui/city-bombardment.js)、[テスト](../tests/city-bombardment.test.js)、[ブラウザQA](../tools/qa/browser-city-bombardment.mjs)、[旧保存QA](../tools/qa/save-city-bombardment-compat.mjs)です。保存の全歴史的中間版や任意状態を網羅した保証ではありません。
