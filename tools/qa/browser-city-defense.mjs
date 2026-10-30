@@ -44,7 +44,7 @@ try {
   await select('#game-mode', 'ai-conquest'); await click('#reset'); const initial = await save();
   assert.equal(initial.cityDefenseVersion, 3); assert.equal(initial.cities['city-1'].defense.counterattacksRemaining, 1);
   assert.match(await page.locator('#city-defense').innerText(), /反撃 1\/1/); assert.match(await page.locator('#scenario-detail').innerText(), /全体ターン1回反撃/);
-  checks.push('new conquest explains one city counter per round and enables defense version 2');
+  checks.push('new conquest explains one city counter per round alongside version-3 bombardment');
 
   const base = structuredClone(initial); relocate(base, 'party-1', '3,-3,0'); relocate(base, 'party-2', '-6,6,0');
   await load(base); await target(); assert.match(await page.locator('#siege-counter-preview').innerText(), /都市反撃: あり/); assert.match(await page.locator('#siege-counter-preview').innerText(), /unit-2.*肩代わり/); assert.deepEqual(await save(), base);

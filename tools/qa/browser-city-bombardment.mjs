@@ -37,7 +37,7 @@ try {
   await page.clock.install(); await page.clock.pauseAt(new Date());
   const click = selector => page.locator(selector).evaluate(element => element.click());
   const save = async () => { await click('#save'); return page.evaluate(() => JSON.parse(localStorage.getItem('kingdom-m1-save'))); };
-  const load = async value => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); };
+  const load = async (value, valid = true) => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); if (valid) assert.match(await page.locator('#message').innerText(), /セーブをロードしました/); };
   const select = async (selector, value) => page.locator(selector).evaluate((el, value) => { el.value = value; el.dispatchEvent(new Event('change', { bubbles: true })); }, value);
   const relocate = (value, id, location) => { const p = value.parties[id]; p.location = location; p.unitIds.forEach(id => { value.units[id].location = location; }); value.world.tiles[location].terrainId = 'plains'; };
   const target = () => select('#bombard-target', 'party-2');
@@ -45,7 +45,7 @@ try {
   await select('#game-mode', 'ai-conquest'); await click('#reset'); const initial = await save();
   assert.equal(initial.cityDefenseVersion, 3); assert.equal(initial.cities['city-1'].defense.bombardmentsRemaining, 1);
   assert.match(await page.locator('#bombard-status').innerText(), /城壁/); assert.equal(await page.locator('#bombard-party').isDisabled(), true);
-  const base = structuredClone(initial); base.kingdoms['kingdom-1'].stockpiles.gold = 120; base.kingdoms['kingdom-2'].controllerType = 'human';
+  const base = structuredClone(initial); base.scenarioId = 'city-bombardment-qa'; base.kingdoms['kingdom-1'].stockpiles.gold = 120; base.kingdoms['kingdom-2'].controllerType = 'human';
   relocate(base, 'party-2', '2,-2,0'); await load(base); await click('[data-buy="walls"]'); const armed = await save();
   assert.equal(armed.cities['city-1'].defense.wallHp, 60); await target();
   assert.equal(await page.locator('#bombard-party').isEnabled(), true); assert.match(await page.locator('#bombard-preview').innerText(), /肩代わり/);
@@ -86,7 +86,7 @@ try {
   checks.push('lethal fire retains defeated records, clears unavailable targets and does not invent city-control victory');
 
   const invalid = structuredClone(armed); invalid.cities['city-1'].defense.bombardmentsRemaining = 2;
-  await load(invalid); assert.match(await page.locator('#message').innerText(), /セーブデータが不正/); assert.deepEqual(await save(), defeated);
+  await load(invalid, false); assert.match(await page.locator('#message').innerText(), /セーブデータが不正/); assert.deepEqual(await save(), defeated);
   for (const version of [1, 2]) {
     const legacy = structuredClone(armed); legacy.cityDefenseVersion = version;
     for (const city of Object.values(legacy.cities)) { delete city.defense.bombardmentsRemaining; if (version === 1) delete city.defense.counterattacksRemaining; }
@@ -94,7 +94,7 @@ try {
   }
   checks.push('corrupt charges reject without replacement; v1 and v2 saves retain rules and explain unavailable city fire');
 
-  const ai = structuredClone(armed); ai.kingdoms['kingdom-2'].controllerType = 'ai';
+  const ai = structuredClone(armed); ai.scenarioId = 'ai-conquest'; ai.kingdoms['kingdom-2'].controllerType = 'ai';
   ai.cities['city-2'].buildings.push('walls'); ai.cities['city-2'].defense.wallHp = 60;
   relocate(ai, 'party-1', '3,-3,0'); relocate(ai, 'party-2', '6,-6,0');
   await load(ai); await click('#end-turn'); const aiPending = await save();
