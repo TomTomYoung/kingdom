@@ -1,7 +1,7 @@
 import { hasCityDefense } from '../models/city-defense.js';
 import { Hex } from '../world/hex.js';
 import { RULESET } from '../core/ruleset.js';
-import { occupiesMapTile } from '../models/party.js';
+import { occupiesMapTile, hasPartyRecovery, isActiveUnit } from '../models/party.js';
 import { MapCamera, HEX_SIZE, hexPosition } from './map-camera.js';
 
 function hexPath(ctx, x, y, size) {
@@ -138,7 +138,7 @@ export class MapView {
     }
     this.markers = [];
     const waiting = new Map();
-    for (const unit of Object.values(state.units).filter((u) => !u.partyId)) {
+    for (const unit of Object.values(state.units).filter((u) => !u.partyId && (!hasPartyRecovery(state) || isActiveUnit(u)))) {
       const key = `${unit.location}:${unit.ownerId}`;
       if (!waiting.has(key)) waiting.set(key, []); waiting.get(key).push(unit);
     }

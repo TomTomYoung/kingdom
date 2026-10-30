@@ -1,3 +1,5 @@
+import { PartyCarePanel } from './party-care.js';
+import { isActiveUnit } from '../models/party.js';
 import { createDuelGameState, createRangedDuelGameState, createTwoCityGameState, createSettlementGameState, createAiSkirmishGameState, createAiReinforcementGameState, createAiConquestGameState } from '../core/scenarios.js';
 import { hasCityRetaliation, hasCityDefense, cityDefenseLabel } from '../models/city-defense.js';
 import { SiegePanel } from './siege-panel.js';
@@ -56,6 +58,10 @@ const formationPanel = new FormationPanel($('#formation'), assets, {
   onCancel: () => { void audio.play('se-ui-cancel'); },
 });
 
+const partyCare = new PartyCarePanel($('#party-care'), {
+  onRest: partyId => run(controller.restParty(state, partyId), '休養を開始しました。被害や敵接近がなければ次の全体ターン開始時に回復します。'),
+  onRemove: partyId => { const result = run(controller.removeCasualties(state, partyId), '戦闘不能者が部隊から離脱しました。補充は次の全体ターンから行えます。'); if (result.ok) { reorganization.clear(); formationPanel.clear(); inspection.clear(); selectedUnitId = state.parties[partyId].leaderUnitId; render(); } },
+});
 const reorganization = new ReorganizationPanel($('#party-reorganization'), {
   onReinforce: (partyId, ids) => reorganize(controller.reinforceParty(state, partyId, ids), '待機兵を補充しました。部隊の行動はこのターン終了です。'),
   onMerge: (source, target) => reorganize(controller.mergeParties(state, source, target), '部隊を合流しました。合流先の行動はこのターン終了です。'),
@@ -120,6 +126,7 @@ function scheduleAi() {
 function aiActionMessage(result) {
   if (result.state.gameResult) return '対局が終了しました。結果と戦闘ログを確認できます。';
   const messages = {
+    RestParty: 'AIが負傷した部隊の休養を開始しました。', RemoveCasualties: 'AIが戦闘不能者を部隊から離脱させました。',
     AttackCity: 'AIが都市を攻撃しました。', CaptureCity: 'AIが都市を占領しました。',
     EndTurn: 'AIの手番が終了しました。あなたの手番です。', AttackParty: 'AIが攻撃しました。戦闘ログで結果を確認できます。',
     ReinforceParty: 'AIが待機兵を既存部隊へ補充しました。', MergeParties: 'AIが隣接部隊を合流しました。',
@@ -132,7 +139,7 @@ function aiActionMessage(result) {
 function renderAiActivity() {
   const commands = state.commandLog.filter(command => state.kingdoms[command.playerId]?.controllerType === 'ai');
   const turn = commands.at(-1)?.turn, recent = commands.filter(command => command.turn === turn);
-  const labels = { AttackCity: '攻城', CaptureCity: '都市占領', SetCityProduction: '生産設定', PurchaseCityItem: '購入', CreateParty: '増援編成', ReinforceParty: '補充', MergeParties: '合流', MoveParty: '移動', AttackParty: '攻撃' };
+  const labels = { RestParty: '休養', RemoveCasualties: '戦闘不能者の離脱', AttackCity: '攻城', CaptureCity: '都市占領', SetCityProduction: '生産設定', PurchaseCityItem: '購入', CreateParty: '増援編成', ReinforceParty: '補充', MergeParties: '合流', MoveParty: '移動', AttackParty: '攻撃' };
   const actions = Object.entries(labels).map(([type, label]) => {
     const count = recent.filter(command => command.type === type).length;
     return count ? `${label} ${count}回` : null;
@@ -224,8 +231,8 @@ function renderRoster() {
     const button = document.createElement('button'); button.className = 'secondary roster-entry'; button.textContent = text; button.dataset[attribute] = id;
     button.setAttribute('aria-pressed', String(selected)); button.onclick = onClick; root.append(button);
   };
-  for (const party of Object.values(state.parties).filter((p) => p.ownerId === controller.playerId)) append(`${partyName(party)}${party.status === 'defeated' ? '（敗北記録・占有なし）' : ''} · ${party.unitIds.length}体 · 移動 ${party.movementRemaining}/${party.movementMaximum} · (${party.location})`, 'selectParty', party.id, selectedPartyId === party.id, () => selectParty(party.id));
-  for (const unit of Object.values(state.units).filter((u) => u.ownerId === controller.playerId && !u.partyId)) append(`待機 ${unitName(unit)} ${unit.id} · HP ${unit.currentHp}/${unit.maxHp} · (${unit.location})`, 'selectUnit', unit.id, selectedUnitId === unit.id, () => selectUnit(unit.id));
+  for (const party of Object.values(state.parties).filter((p) => p.ownerId === controller.playerId)) append(`${partyName(party)}${party.restOrder ? '（休養中）' : ''}${party.status === 'defeated' ? '（敗北記録・占有なし）' : ''} · ${party.unitIds.length}体 · 移動 ${party.movementRemaining}/${party.movementMaximum} · (${party.location})`, 'selectParty', party.id, selectedPartyId === party.id, () => selectParty(party.id));
+  for (const unit of Object.values(state.units).filter((u) => u.ownerId === controller.playerId && !u.partyId)) append(`${isActiveUnit(unit) ? '待機' : '戦闘不能の記録'} ${unitName(unit)} ${unit.id} · HP ${unit.currentHp}/${unit.maxHp} · (${unit.location})`, 'selectUnit', unit.id, selectedUnitId === unit.id, () => selectUnit(unit.id));
   if (!root.childNodes.length) root.textContent = 'Unitがいません。都市でUnitを生産・購入してください。';
 }
 function selectCity(id) {
@@ -341,10 +348,10 @@ function render() {
   document.querySelectorAll('[data-produce]').forEach((button) => { const item = RULESET.items[button.dataset.produce]; button.replaceChildren(assets.icon(item.category === 'unit' ? `unit-${item.itemId}` : item.itemId === 'walls' ? 'building-city' : 'building-monument', 'unit-art'), `${item.name}を生産`); });
   $('#party-status').replaceChildren();
   if (party) { $('#party-status').append(assets.icon(`unit-${state.units[party.leaderUnitId]?.typeId ?? 'warrior'}`, 'unit-art'), `${partyName(party)} · ${party.unitIds.length}体`); $('#party-detail').textContent = `移動力 ${party.movementRemaining}/${party.movementMaximum} · 攻撃回数 ${party.attacksRemaining}/${party.attacksMaximum}`; }
-  else { $('#party-status').textContent = selectedUnitId ? `${unitName(state.units[selectedUnitId])} ${selectedUnitId} · 待機中` : '部隊・Unitを選択してください'; $('#party-detail').textContent = '地図の駒または上の一覧から選べます。'; }
+  else { $('#party-status').textContent = selectedUnitId ? `${unitName(state.units[selectedUnitId])} ${selectedUnitId} · ${isActiveUnit(state.units[selectedUnitId]) ? '待機中' : '戦闘不能の記録'}` : '部隊・Unitを選択してください'; $('#party-detail').textContent = '地図の駒または上の一覧から選べます。'; }
   $('#deselect-party').disabled = !party && !selectedUnitId; $('#focus-party').disabled = !party && !selectedUnitId;
   $('#map-mode').textContent = party ? `${partyName(party)} 選択中` : selectedUnitId ? '待機Unit 選択中' : 'セル確認';
-  renderFounding(); renderRoster(); formationPanel.render(state, party); reorganization.render(state, party, controller.playerId); renderInspection(); updateHover(); drawMap();
+  renderFounding(); renderRoster(); formationPanel.render(state, party); partyCare.render(state, party, controller.playerId); reorganization.render(state, party, controller.playerId); renderInspection(); updateHover(); drawMap();
   combatPanel.render(state, selectedPartyId, selectedEnemyId, controller.playerId);
   void audio.setMusic(state.parties[selectedEnemyId]?.status === 'active' ? 'bgm-battle' : 'bgm-overworld');
   document.querySelectorAll('[data-produce],[data-buy]').forEach(button => { const id = button.dataset.produce ?? button.dataset.buy; button.hidden = id === 'walls' && !hasCityDefense(state); button.disabled = button.hidden || !city || !canAct() || RULESET.items[id].category === 'building' && city.buildings.includes(id); });

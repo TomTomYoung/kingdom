@@ -1,3 +1,4 @@
+import { partyCareSafetyError } from '../systems/party-care.js';
 import { validateScenarioSave } from '../systems/scenario-system.js';
 import { RULESET } from './ruleset.js';
 import { validateFormation, occupiesMapTile, hasActiveUnits } from '../models/party.js';
@@ -29,6 +30,8 @@ function yieldRecord(value, path, negative = false) {
 // errors, not invitations to regenerate a map, an army, or its random streams.
 export function migrateAndValidateSave(state) {
   object(state, 'root');
+  const recovery = Object.hasOwn(state, 'partyRecoveryVersion');
+  if (recovery) check(state.partyRecoveryVersion === 1, 'partyRecoveryVersion');
   const legacyTerritory = !Object.hasOwn(state, 'cityTerritoryVersion');
   if (!legacyTerritory) check(state.cityTerritoryVersion === 1, 'cityTerritoryVersion');
   for (const name of ['kingdoms', 'cities', 'units', 'world', 'rng', 'nextIds']) object(state[name], name);
@@ -86,6 +89,7 @@ export function migrateAndValidateSave(state) {
   for (const entry of array(state.commandLog, 'commandLog')) {
     object(entry, 'commandLog'); text(entry.commandId, 'commandLog.commandId');
     check(!commandIds.has(entry.commandId), 'commandLog.commandId'); commandIds.add(entry.commandId);
+    if (!recovery) check(!['RestParty', 'RemoveCasualties'].includes(entry.type), 'commandLog: 休養・離脱の版がありません');
     text(entry.type, 'commandLog.type'); object(entry.payload, 'commandLog.payload');
     reference(state.kingdoms, entry.playerId, 'commandLog.playerId'); integer(entry.turn, 'commandLog.turn', 1, state.currentTurn);
   }
@@ -244,7 +248,18 @@ export function migrateAndValidateSave(state) {
     if (party.status === 'defeated') check(!hasActiveUnits(state, party), `parties.${id}.status: 敗北部隊に活動中のUnitがあります`);
     check(['ready', 'ended'].includes(party.activationState), `parties.${id}.activationState`);
     for (const key of ['hasMoved', 'hasAttacked']) check(typeof party[key] === 'boolean', `parties.${id}.${key}`);
+    if (Object.hasOwn(party, 'restOrder')) {
+      const path = `parties.${id}.restOrder`;
+      check(recovery, `${path}: 休養の版がありません`);
+      const order = object(party.restOrder, path);
+      check(order.turn === state.currentTurn && state.lastProcessedTurn === state.currentTurn, `${path}.turn`);
+      check(order.location === party.location, `${path}.location`);
+      check(party.status === 'active' && hasActiveUnits(state, party) && party.activationState === 'ended', path);
+      check(!party.hasMoved && !party.hasAttacked && party.movementRemaining === 0 && party.attacksRemaining === 0 && party.reactionCharges === 0, `${path}.actions`);
+      check(party.unitIds.some(unitId => state.units[unitId].status === 'active' && state.units[unitId].currentHp > 0 && state.units[unitId].currentHp < state.units[unitId].maxHp), `${path}.wounded`);
+    }
   }
+  for (const party of Object.values(state.parties)) if (party.restOrder) check(!partyCareSafetyError(state, party), `parties.${party.id}.restOrder.safety`);
   if (legacyTerritory) {
     // Validate the whole historical save before repairing its known K-05
     // snapshots. Never collect income, progress production, or consume RNG.

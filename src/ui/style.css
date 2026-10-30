@@ -75,3 +75,7 @@ select:focus-visible{outline:2px solid #fff1be;outline-offset:3px}
 #siege-defense { color: #f0cf8f; font-weight: 700; }
 #siege-panel select { width: 100%; margin: 6px 0; }
 #siege-log p { overflow-wrap: anywhere; }
+
+.party-care-panel { border-top: 1px solid var(--border, #454b50); margin-top: 1rem; padding-top: .75rem; overflow-wrap: anywhere; }
+.party-care-log { padding-left: 1.3rem; font-size: .85rem; line-height: 1.6; }
+.party-care-log li + li { margin-top: .4rem; }

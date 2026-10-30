@@ -3,6 +3,7 @@ import { COMMAND_TYPES } from './commands.js';
 const record = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 const identifier = (value) => typeof value === 'string' && value.trim().length > 0;
 const fields = {
+  RestParty: ['partyId'], RemoveCasualties: ['partyId'],
   AttackCity: ['partyId', 'cityId', 'attackType'],
   CaptureCity: ['partyId', 'cityId'],
   StartTurn: [], EndTurn: [], SetGuardOrder: ['partyId', 'guardUnitId', 'mode'],

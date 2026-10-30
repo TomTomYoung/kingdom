@@ -1,0 +1,793 @@
+{
+  "verifiedAt": "2026-10-30T02:54:17.756Z",
+  "previousCommit": "54934b2849e7f5aa28b80166a07051cedc2899c2",
+  "caseCount": 156,
+  "seeds": [
+    1,
+    19,
+    117,
+    9876
+  ],
+  "cases": [
+    {
+      "label": "1/single/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/single/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/small/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/small/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/duel/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/duel/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/ranged/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/ranged/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/cities/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/cities/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/settlement/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/settlement/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/tactical/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/tactical/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/reinforcements/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/reinforcements/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/conquest/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/conquest/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/tactical/wounded-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "1/tactical/mid-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "1/tactical/end-AI",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/reinforcements/wounded-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "1/reinforcements/mid-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "1/reinforcements/end-AI",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/conquest/wounded-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "1/conquest/mid-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "1/conquest/end-AI",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/reorganization/split",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/reorganization/reinforced",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/reorganization/casualty",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/reorganization/next-round",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/siege-1/queued",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/siege-1/built",
+      "restore": "identical",
+      "continuation": "AttackCity identical"
+    },
+    {
+      "label": "1/siege-1/damaged",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/siege-1/captured",
+      "restore": "identical",
+      "continuation": "not requested"
+    },
+    {
+      "label": "1/siege-2/queued",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/siege-2/built",
+      "restore": "identical",
+      "continuation": "AttackCity identical"
+    },
+    {
+      "label": "1/siege-2/damaged",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "1/siege-2/captured",
+      "restore": "identical",
+      "continuation": "not requested"
+    },
+    {
+      "label": "19/single/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/single/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/small/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/small/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/duel/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/duel/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/ranged/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/ranged/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/cities/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/cities/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/settlement/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/settlement/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/tactical/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/tactical/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/reinforcements/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/reinforcements/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/conquest/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/conquest/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/tactical/wounded-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "19/tactical/mid-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "19/tactical/end-AI",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/reinforcements/wounded-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "19/reinforcements/mid-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "19/reinforcements/end-AI",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/conquest/wounded-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "19/conquest/mid-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "19/conquest/end-AI",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/reorganization/split",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/reorganization/reinforced",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/reorganization/casualty",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/reorganization/next-round",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/siege-1/queued",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/siege-1/built",
+      "restore": "identical",
+      "continuation": "AttackCity identical"
+    },
+    {
+      "label": "19/siege-1/damaged",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/siege-1/captured",
+      "restore": "identical",
+      "continuation": "not requested"
+    },
+    {
+      "label": "19/siege-2/queued",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/siege-2/built",
+      "restore": "identical",
+      "continuation": "AttackCity identical"
+    },
+    {
+      "label": "19/siege-2/damaged",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "19/siege-2/captured",
+      "restore": "identical",
+      "continuation": "not requested"
+    },
+    {
+      "label": "117/single/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/single/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/small/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/small/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/duel/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/duel/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/ranged/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/ranged/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/cities/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/cities/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/settlement/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/settlement/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/tactical/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/tactical/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/reinforcements/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/reinforcements/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/conquest/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/conquest/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/tactical/wounded-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "117/tactical/mid-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "117/tactical/end-AI",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/reinforcements/wounded-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "117/reinforcements/mid-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "117/reinforcements/end-AI",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/conquest/wounded-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "117/conquest/mid-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "117/conquest/end-AI",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/reorganization/split",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/reorganization/reinforced",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/reorganization/casualty",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/reorganization/next-round",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/siege-1/queued",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/siege-1/built",
+      "restore": "identical",
+      "continuation": "AttackCity identical"
+    },
+    {
+      "label": "117/siege-1/damaged",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/siege-1/captured",
+      "restore": "identical",
+      "continuation": "not requested"
+    },
+    {
+      "label": "117/siege-2/queued",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/siege-2/built",
+      "restore": "identical",
+      "continuation": "AttackCity identical"
+    },
+    {
+      "label": "117/siege-2/damaged",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "117/siege-2/captured",
+      "restore": "identical",
+      "continuation": "not requested"
+    },
+    {
+      "label": "9876/single/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/single/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/small/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/small/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/duel/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/duel/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/ranged/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/ranged/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/cities/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/cities/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/settlement/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/settlement/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/tactical/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/tactical/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/reinforcements/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/reinforcements/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/conquest/initial",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/conquest/two-rounds",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/tactical/wounded-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "9876/tactical/mid-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "9876/tactical/end-AI",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/reinforcements/wounded-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "9876/reinforcements/mid-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "9876/reinforcements/end-AI",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/conquest/wounded-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "9876/conquest/mid-AI",
+      "restore": "identical",
+      "continuation": "AI identical"
+    },
+    {
+      "label": "9876/conquest/end-AI",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/reorganization/split",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/reorganization/reinforced",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/reorganization/casualty",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/reorganization/next-round",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/siege-1/queued",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/siege-1/built",
+      "restore": "identical",
+      "continuation": "AttackCity identical"
+    },
+    {
+      "label": "9876/siege-1/damaged",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/siege-1/captured",
+      "restore": "identical",
+      "continuation": "not requested"
+    },
+    {
+      "label": "9876/siege-2/queued",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/siege-2/built",
+      "restore": "identical",
+      "continuation": "AttackCity identical"
+    },
+    {
+      "label": "9876/siege-2/damaged",
+      "restore": "identical",
+      "continuation": "EndTurn identical"
+    },
+    {
+      "label": "9876/siege-2/captured",
+      "restore": "identical",
+      "continuation": "not requested"
+    }
+  ]
+}

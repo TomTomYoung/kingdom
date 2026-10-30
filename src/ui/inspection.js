@@ -74,7 +74,7 @@ export class InspectionView {
             updateDraft();
           }; checkboxes.push(input); row.append(input);
         }
-        const select = button(`${unitName(u)} ${u.id} · HP ${u.currentHp}/${u.maxHp} · ${u.partyId ? partyName(state.parties[u.partyId]) : '待機'}`, () => this.callbacks.onUnit(u.id), { inspectUnit: u.id });
+        const select = button(`${unitName(u)} ${u.id} · HP ${u.currentHp}/${u.maxHp} · ${u.partyId ? partyName(state.parties[u.partyId]) : isActiveUnit(u) ? '待機' : '戦闘不能の記録（占有なし）'}`, () => this.callbacks.onUnit(u.id), { inspectUnit: u.id });
         select.setAttribute('aria-pressed', String(u.id === unitId)); row.append(select); roster.append(row);
       }
       this.tileRoot.append(roster);
@@ -95,7 +95,7 @@ export class InspectionView {
     const slotLabel = slot?.replace('front', '前列').replace('middle', '中列').replace('rear', '後列').replace('left', '左').replace('center', '中央').replace('right', '右').replace('-', '・');
     this.unitRoot.append(facts([
       ['状態', stateLabels[unit.status] ?? unit.status], ['HP', `${unit.currentHp} / ${unit.maxHp}`], ['所属国', state.kingdoms[unit.ownerId]?.name ?? unit.ownerId],
-      ['所属部隊', unitParty ? `${partyName(unitParty)}${occupiesMapTile(unitParty) ? '' : ' · 敗北記録（占有なし）'}` : '未編成・待機中'], ['位置', unit.location], ['配置', slotLabel ?? 'なし'], ['指揮者', unitParty?.leaderUnitId === unit.id ? 'このUnit' : unitParty?.leaderUnitId ?? 'なし'],
+      ['所属部隊', unitParty ? `${partyName(unitParty)}${occupiesMapTile(unitParty) ? '' : ' · 敗北記録（占有なし）'}` : isActiveUnit(unit) ? '未編成・待機中' : '離脱済み・戦闘不能の記録'], ['位置', unit.location], ['配置', slotLabel ?? 'なし'], ['指揮者', unitParty?.leaderUnitId === unit.id ? 'このUnit' : unitParty?.leaderUnitId ?? 'なし'],
       ['近接 / 遠隔', `${unit.meleeStrength} / ${unit.rangedStrength}`], ['防御 / 装甲', `${unit.defenseStrength} / ${unit.armor}`], ['射程', unit.range], ['護衛容量', `${unit.guardCapacityRemaining} / ${unit.guardCapacityMax}`], ['肩代わり率', `${Math.round(unit.guardRate * 100)}%`],
       ['命中 / 回避', `${Math.round((unit.accuracy ?? 1) * 100)}% / ${Math.round((unit.evasion ?? 0) * 100)}%`], ['挑発 / 遮蔽', `${Math.round((unit.tauntStrength ?? 0) * 100)}% / ${Math.round((unit.coverPower ?? 0) * 100)}%`],
     ]));

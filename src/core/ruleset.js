@@ -2,6 +2,7 @@ export const RULESET_VERSION = 'm1.0';
 
 export const RULESET = Object.freeze({
   mapRadius: 10,
+  partyRecovery: Object.freeze({ fieldHp: 20, cityHp: 30, threatRange: 1, aiRestHpRatio: 0.5 }),
   cityDefense: Object.freeze({ maximumHp: 100, wallHp: 60, strength: 20, recoveryHp: 10, recoveryWallHp: 5, capturedHp: 25, ballistaWallBonus: 0.5, counterStrength: 20, counterattacksPerRound: 1 }),
   aiRecruitment: Object.freeze({ maxCombatUnits: 15, goldReserve: 24, purchasesPerCityPerTurn: 1, composition: Object.freeze({ warrior: 2, archer: 2, ballista: 1 }) }),
   aiCityDefense: Object.freeze({ minimumCombatUnits: 5, threatRange: 3 }),

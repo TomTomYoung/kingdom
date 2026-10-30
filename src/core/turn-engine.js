@@ -1,3 +1,4 @@
+import { processPartyRest } from '../systems/party-care.js';
 import { hasCityRetaliation } from '../models/city-defense.js';
 import { recoverCityDefense } from '../systems/city-siege.js';
 import { RULESET } from './ruleset.js';
@@ -9,6 +10,9 @@ import { isActiveUnit, hasActiveUnits } from '../models/party.js';
 
 export function processTurnStart(state, events) {
   if (state.lastProcessedTurn === state.currentTurn) return;
+  // Resolve all rest orders against the same round boundary before any city
+  // expands territory; kingdom iteration order must not decide recovery.
+  for (const party of Object.values(state.parties)) processPartyRest(state, party, events);
   for (const kingdom of Object.values(state.kingdoms)) {
     const paid = Math.min(kingdom.stockpiles.popularSupport, kingdom.supportUpkeep);
     kingdom.stockpiles.popularSupport = Math.min(RULESET.popularSupportCap, kingdom.stockpiles.popularSupport - paid + kingdom.supportIncome);

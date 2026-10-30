@@ -19,7 +19,7 @@ export function createInitialGameState(seed = 117, { radius = RULESET.mapRadius,
     if (tile) { tile.ownerId = kingdom.id; tile.territoryCityId = city.id; if (hex.equals(center)) tile.cityId = city.id; }
   }
   const state = {
-    schemaVersion: 1, rulesetVersion: RULESET_VERSION, cityTerritoryVersion: 1, seed, currentTurn: 1, phase: 'PLAYER_ACTION', lastProcessedTurn: 0,
+    schemaVersion: 1, rulesetVersion: RULESET_VERSION, cityTerritoryVersion: 1, partyRecoveryVersion: 1, seed, currentTurn: 1, phase: 'PLAYER_ACTION', lastProcessedTurn: 0,
     activePlayerId: kingdom.id, activePlayerIndex: 0, turnOrder: [kingdom.id], kingdoms: { [kingdom.id]: kingdom }, cities: { [city.id]: city }, units: {}, parties: {}, world,
     rng: { territory: { seed: (seed ^ 0x9e3779b9) >>> 0, state: (seed ^ 0x9e3779b9) >>> 0 }, combat: { seed: (seed ^ 0x85ebca6b) >>> 0, state: (seed ^ 0x85ebca6b) >>> 0 } },
     nextIds: { city: 2, unit: 1, party: 1, command: 1 }, commandLog: [], eventLog: [],

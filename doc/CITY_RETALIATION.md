@@ -48,4 +48,4 @@ npm run check
 KINGDOM_QA_MODULES=/path/to/node_modules node tools/qa/browser-city-defense.mjs /tmp/kingdom-city-defense-qa
 ```
 
-都市の能動的な砲撃、射程2以上の都市反撃、駐屯兵による都市威力補正、反撃を使うかどうかの手動選択は未実装です。既存の無料部隊反撃の消費規則は変えていません。次はUnitの休養・回復と戦闘不能者の離脱規則を定義し、長期戦での部隊再建を整備します。
+都市の能動的な砲撃、射程2以上の都市反撃、駐屯兵による都市威力補正、反撃を使うかどうかの手動選択は未実装です。既存の無料部隊反撃の消費規則は変えていません。Unitの休養・回復と戦闘不能者の離脱は後続工程で追加しました。[現行の休養規則](PARTY_RECOVERY.md)。

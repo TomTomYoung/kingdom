@@ -1,3 +1,4 @@
+import { resolvePartyRest, resolveRemoveCasualties, cancelPartyRest, partyCareSafetyError } from '../systems/party-care.js';
 import { hasCityDefense, cityEntryError } from '../models/city-defense.js';
 import { resolveCityAttack } from '../systems/city-siege.js';
 import { cloneGameState } from './game-state.js';
@@ -89,6 +90,10 @@ export class RuleSystem {
         : command.type === COMMAND_TYPES.MERGE_PARTIES ? resolveMergeParties(state, command.playerId, p.sourcePartyId, p.targetPartyId, events)
         : resolveSplitParty(state, command.playerId, p.partyId, p.unitIds, p.location, events);
       if (!result.ok) return reject(result.reason);
+    } else if ([COMMAND_TYPES.REST_PARTY, COMMAND_TYPES.REMOVE_CASUALTIES].includes(command.type)) {
+      const resolver = command.type === COMMAND_TYPES.REST_PARTY ? resolvePartyRest : resolveRemoveCasualties;
+      const result = resolver(state, command.playerId, command.payload.partyId, events);
+      if (!result.ok) return reject(result.reason);
     } else if (command.type === COMMAND_TYPES.ATTACK_CITY) {
       const p = command.payload, result = resolveCityAttack(state, command.playerId, p.partyId, p.cityId, p.attackType, events);
       if (!result.ok) return reject(result.reason);
@@ -144,6 +149,12 @@ export class RuleSystem {
       }
     } else return reject('不明なCommandです');
 
+    if (state.partyRecoveryVersion === 1) for (const party of Object.values(state.parties)) {
+      if (party.restOrder) { const reason = partyCareSafetyError(state, party); if (reason) cancelPartyRest(party, events, reason); }
+    }
+    if (state.partyRecoveryVersion === 1 && events.some(event => ['CombatDamage', 'PartyCasualtiesRemoved'].includes(event.type))) {
+      for (const kingdom of Object.values(state.kingdoms)) updateDerivedCapabilities(kingdom, state);
+    }
     resolveScenario(state, events);
     state.commandLog.push(structuredClone(command)); state.eventLog.push(...events.map((event) => ({ turn: state.currentTurn, ...event })));
     return { ok: true, state, events };

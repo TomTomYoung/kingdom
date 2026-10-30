@@ -1,3 +1,4 @@
+import { cancelPartyRest } from './party-care.js';
 import { RULESET } from '../core/ruleset.js';
 import { SeededRng } from '../core/rng.js';
 import { Hex } from '../world/hex.js';
@@ -84,6 +85,7 @@ export function applyPartyDamage(state, targetParty, primary, allocations, rawDa
     const role = roles.has('intercept') ? 'intercept' : roles.has('guard') ? 'guard' : roles.has('primary') ? 'primary' : 'area';
     events.push({ type: 'CombatDamage', ...metadata, targetUnitId: unit.id, primaryTargetUnitId: primary.id, targetSlot: Object.keys(targetParty.formation).find(slot => targetParty.formation[slot] === unit.id), rawDamage, allocatedDamage: amount, damage, role, roles: [...roles], remainingHp: unit.currentHp });
   }
+  if (total > 0) cancelPartyRest(targetParty, events, '戦闘で被害を受けたため');
   targetParty.morale = Math.max(0, targetParty.morale - Math.ceil(total * RULESET.combat.moraleDamageRate));
   inheritLeadership(state, targetParty, events);
   return { target: primary, damage: total };

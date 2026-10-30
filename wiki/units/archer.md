@@ -29,3 +29,5 @@
 横列への一斉射撃は指定した前・中・後列の生存Unitへ基礎Damageの50%を配分します。空枠に入る被害は他へ移しません。詳細は[戦闘](../rules/combat.md)・[実装仕様](../../doc/RANGED_COMBAT.md)を参照してください。
 
 根拠: [種類と費用](../../src/core/ruleset.js)、[攻撃定義](../../src/systems/combat-attacks.js)、[戦闘処理](../../src/systems/combat-system.js)。
+
+新規対局では生存負傷者を[休養](../rules/recovery.md)で回復できます。HP0は復活せず、生存者がいる部隊から記録を残して離脱させられます。

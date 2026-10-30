@@ -1,6 +1,8 @@
+import { previewPartyRest, validateRemoveCasualties } from '../systems/party-care.js';
+import { RULESET } from './ruleset.js';
 import { hasCityRetaliation, hasCityDefense, isCityDefended, cityEntryError } from '../models/city-defense.js';
 import { previewCityAttack, validateCityAttack } from '../systems/city-siege.js';
-import { attackCity, captureCity, attackParty, moveParty, endTurn } from './commands.js';
+import { restParty, removeCasualties, attackCity, captureCity, attackParty, moveParty, endTurn } from './commands.js';
 import { chooseCityExitCommand, chooseDeploymentCommand, chooseSupplyCommand, chooseReinforcementCommand, chooseMergeCommand } from './ai-economy.js';
 import { RuleSystem } from './rule-system.js';
 import { validatePartyAttack } from '../systems/combat-system.js';
@@ -68,6 +70,10 @@ export class AIController {
     const enemyCities = conquest ? ordered(state.cities).filter(city => city.ownerId !== this.playerId) : [];
     if (conquest) for (const party of ordered(state.parties)) for (const city of enemyCities) {
       if (validateCaptureCity(state, this.playerId, party.id, city.id).ok) return captureCity(this.playerId, state.currentTurn, party.id, city.id, id);
+    }
+    for (const party of ordered(state.parties).filter(p => p.ownerId === this.playerId)) {
+      if (validateRemoveCasualties(state, this.playerId, party.id).ok) return removeCasualties(this.playerId, state.currentTurn, party.id, id);
+      if (party.unitIds.some(id => isActiveUnit(state.units[id]) && state.units[id].currentHp / state.units[id].maxHp <= RULESET.partyRecovery.aiRestHpRatio) && previewPartyRest(state, this.playerId, party.id).ok) return restParty(this.playerId, state.currentTurn, party.id, id);
     }
     const recruits = state.kingdoms[this.playerId].aiPolicy === 'reinforcements';
     if (recruits) {
