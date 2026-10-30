@@ -1,0 +1,30 @@
+name: Kingdom tests
+on:
+  pull_request:
+  push:
+    branches: [main, 'codex/production-queue-ui-20261030']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax checks
+        run: find src tests tools -type f \( -name '*.js' -o -name '*.mjs' \) -print0 | xargs -0 -n1 node --check
+      - name: Node regression tests
+        run: node --test tests/*.test.js
+      - name: Package reproducible test source
+        if: always()
+        run: git archive --format=tar.gz -o kingdom-test-source.tar.gz HEAD
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kingdom-test-source
+          path: kingdom-test-source.tar.gz
+          retention-days: 3
