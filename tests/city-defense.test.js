@@ -15,7 +15,7 @@ const human = new HumanController('kingdom-1'), enemy = new HumanController('kin
 const execute = (s, c) => { const r = RuleSystem.execute(s, c); assert.equal(r.ok, true, r.reason); return r.state; };
 const trip = s => { const after = restoreGameState(serializeGameState(s)); assert.deepEqual(after, s); return after; };
 function relocate(s, id, location) { const p = s.parties[id]; p.location = location; p.unitIds.forEach(id => { s.units[id].location = location; }); s.world.tiles[location].terrainId = 'plains'; }
-function ready(seed = 117) { let s = createAiConquestGameState(seed); s = execute(s, human.startTurn(s)); relocate(s, 'party-1', '3,-3,0'); relocate(s, 'party-2', '-6,6,0'); return s; }
+function ready(seed = 117) { let s = createAiConquestGameState(seed); s.cityDefenseVersion = 2; Object.values(s.cities).forEach(c => { delete c.defense.bombardmentsRemaining; }); s = execute(s, human.startTurn(s)); relocate(s, 'party-1', '3,-3,0'); relocate(s, 'party-2', '-6,6,0'); return s; }
 const attack = (s, type = 'melee', partyId = 'party-1') => human.attackCity(s, partyId, 'city-2', type);
 const round = s => execute(execute(s, human.endTurn(s)), enemy.endTurn(s));
 const forecast = (s, type = 'melee') => previewCityAttack(s, 'kingdom-1', 'party-1', 'city-2', type);
@@ -29,7 +29,7 @@ const counterEvents = s => s.eventLog.filter(e => e.type === 'CityCounterattacke
 function aiReady() { let s = ready(); s = execute(s, human.endTurn(s)); s.kingdoms['kingdom-2'].stockpiles.gold = 144; return s; }
 
 // Version 1 and earlier capture-only modes are covered by their retained suites.
-test('new conquest starts version 2 with one counterattack and preserves it through saves', () => {
+test('retained conquest version 2 starts with one counterattack and preserves it through saves', () => {
   const s = ready(); assert.equal(s.cityDefenseVersion, 2);
   for (const city of Object.values(s.cities)) assert.deepEqual(city.defense, { hp: 100, wallHp: 0, lastDamagedTurn: null, counterattacksRemaining: 1 }); trip(s);
 });
@@ -120,7 +120,7 @@ test('version 2 requires integral bounded charges; version 1 cannot contain part
   const s = ready();
   for (const value of [-1, 0.5, 2, null, undefined, '1']) { const bad = structuredClone(s); bad.cities['city-2'].defense.counterattacksRemaining = value; assert.throws(() => restoreGameState(serializeGameState(bad)), /counterattacksRemaining/); }
   const mixed = structuredClone(s); mixed.cityDefenseVersion = 1; assert.throws(() => restoreGameState(serializeGameState(mixed)), /counterattacksRemaining/);
-  const future = structuredClone(s); future.cityDefenseVersion = 3; assert.throws(() => restoreGameState(serializeGameState(future)), /cityDefenseVersion/);
+  const future = structuredClone(s); future.cityDefenseVersion = 4; assert.throws(() => restoreGameState(serializeGameState(future)), /cityDefenseVersion/);
   s.cities['city-2'].defense.counterattacksRemaining = 0; trip(s);
 });
 

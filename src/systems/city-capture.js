@@ -1,4 +1,4 @@
-import { hasCityRetaliation, hasCityDefense, isCityDefended } from '../models/city-defense.js';
+import { hasCityBombardment, hasCityRetaliation, hasCityDefense, isCityDefended } from '../models/city-defense.js';
 import { RULESET } from '../core/ruleset.js';
 import { occupiesMapTile } from '../models/party.js';
 import { participatingUnits } from './combat-attacks.js';
@@ -29,6 +29,7 @@ export function resolveCaptureCity(state, playerId, partyId, cityId, events) {
   state.kingdoms[playerId].cityIds.push(cityId); city.ownerId = playerId;
   if (hasCityDefense(state)) city.defense = { hp: RULESET.cityDefense.capturedHp, wallHp: 0, lastDamagedTurn: state.currentTurn };
   if (hasCityRetaliation(state)) city.defense.counterattacksRemaining = 0;
+  if (hasCityBombardment(state)) city.defense.bombardmentsRemaining = 0;
   const territoryKeys = [];
   for (const tile of Object.values(state.world.tiles)) if (tile.territoryCityId === cityId) { tile.ownerId = playerId; territoryKeys.push(tile.key); }
   // Capturing neither collects income nor refunds/reuses the old owner's orders.

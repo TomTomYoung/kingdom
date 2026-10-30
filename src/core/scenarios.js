@@ -48,7 +48,7 @@ export function createAiReinforcementGameState(seed = 117) {
 export function createAiConquestGameState(seed = 117) {
   const state = createAiReinforcementGameState(seed);
   state.scenarioId = 'ai-conquest'; state.scenarioObjective.type = 'control-cities';
-  state.cityDefenseVersion = 2; Object.values(state.cities).forEach(city => initializeCityDefense(state, city));
+  state.cityDefenseVersion = 3; Object.values(state.cities).forEach(city => initializeCityDefense(state, city));
   return state;
 }
 

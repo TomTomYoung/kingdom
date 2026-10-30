@@ -1,3 +1,4 @@
+import { CityBombardmentPanel } from './city-bombardment.js';
 import { ProductionQueuePanel, queueForSelection } from './production-queue.js';
 import { PartyCarePanel } from './party-care.js';
 import { isActiveUnit } from '../models/party.js';
@@ -88,6 +89,10 @@ const combatPanel = new CombatPanel($('#combat-panel'), {
   onGuard: (partyId, guardId, targetId, mode) => run(controller.setGuardOrder(state, partyId, guardId, targetId, mode), '護衛設定を変更しました'),
 });
 
+const bombardmentPanel = new CityBombardmentPanel($('#city-bombardment'), {
+  onTarget: id => { if (id) selectParty(id); else { selectedEnemyId = null; render(); } },
+  onFire: (cityId, partyId) => run(controller.bombardParty(state, cityId, partyId), '都市から砲撃しました。被害は都市砲撃ログと戦闘ログで確認できます。'),
+});
 const siegePanel = new SiegePanel($('#siege-panel'), {
   onTarget: id => { selectedTileKey = state.cities[id].centerHex; renderInspection(); drawMap(); map.focus(selectedTileKey); },
   onAttack: (id, kind) => run(controller.attackCity(state, selectedPartyId, id, kind), '攻城を解決しました。耐久と城壁の損害を攻城ログで確認できます。'),
@@ -131,7 +136,7 @@ function aiActionMessage(result) {
   if (result.state.gameResult) return '対局が終了しました。結果と戦闘ログを確認できます。';
   const messages = {
     RestParty: 'AIが負傷した部隊の休養を開始しました。', RemoveCasualties: 'AIが戦闘不能者を部隊から離脱させました。',
-    AttackCity: 'AIが都市を攻撃しました。', CaptureCity: 'AIが都市を占領しました。',
+    BombardParty: 'AIが都市から砲撃しました。', AttackCity: 'AIが都市を攻撃しました。', CaptureCity: 'AIが都市を占領しました。',
     EndTurn: 'AIの手番が終了しました。あなたの手番です。', AttackParty: 'AIが攻撃しました。戦闘ログで結果を確認できます。',
     ReinforceParty: 'AIが待機兵を既存部隊へ補充しました。', MergeParties: 'AIが隣接部隊を合流しました。',
     MoveParty: 'AIが部隊を移動しました。', CreateParty: 'AIが待機Unitから増援部隊を編成しました。',
@@ -143,7 +148,7 @@ function aiActionMessage(result) {
 function renderAiActivity() {
   const commands = state.commandLog.filter(command => state.kingdoms[command.playerId]?.controllerType === 'ai');
   const turn = commands.at(-1)?.turn, recent = commands.filter(command => command.turn === turn);
-  const labels = { RestParty: '休養', RemoveCasualties: '戦闘不能者の離脱', AttackCity: '攻城', CaptureCity: '都市占領', SetCityProduction: '生産設定', PurchaseCityItem: '購入', CreateParty: '増援編成', ReinforceParty: '補充', MergeParties: '合流', MoveParty: '移動', AttackParty: '攻撃' };
+  const labels = { BombardParty: '都市砲撃', RestParty: '休養', RemoveCasualties: '戦闘不能者の離脱', AttackCity: '攻城', CaptureCity: '都市占領', SetCityProduction: '生産設定', PurchaseCityItem: '購入', CreateParty: '増援編成', ReinforceParty: '補充', MergeParties: '合流', MoveParty: '移動', AttackParty: '攻撃' };
   const actions = Object.entries(labels).map(([type, label]) => {
     const count = recent.filter(command => command.type === type).length;
     return count ? `${label} ${count}回` : null;
@@ -321,6 +326,7 @@ function render() {
   const k = state.kingdoms[controller.playerId], city = currentCity();
   selectedCityId = city?.id ?? null; $('#focus-city').disabled = !city;
   renderCityDetails(city);
+  bombardmentPanel.render(state, controller.playerId, city?.id, selectedEnemyId, canAct());
   productionQueue.render(state, city, controller.playerId, canAct());
   $('#city-defense').textContent = cityDefenseLabel(state, city); $('#city-defense').hidden = !hasCityDefense(state) || !city;
   if (!state.parties[selectedPartyId]) selectedPartyId = null;

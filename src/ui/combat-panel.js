@@ -14,7 +14,7 @@ function select(id, values, selected) {
 }
 function field(label, control) { const element = node('label', label); element.htmlFor = control.id; element.append(control); return element; }
 function eventText(event) {
-  if (event.type === 'CombatDamage') return `${event.attackerCityId ? '都市反撃' : event.counter ? '反撃' : event.attackName ?? '攻撃'}: ${event.targetUnitId} HP −${event.damage} → ${event.remainingHp}${event.role === 'guard' ? '（肩代わり）' : event.role === 'intercept' ? '（割り込み）' : ''}`;
+  if (event.type === 'CombatDamage') return `${event.attackerCityId ? event.attackName ?? '都市反撃' : event.counter ? '反撃' : event.attackName ?? '攻撃'}: ${event.targetUnitId} HP −${event.damage} → ${event.remainingHp}${event.role === 'guard' ? '（肩代わり）' : event.role === 'intercept' ? '（割り込み）' : ''}`;
   if (event.type === 'CombatGuard') return `${event.guardUnitId} が ${event.targetUnitId} を護衛: ${event.amount}を肩代わり、残り容量${event.capacityRemaining}`;
   if (event.type === 'CombatIntercept') return `${event.guardUnitId} が ${event.targetUnitId} への攻撃に割り込み、残り反応${event.reactionCharges}`;
   if (event.type === 'CombatMiss') return `${event.attackName ?? '狙い撃ち'}: ${event.targetUnitId} への命中に失敗`;

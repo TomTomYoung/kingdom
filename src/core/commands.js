@@ -1,4 +1,4 @@
-export const COMMAND_TYPES = Object.freeze({ START_TURN: 'StartTurn', SET_CITY_PRODUCTION: 'SetCityProduction', PURCHASE_CITY_ITEM: 'PurchaseCityItem', PURCHASE_TILE: 'PurchaseTile', END_TURN: 'EndTurn', CREATE_PARTY: 'CreateParty', SET_FORMATION: 'SetFormation', MOVE_PARTY: 'MoveParty', ATTACK_PARTY: 'AttackParty', SET_GUARD_ORDER: 'SetGuardOrder', FOUND_CITY: 'FoundCity', REINFORCE_PARTY: 'ReinforceParty', MERGE_PARTIES: 'MergeParties', SPLIT_PARTY: 'SplitParty', CAPTURE_CITY: 'CaptureCity', ATTACK_CITY: 'AttackCity', REST_PARTY: 'RestParty', REMOVE_CASUALTIES: 'RemoveCasualties' });
+export const COMMAND_TYPES = Object.freeze({ START_TURN: 'StartTurn', SET_CITY_PRODUCTION: 'SetCityProduction', PURCHASE_CITY_ITEM: 'PurchaseCityItem', PURCHASE_TILE: 'PurchaseTile', END_TURN: 'EndTurn', CREATE_PARTY: 'CreateParty', SET_FORMATION: 'SetFormation', MOVE_PARTY: 'MoveParty', ATTACK_PARTY: 'AttackParty', SET_GUARD_ORDER: 'SetGuardOrder', FOUND_CITY: 'FoundCity', REINFORCE_PARTY: 'ReinforceParty', MERGE_PARTIES: 'MergeParties', SPLIT_PARTY: 'SplitParty', CAPTURE_CITY: 'CaptureCity', ATTACK_CITY: 'AttackCity', BOMBARD_PARTY: 'BombardParty', REST_PARTY: 'RestParty', REMOVE_CASUALTIES: 'RemoveCasualties' });
 export function command(type, playerId, turn, payload = {}, commandId) { return { commandId, type, playerId, turn, phase: type === COMMAND_TYPES.START_TURN ? 'TURN_START' : 'PLAYER_ACTION', payload }; }
 export const startTurn = (playerId, turn, commandId) => command(COMMAND_TYPES.START_TURN, playerId, turn, {}, commandId);
 export const setCityProduction = (playerId, turn, cityId, itemId, queue = [], commandId) => command(COMMAND_TYPES.SET_CITY_PRODUCTION, playerId, turn, { cityId, itemId, queue }, commandId);
@@ -25,3 +25,5 @@ export const attackCity = (playerId, turn, partyId, cityId, attackType = 'melee'
 
 export const restParty = (playerId, turn, partyId, commandId) => command(COMMAND_TYPES.REST_PARTY, playerId, turn, { partyId }, commandId);
 export const removeCasualties = (playerId, turn, partyId, commandId) => command(COMMAND_TYPES.REMOVE_CASUALTIES, playerId, turn, { partyId }, commandId);
+
+export const bombardParty = (playerId, turn, cityId, defenderPartyId, commandId) => command(COMMAND_TYPES.BOMBARD_PARTY, playerId, turn, { cityId, defenderPartyId }, commandId);

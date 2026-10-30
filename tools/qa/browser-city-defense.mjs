@@ -42,7 +42,7 @@ try {
   const target = async (type = 'melee') => { await click('[data-select-party="party-1"]'); await select('#siege-city', 'city-2'); await select('#siege-type', type); };
   const relocate = (s, id, location) => { const p = s.parties[id]; p.location = location; p.unitIds.forEach(id => { s.units[id].location = location; }); s.world.tiles[location].terrainId = 'plains'; };
   await select('#game-mode', 'ai-conquest'); await click('#reset'); const initial = await save();
-  assert.equal(initial.cityDefenseVersion, 2); assert.equal(initial.cities['city-1'].defense.counterattacksRemaining, 1);
+  assert.equal(initial.cityDefenseVersion, 3); assert.equal(initial.cities['city-1'].defense.counterattacksRemaining, 1);
   assert.match(await page.locator('#city-defense').innerText(), /反撃 1\/1/); assert.match(await page.locator('#scenario-detail').innerText(), /全体ターン1回反撃/);
   checks.push('new conquest explains one city counter per round and enables defense version 2');
 
@@ -91,7 +91,7 @@ try {
   await load(rebuilding); await click('#end-turn'); await page.clock.runFor(180); const rebuilt = await save(); assert.notEqual(rebuilt.cities['city-2'].production.currentItemId, 'walls'); assert.equal(rebuilt.commandLog.at(-1).type, 'SetCityProduction');
   checks.push('AI chooses wall production without purchase funds and prioritizes military rebuilding when its army is depleted');
 
-  const legacy = structuredClone(base); legacy.cityDefenseVersion = 1; Object.values(legacy.cities).forEach(city => { delete city.defense.counterattacksRemaining; }); await load(legacy); await target();
+  const legacy = structuredClone(base); legacy.cityDefenseVersion = 1; Object.values(legacy.cities).forEach(city => { delete city.defense.counterattacksRemaining; delete city.defense.bombardmentsRemaining; }); await load(legacy); await target();
   assert.match(await page.locator('#siege-rules').innerText(), /反撃のない旧攻城ルール/); assert.match(await page.locator('#siege-counter-preview').innerText(), /都市反撃: なし/); await click('#attack-city'); const oldHit = await save(); assert.deepEqual(oldHit.units, legacy.units); assert.equal(oldHit.cityDefenseVersion, 1);
   const ancient = structuredClone(legacy); delete ancient.cityDefenseVersion; Object.values(ancient.cities).forEach(city => { delete city.defense; }); await load(ancient); assert.equal(await page.locator('#siege-panel').isVisible(), false); assert.deepEqual(await save(), ancient);
   checks.push('version-1 siege and capture-only historical saves retain their respective rules');
