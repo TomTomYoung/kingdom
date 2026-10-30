@@ -1,0 +1,117 @@
+name: City bombardment integration verification
+on:
+  push:
+    branches: ['codex/city-bombardment-20261030']
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash
+concurrency:
+  group: kingdom-city-bombardment-integration
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: github.ref == 'refs/heads/codex/city-bombardment-20261030'
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: b1368044c0a14f5989a0634b42919d5ad4b39b88
+          path: .qa-baseline
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify and integrate the exact locally tested patch
+        run: |
+          mkdir -p "$RUNNER_TEMP/kingdom-reports"
+          python3 - <<'PY'
+          import hashlib, lzma, os
+          from pathlib import Path
+          parts = Path('.github/bombardment-transfer')
+          patch = lzma.decompress(b''.join((parts/f'part-{i:02}.xz').read_bytes() for i in range(1,4)))
+          assert hashlib.sha256(patch).hexdigest() == '061dd2d3a92d03d42ccdefcf03a906e780544a688438771209ec16ef8b845aa9'
+          Path(os.environ['RUNNER_TEMP'],'bombardment.patch').write_bytes(patch)
+          PY
+          export GIT_INDEX_FILE="$RUNNER_TEMP/verify-bombardment.index"
+          git read-tree b1368044c0a14f5989a0634b42919d5ad4b39b88
+          git apply --cached --unidiff-zero "$RUNNER_TEMP/bombardment.patch"
+          test "$(git write-tree)" = ddcdb95fa5f0b53d110048d7b7d5fb3ac05795be
+          unset GIT_INDEX_FILE
+          if git apply --check --unidiff-zero "$RUNNER_TEMP/bombardment.patch"; then
+            git apply --unidiff-zero "$RUNNER_TEMP/bombardment.patch"
+          else
+            git apply --reverse --check --unidiff-zero "$RUNNER_TEMP/bombardment.patch"
+          fi
+      - name: Syntax, Node regressions and historical save continuation
+        run: |
+          npm run check | tee "$RUNNER_TEMP/kingdom-reports/syntax.log"
+          npm test | tee "$RUNNER_TEMP/kingdom-reports/node.log"
+          node tools/qa/save-city-bombardment-compat.mjs .qa-baseline assets/qa/save-city-bombardment-compat-2026-10-30.json | tee "$RUNNER_TEMP/kingdom-reports/compat.log"
+      - name: Commit verified implementation on its feature branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- doc index.html src tests tools/qa wiki assets/qa/save-city-bombardment-compat-2026-10-30.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'feat: implement city bombardment with independent charges and legacy save rules'
+            git push origin HEAD:refs/heads/codex/city-bombardment-20261030
+          fi
+          echo "KINGDOM_TESTED_REVISION=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Install isolated browser QA runtime
+        run: |
+          mkdir -p "$RUNNER_TEMP/kingdom-qa"
+          printf '{"private":true}\n' > "$RUNNER_TEMP/kingdom-qa/package.json"
+          npm install --prefix "$RUNNER_TEMP/kingdom-qa" --no-save --package-lock=false playwright@1.56.1
+          "$RUNNER_TEMP/kingdom-qa/node_modules/.bin/playwright" install --with-deps chromium
+          echo "KINGDOM_QA_MODULES=$RUNNER_TEMP/kingdom-qa" >> "$GITHUB_ENV"
+      - name: Verify bombardment and all existing browser regressions
+        run: |
+          for suite in city-bombardment production-queue party-care city-defense siege conquest ai cities ranged founding reorganization; do
+            node "tools/qa/browser-$suite.mjs" "$RUNNER_TEMP/kingdom-reports/$suite" 2>&1 | tee "$RUNNER_TEMP/kingdom-reports/$suite.log"
+            report="$RUNNER_TEMP/kingdom-reports/$suite/report.json"
+            if [ ! -f "$report" ]; then cp "$RUNNER_TEMP/kingdom-reports/$suite/results.json" "$report"; fi
+            cp "$report" "assets/qa/browser-city-bombardment-$suite-2026-10-30.json"
+          done
+      - name: Record actual verification results
+        run: |
+          python3 - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          from datetime import datetime, timezone
+          root = Path(os.environ['RUNNER_TEMP'])/'kingdom-reports'
+          suites = ['city-bombardment','production-queue','party-care','city-defense','siege','conquest','ai','cities','ranged','founding','reorganization']
+          reports = {s:json.loads((root/s/'report.json').read_text()) for s in suites}
+          for report in reports.values():
+              for field in ['error','pageErrors','httpFailures','errors','failures']: assert not report.get(field), report
+              assert isinstance(report['checks'],list) and report['checks'], report
+          counts = {s:len(r['checks']) for s,r in reports.items()}
+          node = (root/'node.log').read_text()
+          tests = int(re.search(r'# tests (\d+)',node)[1]); passed = int(re.search(r'# pass (\d+)',node)[1]); failed = int(re.search(r'# fail (\d+)',node)[1])
+          assert tests == passed and failed == 0
+          syntax = int(re.search(r'Syntax checked (\d+) JavaScript files',(root/'syntax.log').read_text())[1])
+          compat = json.loads(Path('assets/qa/save-city-bombardment-compat-2026-10-30.json').read_text())
+          result = {'verifiedAt':datetime.now(timezone.utc).isoformat(),'baselineRevision':'b1368044c0a14f5989a0634b42919d5ad4b39b88','workflowRunId':os.environ['GITHUB_RUN_ID'],'testedRevision':os.environ['KINGDOM_TESTED_REVISION'],'browser':reports['city-bombardment']['browser'],'nodeTests':tests,'syntaxFiles':syntax,'saveSnapshots':compat['snapshots'],'continuationCommands':compat['continuationCommands'],'browserCheckGroups':sum(counts.values()),'suites':counts,'pageErrors':[],'httpFailures':[]}
+          Path('assets/qa/city-bombardment-summary-2026-10-30.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+          p=Path('doc/CITY_BOMBARDMENT.md'); text=p.read_text(); text=text.replace('実ブラウザ検証は未完了です。結果を確認してからこの段落を更新します。',f"Chromium {result['browser']}で全{result['browserCheckGroups']}チェック群が成功しました。新規砲撃{counts['city-bombardment']}群と既存の生産キュー・休養・都市反撃・攻城・占領・AI・都市・遠隔・開拓・再編を含み、画面例外・HTTP失敗は0です。[検証概要](../assets/qa/city-bombardment-summary-2026-10-30.json)・[旧保存検証](../assets/qa/save-city-bombardment-compat-2026-10-30.json)。1440px／390pxの画面画像をActionsの検証成果物に保存しました。画像の目視確認は別途記録します。"); p.write_text(text)
+          print(json.dumps(result,ensure_ascii=False,indent=2))
+          PY
+          git add assets/qa/browser-city-bombardment-*-2026-10-30.json assets/qa/city-bombardment-summary-2026-10-30.json doc/CITY_BOMBARDMENT.md
+          git commit -m 'test: record city bombardment browser and save compatibility checks'
+          git push origin HEAD:refs/heads/codex/city-bombardment-20261030
+      - name: Package exact tested source
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/kingdom-reports"
+          git archive --format=tar.gz -o "$RUNNER_TEMP/kingdom-reports/kingdom-tested-source.tar.gz" HEAD
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kingdom-city-bombardment-verification
+          path: ${{ runner.temp }}/kingdom-reports
+          retention-days: 7
