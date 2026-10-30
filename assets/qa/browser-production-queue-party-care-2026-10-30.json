@@ -1,0 +1,18 @@
+{
+  "verifiedAt": "2026-10-30T05:51:19.412Z",
+  "browser": "141.0.7390.37",
+  "checks": [
+    "new games enable care and explain why an uninjured party cannot rest",
+    "city rest preview is state-free, caps healing, reserves actions without immediate HP gain, and survives reload",
+    "corrupt rest order rejects atomically; hotseat handoff does not heal and the full-round recovery replays identically",
+    "field recovery uses 20 HP and adjacent enemies disable rest and casualty removal with a reason",
+    "real ranged attack interrupts pending rest; cancellation and unrecovered HP appear after returning to the party",
+    "casualty removal retains inspectable records, disables resurrection, and permits purchased reinforcements only on the next round",
+    "removing a fallen leader repairs selection, succession, formation and guards in the actual UI",
+    "AI removes casualties then rests through visible commands and reproduces both decisions from saved boundaries",
+    "historical saves retain their version and show an explanation instead of new care controls",
+    "390px recovery forecast, actions, pending state and logs render without horizontal overflow"
+  ],
+  "pageErrors": [],
+  "httpFailures": []
+}

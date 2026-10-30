@@ -4,7 +4,7 @@ import { createUnit } from '../models/unit.js';
 export function validateProductionSelection(city, itemId, queue) {
   const buildings = new Set(city.buildings);
   for (const id of [itemId, ...queue]) {
-    if (RULESET.items[id].category !== 'building') continue;
+    if (id === null || RULESET.items[id].category !== 'building') continue;
     if (buildings.has(id)) return '建設済み、またはキュー内で重複している建物です';
     buildings.add(id);
   }
