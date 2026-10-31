@@ -23,7 +23,7 @@ export function calculateCityYields(state, city) {
     return { tileKey: key, terrainId: tile.terrainId, yields };
   });
   const buildings = city.buildings.map((buildingId) => {
-    const yields = buildingId === 'monument' ? { ...emptyYields(), culture: 2 } : emptyYields();
+    const yields = buildingId === 'monument' ? { ...emptyYields(), culture: 2 } : { ...emptyYields(), ...RULESET.items[buildingId].yields };
     YIELDS.forEach((name) => { total[name] += yields[name]; });
     return { buildingId, yields };
   });

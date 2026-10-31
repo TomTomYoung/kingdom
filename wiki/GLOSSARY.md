@@ -81,3 +81,5 @@
 休養（RestParty）: 行動前に予約し、次の全体ターン開始に生存負傷者のHPを回復する操作。[休養と離脱](rules/recovery.md)。
 
 戦闘不能者の離脱（RemoveCasualties）: HP0の記録を保持して部隊の枠を空ける操作。全滅部隊は対象外。[休養と離脱](rules/recovery.md)。
+
+研究選択（SelectResearch）・未配分科学: [研究の規則](rules/research.md)。文字・農業・工学: [技術一覧](technologies/README.md)。図書館・穀物庫・工房: [建物一覧](buildings/README.md)。

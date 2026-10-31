@@ -1,3 +1,4 @@
+import { hasResearch, itemResearchError } from '../systems/research-system.js';
 import { RULESET } from '../core/ruleset.js';
 import { hasCityDefense } from '../models/city-defense.js';
 import { validateProductionSelection } from '../systems/production-system.js';
@@ -14,6 +15,7 @@ export function productionPlanError(state, city, items) {
   if (!city) return '所有都市がありません。';
   if (!Array.isArray(items) || !items.every(id => typeof id === 'string' && Object.hasOwn(RULESET.items, id))) return '不明な生産対象です。';
   if (!hasCityDefense(state) && items.includes('walls')) return '城壁は新規の都市争奪戦で建設できます。';
+  for (const id of items) { const reason = itemResearchError(state, city.ownerId, id); if (reason) return reason; }
   return validateProductionSelection(city, items[0] ?? null, items.slice(1));
 }
 
@@ -96,8 +98,10 @@ export class ProductionQueuePanel {
       const label = node('label', '末尾に追加する対象'); label.htmlFor = 'production-queue-item';
       const select = node('select'); select.id = 'production-queue-item';
       for (const item of Object.values(RULESET.items)) {
+        if (item.requiredTechnology && !hasResearch(state)) continue;
         if (item.itemId === 'walls' && !hasCityDefense(state)) continue;
-        const option = node('option', `${item.name} · 生産 ${item.productionCost}`); option.value = item.itemId;
+        const locked = itemResearchError(state, playerId, item.itemId);
+        const option = node('option', `${item.name} · 生産 ${item.productionCost}${locked ? ` · ${locked}` : ''}`); option.value = item.itemId;
         option.disabled = !!productionPlanError(state, city, [...plan, item.itemId]); select.append(option);
       }
       const choices = [...select.options].filter(option => !option.disabled);

@@ -60,7 +60,7 @@ try {
   await page.selectOption('#combat-target', 'party-2'); await assertLocked();
   await page.clock.runFor(1000); state = await snapshot();
   assert.equal(state.activePlayerId, 'kingdom-1'); assert.equal(state.currentTurn, 2);
-  assert.deepEqual(state.commandLog.slice(-3).map(c => c.type), ['MoveParty', 'AttackParty', 'EndTurn']);
+  assert.deepEqual(state.commandLog.slice(-4).map(c => c.type), ['MoveParty', 'AttackParty', 'SelectResearch', 'EndTurn']);
   assert.equal(await page.locator('#end-turn').isEnabled(), true);
   assert.match(await page.locator('#combat-log').innerText(), /HP/);
   checks.push('human turn -> AI move/attack/end -> human; own-city viewpoint and mutation controls stay correct');

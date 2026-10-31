@@ -1,3 +1,4 @@
+import { resolveSelectResearch, itemResearchError } from '../systems/research-system.js';
 import { resolveCityBombardment } from '../systems/city-bombardment.js';
 import { resolvePartyRest, resolveRemoveCasualties, cancelPartyRest, partyCareSafetyError } from '../systems/party-care.js';
 import { hasCityDefense, cityEntryError } from '../models/city-defense.js';
@@ -45,11 +46,17 @@ export class RuleSystem {
     if (command.type === COMMAND_TYPES.START_TURN) {
       if (state.lastProcessedTurn === state.currentTurn) return reject('このターンは開始処理済みです');
       processTurnStart(state, events);
+    } else if (command.type === COMMAND_TYPES.SELECT_RESEARCH) {
+      const reason = resolveSelectResearch(state, command.playerId, command.payload.technologyId, events);
+      if (reason) return reject(reason);
     } else if (command.type === COMMAND_TYPES.SET_CITY_PRODUCTION) {
       if (state.phase !== 'PLAYER_ACTION') return reject('行動フェーズではありません');
       if (command.payload.itemId !== null && !Object.hasOwn(RULESET.items, command.payload.itemId)) return reject('不明な生産対象です');
       if (!command.payload.queue.every((id) => Object.hasOwn(RULESET.items, id))) return reject('キューに不明な生産対象があります');
       if (!hasCityDefense(state) && [command.payload.itemId, ...command.payload.queue].includes('walls')) return reject('城壁は新規の都市争奪戦で建設できます');
+      for (const itemId of [command.payload.itemId, ...command.payload.queue]) {
+        const reason = itemResearchError(state, command.playerId, itemId); if (reason) return reject(reason);
+      }
       const productionError = validateProductionSelection(city, command.payload.itemId, command.payload.queue);
       if (productionError) return reject(productionError);
       city.production.currentItemId = command.payload.itemId; city.production.queue = [...command.payload.queue];
@@ -57,6 +64,7 @@ export class RuleSystem {
     } else if (command.type === COMMAND_TYPES.PURCHASE_CITY_ITEM) {
       const item = Object.hasOwn(RULESET.items, command.payload.itemId) && RULESET.items[command.payload.itemId]; if (!item) return reject('不明な購入対象です');
       if (item.itemId === 'walls' && !hasCityDefense(state)) return reject('城壁は新規の都市争奪戦で建設できます');
+      const researchError = itemResearchError(state, command.playerId, item.itemId); if (researchError) return reject(researchError);
       const cost = Object.hasOwn(item.purchaseOptions ?? {}, command.payload.currency) ? item.purchaseOptions[command.payload.currency] : undefined; if (cost === undefined) return reject('この対象は指定通貨で購入できません');
       const kingdom = state.kingdoms[command.playerId]; if ((kingdom.stockpiles[command.payload.currency] ?? 0) < cost) return reject(`${command.payload.currency}が不足しています`);
       if (item.category === 'building' && city.buildings.includes(item.itemId)) return reject('建設済みです');

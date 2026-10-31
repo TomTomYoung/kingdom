@@ -1,3 +1,4 @@
+import { validateResearchSave } from '../systems/research-system.js';
 import { partyCareSafetyError } from '../systems/party-care.js';
 import { validateScenarioSave } from '../systems/scenario-system.js';
 import { RULESET } from './ruleset.js';
@@ -281,6 +282,7 @@ export function migrateAndValidateSave(state) {
     }
   }
   if (['ai-reinforcements', 'ai-conquest'].includes(state.scenarioId)) check(Object.values(state.kingdoms).some(kingdom => kingdom.controllerType === 'ai' && kingdom.aiPolicy === 'reinforcements'), 'scenario.aiPolicy');
+  validateResearchSave(state);
   validateScenarioSave(state);
   return state;
 }

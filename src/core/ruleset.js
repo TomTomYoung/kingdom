@@ -2,6 +2,12 @@ export const RULESET_VERSION = 'm1.0';
 
 export const RULESET = Object.freeze({
   mapRadius: 10,
+  // Provisional vertical-slice content, not the final technology tree.
+  technologies: Object.freeze({
+    writing: Object.freeze({ id: 'writing', name: '文字', scienceCost: 12, prerequisites: Object.freeze([]), unlocks: Object.freeze(['library']) }),
+    agriculture: Object.freeze({ id: 'agriculture', name: '農業', scienceCost: 16, prerequisites: Object.freeze([]), unlocks: Object.freeze(['granary']) }),
+    engineering: Object.freeze({ id: 'engineering', name: '工学', scienceCost: 24, prerequisites: Object.freeze(['writing']), unlocks: Object.freeze(['workshop']) }),
+  }),
   partyRecovery: Object.freeze({ fieldHp: 20, cityHp: 30, threatRange: 1, aiRestHpRatio: 0.5 }),
   cityBombardment: Object.freeze({ range: 2, strength: 20, attacksPerRound: 1 }),
   cityDefense: Object.freeze({ maximumHp: 100, wallHp: 60, strength: 20, recoveryHp: 10, recoveryWallHp: 5, capturedHp: 25, ballistaWallBonus: 0.5, counterStrength: 20, counterattacksPerRound: 1 }),
@@ -20,6 +26,9 @@ export const RULESET = Object.freeze({
     ballista: Object.freeze({ scaleClass: 'construct', maxHp: 100, meleeStrength: 8, rangedStrength: 25, magicStrength: 0, defenseStrength: 10, resistance: 3, armor: 2, range: 3, guardRate: 0, guardCapacity: 0, guardRange: 0, moraleContribution: 6, commandContribution: 2, accuracy: 0.85, evasion: 0, tauntStrength: 0, coverPower: 0 }),
   }),
   items: Object.freeze({
+    library: Object.freeze({ itemId: 'library', name: '図書館', category: 'building', productionCost: 20, purchaseOptions: { gold: 80 }, requiredTechnology: 'writing', yields: Object.freeze({ science: 2 }) }),
+    granary: Object.freeze({ itemId: 'granary', name: '穀物庫', category: 'building', productionCost: 20, purchaseOptions: { gold: 80 }, requiredTechnology: 'agriculture', yields: Object.freeze({ food: 2 }) }),
+    workshop: Object.freeze({ itemId: 'workshop', name: '工房', category: 'building', productionCost: 30, purchaseOptions: { gold: 120 }, requiredTechnology: 'engineering', yields: Object.freeze({ production: 2 }) }),
     settler: Object.freeze({ itemId: 'settler', name: '開拓者', category: 'unit', productionCost: 30, purchaseOptions: { gold: 120 } }),
     warrior: Object.freeze({ itemId: 'warrior', name: '戦士', category: 'unit', productionCost: 12, purchaseOptions: { gold: 48 } }),
     archer: Object.freeze({ itemId: 'archer', name: '弓兵', category: 'unit', productionCost: 18, purchaseOptions: { gold: 72 } }),

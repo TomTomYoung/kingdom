@@ -1,3 +1,4 @@
+import { hasResearch, createResearch } from '../systems/research-system.js';
 import { RULESET, RULESET_VERSION } from './ruleset.js';
 import { createWorldMap } from '../world/world-map.js';
 import { Hex } from '../world/hex.js';
@@ -10,7 +11,7 @@ import { createUnit } from '../models/unit.js';
 import { createParty } from '../models/party.js';
 import { migrateAndValidateSave } from './save-validation.js';
 
-export function createInitialGameState(seed = 117, { radius = RULESET.mapRadius, startingParty = false } = {}) {
+export function createInitialGameState(seed = 117, { radius = RULESET.mapRadius, startingParty = false, researchEnabled = true } = {}) {
   const world = createWorldMap(seed, radius);
   const kingdom = createKingdom(); const center = new Hex(0, 0, 0);
   const city = createCity(kingdom.id, center.key);
@@ -24,6 +25,7 @@ export function createInitialGameState(seed = 117, { radius = RULESET.mapRadius,
     rng: { territory: { seed: (seed ^ 0x9e3779b9) >>> 0, state: (seed ^ 0x9e3779b9) >>> 0 }, combat: { seed: (seed ^ 0x85ebca6b) >>> 0, state: (seed ^ 0x85ebca6b) >>> 0 } },
     nextIds: { city: 2, unit: 1, party: 1, command: 1 }, commandLog: [], eventLog: [],
   };
+  if (researchEnabled) { state.researchVersion = 1; kingdom.research = createResearch(); }
   if (startingParty) {
     const unit = createUnit('unit-1', kingdom.id, 'warrior', center.key);
     unit.partyId = 'party-1'; state.units[unit.id] = unit; kingdom.unitIds.push(unit.id);
@@ -52,6 +54,7 @@ export function addKingdom(state, { id, name, cityId, cityName, centerHex, contr
     const tile = state.world.tiles[hex.key]; if (tile?.ownerId === null && tile.terrainId !== 'void') { tile.ownerId = id; tile.territoryCityId = cityId; }
   }
   initializeCityDefense(state, city);
+  if (hasResearch(state)) kingdom.research = createResearch();
   centerTile.cityId = cityId; state.kingdoms[id] = kingdom; state.cities[cityId] = city; state.turnOrder.push(id);
   advanceCityId(state, cityId);
   calculateCityYields(state, city); updateDerivedCapabilities(kingdom, state); return state;

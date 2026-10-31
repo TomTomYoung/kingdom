@@ -89,3 +89,12 @@ select:focus-visible{outline:2px solid #fff1be;outline-offset:3px}
 .production-queue-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .production-queue-actions button { flex: 1 1 auto; min-width: 0; }
 .production-queue select { display: block; width: 100%; min-width: 0; margin: 6px 0; }
+
+.research-panel { min-width: 0; }
+.research-panel select { display: block; width: 100%; min-width: 0; margin: 8px 0; }
+.research-budget, .research-status { overflow-wrap: anywhere; }
+.research-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.research-actions button { flex: 1 1 auto; min-width: 0; }
+.research-list { list-style: none; padding: 0; display: grid; gap: 12px; }
+.research-list li { display: grid; gap: 4px; overflow-wrap: anywhere; }
+.research-list .hint { margin: 0; }
