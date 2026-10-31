@@ -83,3 +83,5 @@
 戦闘不能者の離脱（RemoveCasualties）: HP0の記録を保持して部隊の枠を空ける操作。全滅部隊は対象外。[休養と離脱](rules/recovery.md)。
 
 研究選択（SelectResearch）・未配分科学: [研究の規則](rules/research.md)。文字・農業・工学: [技術一覧](technologies/README.md)。図書館・穀物庫・工房: [建物一覧](buildings/README.md)。
+
+- 施設投資AI: 研究で解禁した施設を安全・軍備・予備費・発注上限の条件下で建設する新規対局のAI方針。[詳細](rules/ai-development.md)。

@@ -31,6 +31,7 @@ function yieldRecord(value, path, negative = false) {
 // errors, not invitations to regenerate a map, an army, or its random streams.
 export function migrateAndValidateSave(state) {
   object(state, 'root');
+  if (Object.hasOwn(state, 'aiInfrastructureVersion')) check(state.aiInfrastructureVersion === 1 && state.researchVersion === 1, 'aiInfrastructureVersion');
   const recovery = Object.hasOwn(state, 'partyRecoveryVersion');
   if (recovery) check(state.partyRecoveryVersion === 1, 'partyRecoveryVersion');
   const legacyTerritory = !Object.hasOwn(state, 'cityTerritoryVersion');

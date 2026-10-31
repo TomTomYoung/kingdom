@@ -42,6 +42,7 @@ export function createAiReinforcementGameState(seed = 117) {
   const state = createAiSkirmishGameState(seed);
   state.scenarioId = 'ai-reinforcements';
   state.kingdoms['kingdom-2'].aiPolicy = 'reinforcements';
+  state.aiInfrastructureVersion = 1;
   return state;
 }
 

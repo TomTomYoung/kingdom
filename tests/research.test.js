@@ -18,7 +18,7 @@ const nextRound = s => { const turn = s.currentTurn; do { const h = new HumanCon
 const roundTrip = s => { const text = serializeGameState(s); assert.deepEqual(restoreGameState(text), s); return restoreGameState(text); };
 function reject(s, cmd) { const before = serializeGameState(s), r = RuleSystem.execute(s, cmd); assert.equal(r.ok, false); assert.equal(r.state, s); assert.deepEqual(r.events, []); assert.equal(serializeGameState(s), before); }
 function completed(s, ids = ['writing']) { const k = kingdom(s); k.progress.science = ids.reduce((n, id) => n + RULESET.technologies[id].scienceCost, 0); k.research.completedTechnologyIds = [...ids]; return s; }
-function legacy(s) { delete s.researchVersion; Object.values(s.kingdoms).forEach(k => { delete k.research; }); return s; }
+function legacy(s) { delete s.aiInfrastructureVersion; delete s.researchVersion; Object.values(s.kingdoms).forEach(k => { delete k.research; }); return s; }
 
 test('new games and added kingdoms initialize separate research; legacy setup stays unversioned', () => {
   const s = createDuelGameState(); assert.equal(s.researchVersion, 1);
