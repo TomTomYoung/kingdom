@@ -6,9 +6,9 @@
 
 ## 現在地と読み方
 
-開拓者の生産・購入、都市建設、護衛の維持、新都市選択と保存互換を利用できます。都市別の領土・市民作業・文化／Gold取得、二都市運営と都市切替・産出内訳も利用できます。弓兵・弩砲と7攻撃、敗北非占有、旧37セル保存を維持します。戦術AIと部隊撃破・40ターン期限の遭遇戦勝敗を追加しました。増援戦のAIは兵の生産・購入・編成も行います。都市拡張・城壁以外の建物の戦略AI、Domination、Dungeonは未実装です。
+開拓者の生産・購入、都市建設、護衛の維持、新都市選択と保存互換を利用できます。都市別の領土・市民作業・文化／Gold取得、二都市運営と都市切替・産出内訳も利用できます。弓兵・弩砲と7攻撃、敗北非占有、旧37セル保存を維持します。戦術AIと部隊撃破・40ターン期限の遭遇戦勝敗を追加しました。増援戦のAIは兵の生産・購入・編成も行います。都市拡張・3研究施設と城壁以外の建物の戦略AI、Domination、Dungeonは未実装です。
 
-まず[現行実装](CURRENT_IMPLEMENTATION.md)、[課題](STATUS.md)、[次作業](HANDOFF.md)を確認してください。操作は[戦闘操作](COMBAT_OPERATIONS.md)と[地図操作](MAP_OPERATIONS.md)、定義・配分・保存互換は[遠隔仕様](RANGED_COMBAT.md)にあります。都市操作・所属・保存移行は[CITY_MANAGEMENT.md](CITY_MANAGEMENT.md)、[AIと遭遇戦](AI_SCENARIOS.md)も参照してください。[部隊再編](PARTY_MANAGEMENT.md)の補充・合流・分割とAIの補充・合流判断も実装済みです。[都市占領と都市争奪戦](CITY_CONQUEST.md)も追加しました。[都市耐久・城壁・攻城](CITY_SIEGE.md)も実装しました。[都市反撃と城壁建設AI](CITY_RETALIATION.md)を版2の新規対局に追加しました。[休養・回復・戦闘不能者の離脱](PARTY_RECOVERY.md)も新規対局で利用できます。[生産キュー編集UI](PRODUCTION_QUEUE.md)も実装済みです。[能動的な都市砲撃](CITY_BOMBARDMENT.md)も新規版3で実装しました。[研究の選択・進捗・施設解禁](RESEARCH.md)を新規版に追加しました。次の推奨工程は解禁した研究施設へのAI投資です。
+まず[現行実装](CURRENT_IMPLEMENTATION.md)、[課題](STATUS.md)、[次作業](HANDOFF.md)を確認してください。操作は[戦闘操作](COMBAT_OPERATIONS.md)と[地図操作](MAP_OPERATIONS.md)、定義・配分・保存互換は[遠隔仕様](RANGED_COMBAT.md)にあります。都市操作・所属・保存移行は[CITY_MANAGEMENT.md](CITY_MANAGEMENT.md)、[AIと遭遇戦](AI_SCENARIOS.md)も参照してください。[部隊再編](PARTY_MANAGEMENT.md)の補充・合流・分割とAIの補充・合流判断も実装済みです。[都市占領と都市争奪戦](CITY_CONQUEST.md)も追加しました。[都市耐久・城壁・攻城](CITY_SIEGE.md)も実装しました。[都市反撃と城壁建設AI](CITY_RETALIATION.md)を版2の新規対局に追加しました。[休養・回復・戦闘不能者の離脱](PARTY_RECOVERY.md)も新規対局で利用できます。[生産キュー編集UI](PRODUCTION_QUEUE.md)も実装済みです。[能動的な都市砲撃](CITY_BOMBARDMENT.md)も新規版3で実装しました。[研究の選択・進捗・施設解禁](RESEARCH.md)を新規版に追加しました。[解禁施設へのAI投資](AI_INFRASTRUCTURE.md)を新規増援戦・都市争奪戦へ追加しました。次の候補は都市拡張AIです。
 
 起動は `npm run dev`、検証は `npm test`、`npm run check`、`npm run check:assets`。Canvas 2D／DOM・ES Modules・Node標準テストを使い、Phaser／Vite／Vitestは使いません。プレイヤー向け名称・費用・操作は[Kingdom Wiki](../wiki/README.md)で確認できます。
 

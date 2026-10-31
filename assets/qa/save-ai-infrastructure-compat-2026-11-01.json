@@ -1,0 +1,1256 @@
+{
+  "verifiedAt": "2026-10-31T15:48:03.021Z",
+  "baselineRevision": "3ffac57429050908fe120fef81d896770f7499f1",
+  "seeds": [
+    1,
+    7,
+    42,
+    117
+  ],
+  "scenarios": [
+    "single",
+    "party",
+    "duel",
+    "ranged",
+    "cities",
+    "settlement",
+    "skirmish",
+    "reinforcements",
+    "conquest"
+  ],
+  "snapshots": 204,
+  "continuationCommands": 816,
+  "checks": [
+    "real baseline-source saves restore identically",
+    "serialized contents are unchanged",
+    "four continued Human/AI Commands match the baseline state and decisions",
+    "old absent recovery version remains absent",
+    "no infrastructure version or facility decisions added to old research games"
+  ],
+  "records": [
+    {
+      "scenario": "single",
+      "seed": 1,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "single",
+      "seed": 1,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "single",
+      "seed": 1,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "single",
+      "seed": 1,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "party",
+      "seed": 1,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "party",
+      "seed": 1,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "party",
+      "seed": 1,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "party",
+      "seed": 1,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "duel",
+      "seed": 1,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "duel",
+      "seed": 1,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "duel",
+      "seed": 1,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "duel",
+      "seed": 1,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ranged",
+      "seed": 1,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ranged",
+      "seed": 1,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ranged",
+      "seed": 1,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ranged",
+      "seed": 1,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "cities",
+      "seed": 1,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "cities",
+      "seed": 1,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "cities",
+      "seed": 1,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "cities",
+      "seed": 1,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "settlement",
+      "seed": 1,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "settlement",
+      "seed": 1,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "settlement",
+      "seed": 1,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "settlement",
+      "seed": 1,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "skirmish",
+      "seed": 1,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "skirmish",
+      "seed": 1,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "skirmish",
+      "seed": 1,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "skirmish",
+      "seed": 1,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "reinforcements",
+      "seed": 1,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "reinforcements",
+      "seed": 1,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "reinforcements",
+      "seed": 1,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "reinforcements",
+      "seed": 1,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 1,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 1,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 1,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 1,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "single",
+      "seed": 7,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "single",
+      "seed": 7,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "single",
+      "seed": 7,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "single",
+      "seed": 7,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "party",
+      "seed": 7,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "party",
+      "seed": 7,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "party",
+      "seed": 7,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "party",
+      "seed": 7,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "duel",
+      "seed": 7,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "duel",
+      "seed": 7,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "duel",
+      "seed": 7,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "duel",
+      "seed": 7,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ranged",
+      "seed": 7,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ranged",
+      "seed": 7,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ranged",
+      "seed": 7,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ranged",
+      "seed": 7,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "cities",
+      "seed": 7,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "cities",
+      "seed": 7,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "cities",
+      "seed": 7,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "cities",
+      "seed": 7,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "settlement",
+      "seed": 7,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "settlement",
+      "seed": 7,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "settlement",
+      "seed": 7,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "settlement",
+      "seed": 7,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "skirmish",
+      "seed": 7,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "skirmish",
+      "seed": 7,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "skirmish",
+      "seed": 7,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "skirmish",
+      "seed": 7,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "reinforcements",
+      "seed": 7,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "reinforcements",
+      "seed": 7,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "reinforcements",
+      "seed": 7,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "reinforcements",
+      "seed": 7,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 7,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 7,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 7,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 7,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "single",
+      "seed": 42,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "single",
+      "seed": 42,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "single",
+      "seed": 42,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "single",
+      "seed": 42,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "party",
+      "seed": 42,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "party",
+      "seed": 42,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "party",
+      "seed": 42,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "party",
+      "seed": 42,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "duel",
+      "seed": 42,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "duel",
+      "seed": 42,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "duel",
+      "seed": 42,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "duel",
+      "seed": 42,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ranged",
+      "seed": 42,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ranged",
+      "seed": 42,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ranged",
+      "seed": 42,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ranged",
+      "seed": 42,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "cities",
+      "seed": 42,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "cities",
+      "seed": 42,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "cities",
+      "seed": 42,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "cities",
+      "seed": 42,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "settlement",
+      "seed": 42,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "settlement",
+      "seed": 42,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "settlement",
+      "seed": 42,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "settlement",
+      "seed": 42,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "skirmish",
+      "seed": 42,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "skirmish",
+      "seed": 42,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "skirmish",
+      "seed": 42,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "skirmish",
+      "seed": 42,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "reinforcements",
+      "seed": 42,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "reinforcements",
+      "seed": 42,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "reinforcements",
+      "seed": 42,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "reinforcements",
+      "seed": 42,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 42,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 42,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 42,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 42,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "single",
+      "seed": 117,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "single",
+      "seed": 117,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "single",
+      "seed": 117,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "single",
+      "seed": 117,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "party",
+      "seed": 117,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "party",
+      "seed": 117,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "party",
+      "seed": 117,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "party",
+      "seed": 117,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "duel",
+      "seed": 117,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "duel",
+      "seed": 117,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "duel",
+      "seed": 117,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "duel",
+      "seed": 117,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ranged",
+      "seed": 117,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ranged",
+      "seed": 117,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ranged",
+      "seed": 117,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ranged",
+      "seed": 117,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "cities",
+      "seed": 117,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "cities",
+      "seed": 117,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "cities",
+      "seed": 117,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "cities",
+      "seed": 117,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "settlement",
+      "seed": 117,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "settlement",
+      "seed": 117,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "settlement",
+      "seed": 117,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "settlement",
+      "seed": 117,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "skirmish",
+      "seed": 117,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "skirmish",
+      "seed": 117,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "skirmish",
+      "seed": 117,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "skirmish",
+      "seed": 117,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "reinforcements",
+      "seed": 117,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "reinforcements",
+      "seed": 117,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "reinforcements",
+      "seed": 117,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "reinforcements",
+      "seed": 117,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 117,
+      "stage": "turn-start",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 117,
+      "stage": "partial-queue",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 117,
+      "stage": "legacy-without-recovery",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 117,
+      "stage": "handoff-or-next-round",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 1,
+      "stage": "v3-walled-human",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 1,
+      "stage": "v3-spent-fire",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 1,
+      "stage": "v2-walled-human",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 1,
+      "stage": "v2-walled-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 1,
+      "stage": "v2-damaged-and-spent-counter",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 1,
+      "stage": "v1-walled",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 1,
+      "stage": "capture-only",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 7,
+      "stage": "v3-walled-human",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 7,
+      "stage": "v3-spent-fire",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 7,
+      "stage": "v2-walled-human",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 7,
+      "stage": "v2-walled-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 7,
+      "stage": "v2-damaged-and-spent-counter",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 7,
+      "stage": "v1-walled",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 7,
+      "stage": "capture-only",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 42,
+      "stage": "v3-walled-human",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 42,
+      "stage": "v3-spent-fire",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 42,
+      "stage": "v2-walled-human",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 42,
+      "stage": "v2-walled-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 42,
+      "stage": "v2-damaged-and-spent-counter",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 42,
+      "stage": "v1-walled",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 42,
+      "stage": "capture-only",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 117,
+      "stage": "v3-walled-human",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 117,
+      "stage": "v3-spent-fire",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 117,
+      "stage": "v2-walled-human",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 117,
+      "stage": "v2-walled-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 117,
+      "stage": "v2-damaged-and-spent-counter",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 117,
+      "stage": "v1-walled",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "conquest",
+      "seed": 117,
+      "stage": "capture-only",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-reinforcements",
+      "seed": 1,
+      "stage": "research-complete-wealthy-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-reinforcements",
+      "seed": 1,
+      "stage": "partial-facility-queue-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-reinforcements",
+      "seed": 1,
+      "stage": "purchased-facility-logged-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-reinforcements",
+      "seed": 1,
+      "stage": "pre-research-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-conquest",
+      "seed": 1,
+      "stage": "research-complete-wealthy-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-conquest",
+      "seed": 1,
+      "stage": "partial-facility-queue-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-conquest",
+      "seed": 1,
+      "stage": "purchased-facility-logged-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-conquest",
+      "seed": 1,
+      "stage": "pre-research-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-reinforcements",
+      "seed": 7,
+      "stage": "research-complete-wealthy-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-reinforcements",
+      "seed": 7,
+      "stage": "partial-facility-queue-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-reinforcements",
+      "seed": 7,
+      "stage": "purchased-facility-logged-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-reinforcements",
+      "seed": 7,
+      "stage": "pre-research-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-conquest",
+      "seed": 7,
+      "stage": "research-complete-wealthy-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-conquest",
+      "seed": 7,
+      "stage": "partial-facility-queue-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-conquest",
+      "seed": 7,
+      "stage": "purchased-facility-logged-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-conquest",
+      "seed": 7,
+      "stage": "pre-research-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-reinforcements",
+      "seed": 42,
+      "stage": "research-complete-wealthy-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-reinforcements",
+      "seed": 42,
+      "stage": "partial-facility-queue-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-reinforcements",
+      "seed": 42,
+      "stage": "purchased-facility-logged-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-reinforcements",
+      "seed": 42,
+      "stage": "pre-research-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-conquest",
+      "seed": 42,
+      "stage": "research-complete-wealthy-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-conquest",
+      "seed": 42,
+      "stage": "partial-facility-queue-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-conquest",
+      "seed": 42,
+      "stage": "purchased-facility-logged-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-conquest",
+      "seed": 42,
+      "stage": "pre-research-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-reinforcements",
+      "seed": 117,
+      "stage": "research-complete-wealthy-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-reinforcements",
+      "seed": 117,
+      "stage": "partial-facility-queue-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-reinforcements",
+      "seed": 117,
+      "stage": "purchased-facility-logged-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-reinforcements",
+      "seed": 117,
+      "stage": "pre-research-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-conquest",
+      "seed": 117,
+      "stage": "research-complete-wealthy-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-conquest",
+      "seed": 117,
+      "stage": "partial-facility-queue-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-conquest",
+      "seed": 117,
+      "stage": "purchased-facility-logged-ai",
+      "continuationCommands": 4
+    },
+    {
+      "scenario": "ai-conquest",
+      "seed": 117,
+      "stage": "pre-research-ai",
+      "continuationCommands": 4
+    }
+  ]
+}

@@ -8,4 +8,6 @@
 
 占領した施設は保持しますが、技術を持たない王国は別都市へ新規発注できません。旧版なしセーブでは利用できません。
 
+新規増援戦・都市争奪戦のAIも、安全と軍備を確保した場合に[施設投資](../rules/ai-development.md)で発注します。
+
 根拠: [定義](../../src/core/ruleset.js)・[産出](../../src/systems/yield-system.js)・[研究仕様](../../doc/RESEARCH.md)。

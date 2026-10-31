@@ -1,0 +1,24 @@
+{
+  "verifiedAt": "2026-10-31T15:52:56.854772+00:00",
+  "browserWorkflowRunId": "41216530488",
+  "testedSourceRevision": "e54a48addb98c8e90ee51fe8e932e9f048056080",
+  "nodeTests": 355,
+  "syntaxFiles": 112,
+  "targetSpecificationBodyUnchanged": true,
+  "nonQaAssetsUnchanged": true,
+  "temporaryTransferFilesRemoved": true,
+  "visualReview": {
+    "viewports": [
+      1440,
+      390
+    ],
+    "files": [
+      "ai-infrastructure/ai-investment-wide.png",
+      "ai-infrastructure/ai-investment-panel.png",
+      "ai-infrastructure/ai-investment-mobile.png"
+    ],
+    "reviewed": true,
+    "observations": "Investment conditions and named facility activity are readable without clipping or horizontal overflow."
+  },
+  "relativeMarkdownLinks": 1044
+}

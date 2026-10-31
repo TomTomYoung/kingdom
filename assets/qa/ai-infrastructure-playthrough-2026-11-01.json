@@ -1,0 +1,193 @@
+{
+  "verifiedAt": "2026-10-31T15:48:16.681Z",
+  "fixture": "Two immobile garrisons; normal economy and AI, no combat or turn deadline",
+  "roundsPerSeed": 80,
+  "games": [
+    {
+      "seed": 1,
+      "turn": 81,
+      "cities": [
+        {
+          "id": "city-1",
+          "buildings": [
+            "library",
+            "granary",
+            "workshop"
+          ]
+        },
+        {
+          "id": "city-2",
+          "buildings": [
+            "library",
+            "granary",
+            "workshop"
+          ]
+        }
+      ],
+      "investmentCommands": 6
+    },
+    {
+      "seed": 2,
+      "turn": 81,
+      "cities": [
+        {
+          "id": "city-1",
+          "buildings": [
+            "library",
+            "granary",
+            "workshop"
+          ]
+        },
+        {
+          "id": "city-2",
+          "buildings": [
+            "library",
+            "granary",
+            "workshop"
+          ]
+        }
+      ],
+      "investmentCommands": 6
+    },
+    {
+      "seed": 7,
+      "turn": 81,
+      "cities": [
+        {
+          "id": "city-1",
+          "buildings": [
+            "library",
+            "granary",
+            "workshop"
+          ]
+        },
+        {
+          "id": "city-2",
+          "buildings": [
+            "library",
+            "granary",
+            "workshop"
+          ]
+        }
+      ],
+      "investmentCommands": 6
+    },
+    {
+      "seed": 19,
+      "turn": 81,
+      "cities": [
+        {
+          "id": "city-1",
+          "buildings": [
+            "library",
+            "granary",
+            "workshop"
+          ]
+        },
+        {
+          "id": "city-2",
+          "buildings": [
+            "library",
+            "granary",
+            "workshop"
+          ]
+        }
+      ],
+      "investmentCommands": 6
+    },
+    {
+      "seed": 42,
+      "turn": 81,
+      "cities": [
+        {
+          "id": "city-1",
+          "buildings": [
+            "library",
+            "granary",
+            "workshop"
+          ]
+        },
+        {
+          "id": "city-2",
+          "buildings": [
+            "library",
+            "granary",
+            "workshop"
+          ]
+        }
+      ],
+      "investmentCommands": 6
+    },
+    {
+      "seed": 81,
+      "turn": 81,
+      "cities": [
+        {
+          "id": "city-1",
+          "buildings": [
+            "library",
+            "granary",
+            "workshop"
+          ]
+        },
+        {
+          "id": "city-2",
+          "buildings": [
+            "library",
+            "granary",
+            "workshop"
+          ]
+        }
+      ],
+      "investmentCommands": 6
+    },
+    {
+      "seed": 117,
+      "turn": 81,
+      "cities": [
+        {
+          "id": "city-1",
+          "buildings": [
+            "library",
+            "granary",
+            "workshop"
+          ]
+        },
+        {
+          "id": "city-2",
+          "buildings": [
+            "library",
+            "granary",
+            "workshop"
+          ]
+        }
+      ],
+      "investmentCommands": 6
+    },
+    {
+      "seed": 999,
+      "turn": 81,
+      "cities": [
+        {
+          "id": "city-1",
+          "buildings": [
+            "library",
+            "granary",
+            "workshop"
+          ]
+        },
+        {
+          "id": "city-2",
+          "buildings": [
+            "library",
+            "granary",
+            "workshop"
+          ]
+        }
+      ],
+      "investmentCommands": 6
+    }
+  ],
+  "commands": 1456,
+  "saveRoundTrips": 1280
+}

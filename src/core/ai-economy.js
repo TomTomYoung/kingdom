@@ -1,3 +1,4 @@
+import { chooseInfrastructureCommand } from './ai-infrastructure.js';
 import { hasCityRetaliation, cityEntryError } from '../models/city-defense.js';
 import { COMMAND_TYPES, createParty, moveParty, purchaseCityItem, setCityProduction, reinforceParty, mergeParties } from './commands.js';
 import { RULESET } from './ruleset.js';
@@ -80,6 +81,7 @@ export function chooseDeploymentCommand(state, playerId, commandId) {
 
 export function chooseSupplyCommand(state, playerId, commandId) {
   const defense = chooseCityDefenseCommand(state, playerId, commandId); if (defense) return defense;
+  const infrastructure = chooseInfrastructureCommand(state, playerId, commandId); if (infrastructure) return infrastructure;
   const needs = recruitmentNeeds(state, playerId);
   if (needs.total >= RULESET.aiRecruitment.maxCombatUnits) return null;
   const ownCities = cities(state, playerId), recruits = waiting(state, playerId);

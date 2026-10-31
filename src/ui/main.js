@@ -1,3 +1,4 @@
+import { hasInfrastructureAi } from '../core/ai-infrastructure.js';
 import { ResearchPanel } from './research.js';
 import { hasResearch, itemResearchError } from '../systems/research-system.js';
 import { CityBombardmentPanel } from './city-bombardment.js';
@@ -162,12 +163,23 @@ function renderAiActivity() {
   }).filter(Boolean);
   const walls = recent.filter(command => ['SetCityProduction', 'PurchaseCityItem'].includes(command.type) && command.payload.itemId === 'walls').length;
   if (walls) actions.push(`城壁発注 ${walls}回`);
+  for (const item of Object.values(RULESET.items).filter(item => item.requiredTechnology)) {
+    const orders = recent.filter(command => ['SetCityProduction', 'PurchaseCityItem'].includes(command.type) && command.payload.itemId === item.itemId);
+    const bought = orders.filter(command => command.type === 'PurchaseCityItem').length, produced = orders.length - bought;
+    if (bought) actions.push(`${item.name}購入 ${bought}回`);
+    if (produced) actions.push(`${item.name}生産予約 ${produced}回`);
+  }
   $('#ai-activity').textContent = actions.length ? `AIの直近の手番（ターン ${turn}）：${actions.join(' · ')}` : '';
   $('#ai-activity').hidden = !actions.length;
 }
 function renderScenario() {
   $('#scenario-status').hidden = !state.scenarioObjective;
   renderAiActivity();
+  const investmentStatus = $('#ai-infrastructure-status');
+  investmentStatus.hidden = !Object.values(state.kingdoms).some(k => k.controllerType === 'ai' && k.aiPolicy === 'reinforcements');
+  investmentStatus.textContent = hasInfrastructureAi(state)
+    ? `施設投資AI: 生存兵${RULESET.aiInfrastructure.minimumCombatUnits}体以上・自国都市の${RULESET.aiInfrastructure.threatRange}ヘクス以内に敵軍なしで、解禁施設へ王国ごと全体ターン${RULESET.aiInfrastructure.ordersPerKingdomPerTurn}件まで投資します。城壁防御を優先し、購入後にGold${RULESET.aiRecruitment.goldReserve + RULESET.items.warrior.purchaseOptions.gold}以上を残します。`
+    : '旧セーブの施設投資なしAIを維持しています。施設投資AIは新規の増援戦・都市争奪戦で利用できます。';
   const result = state.gameResult;
   if (result) {
     $('#scenario-title').textContent = result.outcome === 'draw' ? '引き分け' : result.winnerId === controller.playerId ? '勝利' : '敗北';
