@@ -89,7 +89,7 @@ try {
   assert.match(await page.locator('#ai-activity').innerText(), /城壁発注/);
   checks.push('nearby enemy pressure produces a wall order instead of discretionary facility investment');
 
-  const weak = await make(); const dead = weak.units[weak.parties['party-2'].unitIds[0]]; dead.hp = dead.currentHp = 0; dead.status = 'incapacitated';
+  const weak = await make(); const dead = weak.units[weak.parties['party-2'].unitIds[0]]; dead.hp = dead.currentHp = 0; dead.status = 'shattered';
   // Leave four live soldiers and an exhausted activation; the normal supply AI must rebuild.
   weak.parties['party-2'].leaderUnitId = weak.parties['party-2'].unitIds[1];
   await load(weak); await step(); const rebuilt = await save();

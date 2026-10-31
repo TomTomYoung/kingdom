@@ -63,7 +63,7 @@ test('locked, completed and already reserved facilities are never purchased or d
 });
 test('army rebuilding precedes investment; dead, civilian and queued units cannot satisfy its live minimum', () => {
   const s = fixture(), ids = s.parties['party-2'].unitIds;
-  s.units[ids[0]].currentHp = s.units[ids[0]].hp = 0; s.units[ids[0]].status = 'incapacitated';
+  s.units[ids[0]].currentHp = s.units[ids[0]].hp = 0; s.units[ids[0]].status = 'shattered';
   recruit(s, 'settler'); city(s).production.currentItemId = 'warrior'; city(s).production.queue = Array(10).fill('warrior');
   assert.equal(choose(s), null);
   city(s).production.currentItemId = null; city(s).production.queue = [];
@@ -71,7 +71,7 @@ test('army rebuilding precedes investment; dead, civilian and queued units canno
 });
 test('waiting soldiers alone cannot trigger investment without a live military party', () => {
   const s = fixture(), p = s.parties['party-2'];
-  p.unitIds.forEach(id => { s.units[id].currentHp = s.units[id].hp = 0; s.units[id].status = 'incapacitated'; }); p.status = 'defeated';
+  p.unitIds.forEach(id => { s.units[id].currentHp = s.units[id].hp = 0; s.units[id].status = 'shattered'; }); p.status = 'defeated';
   for (let n = 0; n < 5; n++) recruit(s);
   assert.equal(choose(s), null);
 });
@@ -91,7 +91,7 @@ test('threat boundary is three hexes; distant, defeated and civilian-only partie
 test('an enemy waiting unit on the city center blocks investment, while friendly garrisons do not', () => {
   const s = fixture(); relocate(s, 'party-2', city(s).centerHex); assert.ok(choose(s));
   const enemy = recruit(s, 'settler', 'kingdom-1'); assert.equal(choose(s), null);
-  enemy.currentHp = enemy.hp = 0; enemy.status = 'incapacitated'; assert.ok(choose(s));
+  enemy.currentHp = enemy.hp = 0; enemy.status = 'shattered'; assert.ok(choose(s));
 });
 test('urgent walls are chosen before facilities even if research and funds are available', () => {
   const s = fixture(createAiConquestGameState); relocate(s, 'party-1', '2,-2,0');
