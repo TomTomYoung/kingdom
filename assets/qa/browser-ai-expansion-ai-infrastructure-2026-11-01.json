@@ -1,0 +1,17 @@
+{
+  "verifiedAt": "2026-10-31T16:40:53.585Z",
+  "browser": "141.0.7390.37",
+  "checks": [
+    "new AI scenario declares the investment policy and a real scheduled AI step buys an unlocked library at full price without immediate income",
+    "reload after the purchase preserves the shared purchase cap and reproduces the next human turn and library income",
+    "poor AI uses idle production with retained partial progress and the reservation replays from a mid-turn save",
+    "existing military queues survive facility purchases and already reserved libraries are not duplicated",
+    "nearby enemy pressure produces a wall order instead of discretionary facility investment",
+    "fewer than five living soldiers trigger ordinary army rebuilding rather than a library",
+    "old research-enabled saves keep the former military policy and do not gain the new version",
+    "unknown investment versions reject loading atomically without replacing the running game",
+    "investment policy and named facility activity remain readable at desktop and 390px without horizontal overflow"
+  ],
+  "pageErrors": [],
+  "httpFailures": []
+}

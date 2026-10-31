@@ -1,0 +1,18 @@
+{
+  "verifiedAt": "2026-10-31T16:41:21.484Z",
+  "browser": "141.0.7390.37",
+  "checks": [
+    "version-1 conquest preserves durability, siege controls and city-defense rules",
+    "wall production and purchase share building rules, remove duplicate orders and round-trip unchanged",
+    "enemy city selection previews wall-first damage without mutation and blocks entry/capture",
+    "actual siege spends activation, damages walls first, records the attack and reloads identically",
+    "repeated real attacks breach the city; next-turn movement and capture win with damaged inherited walls",
+    "invalid durability save rejects without replacing the current game",
+    "AI uses AttackCity and resumes the same seeded siege from a mid-turn save",
+    "historical conquest stays unfortified and explains how to start the new siege mode",
+    "wide and 390px layouts expose durability and siege controls without horizontal overflow",
+    "existing non-conquest modes hide unavailable siege and walls"
+  ],
+  "pageErrors": [],
+  "httpFailures": []
+}

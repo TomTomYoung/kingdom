@@ -8,7 +8,7 @@
 
 main / 7da210f（PR #11）を基準に、開拓者確保・護衛編成・安全な候補地と経路・移動・建設を既存Commandへ接続しました。新規増援戦・都市争奪戦だけaiExpansionVersion 1を使用し、旧施設投資AI保存は維持します。軍備6体・全都市安全・Gold予備費・同時開拓者1体・暫定3都市の条件があります。[現行規則と制約](AI_EXPANSION.md)。
 
-Node382テスト・構文117ファイルが成功。旧main216保存と864継続Commandが一致しました。12シードの単独王国で3都市までの拡張と各Commandの保存再開を確認しました。これは通常対戦のバランス評価とは区別します。[保存互換](../assets/qa/save-ai-expansion-compat-2026-11-01.json)・[運営検証](../assets/qa/ai-expansion-playthrough-2026-11-01.json)。実ブラウザ検証は未完了です。
+Node382テスト・構文117ファイルが成功。旧main216保存と864継続Commandが一致しました。12シードの単独王国で3都市までの拡張と各Commandの保存再開を確認しました。これは通常対戦のバランス評価とは区別します。[保存互換](../assets/qa/save-ai-expansion-compat-2026-11-01.json)・[運営検証](../assets/qa/ai-expansion-playthrough-2026-11-01.json)。Chromium 141.0.7390.37で全144チェック群が成功しました。都市拡張8群と既存の施設投資・研究・都市砲撃・生産・休養・戦闘・都市運営を含み、画面例外・HTTP失敗は0です。[検証概要](../assets/qa/ai-expansion-summary-2026-11-01.json)。画像の目視確認は別途記録します。
 
 ## 2026-11-01 解禁施設へのAI投資
 

@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-31T16:41:38.396Z",
+  "browser": "141.0.7390.37",
+  "realBrowser": true,
+  "errors": [],
+  "failures": [],
+  "result": "passed",
+  "checks": [
+    "two-city setup and disjoint worked tiles",
+    "selection and collection details have no state or RNG effects",
+    "selected-city production and purchase keep separate queues and spawn locations",
+    "territory candidates and cost follow selection; purchase spends shared Gold and assigns the chosen city",
+    "save/load preserves territory, work, economy and scenario",
+    "invalid territory load preserves city selection, camera and game",
+    "malformed collection snapshots reject atomically and retain city and zoom",
+    "historical missing collection details display summary only and return after collection",
+    "culture expands only its earning city; each city contributes once to shared income",
+    "legacy city assignment and 37-cell migration preserve stockpiles, RNG and map size",
+    "hotseat switches to the active kingdom city and purchases for that kingdom",
+    "1440px and 390px city controls, work details and map overlays"
+  ]
+}

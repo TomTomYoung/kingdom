@@ -1,0 +1,32 @@
+{
+  "verifiedAt": "2026-10-31T16:41:54.070543+00:00",
+  "baselineRevision": "7da210f663fe9c1d49af81138ce12746682a1c93",
+  "workflowRunId": "41220771966",
+  "testedRevision": "735bf389e9dad7c85707ddfddfce483c4450ca44",
+  "browser": "141.0.7390.37",
+  "nodeTests": 382,
+  "syntaxFiles": 117,
+  "saveSnapshots": 216,
+  "continuationCommands": 864,
+  "playthroughCommands": 692,
+  "playthroughSaveRoundTrips": 692,
+  "browserCheckGroups": 144,
+  "suites": {
+    "ai-expansion": 8,
+    "ai-infrastructure": 9,
+    "research": 12,
+    "city-bombardment": 11,
+    "production-queue": 11,
+    "party-care": 10,
+    "city-defense": 10,
+    "siege": 10,
+    "conquest": 10,
+    "ai": 13,
+    "cities": 12,
+    "ranged": 13,
+    "founding": 7,
+    "reorganization": 8
+  },
+  "pageErrors": [],
+  "httpFailures": []
+}
