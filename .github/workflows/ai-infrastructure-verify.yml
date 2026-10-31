@@ -27,41 +27,27 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify and integrate the exact tested patch
+      - name: Correct the casualty fixture without relaxing game validation
         run: |
           mkdir -p "$RUNNER_TEMP/kingdom-reports"
           python3 - <<'PY'
-          import hashlib, lzma, os
           from pathlib import Path
-          parts = Path('.github/ai-infrastructure-transfer')
-          patch = lzma.decompress(b''.join((parts/f'part-{i:02}.xz').read_bytes() for i in range(1,4)))
-          assert hashlib.sha256(patch).hexdigest() == 'adb2a4e5e8a4290456b3c230cf1b3b0eb6f00e1ffcbfe6541c06653cdd9a07f3'
-          Path(os.environ['RUNNER_TEMP'],'infrastructure.patch').write_bytes(patch)
+          for name in ['tools/qa/browser-ai-infrastructure.mjs','tests/ai-infrastructure.test.js']:
+              p=Path(name); text=p.read_text(); p.write_text(text.replace("status = 'incapacitated'", "status = 'shattered'"))
           PY
-          git fetch --no-tags --depth=1 origin 3ffac57429050908fe120fef81d896770f7499f1
-          export GIT_INDEX_FILE="$RUNNER_TEMP/verify-infrastructure.index"
-          git read-tree 3ffac57429050908fe120fef81d896770f7499f1
-          git apply --cached "$RUNNER_TEMP/infrastructure.patch"
-          test "$(git write-tree)" = c508ce59d107353d0c4f836e8d99708c02e834d5
-          unset GIT_INDEX_FILE
-          if git apply --check "$RUNNER_TEMP/infrastructure.patch"; then
-            git apply "$RUNNER_TEMP/infrastructure.patch"
-          else
-            git apply --reverse --check "$RUNNER_TEMP/infrastructure.patch"
-          fi
       - name: Syntax, regressions, old saves and development playthrough
         run: |
           npm run check | tee "$RUNNER_TEMP/kingdom-reports/syntax.log"
           npm test | tee "$RUNNER_TEMP/kingdom-reports/node.log"
           node tools/qa/save-ai-infrastructure-compat.mjs .qa-baseline assets/qa/save-ai-infrastructure-compat-2026-11-01.json | tee "$RUNNER_TEMP/kingdom-reports/compat.log"
           node tools/qa/ai-infrastructure-playthrough.mjs assets/qa/ai-infrastructure-playthrough-2026-11-01.json | tee "$RUNNER_TEMP/kingdom-reports/playthrough.log"
-      - name: Commit verified implementation on its feature branch
+      - name: Commit verified test fixture corrections
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- doc index.html src tests tools/qa wiki assets/qa/save-ai-infrastructure-compat-2026-11-01.json assets/qa/ai-infrastructure-playthrough-2026-11-01.json
+          git add -- tests tools/qa assets/qa/save-ai-infrastructure-compat-2026-11-01.json assets/qa/ai-infrastructure-playthrough-2026-11-01.json
           if ! git diff --cached --quiet; then
-            git commit -m 'feat: invest in unlocked facilities without changing old saved AI policies'
+            git commit -m 'test: use valid casualty states in AI investment fixtures'
             git push origin HEAD:refs/heads/codex/ai-infrastructure-20261101
           fi
           echo "KINGDOM_TESTED_REVISION=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
