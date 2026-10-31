@@ -1,0 +1,16 @@
+{
+  "verifiedAt": "2026-10-31T15:50:05.588Z",
+  "browser": "141.0.7390.37",
+  "checks": [
+    "purchase -> choose waiting unit without mutation -> reinforce existing party; action and reaction are spent",
+    "split preview focuses adjacent terrain; ended parties reject, then next turn splits and selects the new party",
+    "merge preserves recipient ID, removes donor marker and roster entry, and selects the ended recipient",
+    "successful load clears draft selections; dangling donor references reject without replacing state or selection",
+    "390px controls have no horizontal overflow and can merge in the opposite direction",
+    "hotseat handover clears the prior kingdom draft and exposes only the current kingdom members",
+    "AI uses ReinforceParty, reports the action and resumes identically; human reorganization is locked during AI turns",
+    "AI consolidates small adjacent parties through MergeParties and reports it in the activity summary"
+  ],
+  "pageErrors": [],
+  "httpFailures": []
+}

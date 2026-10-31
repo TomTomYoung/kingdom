@@ -1,0 +1,19 @@
+{
+  "verifiedAt": "2026-10-31T15:48:56.749Z",
+  "browser": "141.0.7390.37",
+  "checks": [
+    "new v3 starts without walls; real purchase enables range-two fire and preview is read-only",
+    "fire spends only its city charge, labels damage correctly and cannot be repeated after loading",
+    "human handoff does not refresh fire; the full-round boundary refreshes it once",
+    "destroyed walls, ruined city and out-of-range targets explain refusal and do not mutate state",
+    "intercept forecast matches actual HP, protection log and defender reaction consumption",
+    "lethal fire retains defeated records, clears unavailable targets and does not invent city-control victory",
+    "corrupt charges reject without replacement; v1 and v2 saves retain rules and explain unavailable city fire",
+    "AI fires through BombardParty, resumes the exact pending shot after reload and completes its bounded turn",
+    "changing selected cities switches source and keeps each fire charge independent",
+    "finished games disable city fire while preserving log inspection and saving",
+    "desktop and 390px previews fit without horizontal overflow and keyboard fire works"
+  ],
+  "pageErrors": [],
+  "httpFailures": []
+}

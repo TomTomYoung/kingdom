@@ -1,0 +1,19 @@
+{
+  "verifiedAt": "2026-10-31T15:49:01.975Z",
+  "browser": "141.0.7390.37",
+  "checks": [
+    "draft add, reorder and cancel do not mutate GameState or saved production",
+    "confirm uses one Command and preserves progress, resources, RNG and save round-trip",
+    "quick production buttons retain reservations and promote queued buildings without duplication",
+    "clear requires confirmation, retains work, and resume replays identically after reload",
+    "duplicate and completed buildings are disabled; purchasing one normalizes the displayed queue",
+    "city switching discards a draft and subsequent confirmation targets only the selected city",
+    "turn changes, successful load and new game invalidate unconfirmed drafts",
+    "AI turns disable edits and cannot submit a stale draft",
+    "walls are available in the defense scenario and finished games disable queue editing",
+    "zero-production forecasts are explicit and historical saves remain unchanged when inspected",
+    "keyboard reorder retains focus and the complete editor fits 1440px and 390px viewports"
+  ],
+  "pageErrors": [],
+  "httpFailures": []
+}

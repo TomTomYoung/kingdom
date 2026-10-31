@@ -42,7 +42,7 @@ aiInfrastructureVersionは存在するなら数値1だけを認め、researchVer
 
 Node標準355テスト（専用27件追加）が成功しました。旧mainの実ソースから生成した204保存で復元とJSONが一致し、816継続CommandのAI判断・状態が一致しました。研究済み・施設予約中・施設購入済み・旧研究版なしの状態も含みます。
 
-追加の開発継続検証は、2国の5人駐屯部隊の移動力を0にした非接敵の専用fixtureです。通常の科学収集・研究・費用・AI発注・生産で8seed×80ターンを進め、両国の全3研究・全3施設の完成、1,456コマンド、1,280回の保存復元と継続一致を確認しました。通常の戦争バランス評価ではありません。実ブラウザ検証は未完了です。
+追加の開発継続検証は、2国の5人駐屯部隊の移動力を0にした非接敵の専用fixtureです。通常の科学収集・研究・費用・AI発注・生産で8seed×80ターンを進め、両国の全3研究・全3施設の完成、1,456コマンド、1,280回の保存復元と継続一致を確認しました。通常の戦争バランス評価ではありません。Chromium 141.0.7390.37で全136チェック群が成功しました。施設投資9群と既存機能を含み、画面例外・HTTP失敗は0です。[検証概要](../assets/qa/ai-infrastructure-summary-2026-11-01.json)・[保存互換](../assets/qa/save-ai-infrastructure-compat-2026-11-01.json)・[非接敵開発検証](../assets/qa/ai-infrastructure-playthrough-2026-11-01.json)。1440px／390pxの画面画像は検証成果物に保存し、目視確認は別途記録します。
 
 再実行: npm test、npm run check。旧保存の比較はtools/qa/save-ai-infrastructure-compat.mjsへ旧mainチェックアウトと結果JSONのパスを渡します。非接敵の継続検証はtools/qa/ai-infrastructure-playthrough.mjs、実画面はtools/qa/browser-ai-infrastructure.mjsを使用します。
 
