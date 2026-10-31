@@ -1,0 +1,24 @@
+{
+  "verifiedAt": "2026-10-31T04:49:12.491353+00:00",
+  "browserWorkflowRunId": "41169644255",
+  "testedSourceRevision": "c54988da3ce05597599b7716ec5760bc85a0c3c1",
+  "nodeTests": 328,
+  "syntaxFiles": 107,
+  "targetSpecificationUnchanged": true,
+  "nonQaAssetsUnchanged": true,
+  "temporaryTransferFilesRemoved": true,
+  "visualReview": {
+    "viewports": [
+      1440,
+      390
+    ],
+    "files": [
+      "research/research-wide.png",
+      "research/research-panel.png",
+      "research/research-mobile.png"
+    ],
+    "reviewed": true,
+    "observations": "Research target selection, science budget, prerequisites, unlocks and controls are readable without horizontal overflow."
+  },
+  "relativeMarkdownLinks": 1012
+}

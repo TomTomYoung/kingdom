@@ -1,0 +1,177 @@
+{
+  "verifiedAt": "2026-10-31T04:49:12.431Z",
+  "kind": "additional bounded single-city playthrough",
+  "roundsPerSeed": 80,
+  "commands": 1046,
+  "saveRoundTrips": 1046,
+  "games": [
+    {
+      "seed": 1,
+      "turn": 81,
+      "completed": [
+        "writing",
+        "engineering",
+        "agriculture"
+      ],
+      "buildings": [
+        "library",
+        "granary",
+        "workshop"
+      ]
+    },
+    {
+      "seed": 2,
+      "turn": 81,
+      "completed": [
+        "writing",
+        "engineering",
+        "agriculture"
+      ],
+      "buildings": [
+        "library",
+        "workshop",
+        "granary"
+      ]
+    },
+    {
+      "seed": 3,
+      "turn": 81,
+      "completed": [
+        "writing",
+        "engineering",
+        "agriculture"
+      ],
+      "buildings": [
+        "library",
+        "workshop",
+        "granary"
+      ]
+    },
+    {
+      "seed": 4,
+      "turn": 81,
+      "completed": [
+        "writing",
+        "engineering",
+        "agriculture"
+      ],
+      "buildings": [
+        "library",
+        "workshop",
+        "granary"
+      ]
+    },
+    {
+      "seed": 5,
+      "turn": 81,
+      "completed": [
+        "writing",
+        "engineering",
+        "agriculture"
+      ],
+      "buildings": [
+        "library",
+        "workshop",
+        "granary"
+      ]
+    },
+    {
+      "seed": 6,
+      "turn": 81,
+      "completed": [
+        "writing",
+        "engineering",
+        "agriculture"
+      ],
+      "buildings": [
+        "library",
+        "workshop",
+        "granary"
+      ]
+    },
+    {
+      "seed": 7,
+      "turn": 81,
+      "completed": [
+        "writing",
+        "engineering",
+        "agriculture"
+      ],
+      "buildings": [
+        "library",
+        "workshop",
+        "granary"
+      ]
+    },
+    {
+      "seed": 8,
+      "turn": 81,
+      "completed": [
+        "writing",
+        "engineering",
+        "agriculture"
+      ],
+      "buildings": [
+        "library",
+        "workshop",
+        "granary"
+      ]
+    },
+    {
+      "seed": 9,
+      "turn": 81,
+      "completed": [
+        "writing",
+        "engineering",
+        "agriculture"
+      ],
+      "buildings": [
+        "library",
+        "workshop",
+        "granary"
+      ]
+    },
+    {
+      "seed": 10,
+      "turn": 81,
+      "completed": [
+        "writing",
+        "engineering",
+        "agriculture"
+      ],
+      "buildings": [
+        "library",
+        "workshop",
+        "granary"
+      ]
+    },
+    {
+      "seed": 11,
+      "turn": 81,
+      "completed": [
+        "writing",
+        "engineering",
+        "agriculture"
+      ],
+      "buildings": [
+        "library",
+        "workshop",
+        "granary"
+      ]
+    },
+    {
+      "seed": 12,
+      "turn": 81,
+      "completed": [
+        "writing",
+        "engineering",
+        "agriculture"
+      ],
+      "buildings": [
+        "library",
+        "workshop",
+        "granary"
+      ]
+    }
+  ]
+}
