@@ -1,4 +1,4 @@
-import { bombardParty, restParty, removeCasualties, attackCity, captureCity, reinforceParty, mergeParties, splitParty, attackParty, createParty, endTurn, foundCity, moveParty, purchaseCityItem, purchaseTile, setCityProduction, setFormation, setGuardOrder, startTurn } from './commands.js';
+import { selectResearch, bombardParty, restParty, removeCasualties, attackCity, captureCity, reinforceParty, mergeParties, splitParty, attackParty, createParty, endTurn, foundCity, moveParty, purchaseCityItem, purchaseTile, setCityProduction, setFormation, setGuardOrder, startTurn } from './commands.js';
 export class HumanController {
   constructor(playerId) { this.playerId = playerId; }
   nextId(state) { return `${this.playerId}-${state.currentTurn}-${state.commandLog.length + 1}`; }
@@ -20,5 +20,6 @@ export class HumanController {
   bombardParty(state, cityId, defenderPartyId) { return bombardParty(this.playerId, state.currentTurn, cityId, defenderPartyId, this.nextId(state)); }
   restParty(state, partyId) { return restParty(this.playerId, state.currentTurn, partyId, this.nextId(state)); }
   removeCasualties(state, partyId) { return removeCasualties(this.playerId, state.currentTurn, partyId, this.nextId(state)); }
+  selectResearch(state, technologyId) { return selectResearch(this.playerId, state.currentTurn, technologyId, this.nextId(state)); }
   endTurn(state) { return endTurn(this.playerId, state.currentTurn, this.nextId(state)); }
 }

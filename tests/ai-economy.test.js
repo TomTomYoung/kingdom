@@ -27,7 +27,9 @@ const roundTrip = state => restoreGameState(serializeGameState(state));
 test('reinforcement scenario is explicit and older tactical saves preserve both state and command choices', () => {
   const state = ready(); assert.equal(state.scenarioId, 'ai-reinforcements'); assert.equal(state.kingdoms[player].aiPolicy, 'reinforcements');
   assert.deepEqual(roundTrip(state), state); assert.equal(state.scenarioObjective.type, 'eliminate-parties');
-  const old = createAiSkirmishGameState(), restored = roundTrip(old);
+  const old = createAiSkirmishGameState();
+  delete old.researchVersion; Object.values(old.kingdoms).forEach(k => { delete k.research; });
+  const restored = roundTrip(old);
   assert.deepEqual(restored, old); assert.equal(Object.hasOwn(restored.kingdoms[player], 'aiPolicy'), false);
   let turn = apply(old, human.startTurn(old)); turn = apply(turn, human.endTurn(turn));
   assert.deepEqual(runAiTurn(turn).commands.map(c => c.type), ['MoveParty', 'AttackParty', 'EndTurn']);
@@ -143,7 +145,7 @@ test('enemy occupation and an impassable city exit cannot trigger illegal purcha
   for (let d = 0; d < 6; d++) trapped.world.tiles[Hex.fromKey(capital).neighbor(d).key].terrainId = 'void';
   relocate(trapped, 'party-1', '-5,5,0');
   trapped.cities['city-2'].production.currentItemId = 'warrior';
-  const result = runAiTurn(trapped); assert.equal(result.ok, true); assert.deepEqual(result.commands.map(c => c.type), ['EndTurn']);
+  const result = runAiTurn(trapped); assert.equal(result.ok, true); assert.deepEqual(result.commands.map(c => c.type), ['SelectResearch', 'EndTurn']);
 });
 
 test('two AI cities use shared Gold, separate production and at most one purchase each per turn', () => {

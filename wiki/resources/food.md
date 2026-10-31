@@ -23,3 +23,5 @@
 関連: [人口と人的資源](../rules/population.md)・[都市と生産](../rules/cities.md)。
 
 根拠: [産出・成長費](../../src/core/ruleset.js)、[都市産出](../../src/systems/yield-system.js)、[成長処理](../../src/core/turn-engine.js)。
+
+新規対局では[研究](../rules/research.md)で図書館・穀物庫・工房を解禁できます。施設は通常生産または全額Gold購入で建設し、追加産出は次回の収集からです。

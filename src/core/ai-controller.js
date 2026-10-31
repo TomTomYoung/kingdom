@@ -1,3 +1,4 @@
+import { chooseResearchCommand } from '../systems/research-system.js';
 import { validateCityBombardment } from '../systems/city-bombardment.js';
 import { previewPartyRest, validateRemoveCasualties } from '../systems/party-care.js';
 import { RULESET } from './ruleset.js';
@@ -111,7 +112,8 @@ export class AIController {
       const command = chooseSupplyCommand(state, this.playerId, id);
       if (command) return command;
     }
-    return finish();
+    const research = chooseResearchCommand(state, this.playerId, id);
+    return research ?? finish();
   }
 }
 

@@ -27,3 +27,5 @@
 根拠: [初期備蓄・軍事力](../../src/models/kingdom.js)、[費用](../../src/core/ruleset.js)、[購入](../../src/core/rule-system.js)、[領土価格](../../src/systems/territory-system.js)。
 
 新規都市争奪戦では[城壁](../buildings/walls.md)をGold120で購入できます。既存の建物と同様に生産途中の予約・進捗を解除し、再購入はできません。
+
+新規対局では[研究](../rules/research.md)で図書館・穀物庫・工房を解禁できます。施設は通常生産または全額Gold購入で建設し、追加産出は次回の収集からです。

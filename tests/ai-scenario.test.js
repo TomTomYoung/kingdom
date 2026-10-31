@@ -42,7 +42,7 @@ test('AI choices are deterministic and never inspect future RNG or mutate state'
 test('AI advances into firing range, attacks once, and ends its turn through ordinary Commands', () => {
   const state = aiTurn(), before = structuredClone(state), result = runAiTurn(state);
   assert.equal(result.ok, true, result.reason); assert.deepEqual(state, before);
-  assert.deepEqual(result.commands.map(c => c.type), ['MoveParty', 'AttackParty', 'EndTurn']);
+  assert.deepEqual(result.commands.map(c => c.type), ['MoveParty', 'AttackParty', 'SelectResearch', 'EndTurn']);
   assert.equal(result.commands[1].payload.attackType, 'ranged'); assert.equal(result.state.activePlayerId, 'kingdom-1');
   assert.equal(result.state.currentTurn, 2); assert.ok(result.events.some(event => event.type === 'CombatDamage'));
   assert.equal(new Set(result.commands.map(c => c.commandId)).size, result.commands.length); roundTrip(result.state);
@@ -69,20 +69,23 @@ test('AI searches around impassable terrain and occupied cells using legal movem
   state.world.tiles['6,-5,-1'].terrainId = 'forest';
   let next = ai.nextCommand(state); assert.equal(next.type, 'MoveParty'); assert.deepEqual(next.payload.path, ['6,-5,-1']);
   state = apply(state, next); assert.equal(state.parties['party-2'].movementRemaining, 0);
-  // An allied active party blocking the only route forces EndTurn; a defeated record does not.
+  // A blocked army may still select research, then ends its turn; a defeated record does not block movement.
   const blocked = aiTurn(); for (let d = 0; d < 6; d++) blocked.world.tiles[Hex.fromKey('6,-6,0').neighbor(d).key].terrainId = 'void';
   blocked.world.tiles['5,-5,0'].terrainId = 'plains';
   const unit = createUnit('unit-11', 'kingdom-2', 'settler', '5,-5,0'); unit.partyId = 'party-3'; blocked.units[unit.id] = unit;
   blocked.parties['party-3'] = createParty('party-3', 'kingdom-2', [unit.id], unit.location);
-  assert.equal(ai.nextCommand(blocked).type, 'EndTurn');
+  assert.equal(ai.nextCommand(blocked).type, 'SelectResearch');
+  const selected = apply(blocked, ai.nextCommand(blocked)); assert.equal(ai.nextCommand(selected).type, 'EndTurn');
   blocked.parties['party-3'].status = 'defeated'; assert.equal(ai.nextCommand(blocked).type, 'MoveParty');
 });
 
 test('AI skips civilian-only and exhausted parties and enforces a finite command budget', () => {
   const state = aiTurn();
   for (const id of state.parties['party-2'].unitIds) state.units[id].typeId = 'settler';
-  assert.equal(ai.nextCommand(state).type, 'EndTurn');
-  const exhausted = aiTurn(); exhausted.parties['party-2'].attacksRemaining = 0; assert.equal(ai.nextCommand(exhausted).type, 'EndTurn');
+  assert.equal(ai.nextCommand(state).type, 'SelectResearch');
+  assert.equal(ai.nextCommand(apply(state, ai.nextCommand(state))).type, 'EndTurn');
+  const exhausted = aiTurn(); exhausted.parties['party-2'].attacksRemaining = 0; assert.equal(ai.nextCommand(exhausted).type, 'SelectResearch');
+  assert.equal(ai.nextCommand(apply(exhausted, ai.nextCommand(exhausted))).type, 'EndTurn');
   const bounded = runAiTurn(aiTurn(), { commandLimit: 1 });
   assert.equal(bounded.ok, true); assert.deepEqual(bounded.commands.map(c => c.type), ['MoveParty', 'EndTurn']);
   assert.equal(bounded.state.activePlayerId, 'kingdom-1');

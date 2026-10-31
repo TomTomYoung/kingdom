@@ -3,6 +3,7 @@ import { COMMAND_TYPES } from './commands.js';
 const record = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 const identifier = (value) => typeof value === 'string' && value.trim().length > 0;
 const fields = {
+  SelectResearch: [],
   RestParty: ['partyId'], RemoveCasualties: ['partyId'],
   BombardParty: ['cityId', 'defenderPartyId'],
   AttackCity: ['partyId', 'cityId', 'attackType'],
@@ -34,6 +35,7 @@ export function validateCommand(state, command) {
   for (const field of fields[command.type]) {
     if (!Object.hasOwn(payload, field) || !identifier(payload[field])) return `${field}が必要です`;
   }
+  if (command.type === COMMAND_TYPES.SELECT_RESEARCH && (!Object.hasOwn(payload, 'technologyId') || (payload.technologyId !== null && !identifier(payload.technologyId)))) return 'technologyIdが必要です';
   if (command.type === COMMAND_TYPES.SET_CITY_PRODUCTION) {
     if (!Object.hasOwn(payload, 'itemId') || (payload.itemId !== null && !identifier(payload.itemId))) return 'itemIdが必要です';
     if (!Array.isArray(payload.queue) || !payload.queue.every(identifier)) return '生産キューは対象IDの配列で指定してください';

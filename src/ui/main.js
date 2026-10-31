@@ -1,3 +1,5 @@
+import { ResearchPanel } from './research.js';
+import { hasResearch, itemResearchError } from '../systems/research-system.js';
 import { CityBombardmentPanel } from './city-bombardment.js';
 import { ProductionQueuePanel, queueForSelection } from './production-queue.js';
 import { PartyCarePanel } from './party-care.js';
@@ -60,6 +62,9 @@ const formationPanel = new FormationPanel($('#formation'), assets, {
   onCancel: () => { void audio.play('se-ui-cancel'); },
 });
 
+const researchPanel = new ResearchPanel($('#research-panel'), {
+  onSelect: id => run(controller.selectResearch(state, id), id === null ? '研究を一時停止しました。途中進捗と未配分の科学は保持します。' : '研究対象を設定しました。次の全体ターン開始に科学を配分します。'),
+});
 const productionQueue = new ProductionQueuePanel($('#production-queue'), {
   onApply: (cityId, items) => run(controller.setProduction(state, cityId, items[0] ?? null, items.slice(1)), items.length ? '生産キューを確定しました。途中の進捗は保持しています。' : '生産を停止しました。途中の進捗は再選択すると引き継ぎます。'),
 });
@@ -112,7 +117,8 @@ function applyResult(result, command, success) {
     selectedUnitId = state.parties[selectedPartyId]?.leaderUnitId ?? null; selectedEnemyId = null; selectedTileKey = state.parties[selectedPartyId]?.location ?? homeLocation();
     formationPanel.clear(); inspection.clear(); hoveredKey = null;
   }
-  show(typeof success === 'function' ? success() : success); render();
+  const completed = result.events.filter(e => e.type === 'TechnologyCompleted' && e.kingdomId === controller.playerId).map(e => RULESET.technologies[e.technologyId].name);
+  show(`${typeof success === 'function' ? success() : success}${completed.length ? ` 研究完了: ${completed.join('、')}` : ''}`); render();
   if (result.events.some(event => event.type === 'CombatDamage')) map.playCombat(result.events);
   if (controller.playerId !== previousPlayer) map.focus(selectedTileKey);
   scheduleAi(); return result;
@@ -135,6 +141,7 @@ function scheduleAi() {
 function aiActionMessage(result) {
   if (result.state.gameResult) return '対局が終了しました。結果と戦闘ログを確認できます。';
   const messages = {
+    SelectResearch: 'AIが研究対象を選択しました。',
     RestParty: 'AIが負傷した部隊の休養を開始しました。', RemoveCasualties: 'AIが戦闘不能者を部隊から離脱させました。',
     BombardParty: 'AIが都市から砲撃しました。', AttackCity: 'AIが都市を攻撃しました。', CaptureCity: 'AIが都市を占領しました。',
     EndTurn: 'AIの手番が終了しました。あなたの手番です。', AttackParty: 'AIが攻撃しました。戦闘ログで結果を確認できます。',
@@ -148,7 +155,7 @@ function aiActionMessage(result) {
 function renderAiActivity() {
   const commands = state.commandLog.filter(command => state.kingdoms[command.playerId]?.controllerType === 'ai');
   const turn = commands.at(-1)?.turn, recent = commands.filter(command => command.turn === turn);
-  const labels = { BombardParty: '都市砲撃', RestParty: '休養', RemoveCasualties: '戦闘不能者の離脱', AttackCity: '攻城', CaptureCity: '都市占領', SetCityProduction: '生産設定', PurchaseCityItem: '購入', CreateParty: '増援編成', ReinforceParty: '補充', MergeParties: '合流', MoveParty: '移動', AttackParty: '攻撃' };
+  const labels = { SelectResearch: '研究選択', BombardParty: '都市砲撃', RestParty: '休養', RemoveCasualties: '戦闘不能者の離脱', AttackCity: '攻城', CaptureCity: '都市占領', SetCityProduction: '生産設定', PurchaseCityItem: '購入', CreateParty: '増援編成', ReinforceParty: '補充', MergeParties: '合流', MoveParty: '移動', AttackParty: '攻撃' };
   const actions = Object.entries(labels).map(([type, label]) => {
     const count = recent.filter(command => command.type === type).length;
     return count ? `${label} ${count}回` : null;
@@ -326,6 +333,7 @@ function render() {
   const k = state.kingdoms[controller.playerId], city = currentCity();
   selectedCityId = city?.id ?? null; $('#focus-city').disabled = !city;
   renderCityDetails(city);
+  researchPanel.render(state, controller.playerId, canAct());
   bombardmentPanel.render(state, controller.playerId, city?.id, selectedEnemyId, canAct());
   productionQueue.render(state, city, controller.playerId, canAct());
   $('#city-defense').textContent = cityDefenseLabel(state, city); $('#city-defense').hidden = !hasCityDefense(state) || !city;
@@ -348,6 +356,7 @@ function render() {
     $('#city-art').replaceChildren(assets.icon('building-city', 'unit-art')); $('#buildings').replaceChildren();
     if (city.buildings.includes('monument')) $('#buildings').append(assets.icon('building-monument', 'unit-art'), 'モニュメント建設済み');
     if (city.buildings.includes('walls')) $('#buildings').append(' 城壁建設済み');
+    for (const id of city.buildings.filter(id => RULESET.items[id].requiredTechnology)) $('#buildings').append(` ${RULESET.items[id].name}建設済み`);
     const item = city.production.currentItemId && RULESET.items[city.production.currentItemId];
     $('#production-status').textContent = item ? `${item.name}: ${city.production.progressByItem[item.itemId] ?? 0} / ${item.productionCost}` : '生産対象を選択してください';
   } else {
@@ -356,7 +365,7 @@ function render() {
     $('#food-bar').style.width = '0%'; $('#culture-bar').style.width = '0%';
     $('#production-status').textContent = '所有都市なし';
   }
-  document.querySelectorAll('[data-produce]').forEach((button) => { const item = RULESET.items[button.dataset.produce]; button.replaceChildren(assets.icon(item.category === 'unit' ? `unit-${item.itemId}` : item.itemId === 'walls' ? 'building-city' : 'building-monument', 'unit-art'), `${item.name}を生産`); });
+  document.querySelectorAll('[data-produce]').forEach((button) => { const item = RULESET.items[button.dataset.produce]; button.replaceChildren(assets.icon(item.category === 'unit' ? `unit-${item.itemId}` : item.itemId === 'monument' ? 'building-monument' : 'building-city', 'unit-art'), `${item.name}を生産`); });
   $('#party-status').replaceChildren();
   if (party) { $('#party-status').append(assets.icon(`unit-${state.units[party.leaderUnitId]?.typeId ?? 'warrior'}`, 'unit-art'), `${partyName(party)} · ${party.unitIds.length}体`); $('#party-detail').textContent = `移動力 ${party.movementRemaining}/${party.movementMaximum} · 攻撃回数 ${party.attacksRemaining}/${party.attacksMaximum}`; }
   else { $('#party-status').textContent = selectedUnitId ? `${unitName(state.units[selectedUnitId])} ${selectedUnitId} · ${isActiveUnit(state.units[selectedUnitId]) ? '待機中' : '戦闘不能の記録'}` : '部隊・Unitを選択してください'; $('#party-detail').textContent = '地図の駒または上の一覧から選べます。'; }
@@ -365,7 +374,7 @@ function render() {
   renderFounding(); renderRoster(); formationPanel.render(state, party); partyCare.render(state, party, controller.playerId); reorganization.render(state, party, controller.playerId); renderInspection(); updateHover(); drawMap();
   combatPanel.render(state, selectedPartyId, selectedEnemyId, controller.playerId);
   void audio.setMusic(state.parties[selectedEnemyId]?.status === 'active' ? 'bgm-battle' : 'bgm-overworld');
-  document.querySelectorAll('[data-produce],[data-buy]').forEach(button => { const id = button.dataset.produce ?? button.dataset.buy; button.hidden = id === 'walls' && !hasCityDefense(state); button.disabled = button.hidden || !city || !canAct() || RULESET.items[id].category === 'building' && city.buildings.includes(id); });
+  document.querySelectorAll('[data-produce],[data-buy]').forEach(button => { const id = button.dataset.produce ?? button.dataset.buy; const reason = itemResearchError(state, controller.playerId, id); button.hidden = id === 'walls' && !hasCityDefense(state) || !!RULESET.items[id].requiredTechnology && !hasResearch(state); button.title = reason ?? ''; button.disabled = button.hidden || !city || !canAct() || !!reason || RULESET.items[id].category === 'building' && city.buildings.includes(id); });
 }
 
 const gesture = () => { void audio.unlock(); };

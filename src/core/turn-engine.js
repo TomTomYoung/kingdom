@@ -1,3 +1,4 @@
+import { applyResearch } from '../systems/research-system.js';
 import { processPartyRest } from '../systems/party-care.js';
 import { hasCityBombardment, hasCityRetaliation } from '../models/city-defense.js';
 import { recoverCityDefense } from '../systems/city-siege.js';
@@ -35,6 +36,8 @@ export function processTurnStart(state, events) {
         city.localCultureProgress -= RULESET.cultureExpansionCost;
       }
     }
+    // Science has already been collected once above. Allocate its unassigned portion.
+    applyResearch(state, kingdom, events);
     for (const party of Object.values(state.parties).filter(({ ownerId }) => ownerId === kingdom.id)) {
       const active = party.status === 'active' && hasActiveUnits(state, party);
       party.movementRemaining = active ? party.movementMaximum : 0;
