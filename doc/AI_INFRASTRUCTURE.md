@@ -46,7 +46,7 @@ Node標準355テスト（専用27件追加）が成功しました。旧mainの�
 
 再実行: npm test、npm run check。旧保存の比較はtools/qa/save-ai-infrastructure-compat.mjsへ旧mainチェックアウトと結果JSONのパスを渡します。非接敵の継続検証はtools/qa/ai-infrastructure-playthrough.mjs、実画面はtools/qa/browser-ai-infrastructure.mjsを使用します。
 
-次の候補は都市拡張AIです。既存FoundCityの距離・所有権・移動力・護衛維持を共用し、開拓者・護衛の確保と建設地点評価を段階的に接続します。現時点では開拓AI、正式研究木、汎用Ability、mana用途、Dungeon、Domination全体は未実装です。
+都市拡張AIは後続工程で実装しました。新規aiExpansionVersion 1では緊急城壁の後・施設投資の前に開拓者調達を判定します。[開拓・護衛・経路の条件](AI_EXPANSION.md)。正式研究木、汎用Ability、mana用途、Dungeon、Domination全体は未実装です。
 
 根拠: [投資判断](../src/core/ai-infrastructure.js)・[補給順序](../src/core/ai-economy.js)・[定義](../src/core/ruleset.js)・[保存検証](../src/core/save-validation.js)・[専用テスト](../tests/ai-infrastructure.test.js)。
 

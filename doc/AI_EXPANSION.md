@@ -50,10 +50,12 @@ Node標準382テスト（専用27件追加）とJavaScript117ファイルの構�
 
 12シードの地形を変更しない単独王国fixtureで、6初期兵から通常AIによる3都市への拡張と各Command境界の保存・同一継続を確認しました。[拡張運営検証](../assets/qa/ai-expansion-playthrough-2026-11-01.json)。敵がいない条件であり、通常の対戦バランス評価ではありません。通常の増援戦・都市争奪戦でも2AIの終了・保存再開を各2シードで確認しています。
 
-Chromium 141.0.7390.37で全144チェック群が成功しました。都市拡張8群と既存の施設投資・研究・都市砲撃・生産・休養・戦闘・都市運営を含み、画面例外・HTTP失敗は0です。[検証概要](../assets/qa/ai-expansion-summary-2026-11-01.json)。画像の目視確認は別途記録します。
+Chromium 141.0.7390.37で全144チェック群が成功しました。都市拡張8群と既存の施設投資・研究・都市砲撃・生産・休養・戦闘・都市運営を含み、画面例外・HTTP失敗は0です。[検証概要](../assets/qa/ai-expansion-summary-2026-11-01.json)。1440px／390pxの画像を目視確認し、開拓方針・都市数・建設履歴に欠けや横はみ出しがないことを確認しました。
 
 ## 残る範囲と次工程
 
 複数開拓部隊の同時管理、遠方の護衛との合流、先行偵察・視界、外交による通行、撤退の最適化、継続的な都市数戦略、通常対戦の定量的なバランス調整は未実装です。研究木・汎用Ability・mana用途・Dungeon・Domination全体も完成扱いにしません。次工程の候補は、既存の蓄積manaを使う最小限の能動AbilityをCommand・費用・回数・予測・保存へ接続することです。
 
 再検証はnpm test、npm run check。ブラウザはtools/qa/browser-ai-expansion.mjs、旧保存比較はtools/qa/save-ai-expansion-compat.mjs、運営確認はtools/qa/playthrough-ai-expansion.mjsを使用します。
+
+最終整理では検証済み735bf38からゲーム実装・テスト・ブラウザQAを変更せず、Node回帰を再実行しました。[最終確認](../assets/qa/ai-expansion-final-review-2026-11-01.json)。一時統合ヘルパーと書込み権限付き検証ワークフローはマージ前に削除し、既存の読取り専用Node CIを維持します。
