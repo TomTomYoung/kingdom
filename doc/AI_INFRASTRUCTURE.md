@@ -46,8 +46,13 @@ Node標準355テスト（専用27件追加）が成功しました。旧mainの�
 
 再実行: npm test、npm run check。旧保存の比較はtools/qa/save-ai-infrastructure-compat.mjsへ旧mainチェックアウトと結果JSONのパスを渡します。非接敵の継続検証はtools/qa/ai-infrastructure-playthrough.mjs、実画面はtools/qa/browser-ai-infrastructure.mjsを使用します。
 
-次の候補は都市拡張AIです。既存FoundCityの距離・所有権・移動力・護衛維持を共用し、開拓者・護衛の確保と建設地点評価を段階的に接続します。現時点では開拓AI、正式研究木、汎用Ability、mana用途、Dungeon、Domination全体は未実装です。
+都市拡張AIは後続工程で実装しました。新規aiExpansionVersion 1では緊急城壁の後・施設投資の前に開拓者調達を判定します。[開拓・護衛・経路の条件](AI_EXPANSION.md)。正式研究木、汎用Ability、mana用途、Dungeon、Domination全体は未実装です。
 
 根拠: [投資判断](../src/core/ai-infrastructure.js)・[補給順序](../src/core/ai-economy.js)・[定義](../src/core/ruleset.js)・[保存検証](../src/core/save-validation.js)・[専用テスト](../tests/ai-infrastructure.test.js)。
 
 初回ブラウザ検証では、戦闘不能者のfixtureに未定義のincapacitatedを使ったため保存検証が正しく拒否しました。既存モデルのshatteredにテストデータだけを直し、ゲームの保存検証を緩めずに全136群を再検証しました。検証済みソースから実装を変更せず、最終整理でも全355テストを再実行しています。この工程の最終差分には一時転送ファイルと書込み権限付き検証ワークフローを含めません。
+
+
+## 2026-11-01 都市拡張AI
+
+新規増援戦・都市争奪戦に、開拓者の確保・護衛・安全な経路・都市建設を追加しました。旧版なし保存のAIは変更しません。6生存兵、購入後Gold72以上、同時開拓者1体、暫定3都市までの方針です。[条件・操作・制約・検証](AI_EXPANSION.md)。

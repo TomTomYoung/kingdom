@@ -1,0 +1,250 @@
+{
+  "verifiedAt": "2026-10-31T16:40:28.427Z",
+  "kind": "single kingdom, six initial soldiers, unmodified seeded map, no opponent; bounded development verification",
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    7,
+    11,
+    23,
+    42,
+    77,
+    117,
+    256,
+    1024
+  ],
+  "commands": 692,
+  "saveRoundTrips": 692,
+  "games": [
+    {
+      "seed": 1,
+      "turn": 22,
+      "cities": [
+        "city-1",
+        "city-2",
+        "city-3"
+      ],
+      "foundings": [
+        {
+          "turn": 12,
+          "tileKey": "-2,-2,4"
+        },
+        {
+          "turn": 22,
+          "tileKey": "2,-6,4"
+        }
+      ]
+    },
+    {
+      "seed": 2,
+      "turn": 20,
+      "cities": [
+        "city-1",
+        "city-2",
+        "city-3"
+      ],
+      "foundings": [
+        {
+          "turn": 12,
+          "tileKey": "-4,2,2"
+        },
+        {
+          "turn": 20,
+          "tileKey": "3,1,-4"
+        }
+      ]
+    },
+    {
+      "seed": 3,
+      "turn": 25,
+      "cities": [
+        "city-1",
+        "city-2",
+        "city-3"
+      ],
+      "foundings": [
+        {
+          "turn": 14,
+          "tileKey": "-2,4,-2"
+        },
+        {
+          "turn": 25,
+          "tileKey": "4,0,-4"
+        }
+      ]
+    },
+    {
+      "seed": 4,
+      "turn": 25,
+      "cities": [
+        "city-1",
+        "city-2",
+        "city-3"
+      ],
+      "foundings": [
+        {
+          "turn": 16,
+          "tileKey": "4,-3,-1"
+        },
+        {
+          "turn": 25,
+          "tileKey": "5,-7,2"
+        }
+      ]
+    },
+    {
+      "seed": 7,
+      "turn": 25,
+      "cities": [
+        "city-1",
+        "city-2",
+        "city-3"
+      ],
+      "foundings": [
+        {
+          "turn": 14,
+          "tileKey": "0,-4,4"
+        },
+        {
+          "turn": 25,
+          "tileKey": "2,-8,6"
+        }
+      ]
+    },
+    {
+      "seed": 11,
+      "turn": 22,
+      "cities": [
+        "city-1",
+        "city-2",
+        "city-3"
+      ],
+      "foundings": [
+        {
+          "turn": 14,
+          "tileKey": "-2,4,-2"
+        },
+        {
+          "turn": 22,
+          "tileKey": "-3,-2,5"
+        }
+      ]
+    },
+    {
+      "seed": 23,
+      "turn": 24,
+      "cities": [
+        "city-1",
+        "city-2",
+        "city-3"
+      ],
+      "foundings": [
+        {
+          "turn": 16,
+          "tileKey": "-4,2,2"
+        },
+        {
+          "turn": 24,
+          "tileKey": "0,-4,4"
+        }
+      ]
+    },
+    {
+      "seed": 42,
+      "turn": 21,
+      "cities": [
+        "city-1",
+        "city-2",
+        "city-3"
+      ],
+      "foundings": [
+        {
+          "turn": 15,
+          "tileKey": "-3,-1,4"
+        },
+        {
+          "turn": 21,
+          "tileKey": "4,-4,0"
+        }
+      ]
+    },
+    {
+      "seed": 77,
+      "turn": 24,
+      "cities": [
+        "city-1",
+        "city-2",
+        "city-3"
+      ],
+      "foundings": [
+        {
+          "turn": 14,
+          "tileKey": "2,-4,2"
+        },
+        {
+          "turn": 24,
+          "tileKey": "2,2,-4"
+        }
+      ]
+    },
+    {
+      "seed": 117,
+      "turn": 34,
+      "cities": [
+        "city-1",
+        "city-2",
+        "city-3"
+      ],
+      "foundings": [
+        {
+          "turn": 17,
+          "tileKey": "0,-4,4"
+        },
+        {
+          "turn": 34,
+          "tileKey": "-3,-5,8"
+        }
+      ]
+    },
+    {
+      "seed": 256,
+      "turn": 24,
+      "cities": [
+        "city-1",
+        "city-2",
+        "city-3"
+      ],
+      "foundings": [
+        {
+          "turn": 16,
+          "tileKey": "3,1,-4"
+        },
+        {
+          "turn": 24,
+          "tileKey": "5,-3,-2"
+        }
+      ]
+    },
+    {
+      "seed": 1024,
+      "turn": 22,
+      "cities": [
+        "city-1",
+        "city-2",
+        "city-3"
+      ],
+      "foundings": [
+        {
+          "turn": 15,
+          "tileKey": "-3,4,-1"
+        },
+        {
+          "turn": 22,
+          "tileKey": "1,-4,3"
+        }
+      ]
+    }
+  ]
+}

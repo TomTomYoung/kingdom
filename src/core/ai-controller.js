@@ -1,3 +1,4 @@
+import { chooseExpeditionCommand, isExpansionParty } from './ai-expansion.js';
 import { chooseResearchCommand } from '../systems/research-system.js';
 import { validateCityBombardment } from '../systems/city-bombardment.js';
 import { previewPartyRest, validateRemoveCasualties } from '../systems/party-care.js';
@@ -70,7 +71,7 @@ export class AIController {
     if (forceEnd) return finish();
     const conquest = hasCityObjective(state);
     const enemyCities = conquest ? ordered(state.cities).filter(city => city.ownerId !== this.playerId) : [];
-    if (conquest) for (const party of ordered(state.parties)) for (const city of enemyCities) {
+    if (conquest) for (const party of ordered(state.parties).filter(p => !isExpansionParty(state, p))) for (const city of enemyCities) {
       if (validateCaptureCity(state, this.playerId, party.id, city.id).ok) return captureCity(this.playerId, state.currentTurn, party.id, city.id, id);
     }
     // Capture remains first. City fire spends no garrison action and reads no RNG.
@@ -85,13 +86,15 @@ export class AIController {
       if (validateRemoveCasualties(state, this.playerId, party.id).ok) return removeCasualties(this.playerId, state.currentTurn, party.id, id);
       if (party.unitIds.some(id => isActiveUnit(state.units[id]) && state.units[id].currentHp / state.units[id].maxHp <= RULESET.partyRecovery.aiRestHpRatio) && previewPartyRest(state, this.playerId, party.id).ok) return restParty(this.playerId, state.currentTurn, party.id, id);
     }
+    const expedition = chooseExpeditionCommand(state, this.playerId, id);
+    if (expedition) return expedition;
     const recruits = state.kingdoms[this.playerId].aiPolicy === 'reinforcements';
     if (recruits) {
       const command = chooseReinforcementCommand(state, this.playerId, id) ?? chooseCityExitCommand(state, this.playerId, id) ?? chooseDeploymentCommand(state, this.playerId, id);
       if (command) return command;
     }
     const parties = ordered(state.parties), enemies = parties.filter(p => p.ownerId !== this.playerId && p.status === 'active' && hasActiveUnits(state, p));
-    const own = parties.filter(p => p.ownerId === this.playerId && p.status === 'active' && p.activationState === 'ready' && p.attacksRemaining > 0 && hasActiveUnits(state, p));
+    const own = parties.filter(p => !isExpansionParty(state, p) && p.ownerId === this.playerId && p.status === 'active' && p.activationState === 'ready' && p.attacksRemaining > 0 && hasActiveUnits(state, p));
     for (const party of own) for (const enemy of enemies) {
       const kind = attackTypeAt(state, party, enemy);
       if (kind) return attackParty(this.playerId, state.currentTurn, party.id, enemy.id, kind, id);

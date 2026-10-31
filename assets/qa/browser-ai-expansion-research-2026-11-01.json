@@ -1,0 +1,20 @@
+{
+  "verifiedAt": "2026-10-31T16:40:58.537Z",
+  "browser": "141.0.7390.37",
+  "checks": [
+    "new game exposes research, locks only new buildings, and keyboard selection spends no science or actions",
+    "round start allocates science once, displays progress and replays identically after save/load",
+    "switch, pause and resume retain topic-specific work and spend only unassigned science",
+    "completion unlocks library and engineering; paid construction yields its science bonus only on later collection",
+    "production queue enforces research unlocks and purchase removes a reserved building without duplicate completion",
+    "excess science remains banked and subsequent research cannot complete by repeated selection in the same turn",
+    "research is kingdom-wide across city selection and sums multi-city income once",
+    "human hotseat shows only the active kingdom research and allocates at the shared round boundary",
+    "AI selects through the shared Command, locks human controls and resumes deterministically from an AI-turn save",
+    "legacy rules are explicit and unchanged; corrupt research saves are rejected without replacing current play",
+    "zero-income estimate is explicit; game over locks research before the next collection",
+    "research list, prerequisites, unlocks and keyboard controls render at 1440px and 390px without horizontal overflow"
+  ],
+  "pageErrors": [],
+  "httpFailures": []
+}

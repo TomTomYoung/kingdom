@@ -43,6 +43,7 @@ export function createAiReinforcementGameState(seed = 117) {
   state.scenarioId = 'ai-reinforcements';
   state.kingdoms['kingdom-2'].aiPolicy = 'reinforcements';
   state.aiInfrastructureVersion = 1;
+  state.aiExpansionVersion = 1;
   return state;
 }
 

@@ -1,3 +1,4 @@
+import { hasExpansionAi } from '../core/ai-expansion.js';
 import { hasInfrastructureAi } from '../core/ai-infrastructure.js';
 import { ResearchPanel } from './research.js';
 import { hasResearch, itemResearchError } from '../systems/research-system.js';
@@ -142,6 +143,7 @@ function scheduleAi() {
 function aiActionMessage(result) {
   if (result.state.gameResult) return '対局が終了しました。結果と戦闘ログを確認できます。';
   const messages = {
+    FoundCity: 'AIが開拓者を使って新しい都市を建設しました。',
     SelectResearch: 'AIが研究対象を選択しました。',
     RestParty: 'AIが負傷した部隊の休養を開始しました。', RemoveCasualties: 'AIが戦闘不能者を部隊から離脱させました。',
     BombardParty: 'AIが都市から砲撃しました。', AttackCity: 'AIが都市を攻撃しました。', CaptureCity: 'AIが都市を占領しました。',
@@ -156,14 +158,14 @@ function aiActionMessage(result) {
 function renderAiActivity() {
   const commands = state.commandLog.filter(command => state.kingdoms[command.playerId]?.controllerType === 'ai');
   const turn = commands.at(-1)?.turn, recent = commands.filter(command => command.turn === turn);
-  const labels = { SelectResearch: '研究選択', BombardParty: '都市砲撃', RestParty: '休養', RemoveCasualties: '戦闘不能者の離脱', AttackCity: '攻城', CaptureCity: '都市占領', SetCityProduction: '生産設定', PurchaseCityItem: '購入', CreateParty: '増援編成', ReinforceParty: '補充', MergeParties: '合流', MoveParty: '移動', AttackParty: '攻撃' };
+  const labels = { FoundCity: '都市建設', SelectResearch: '研究選択', BombardParty: '都市砲撃', RestParty: '休養', RemoveCasualties: '戦闘不能者の離脱', AttackCity: '攻城', CaptureCity: '都市占領', SetCityProduction: '生産設定', PurchaseCityItem: '購入', CreateParty: '増援編成', ReinforceParty: '補充', MergeParties: '合流', MoveParty: '移動', AttackParty: '攻撃' };
   const actions = Object.entries(labels).map(([type, label]) => {
     const count = recent.filter(command => command.type === type).length;
     return count ? `${label} ${count}回` : null;
   }).filter(Boolean);
   const walls = recent.filter(command => ['SetCityProduction', 'PurchaseCityItem'].includes(command.type) && command.payload.itemId === 'walls').length;
   if (walls) actions.push(`城壁発注 ${walls}回`);
-  for (const item of Object.values(RULESET.items).filter(item => item.requiredTechnology)) {
+  for (const item of Object.values(RULESET.items).filter(item => item.requiredTechnology || item.itemId === 'settler')) {
     const orders = recent.filter(command => ['SetCityProduction', 'PurchaseCityItem'].includes(command.type) && command.payload.itemId === item.itemId);
     const bought = orders.filter(command => command.type === 'PurchaseCityItem').length, produced = orders.length - bought;
     if (bought) actions.push(`${item.name}購入 ${bought}回`);
@@ -180,6 +182,11 @@ function renderScenario() {
   investmentStatus.textContent = hasInfrastructureAi(state)
     ? `施設投資AI: 生存兵${RULESET.aiInfrastructure.minimumCombatUnits}体以上・自国都市の${RULESET.aiInfrastructure.threatRange}ヘクス以内に敵軍なしで、解禁施設へ王国ごと全体ターン${RULESET.aiInfrastructure.ordersPerKingdomPerTurn}件まで投資します。城壁防御を優先し、購入後にGold${RULESET.aiRecruitment.goldReserve + RULESET.items.warrior.purchaseOptions.gold}以上を残します。`
     : '旧セーブの施設投資なしAIを維持しています。施設投資AIは新規の増援戦・都市争奪戦で利用できます。';
+  const expansionStatus = $('#ai-expansion-status');
+  expansionStatus.hidden = investmentStatus.hidden;
+  expansionStatus.textContent = hasExpansionAi(state)
+    ? `都市拡張AI: 生存兵${RULESET.aiExpansion.minimumCombatUnits}体以上・自国都市の安全を確認して、護衛付きで最大${RULESET.aiExpansion.maxCities}都市まで開拓します。開拓者は同時に1体、購入後Gold72以上を保持。敵軍・敵都市から3ヘクス以内を避け、危険時は退避を試みます。数値は暫定です。`
+    : '旧セーブの開拓なしAIを維持しています。都市拡張AIは新規の増援戦・都市争奪戦で利用できます。';
   const result = state.gameResult;
   if (result) {
     $('#scenario-title').textContent = result.outcome === 'draw' ? '引き分け' : result.winnerId === controller.playerId ? '勝利' : '敗北';

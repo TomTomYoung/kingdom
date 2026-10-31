@@ -154,7 +154,8 @@ test('unfinished research favors a library; complete research favors productive 
   unlock(s, ['writing', 'agriculture', 'engineering']); assert.equal(choose(s).payload.itemId, 'workshop');
 });
 test('at the military recruitment cap, safe infrastructure remains eligible without issuing more troops', () => {
-  const s = fixture(); for (let i = 0; i < 10; i++) recruit(s);
+  const s = fixture(); delete s.aiExpansionVersion; // Preserve the pre-expansion supply ordering.
+  for (let i = 0; i < 10; i++) recruit(s);
   assert.equal(chooseSupplyCommand(s, player, 'at-cap').payload.itemId, 'library');
 });
 test('purchased and produced buildings yield only on subsequent collection and production completes once', () => {

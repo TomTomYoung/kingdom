@@ -1,0 +1,16 @@
+{
+  "verifiedAt": "2026-10-31T16:40:50.565Z",
+  "browser": "141.0.7390.37",
+  "checks": [
+    "new conquest enables expansion and its scheduled AI buys a settler at full cost with a protected reserve",
+    "waiting settler and escort form a single protected formation and spend real movement on an expansion route",
+    "mid-expedition save resumes identical AI decisions, locations, reserves and RNG",
+    "scheduled turns reach a real FoundCity result, consume only the settler and preserve the new city across reload",
+    "poor but safe AI reserves ordinary settler production rather than free purchasing",
+    "nearby enemy pressure preserves emergency wall priority over expansion",
+    "old infrastructure saves retain non-expanding AI and invalid expansion versions reject atomically",
+    "policy and city activity remain readable at 1440px and 390px with no horizontal overflow"
+  ],
+  "pageErrors": [],
+  "httpFailures": []
+}

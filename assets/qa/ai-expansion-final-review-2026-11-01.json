@@ -1,0 +1,24 @@
+{
+  "verifiedAt": "2026-10-31T16:44:20.730718+00:00",
+  "browserWorkflowRunId": "41220771966",
+  "testedSourceRevision": "735bf389e9dad7c85707ddfddfce483c4450ca44",
+  "nodeTests": 382,
+  "syntaxFiles": 117,
+  "targetSpecificationUnchanged": true,
+  "nonQaAssetsUnchanged": true,
+  "temporaryIntegrationHelperRemoved": true,
+  "visualReview": {
+    "viewports": [
+      1440,
+      390
+    ],
+    "files": [
+      "ai-expansion/expansion-wide.png",
+      "ai-expansion/expansion-panel.png",
+      "ai-expansion/expansion-mobile.png"
+    ],
+    "reviewed": true,
+    "observations": "Expansion policy, founded-city count and AI activity are readable without clipping or horizontal overflow."
+  },
+  "relativeMarkdownLinks": 1063
+}
