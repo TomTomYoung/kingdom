@@ -7,100 +7,67 @@ permissions:
 defaults:
   run:
     shell: bash
-concurrency:
-  group: kingdom-ai-expansion-integration
-  cancel-in-progress: false
 jobs:
-  verify:
+  finalize:
     if: github.ref == 'refs/heads/codex/ai-expansion-20261101'
     permissions:
       contents: write
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
-        with:
-          ref: 7da210f663fe9c1d49af81138ce12746682a1c93
-          path: .qa-baseline
-          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Integrate explicit source edits
+      - name: Preserve verified source and rerun regressions
         run: |
-          mkdir -p "$RUNNER_TEMP/kingdom-reports"
-          if ! grep -q 'state.aiExpansionVersion = 1' src/core/scenarios.js; then
-            python3 tools/qa/stage-ai-expansion.py
-          fi
-      - name: Syntax, regressions, old saves and expansion playthrough
-        run: |
-          npm run check | tee "$RUNNER_TEMP/kingdom-reports/syntax.log"
-          npm test | tee "$RUNNER_TEMP/kingdom-reports/node.log"
-          node tools/qa/save-ai-expansion-compat.mjs .qa-baseline assets/qa/save-ai-expansion-compat-2026-11-01.json | tee "$RUNNER_TEMP/kingdom-reports/compat.log"
-          node tools/qa/playthrough-ai-expansion.mjs assets/qa/ai-expansion-playthrough-2026-11-01.json | tee "$RUNNER_TEMP/kingdom-reports/playthrough.log"
-      - name: Commit tested integration to its feature branch
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add src tests tools/qa index.html doc wiki assets/qa/save-ai-expansion-compat-2026-11-01.json assets/qa/ai-expansion-playthrough-2026-11-01.json
-          if ! git diff --cached --quiet; then
-            git commit -m 'feat: integrate escorted city expansion with legacy save compatibility'
-            git push origin HEAD:refs/heads/codex/ai-expansion-20261101
-          fi
-          echo "KINGDOM_TESTED_REVISION=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
-      - name: Install isolated browser QA runtime
-        run: |
-          mkdir -p "$RUNNER_TEMP/kingdom-qa"
-          printf '{"private":true}\n' > "$RUNNER_TEMP/kingdom-qa/package.json"
-          npm install --prefix "$RUNNER_TEMP/kingdom-qa" --no-save --package-lock=false playwright@1.56.1
-          "$RUNNER_TEMP/kingdom-qa/node_modules/.bin/playwright" install --with-deps chromium
-          echo "KINGDOM_QA_MODULES=$RUNNER_TEMP/kingdom-qa" >> "$GITHUB_ENV"
-      - name: Verify expansion and all existing browser regressions
-        run: |
-          for suite in ai-expansion ai-infrastructure research city-bombardment production-queue party-care city-defense siege conquest ai cities ranged founding reorganization; do
-            node "tools/qa/browser-$suite.mjs" "$RUNNER_TEMP/kingdom-reports/$suite" 2>&1 | tee "$RUNNER_TEMP/kingdom-reports/$suite.log"
-            report="$RUNNER_TEMP/kingdom-reports/$suite/report.json"
-            if [ ! -f "$report" ]; then cp "$RUNNER_TEMP/kingdom-reports/$suite/results.json" "$report"; fi
-            cp "$report" "assets/qa/browser-ai-expansion-$suite-2026-11-01.json"
-          done
-      - name: Record actual verification results
+          git fetch --no-tags --depth=1 origin 735bf389e9dad7c85707ddfddfce483c4450ca44 7da210f663fe9c1d49af81138ce12746682a1c93
+          git diff --exit-code 735bf389e9dad7c85707ddfddfce483c4450ca44 HEAD -- src tests tools index.html
+          git diff --exit-code 7da210f663fe9c1d49af81138ce12746682a1c93 HEAD -- doc/SPECIFICATION.md assets ':!assets/qa'
+          npm run check | tee "$RUNNER_TEMP/expansion-syntax.log"
+          npm test | tee "$RUNNER_TEMP/expansion-node.log"
+      - name: Finalize documentation and observed image review
         run: |
           python3 - <<'PY'
-          import json, os, re
           from pathlib import Path
           from datetime import datetime, timezone
-          root = Path(os.environ['RUNNER_TEMP'])/'kingdom-reports'
-          suites = ['ai-expansion','ai-infrastructure','research','city-bombardment','production-queue','party-care','city-defense','siege','conquest','ai','cities','ranged','founding','reorganization']
-          reports = {s:json.loads((root/s/'report.json').read_text()) for s in suites}
-          for report in reports.values():
-              for field in ['error','pageErrors','httpFailures','errors','failures']: assert not report.get(field), report
-              assert isinstance(report['checks'],list) and report['checks'], report
-          counts = {s:len(r['checks']) for s,r in reports.items()}
-          node = (root/'node.log').read_text()
-          tests = int(re.search(r'# tests (\d+)',node)[1]); passed = int(re.search(r'# pass (\d+)',node)[1]); failed = int(re.search(r'# fail (\d+)',node)[1])
-          assert tests == passed and failed == 0
-          syntax = int(re.search(r'Syntax checked (\d+) JavaScript files',(root/'syntax.log').read_text())[1])
-          compat = json.loads(Path('assets/qa/save-ai-expansion-compat-2026-11-01.json').read_text())
-          play = json.loads(Path('assets/qa/ai-expansion-playthrough-2026-11-01.json').read_text())
-          result = {'verifiedAt':datetime.now(timezone.utc).isoformat(),'baselineRevision':'7da210f663fe9c1d49af81138ce12746682a1c93','workflowRunId':os.environ['GITHUB_RUN_ID'],'testedRevision':os.environ['KINGDOM_TESTED_REVISION'],'browser':reports['ai-expansion']['browser'],'nodeTests':tests,'syntaxFiles':syntax,'saveSnapshots':compat['snapshots'],'continuationCommands':compat['continuationCommands'],'playthroughCommands':play['commands'],'playthroughSaveRoundTrips':play['saveRoundTrips'],'browserCheckGroups':sum(counts.values()),'suites':counts,'pageErrors':[],'httpFailures':[]}
-          Path('assets/qa/ai-expansion-summary-2026-11-01.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
-          text = f"Chromium {result['browser']}で全{result['browserCheckGroups']}チェック群が成功しました。都市拡張{counts['ai-expansion']}群と既存の施設投資・研究・都市砲撃・生産・休養・戦闘・都市運営を含み、画面例外・HTTP失敗は0です。[検証概要](../assets/qa/ai-expansion-summary-2026-11-01.json)。画像の目視確認は別途記録します。"
-          p=Path('doc/AI_EXPANSION.md'); p.write_text(p.read_text().replace('実ブラウザ検証は未完了です。実行結果確認後に更新します。',text))
-          p=Path('doc/STATUS.md'); p.write_text(p.read_text().replace('実ブラウザ検証は未完了です。',text))
-          print(json.dumps(result,ensure_ascii=False,indent=2))
+          import json, os, re
+          changes = {
+            'doc/AI_SCENARIOS.md': [('都市建設、城壁と3研究施設以外の建物・領土の購入、範囲や狙い撃ちの選択、配置・護衛の再設定、撤退、戦略評価は後続です。','新規版では護衛付きの都市建設と、その開拓部隊の配置・護衛・限定的な退避を追加しました。城壁と3研究施設以外の建物・領土の購入、範囲や狙い撃ちの選択、一般戦闘部隊の配置・護衛の再設定、高度な撤退・戦略評価は後続です。')],
+            'doc/AI_INFRASTRUCTURE.md': [('次の候補は都市拡張AIです。既存FoundCityの距離・所有権・移動力・護衛維持を共用し、開拓者・護衛の確保と建設地点評価を段階的に接続します。現時点では開拓AI、正式研究木、汎用Ability、mana用途、Dungeon、Domination全体は未実装です。','都市拡張AIは後続工程で実装しました。新規aiExpansionVersion 1では緊急城壁の後・施設投資の前に開拓者調達を判定します。[開拓・護衛・経路の条件](AI_EXPANSION.md)。正式研究木、汎用Ability、mana用途、Dungeon、Domination全体は未実装です。')],
+            'doc/README.md': [('都市拡張・3研究施設と城壁以外の建物の戦略AI、Domination、Dungeonは未実装です。','新規版では護衛付き都市拡張AIも利用できます。3研究施設と城壁以外の建物の戦略AI、Domination全体、Dungeonは未実装です。'),('次の候補は都市拡張AIです。','[都市拡張AI](AI_EXPANSION.md)も新規版に追加しました。次の候補は最小限の能動Abilityです。')],
+            'doc/STATUS.md': [('次の候補は都市拡張AIです。','都市拡張AIも実装済みです。次の候補は最小限の能動Abilityです。')]
+          }
+          for name, pairs in changes.items():
+              p=Path(name); text=p.read_text()
+              for old,new in pairs:
+                  assert old in text,(name,old)
+                  text=text.replace(old,new)
+              p.write_text(text)
+          for name in ['doc/AI_EXPANSION.md','doc/STATUS.md']:
+              p=Path(name); text=p.read_text().replace('画像の目視確認は別途記録します。','1440px／390pxの画像を目視確認し、開拓方針・都市数・建設履歴に欠けや横はみ出しがないことを確認しました。')
+              p.write_text(text)
+          p=Path('doc/AI_EXPANSION.md')
+          p.write_text(p.read_text()+'\n最終整理では検証済み735bf38からゲーム実装・テスト・ブラウザQAを変更せず、Node回帰を再実行しました。[最終確認](../assets/qa/ai-expansion-final-review-2026-11-01.json)。一時統合ヘルパーと書込み権限付き検証ワークフローはマージ前に削除し、既存の読取り専用Node CIを維持します。\n')
+          Path('tools/qa/stage-ai-expansion.py').unlink()
+          root=Path(os.environ['RUNNER_TEMP'])
+          node=(root/'expansion-node.log').read_text(); tests=int(re.search(r'# tests (\d+)',node)[1]); passed=int(re.search(r'# pass (\d+)',node)[1]); failed=int(re.search(r'# fail (\d+)',node)[1]); assert tests==passed and failed==0
+          syntax=int(re.search(r'Syntax checked (\d+) JavaScript files',(root/'expansion-syntax.log').read_text())[1])
+          report={'verifiedAt':datetime.now(timezone.utc).isoformat(),'browserWorkflowRunId':'41220771966','testedSourceRevision':'735bf389e9dad7c85707ddfddfce483c4450ca44','nodeTests':tests,'syntaxFiles':syntax,'targetSpecificationUnchanged':True,'nonQaAssetsUnchanged':True,'temporaryIntegrationHelperRemoved':True,'visualReview':{'viewports':[1440,390],'files':['ai-expansion/expansion-wide.png','ai-expansion/expansion-panel.png','ai-expansion/expansion-mobile.png'],'reviewed':True,'observations':'Expansion policy, founded-city count and AI activity are readable without clipping or horizontal overflow.'}}
+          dest=Path('assets/qa/ai-expansion-final-review-2026-11-01.json'); dest.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+          count=0
+          for folder in ['doc','wiki']:
+              for p in Path(folder).rglob('*.md'):
+                  for href in re.findall(r'\]\(([^)]+)\)',p.read_text()):
+                      href=href.split('#')[0]
+                      if not href or '://' in href or href.startswith('mailto:'): continue
+                      assert (p.parent/href).exists(),(str(p),href)
+                      count+=1
+          report['relativeMarkdownLinks']=count; dest.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n');print(json.dumps(report,ensure_ascii=False,indent=2))
           PY
-          git add assets/qa/browser-ai-expansion-*-2026-11-01.json assets/qa/ai-expansion-summary-2026-11-01.json doc/AI_EXPANSION.md doc/STATUS.md
-          git commit -m 'test: record expansion browser, save and playthrough verification'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -u -- doc tools/qa
+          git add assets/qa/ai-expansion-final-review-2026-11-01.json
+          git commit -m 'docs: finalize expansion verification and current implementation records'
           git push origin HEAD:refs/heads/codex/ai-expansion-20261101
-      - name: Package exact tested source
-        if: always()
-        run: |
-          mkdir -p "$RUNNER_TEMP/kingdom-reports"
-          git archive --format=tar.gz -o "$RUNNER_TEMP/kingdom-reports/kingdom-tested-source.tar.gz" HEAD
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: kingdom-ai-expansion-verification
-          path: ${{ runner.temp }}/kingdom-reports
-          retention-days: 7
