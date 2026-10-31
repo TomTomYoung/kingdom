@@ -1,0 +1,121 @@
+name: AI infrastructure integration verification
+on:
+  push:
+    branches: ['codex/ai-infrastructure-20261101']
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash
+concurrency:
+  group: kingdom-ai-infrastructure-integration
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: github.ref == 'refs/heads/codex/ai-infrastructure-20261101'
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: 3ffac57429050908fe120fef81d896770f7499f1
+          path: .qa-baseline
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify and integrate the exact tested patch
+        run: |
+          mkdir -p "$RUNNER_TEMP/kingdom-reports"
+          python3 - <<'PY'
+          import hashlib, lzma, os
+          from pathlib import Path
+          parts = Path('.github/ai-infrastructure-transfer')
+          patch = lzma.decompress(b''.join((parts/f'part-{i:02}.xz').read_bytes() for i in range(1,4)))
+          assert hashlib.sha256(patch).hexdigest() == 'adb2a4e5e8a4290456b3c230cf1b3b0eb6f00e1ffcbfe6541c06653cdd9a07f3'
+          Path(os.environ['RUNNER_TEMP'],'infrastructure.patch').write_bytes(patch)
+          PY
+          git fetch --no-tags --depth=1 origin 3ffac57429050908fe120fef81d896770f7499f1
+          export GIT_INDEX_FILE="$RUNNER_TEMP/verify-infrastructure.index"
+          git read-tree 3ffac57429050908fe120fef81d896770f7499f1
+          git apply --cached "$RUNNER_TEMP/infrastructure.patch"
+          test "$(git write-tree)" = c508ce59d107353d0c4f836e8d99708c02e834d5
+          unset GIT_INDEX_FILE
+          if git apply --check "$RUNNER_TEMP/infrastructure.patch"; then
+            git apply "$RUNNER_TEMP/infrastructure.patch"
+          else
+            git apply --reverse --check "$RUNNER_TEMP/infrastructure.patch"
+          fi
+      - name: Syntax, regressions, old saves and development playthrough
+        run: |
+          npm run check | tee "$RUNNER_TEMP/kingdom-reports/syntax.log"
+          npm test | tee "$RUNNER_TEMP/kingdom-reports/node.log"
+          node tools/qa/save-ai-infrastructure-compat.mjs .qa-baseline assets/qa/save-ai-infrastructure-compat-2026-11-01.json | tee "$RUNNER_TEMP/kingdom-reports/compat.log"
+          node tools/qa/ai-infrastructure-playthrough.mjs assets/qa/ai-infrastructure-playthrough-2026-11-01.json | tee "$RUNNER_TEMP/kingdom-reports/playthrough.log"
+      - name: Commit verified implementation on its feature branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- doc index.html src tests tools/qa wiki assets/qa/save-ai-infrastructure-compat-2026-11-01.json assets/qa/ai-infrastructure-playthrough-2026-11-01.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'feat: invest in unlocked facilities without changing old saved AI policies'
+            git push origin HEAD:refs/heads/codex/ai-infrastructure-20261101
+          fi
+          echo "KINGDOM_TESTED_REVISION=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Install isolated browser QA runtime
+        run: |
+          mkdir -p "$RUNNER_TEMP/kingdom-qa"
+          printf '{"private":true}\n' > "$RUNNER_TEMP/kingdom-qa/package.json"
+          npm install --prefix "$RUNNER_TEMP/kingdom-qa" --no-save --package-lock=false playwright@1.56.1
+          "$RUNNER_TEMP/kingdom-qa/node_modules/.bin/playwright" install --with-deps chromium
+          echo "KINGDOM_QA_MODULES=$RUNNER_TEMP/kingdom-qa" >> "$GITHUB_ENV"
+      - name: Verify investment and all existing browser regressions
+        run: |
+          for suite in ai-infrastructure research city-bombardment production-queue party-care city-defense siege conquest ai cities ranged founding reorganization; do
+            node "tools/qa/browser-$suite.mjs" "$RUNNER_TEMP/kingdom-reports/$suite" 2>&1 | tee "$RUNNER_TEMP/kingdom-reports/$suite.log"
+            report="$RUNNER_TEMP/kingdom-reports/$suite/report.json"
+            if [ ! -f "$report" ]; then cp "$RUNNER_TEMP/kingdom-reports/$suite/results.json" "$report"; fi
+            cp "$report" "assets/qa/browser-ai-infrastructure-$suite-2026-11-01.json"
+          done
+      - name: Record actual verification results
+        run: |
+          python3 - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          from datetime import datetime, timezone
+          root = Path(os.environ['RUNNER_TEMP'])/'kingdom-reports'
+          suites = ['ai-infrastructure','research','city-bombardment','production-queue','party-care','city-defense','siege','conquest','ai','cities','ranged','founding','reorganization']
+          reports = {s:json.loads((root/s/'report.json').read_text()) for s in suites}
+          for report in reports.values():
+              for field in ['error','pageErrors','httpFailures','errors','failures']: assert not report.get(field), report
+              assert isinstance(report['checks'],list) and report['checks'], report
+          counts = {s:len(r['checks']) for s,r in reports.items()}
+          node = (root/'node.log').read_text()
+          tests = int(re.search(r'# tests (\d+)',node)[1]); passed = int(re.search(r'# pass (\d+)',node)[1]); failed = int(re.search(r'# fail (\d+)',node)[1])
+          assert tests == passed and failed == 0
+          syntax = int(re.search(r'Syntax checked (\d+) JavaScript files',(root/'syntax.log').read_text())[1])
+          compat = json.loads(Path('assets/qa/save-ai-infrastructure-compat-2026-11-01.json').read_text())
+          play = json.loads(Path('assets/qa/ai-infrastructure-playthrough-2026-11-01.json').read_text())
+          result = {'verifiedAt':datetime.now(timezone.utc).isoformat(),'baselineRevision':'3ffac57429050908fe120fef81d896770f7499f1','workflowRunId':os.environ['GITHUB_RUN_ID'],'testedRevision':os.environ['KINGDOM_TESTED_REVISION'],'browser':reports['ai-infrastructure']['browser'],'nodeTests':tests,'syntaxFiles':syntax,'saveSnapshots':compat['snapshots'],'continuationCommands':compat['continuationCommands'],'playthroughCommands':play['commands'],'playthroughSaveRoundTrips':play['saveRoundTrips'],'browserCheckGroups':sum(counts.values()),'suites':counts,'pageErrors':[],'httpFailures':[]}
+          Path('assets/qa/ai-infrastructure-summary-2026-11-01.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+          for name in ['doc/AI_INFRASTRUCTURE.md','doc/STATUS.md']:
+              p=Path(name); text=p.read_text(); text=text.replace('実ブラウザ検証は未完了です。',f"Chromium {result['browser']}で全{result['browserCheckGroups']}チェック群が成功しました。施設投資{counts['ai-infrastructure']}群と既存機能を含み、画面例外・HTTP失敗は0です。[検証概要](../assets/qa/ai-infrastructure-summary-2026-11-01.json)・[保存互換](../assets/qa/save-ai-infrastructure-compat-2026-11-01.json)・[非接敵開発検証](../assets/qa/ai-infrastructure-playthrough-2026-11-01.json)。1440px／390pxの画面画像は検証成果物に保存し、目視確認は別途記録します。"); p.write_text(text)
+          print(json.dumps(result,ensure_ascii=False,indent=2))
+          PY
+          git add assets/qa/browser-ai-infrastructure-*-2026-11-01.json assets/qa/ai-infrastructure-summary-2026-11-01.json doc/AI_INFRASTRUCTURE.md doc/STATUS.md
+          git commit -m 'test: record AI investment browser regressions and legacy continuation'
+          git push origin HEAD:refs/heads/codex/ai-infrastructure-20261101
+      - name: Package exact tested source
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/kingdom-reports"
+          git archive --format=tar.gz -o "$RUNNER_TEMP/kingdom-reports/kingdom-tested-source.tar.gz" HEAD
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kingdom-ai-infrastructure-verification
+          path: ${{ runner.temp }}/kingdom-reports
+          retention-days: 7
