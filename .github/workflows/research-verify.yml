@@ -1,0 +1,120 @@
+name: Research integration verification
+on:
+  push:
+    branches: ['codex/research-20261031']
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash
+concurrency:
+  group: kingdom-research-integration
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: github.ref == 'refs/heads/codex/research-20261031'
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: 009e5841fe5bb41f3230b8fd3b8547cbba18b0d5
+          path: .qa-baseline
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify and integrate the exact tested patch
+        run: |
+          mkdir -p "$RUNNER_TEMP/kingdom-reports"
+          python3 - <<'PY'
+          import hashlib, lzma, os
+          from pathlib import Path
+          parts = Path('.github/research-transfer')
+          patch = lzma.decompress(b''.join((parts/f'part-{i:02}.xz').read_bytes() for i in range(1,5)))
+          assert hashlib.sha256(patch).hexdigest() == 'ead3f660f3bb3c1f052e0d8f2e7e15d966f0689bd09cb06dbf6f883e2d9a7926'
+          Path(os.environ['RUNNER_TEMP'],'research.patch').write_bytes(patch)
+          PY
+          git fetch --no-tags --depth=1 origin 009e5841fe5bb41f3230b8fd3b8547cbba18b0d5
+          export GIT_INDEX_FILE="$RUNNER_TEMP/verify-research.index"
+          git read-tree 009e5841fe5bb41f3230b8fd3b8547cbba18b0d5
+          git apply --cached --unidiff-zero "$RUNNER_TEMP/research.patch"
+          test "$(git write-tree)" = a3f748562726de9f6ba8c141178d1c80f48eee5c
+          unset GIT_INDEX_FILE
+          if git apply --check --unidiff-zero "$RUNNER_TEMP/research.patch"; then
+            git apply --unidiff-zero "$RUNNER_TEMP/research.patch"
+          else
+            git apply --reverse --check --unidiff-zero "$RUNNER_TEMP/research.patch"
+          fi
+      - name: Syntax, Node regressions and historical save continuation
+        run: |
+          npm run check | tee "$RUNNER_TEMP/kingdom-reports/syntax.log"
+          npm test | tee "$RUNNER_TEMP/kingdom-reports/node.log"
+          node tools/qa/save-research-compat.mjs .qa-baseline assets/qa/save-research-compat-2026-10-31.json | tee "$RUNNER_TEMP/kingdom-reports/compat.log"
+      - name: Commit verified implementation on its feature branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- src index.html tests tools/qa doc wiki assets/qa/save-research-compat-2026-10-31.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'feat: implement research selection, science allocation and facility unlocks'
+            git push origin HEAD:refs/heads/codex/research-20261031
+          fi
+          echo "KINGDOM_TESTED_REVISION=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Install isolated browser QA runtime
+        run: |
+          mkdir -p "$RUNNER_TEMP/kingdom-qa"
+          printf '{"private":true}\n' > "$RUNNER_TEMP/kingdom-qa/package.json"
+          npm install --prefix "$RUNNER_TEMP/kingdom-qa" --no-save --package-lock=false playwright@1.56.1
+          "$RUNNER_TEMP/kingdom-qa/node_modules/.bin/playwright" install --with-deps chromium
+          echo "KINGDOM_QA_MODULES=$RUNNER_TEMP/kingdom-qa" >> "$GITHUB_ENV"
+      - name: Verify research and all existing browser regressions
+        run: |
+          for suite in research city-bombardment production-queue party-care city-defense siege conquest ai cities ranged founding reorganization; do
+            node "tools/qa/browser-$suite.mjs" "$RUNNER_TEMP/kingdom-reports/$suite" 2>&1 | tee "$RUNNER_TEMP/kingdom-reports/$suite.log"
+            report="$RUNNER_TEMP/kingdom-reports/$suite/report.json"
+            if [ ! -f "$report" ]; then cp "$RUNNER_TEMP/kingdom-reports/$suite/results.json" "$report"; fi
+            cp "$report" "assets/qa/browser-research-$suite-2026-10-31.json"
+          done
+      - name: Record actual verification results
+        run: |
+          python3 - <<'PY'
+          import json, os, re
+          from pathlib import Path
+          from datetime import datetime, timezone
+          root = Path(os.environ['RUNNER_TEMP'])/'kingdom-reports'
+          suites = ['research','city-bombardment','production-queue','party-care','city-defense','siege','conquest','ai','cities','ranged','founding','reorganization']
+          reports = {s:json.loads((root/s/'report.json').read_text()) for s in suites}
+          for report in reports.values():
+              for field in ['error','pageErrors','httpFailures','errors','failures']: assert not report.get(field), report
+              assert isinstance(report['checks'],list) and report['checks'], report
+          counts = {s:len(r['checks']) for s,r in reports.items()}
+          log = (root/'node.log').read_text()
+          tests = int(re.search(r'# tests (\d+)',log)[1]); passed = int(re.search(r'# pass (\d+)',log)[1]); failed = int(re.search(r'# fail (\d+)',log)[1])
+          assert tests == passed and failed == 0
+          syntax = int(re.search(r'Syntax checked (\d+) JavaScript files',(root/'syntax.log').read_text())[1])
+          compat = json.loads(Path('assets/qa/save-research-compat-2026-10-31.json').read_text())
+          result = {'verifiedAt':datetime.now(timezone.utc).isoformat(),'baselineRevision':'009e5841fe5bb41f3230b8fd3b8547cbba18b0d5','workflowRunId':os.environ['GITHUB_RUN_ID'],'testedRevision':os.environ['KINGDOM_TESTED_REVISION'],'browser':reports['research']['browser'],'nodeTests':tests,'syntaxFiles':syntax,'saveSnapshots':compat['snapshots'],'continuationCommands':compat['continuationCommands'],'browserCheckGroups':sum(counts.values()),'suites':counts,'pageErrors':[],'httpFailures':[]}
+          Path('assets/qa/research-summary-2026-10-31.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+          note=f"Chromium {result['browser']}で全{result['browserCheckGroups']}チェック群が成功しました。研究{counts['research']}群と既存の都市砲撃・生産キュー・休養・都市反撃・攻城・占領・AI・都市・遠隔・開拓・再編を含み、画面例外・HTTP失敗は0です。[検証概要](../assets/qa/research-summary-2026-10-31.json)。1440px／390pxの画面画像を検証成果物に保存しました。目視確認は別途記録します。"
+          p=Path('doc/RESEARCH.md'); p.write_text(p.read_text().replace('実ブラウザ検証は未完了です。結果を確認してから更新します。',note))
+          p=Path('doc/STATUS.md'); p.write_text(p.read_text().replace('実ブラウザ検証は未完了です。',note))
+          print(json.dumps(result,ensure_ascii=False,indent=2))
+          PY
+          git add assets/qa/browser-research-*-2026-10-31.json assets/qa/research-summary-2026-10-31.json doc/RESEARCH.md doc/STATUS.md
+          git commit -m 'test: record research browser and historical save verification'
+          git push origin HEAD:refs/heads/codex/research-20261031
+      - name: Package exact tested source
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/kingdom-reports"
+          git archive --format=tar.gz -o "$RUNNER_TEMP/kingdom-reports/kingdom-tested-source.tar.gz" HEAD
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kingdom-research-verification
+          path: ${{ runner.temp }}/kingdom-reports
+          retention-days: 7
