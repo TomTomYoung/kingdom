@@ -27,40 +27,29 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify and integrate the exact tested patch
+      - name: Check completion notification before the save notification
         run: |
           mkdir -p "$RUNNER_TEMP/kingdom-reports"
           python3 - <<'PY'
-          import hashlib, lzma, os
           from pathlib import Path
-          parts = Path('.github/research-transfer')
-          patch = lzma.decompress(b''.join((parts/f'part-{i:02}.xz').read_bytes() for i in range(1,5)))
-          assert hashlib.sha256(patch).hexdigest() == 'ead3f660f3bb3c1f052e0d8f2e7e15d966f0689bd09cb06dbf6f883e2d9a7926'
-          Path(os.environ['RUNNER_TEMP'],'research.patch').write_bytes(patch)
+          p=Path('tools/qa/browser-research.mjs'); s=p.read_text()
+          old="await load(near); await click('#end-turn'); const unlocked = await save();\n  assert.deepEqual(unlocked.kingdoms['kingdom-1'].research.completedTechnologyIds, ['writing']);\n  assert.match(await page.locator('#message').innerText(), /研究完了.*文字/);"
+          new="await load(near); await click('#end-turn');\n  assert.match(await page.locator('#message').innerText(), /研究完了.*文字/);\n  const unlocked = await save();\n  assert.deepEqual(unlocked.kingdoms['kingdom-1'].research.completedTechnologyIds, ['writing']);"
+          assert old in s or new in s
+          p.write_text(s.replace(old,new))
           PY
-          git fetch --no-tags --depth=1 origin 009e5841fe5bb41f3230b8fd3b8547cbba18b0d5
-          export GIT_INDEX_FILE="$RUNNER_TEMP/verify-research.index"
-          git read-tree 009e5841fe5bb41f3230b8fd3b8547cbba18b0d5
-          git apply --cached --unidiff-zero "$RUNNER_TEMP/research.patch"
-          test "$(git write-tree)" = a3f748562726de9f6ba8c141178d1c80f48eee5c
-          unset GIT_INDEX_FILE
-          if git apply --check --unidiff-zero "$RUNNER_TEMP/research.patch"; then
-            git apply --unidiff-zero "$RUNNER_TEMP/research.patch"
-          else
-            git apply --reverse --check --unidiff-zero "$RUNNER_TEMP/research.patch"
-          fi
       - name: Syntax, Node regressions and historical save continuation
         run: |
           npm run check | tee "$RUNNER_TEMP/kingdom-reports/syntax.log"
           npm test | tee "$RUNNER_TEMP/kingdom-reports/node.log"
           node tools/qa/save-research-compat.mjs .qa-baseline assets/qa/save-research-compat-2026-10-31.json | tee "$RUNNER_TEMP/kingdom-reports/compat.log"
-      - name: Commit verified implementation on its feature branch
+      - name: Commit verified test correction
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- src index.html tests tools/qa doc wiki assets/qa/save-research-compat-2026-10-31.json
+          git add -- tools/qa/browser-research.mjs assets/qa/save-research-compat-2026-10-31.json
           if ! git diff --cached --quiet; then
-            git commit -m 'feat: implement research selection, science allocation and facility unlocks'
+            git commit -m 'test: verify research completion notification before saving'
             git push origin HEAD:refs/heads/codex/research-20261031
           fi
           echo "KINGDOM_TESTED_REVISION=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
