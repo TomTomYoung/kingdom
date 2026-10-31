@@ -69,9 +69,10 @@ try {
   checks.push('switch, pause and resume retain topic-specific work and spend only unassigned science');
 
   const near = structuredClone(chosen); near.kingdoms['kingdom-1'].progress.science = 11; near.kingdoms['kingdom-1'].stockpiles.gold = 200;
-  await load(near); await click('#end-turn'); const unlocked = await save();
-  assert.deepEqual(unlocked.kingdoms['kingdom-1'].research.completedTechnologyIds, ['writing']);
+  await load(near); await click('#end-turn');
   assert.match(await page.locator('#message').innerText(), /研究完了.*文字/);
+  const unlocked = await save();
+  assert.deepEqual(unlocked.kingdoms['kingdom-1'].research.completedTechnologyIds, ['writing']);
   assert.equal(await page.locator('[data-buy="library"]').isEnabled(), true); assert.equal(await page.locator('[data-buy="workshop"]').isDisabled(), true);
   assert.equal(await page.locator('#research-target option[value="engineering"]').evaluate(el => el.disabled), false);
   assert.equal(unlocked.cities['city-1'].buildings.includes('library'), false);
