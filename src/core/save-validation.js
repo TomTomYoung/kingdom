@@ -32,6 +32,7 @@ function yieldRecord(value, path, negative = false) {
 export function migrateAndValidateSave(state) {
   object(state, 'root');
   if (Object.hasOwn(state, 'aiInfrastructureVersion')) check(state.aiInfrastructureVersion === 1 && state.researchVersion === 1, 'aiInfrastructureVersion');
+  if (Object.hasOwn(state, 'aiExpansionVersion')) check(state.aiExpansionVersion === 1, 'aiExpansionVersion');
   const recovery = Object.hasOwn(state, 'partyRecoveryVersion');
   if (recovery) check(state.partyRecoveryVersion === 1, 'partyRecoveryVersion');
   const legacyTerritory = !Object.hasOwn(state, 'cityTerritoryVersion');

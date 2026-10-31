@@ -1,3 +1,4 @@
+import { chooseExpansionSupplyCommand, reservedEscortIds, isExpansionParty } from './ai-expansion.js';
 import { chooseInfrastructureCommand } from './ai-infrastructure.js';
 import { hasCityRetaliation, cityEntryError } from '../models/city-defense.js';
 import { COMMAND_TYPES, createParty, moveParty, purchaseCityItem, setCityProduction, reinforceParty, mergeParties } from './commands.js';
@@ -9,14 +10,17 @@ import { validateReinforceParty, validateMergeParties } from '../systems/party-r
 
 const ordered = records => Object.values(records).sort((a, b) => a.id.localeCompare(b.id));
 const combatUnit = unit => isActiveUnit(unit) && !RULESET.unitTypes[unit.typeId].civilian;
-const waiting = (state, playerId) => ordered(state.units).filter(unit => unit.ownerId === playerId && unit.partyId === null && combatUnit(unit));
+const waiting = (state, playerId) => {
+  const reserved = reservedEscortIds(state, playerId);
+  return ordered(state.units).filter(unit => unit.ownerId === playerId && unit.partyId === null && combatUnit(unit) && !reserved.has(unit.id));
+};
 const cities = (state, playerId) => ordered(state.cities).filter(city => city.ownerId === playerId);
 const occupant = (state, location) => Object.values(state.parties).find(party => occupiesMapTile(party) && party.location === location);
 const purchaseCount = (state, playerId, cityId) => state.commandLog.filter(command => command.playerId === playerId && command.turn === state.currentTurn && command.type === COMMAND_TYPES.PURCHASE_CITY_ITEM && command.payload.cityId === cityId).length;
 
 export function chooseReinforcementCommand(state, playerId, commandId) {
   const recruits = waiting(state, playerId);
-  for (const party of ordered(state.parties).filter(p => p.ownerId === playerId && p.unitIds.some(id => combatUnit(state.units[id])))) {
+  for (const party of ordered(state.parties).filter(p => !isExpansionParty(state, p) && p.ownerId === playerId && p.unitIds.some(id => combatUnit(state.units[id])))) {
     const ids = recruits.filter(unit => unit.location === party.location).slice(0, Math.max(0, 5 - party.unitIds.length)).map(unit => unit.id);
     if (validateReinforceParty(state, playerId, party.id, ids).ok) return reinforceParty(playerId, state.currentTurn, party.id, ids, commandId);
   }
@@ -58,7 +62,7 @@ export function chooseCityExitCommand(state, playerId, commandId) {
   const enemies = Object.values(state.parties).filter(p => p.ownerId !== playerId && occupiesMapTile(p) && hasActiveUnits(state, p));
   for (const city of cities(state, playerId)) {
     const party = occupant(state, city.centerHex);
-    if (!party || party.ownerId !== playerId || !hasActiveUnits(state, party)) continue;
+    if (!party || isExpansionParty(state, party) || party.ownerId !== playerId || !hasActiveUnits(state, party)) continue;
     if (!recruits.some(unit => unit.location === city.centerHex) && !purchaseType(state, playerId, city, needs)) continue;
     const nearestEnemy = key => enemies.length ? Math.min(...enemies.map(enemy => Hex.fromKey(key).distance(Hex.fromKey(enemy.location)))) : 0;
     const civilian = !party.unitIds.some(id => combatUnit(state.units[id]));
@@ -81,6 +85,7 @@ export function chooseDeploymentCommand(state, playerId, commandId) {
 
 export function chooseSupplyCommand(state, playerId, commandId) {
   const defense = chooseCityDefenseCommand(state, playerId, commandId); if (defense) return defense;
+  const expansion = chooseExpansionSupplyCommand(state, playerId, commandId); if (expansion) return expansion;
   const infrastructure = chooseInfrastructureCommand(state, playerId, commandId); if (infrastructure) return infrastructure;
   const needs = recruitmentNeeds(state, playerId);
   if (needs.total >= RULESET.aiRecruitment.maxCombatUnits) return null;

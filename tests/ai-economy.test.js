@@ -212,6 +212,8 @@ function secondParty(state, location, type = 'warrior') {
 
 test('reinforcement AI fills existing parties before evacuating the city, ending actions without healing', () => {
   const state = aiTurn(), party = smallParty(state); relocate(state, party.id, capital);
+  // Pre-expansion AI regression: it must not acquire the new escort reservation.
+  delete state.aiExpansionVersion;
   const civilian = recruit(state, 'settler'), first = recruit(state, 'archer'), second = recruit(state);
   first.hp = first.currentHp = 9; second.guardCapacityRemaining = 1;
   const snapshot = structuredClone(state), next = ai.nextCommand(state);
