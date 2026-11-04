@@ -1,0 +1,182 @@
+{
+  "verifiedAt": "2026-11-04",
+  "sourceCommit": "43389598b64d4a09a45d1c1cb82dfe720c717662",
+  "workflow": "https://github.com/TomTomYoung/kingdom/actions/runs/41815504305",
+  "nodeTests": 456,
+  "syntaxFiles": 137,
+  "newMagicTests": 23,
+  "browserChecks": 176,
+  "suites": [
+    {
+      "suite": "abilities",
+      "verifiedAt": "2026-11-04T10:39:12.155Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 9,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "ai",
+      "verifiedAt": "2026-11-04T10:40:29.303Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 13,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "ai-expansion",
+      "verifiedAt": "2026-11-04T10:39:24.451Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 8,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "ai-infrastructure",
+      "verifiedAt": "2026-11-04T10:39:28.729Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 9,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "cities",
+      "verifiedAt": "2026-11-04T10:40:38.142Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 12,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "city-bombardment",
+      "verifiedAt": "2026-11-04T10:39:44.448Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 11,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "city-defense",
+      "verifiedAt": "2026-11-04T10:40:06.169Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 10,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "conquest",
+      "verifiedAt": "2026-11-04T10:40:18.014Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 10,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "founding",
+      "verifiedAt": "2026-11-04T10:40:56.744Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 7,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "hud",
+      "verifiedAt": "2026-11-04T10:38:56.776Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 7,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "magic",
+      "verifiedAt": "2026-11-04T10:39:20.286Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 8,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "party-care",
+      "verifiedAt": "2026-11-04T10:39:59.003Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 10,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "production-queue",
+      "verifiedAt": "2026-11-04T10:39:50.751Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 11,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "ranged",
+      "verifiedAt": "2026-11-04T10:40:50.740Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 13,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "reorganization",
+      "verifiedAt": "2026-11-04T10:41:01.361Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 8,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "research",
+      "verifiedAt": "2026-11-04T10:39:36.933Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 12,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "siege",
+      "verifiedAt": "2026-11-04T10:40:11.966Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 10,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "turn-flow",
+      "verifiedAt": "2026-11-04T10:39:02.989Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 8,
+      "pageErrors": [],
+      "httpFailures": []
+    }
+  ],
+  "magicChecks": [
+    "new archers expose magic through public selectors, list only enemy targets, and preview each recipient without changing saved state or RNG",
+    "keyboard casting pays once, applies individual resistance after Guard despite high armor, matches visible ranges and leaves the camera fixed",
+    "cast save/load replays identically and round settlement restores uses without restoring finite charges",
+    "Intercept protects the selected target, consumes a reaction and uses the interceptor resistance",
+    "Cover and Taunt are visible; forced misses damage cover or disappear while still consuming mana and charges",
+    "illegal magic and malformed saves preserve live state; v1 saves do not acquire magic, power or charges",
+    "AI casts through the shared command after handoff, names magic correctly, preserves the camera and resumes identically from a mid-turn save",
+    "desktop and mobile keep prediction inside the scrollable HUD drawer without horizontal overflow and allow the spell button to be reached"
+  ],
+  "legacyCompatibility": {
+    "baselineCommit": "16a902b3c5039a2f61d33a4ce3635a30a3a78c37",
+    "snapshots": 228,
+    "continuationCommands": 912,
+    "report": "save-magic-compat-2026-11-04.json"
+  },
+  "publishedFilesVerified": 37,
+  "updatedDocumentLinksVerified": 407,
+  "screenshotsReviewed": [
+    "1440x1050 magic preview with Guard and resistance",
+    "390x844 magic controls inside scrolling HUD drawer"
+  ],
+  "limitations": [
+    "prototype spell name, archer assignment and balance",
+    "AI score is a heuristic, not optimal mana budgeting or exact expected damage",
+    "no area magic, learning UI, charge refill or new spell artwork/audio"
+  ]
+}
