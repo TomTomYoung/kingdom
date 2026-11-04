@@ -34,7 +34,7 @@ try {
   await page.goto(`http://127.0.0.1:${server.address().port}`);
   await page.waitForFunction(() => document.querySelector('#resources img'));
   await page.clock.install();
-  
+
   const open = async view => {
     if (!await page.locator('#hud-drawer').isVisible()) await page.locator('.hud-nav [data-hud-open="menu"]').click();
     await page.selectOption('#hud-view-select', view);
