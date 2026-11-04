@@ -51,7 +51,7 @@ const map = new MapView($('#map'), $('#minimap'), assets, {
   onInspect: ({ tile, marker }) => {
     if (marker?.kind === 'party') return selectParty(marker.id, false);
     if (marker?.kind === 'unit') return selectUnit(marker.id, false);
-    if (tile.cityId && state.cities[tile.cityId]?.ownerId === controller.playerId) return selectCity(tile.cityId, false);
+    if (tile.cityId && state.cities[tile.cityId]?.ownerId === controller.playerId && (!selectedPartyId || contextKind === 'city')) return selectCity(tile.cityId, false);
     selectedTileKey = tile.key; contextKind = selectedPartyId ? 'party' : selectedUnitId ? 'unit' : 'tile'; renderInspection(); renderHud(); drawMap();
   },
   onMove: moveTo,
@@ -357,11 +357,11 @@ function renderCapture() {
   siegePanel.render(state, controller.playerId, selectedPartyId, city?.id, canAct());
   $('#capture-site').textContent = city ? `${city.name} · ${state.kingdoms[city.ownerId].name} · (${city.centerHex})` : '敵都市の中心を選択してください。';
   $('#capture-city').disabled = !canAct() || !validity.ok;
-  $('#capture-status').textContent = validity.ok ? '攻撃回数1を使い、移動・攻撃・割り込みを終了します。人口・建物・領土を引き継ぎ、生産予約と進捗は解除します。収入は次のターン開始からです。' : validity.reason;
+  $('#capture-status').textContent = validity.ok ? '攻撃回数1を使い、移動・攻撃・割り込みを終了します。人口・建物・領土を引き継ぎ、生産予約と進捗は解除します。収入は全プレイヤーの行動後のターン精算からです。' : validity.reason;
 }
 $('#capture-city').onclick = () => {
   const result = run(controller.captureCity(state, selectedPartyId, captureTarget()?.id), '都市を占領しました。');
-  if (result.ok) { selectCity(result.events.find(event => event.type === 'CityCaptured').cityId); show(state.gameResult ? '全都市を支配し、対局が終了しました。' : '都市を占領しました。収入は次のターン開始からです。'); }
+  if (result.ok) { selectCity(result.events.find(event => event.type === 'CityCaptured').cityId); show(state.gameResult ? '全都市を支配し、対局が終了しました。' : '都市を占領しました。収入は全プレイヤーの行動後のターン精算からです。'); }
 };
 
 function renderFounding() {
@@ -437,6 +437,7 @@ function render() {
 function renderHud() {
   const party = state.parties[selectedPartyId], unit = state.units[selectedUnitId], city = currentCity();
   const kind = contextKind === 'city' && city ? 'city' : party ? 'party' : unit ? 'unit' : 'tile';
+  $('#map-mode').textContent = kind === 'city' ? '都市を操作中' : party ? `${partyName(party)} 選択中` : unit ? '待機Unit 選択中' : 'セル確認';
   $('#party-status').hidden = kind === 'city'; $('#party-detail').hidden = kind === 'city' || kind === 'tile';
   $('#hud-city-status').hidden = kind !== 'city';
   $('#hud-city-status').textContent = city ? `${city.name} · 人口 ${city.population}` : '';

@@ -59,7 +59,7 @@ try {
   assert.equal(await page.locator('#end-turn').isVisible(), false);
   const original = await save();
   for (const [width,height,minMap,label] of [[1440,900,650,'desktop'],[1366,768,530,'laptop'],[390,844,550,'mobile'],[844,390,200,'landscape']]) {
-    await page.setViewportSize({width,height}); await page.waitForFunction(() => document.querySelector('#map').width > 0);
+    await page.setViewportSize({width,height}); await page.waitForFunction(() => { const c=document.querySelector('#map'),r=c.getBoundingClientRect(); return c.width===Math.round(r.width*devicePixelRatio) && c.height===Math.round(r.height*devicePixelRatio); });
     const before = await checkFrame(minMap), cam = await camera();
     await page.screenshot({path:path.join(output,`hud-${label}.png`)});
     await open('production'); assert.deepEqual((await frame()).map,before.map); assert.deepEqual(await camera(),cam);

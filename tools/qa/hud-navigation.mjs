@@ -3,7 +3,7 @@
 // The dedicated browser-hud suite deliberately does not install this adapter.
 export function installHudNavigation(page) {
   const rawLocator = page.locator.bind(page);
-  const ensure = async (locator, method) => {
+  const ensure = async locator => {
     if (!await rawLocator('#hud-drawer').count() || !await locator.count()) return;
     const place = await locator.first().evaluate(el => ({
       view: el.closest('[data-hud-view]')?.dataset.hudView,
@@ -24,13 +24,13 @@ export function installHudNavigation(page) {
       const value = target[key];
       if (typeof value !== 'function') return value;
       if (chain.has(key)) return (...args) => wrap(value.apply(target, args));
-      if (actions.has(key)) return async (...args) => { await ensure(target, key); return value.apply(target, args); };
+      if (actions.has(key)) return async (...args) => { await ensure(target); return value.apply(target, args); };
       return value.bind(target);
     },
   });
   page.locator = (...args) => wrap(rawLocator(...args));
   for (const method of ['click', 'dblclick', 'check', 'uncheck', 'fill', 'selectOption', 'focus', 'hover']) {
     const original = page[method].bind(page);
-    page[method] = async (selector, ...args) => { await ensure(rawLocator(selector), method); return original(selector, ...args); };
+    page[method] = async (selector, ...args) => { await ensure(rawLocator(selector)); return original(selector, ...args); };
   }
 }
