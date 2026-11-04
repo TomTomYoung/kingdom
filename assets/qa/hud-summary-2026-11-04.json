@@ -1,0 +1,183 @@
+{
+  "verifiedAt": "2026-11-04",
+  "sourceCommit": "fdb6f7a7ad7eee58d81ccd015a7bb258ad28f97d",
+  "workflow": "https://github.com/TomTomYoung/kingdom/actions/runs/41794602274",
+  "nodeTests": 433,
+  "syntaxFiles": 132,
+  "browserChecks": 168,
+  "suites": [
+    {
+      "suite": "abilities",
+      "verifiedAt": "2026-11-04T07:48:05.346Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 9,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "ai",
+      "verifiedAt": null,
+      "browser": "141.0.7390.37",
+      "checkCount": 13,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "ai-expansion",
+      "verifiedAt": "2026-11-04T07:48:08.511Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 8,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "ai-infrastructure",
+      "verifiedAt": "2026-11-04T07:48:11.862Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 9,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "cities",
+      "verifiedAt": null,
+      "browser": "141.0.7390.37",
+      "checkCount": 12,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "city-bombardment",
+      "verifiedAt": "2026-11-04T07:48:24.429Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 11,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "city-defense",
+      "verifiedAt": "2026-11-04T07:48:43.236Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 10,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "conquest",
+      "verifiedAt": "2026-11-04T07:48:53.037Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 10,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "founding",
+      "verifiedAt": "2026-11-04T07:49:25.612Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 7,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "hud",
+      "verifiedAt": "2026-11-04T07:47:52.944Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 7,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "party-care",
+      "verifiedAt": "2026-11-04T07:48:37.303Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 10,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "production-queue",
+      "verifiedAt": "2026-11-04T07:48:29.583Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 11,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "ranged",
+      "verifiedAt": null,
+      "browser": "141.0.7390.37",
+      "checkCount": 13,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "reorganization",
+      "verifiedAt": "2026-11-04T07:49:29.730Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 8,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "research",
+      "verifiedAt": "2026-11-04T07:48:18.550Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 12,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "siege",
+      "verifiedAt": "2026-11-04T07:48:47.929Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 10,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "turn-flow",
+      "verifiedAt": "2026-11-04T07:47:58.081Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 8,
+      "pageErrors": [],
+      "httpFailures": []
+    }
+  ],
+  "hudChecks": [
+    "desktop, laptop, mobile and short landscape fit the viewport; only the detail body scrolls and opening panels preserves map geometry/camera",
+    "all management views remain reachable, one panel at a time, without changing game state, logs or RNG",
+    "Escape closes details and restores focus; selecting city versus party switches the bottom action strip",
+    "persistent Next/Skip visits party, production and research; individual undo restores the gate; completing decisions enables settlement without moving the camera",
+    "save/load/new game and actual combat remain reachable through the new public controls",
+    "mobile bottom controls can individually skip all decisions and finish the turn without page scrolling",
+    "NPC progress is visible in the persistent footer and returns to the player without camera jumps"
+  ],
+  "viewports": [
+    [
+      1440,
+      900
+    ],
+    [
+      1366,
+      768
+    ],
+    [
+      390,
+      844
+    ],
+    [
+      844,
+      390
+    ]
+  ],
+  "screenshotsReviewed": [
+    "hud/hud-desktop.png",
+    "hud/production-desktop.png",
+    "hud/hud-laptop.png",
+    "hud/hud-mobile.png",
+    "hud/production-mobile.png",
+    "hud/hud-landscape.png",
+    "hud/production-landscape.png"
+  ],
+  "reviewNotes": "4画面サイズで文書スクロール・はみ出しを検証。PC、携帯縦画面、短い横画面の地図・フッター・詳細欄を目視確認。検証の画面サイズ変更待ち、シナリオ別行動数、模擬時計の初期化順を修正して全スイート成功。"
+}

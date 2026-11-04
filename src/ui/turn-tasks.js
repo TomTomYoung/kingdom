@@ -10,8 +10,8 @@ export class TurnTasksPanel {
     status.textContent = state.gameResult ? '対局は終了しました。' : !canAct ? '他プレイヤー・NPCの行動中です。終了後に生産・研究・資源を精算します。'
       : pending.length ? `未処理 ${pending.length}件。各項目を実行するか、このターンだけスキップしてください。` : '未処理の行動はありません。ターンを終了できます。';
     this.root.append(heading, status);
-    const next = document.createElement('button'); next.id = 'next-turn-action'; next.textContent = '次の未処理行動へ'; next.disabled = !canAct || !pending.length;
-    next.onclick = () => this.onOpen(pending[0]); this.root.append(next);
+    const next = document.querySelector('#next-turn-action');
+    next.disabled = !canAct || !pending.length; next.onclick = () => this.onOpen(pending[0]);
     const list = document.createElement('ul'); list.className = 'turn-task-list';
     for (const task of tasks) {
       const row = document.createElement('li'); row.dataset.turnTask = task.id;

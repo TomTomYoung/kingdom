@@ -1,3 +1,4 @@
+import { installHudNavigation } from './hud-navigation.mjs';
 import { finishTurn, prepareTurnFixture } from './turn-flow-helpers.mjs';
 // Optional real Chromium QA for city capture, ownership, AI, conquest outcomes and cityless restoration.
 // Set KINGDOM_QA_MODULES and KINGDOM_BROWSER, then run:
@@ -31,6 +32,7 @@ const errors = [], failures = [], checks = [];
 try {
   browser = await chromium.launch({ headless: true, ...(process.env.KINGDOM_BROWSER ? { executablePath: process.env.KINGDOM_BROWSER } : {}) });
   const context = await browser.newContext({ viewport: { width: 1440, height: 1050 } }), page = await context.newPage();
+  installHudNavigation(page);
   page.on('pageerror', error => errors.push(error.message));
   page.on('response', response => { if (response.status() >= 400 && !response.url().endsWith('favicon.ico')) failures.push(response.url()); });
   await page.goto(`http://127.0.0.1:${server.address().port}`);
