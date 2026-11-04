@@ -31,10 +31,10 @@ function round(state) {
 
 test('new reinforcement/conquest units learn the prototype, other scenarios retain empty ability fields', () => {
   for (const create of [createAiReinforcementGameState, createAiConquestGameState]) {
-    const state = create(); assert.equal(state.activeAbilityVersion, 1);
+    const state = create(); assert.equal(state.activeAbilityVersion, 2);
     assert.deepEqual(state.units['unit-1'].abilityStates, { heal: { usesRemaining: 1 } });
     assert.deepEqual(state.units['unit-1'].charges, { heal: 3 });
-    assert.deepEqual(state.units['unit-3'].abilityStates, {}); assert.deepEqual(trip(state), state);
+    assert.deepEqual(state.units['unit-3'].abilityStates, { 'arcane-bolt': { usesRemaining: 1 } }); assert.deepEqual(trip(state), state);
   }
   const old = createRangedDuelGameState(); assert.equal(Object.hasOwn(old, 'activeAbilityVersion'), false);
   assert.deepEqual(old.units['unit-1'].abilityStates, {});
@@ -139,7 +139,7 @@ test('purchase and production initialize only new warriors and do not refill exi
   let state = fixture(); state.units['unit-1'].charges.heal = 1; state.kingdoms[player].stockpiles.gold = 500;
   for (const type of ['warrior', 'archer', 'settler']) {
     const id = `unit-${state.nextIds.unit}`; state = apply(state, controller.purchaseItem(state, 'city-1', type));
-    assert.deepEqual(state.units[id].charges, type === 'warrior' ? { heal: 3 } : {});
+    assert.deepEqual(state.units[id].charges, type === 'warrior' ? { heal: 3 } : type === 'archer' ? { 'arcane-bolt': 3 } : {});
   }
   state = apply(state, controller.setProduction(state, 'city-1', 'warrior'));
   state.cities['city-1'].production.progressByItem.warrior = 11; const id = `unit-${state.nextIds.unit}`;
@@ -161,7 +161,7 @@ test('splitting, merging and changing formation preserve per-unit spent charges 
 test('ability save validates feature version, paired counters, types, integer bounds and history without migration', () => {
   const base = fixture();
   const corruptions = [
-    ...[0, 2, null, '1', true].map(v => s => { s.activeAbilityVersion = v; }),
+    ...[0, 3, null, '1', true].map(v => s => { s.activeAbilityVersion = v; }),
     s => { delete s.activeAbilityVersion; },
     s => { s.units['unit-1'].abilityStates = null; },
     s => { s.units['unit-1'].charges = []; },

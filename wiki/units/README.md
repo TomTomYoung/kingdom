@@ -39,4 +39,4 @@
 
 根拠: [現行ユニット定義](../../src/core/ruleset.js)、[ユニットの初期状態](../../src/models/unit.js)、[尺度の設計](../../doc/COMBAT_SYSTEM.md)、[民間・特殊行動](../../doc/ACTION_SYSTEM.md)。
 
-新規のAI増援戦・都市争奪戦では、戦士に[治癒](../abilities/heal.md)が追加されます。有限チャージ・mana・行動費用は[能力一覧](../abilities/README.md)で確認できます。
+新規のAI増援戦・都市争奪戦では、戦士に[治癒](../abilities/heal.md)、弓兵に[魔弾](../abilities/arcane-bolt.md)が追加されます。旧版1の保存は治癒のみを維持します。有限チャージ・mana・行動費用は[能力一覧](../abilities/README.md)で確認できます。

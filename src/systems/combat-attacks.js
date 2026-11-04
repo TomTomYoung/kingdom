@@ -81,13 +81,19 @@ export function resolveTargeting(state, attacker, defender, attackType, options 
   const primary = targets[0].unit;
   let cover = null, taunts = [], hitChance = 1;
   if (definition.targeting === 'unit-or-slot') {
-    const [row, column] = targets[0].slot.split('-');
-    cover = FORMATION_ROWS.slice(0, FORMATION_ROWS.indexOf(row)).map(r => unitAt(`${r}-${column}`)).find(unit => activeStrength(unit, 'coverPower') > 0) ?? null;
-    const taunter = exposedUnits(state, defender).map(entry => entry.unit).filter(unit => unit.id !== primary.id && activeStrength(unit, 'tauntStrength') > 0).sort((a, b) => b.tauntStrength - a.tauntStrength || a.id.localeCompare(b.id))[0];
-    taunts = taunter ? [taunter] : [];
     const units = participatingUnits(state, attacker, attackType, distance, definition);
     const accuracy = units.length ? units.reduce((sum, unit) => sum + (unit.accuracy ?? 1), 0) / units.length : 0;
-    hitChance = Math.max(0, Math.min(1, accuracy + (definition.accuracyBonus ?? 0) - (primary.evasion ?? 0) - (cover?.coverPower ?? 0) - (taunter?.tauntStrength ?? 0)));
+    ({ cover, taunts, hitChance } = directHitContext(state, defender, primary, accuracy, definition.accuracyBonus));
   } else if (definition.targeting === 'auto' && activeStrength(primary, 'tauntStrength') > 0) taunts = [primary];
   return { ok: true, definition, slots, targets, primary, cover, taunts, hitChance };
+}
+
+// Shared by aimed physical attacks and a single-caster magic projectile.
+export function directHitContext(state, defender, primary, accuracy, accuracyBonus = 0) {
+  const slot = Object.keys(defender.formation).find(slot => defender.formation[slot] === primary.id);
+  const [row, column] = slot.split('-');
+  const unitAt = slot => state.units[defender.formation[slot]];
+  const cover = FORMATION_ROWS.slice(0, FORMATION_ROWS.indexOf(row)).map(r => unitAt(`${r}-${column}`)).find(unit => activeStrength(unit, 'coverPower') > 0) ?? null;
+  const taunter = exposedUnits(state, defender).map(entry => entry.unit).filter(unit => unit.id !== primary.id && activeStrength(unit, 'tauntStrength') > 0).sort((a, b) => b.tauntStrength - a.tauntStrength || a.id.localeCompare(b.id))[0];
+  return { cover, taunts: taunter ? [taunter] : [], hitChance: Math.max(0, Math.min(1, accuracy + accuracyBonus - (primary.evasion ?? 0) - (cover?.coverPower ?? 0) - (taunter?.tauntStrength ?? 0))) };
 }

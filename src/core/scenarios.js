@@ -45,7 +45,7 @@ export function createAiReinforcementGameState(seed = 117) {
   state.kingdoms['kingdom-2'].aiPolicy = 'reinforcements';
   state.aiInfrastructureVersion = 1;
   state.aiExpansionVersion = 1;
-  state.activeAbilityVersion = 1;
+  state.activeAbilityVersion = 2;
   Object.values(state.units).forEach(unit => initializeUnitAbilities(state, unit));
   return state;
 }

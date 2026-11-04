@@ -1,5 +1,5 @@
 import { RULESET } from './ruleset.js';
-import { ABILITIES } from './abilities.js';
+import { ABILITIES, abilityAvailable } from './abilities.js';
 import { isActiveUnit, hasActiveUnits, occupiesMapTile } from '../models/party.js';
 import { Hex } from '../world/hex.js';
 import { validatePartyPath } from '../systems/movement-system.js';
@@ -8,7 +8,7 @@ import { validateCityAttack } from '../systems/city-siege.js';
 import { validateCityBombardment } from '../systems/city-bombardment.js';
 import { validateCaptureCity } from '../systems/city-capture.js';
 import { validateFoundCity } from '../systems/founding-system.js';
-import { validateAbility } from '../systems/ability-system.js';
+import { validateAbility, abilityTargets } from '../systems/ability-system.js';
 import { previewPartyRest, validateRemoveCasualties } from '../systems/party-care.js';
 import { validateReinforceParty, validateMergeParties, validateSplitParty } from '../systems/party-reorganization.js';
 import { researchSelectionError } from '../systems/research-system.js';
@@ -48,8 +48,9 @@ export function listTurnTasks(state, playerId = state.activePlayerId) {
     }
     if (cities.some(c => validateCaptureCity(state, playerId, party.id, c.id).ok)) actions.push('都市占領');
     if (party.unitIds.some(id => validateFoundCity(state, playerId, party.id, id).ok)) actions.push('都市建設');
-    for (const ability of Object.values(ABILITIES)) if (party.unitIds.some(casterUnitId => party.unitIds.some(targetUnitId =>
-      validateAbility(state, playerId, { partyId: party.id, casterUnitId, targetUnitId, abilityId: ability.id }).ok))) actions.push(ability.name);
+    for (const ability of Object.values(ABILITIES)) if (abilityAvailable(state, ability.id) && party.unitIds.some(casterUnitId =>
+      Object.hasOwn(state.units[casterUnitId].abilityStates, ability.id) && abilityTargets(state, party, ability).some(target =>
+        validateAbility(state, playerId, { partyId: party.id, casterUnitId, targetUnitId: target.id, abilityId: ability.id }).ok))) actions.push(ability.name);
     if (previewPartyRest(state, playerId, party.id).ok) actions.push('休養');
     if (validateRemoveCasualties(state, playerId, party.id).ok) actions.push('戦闘不能者の離脱');
     if (units.some(u => validateReinforceParty(state, playerId, party.id, [u.id]).ok)) actions.push('補充');
