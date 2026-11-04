@@ -123,7 +123,11 @@ try {
   await page.click('#end-turn'); assert.equal((await save()).currentTurn,2); await checkFrame(550);
   checks.push('mobile bottom controls can individually skip all decisions and finish the turn without page scrolling');
   await page.clock.install(); await page.clock.pauseAt(new Date()); await fresh('ai-skirmish');
-  for (let i=0;i<3;i++) await page.click('#skip-current-action');
+  let remaining=0;
+  while (await page.locator('#skip-current-action').isVisible()) {
+    assert.ok(++remaining < 32, 'the finite initial AI-scenario decisions should converge');
+    await page.click('#skip-current-action');
+  }
   const aiCamera=await camera(); await page.click('#end-turn');
   assert.match(await page.locator('#hud-turn-status').innerText(),/行動中/); assert.equal(await page.locator('#end-turn').isDisabled(),true);
   await page.clock.runFor(10000); assert.equal((await save()).currentTurn,2); assert.deepEqual(await camera(),aiCamera);

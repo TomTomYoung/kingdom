@@ -466,7 +466,7 @@ function renderHud() {
     if (hint) hint.hidden = !empty;
   }
   const log = $('#hud-event-log'); log.replaceChildren();
-  const names = { MoveParty: '移動', AttackParty: '攻撃', AttackCity: '攻城', BombardParty: '都市砲撃', CaptureCity: '都市占領', FoundCity: '都市建設', SetCityProduction: '生産設定', PurchaseCityItem: '購入', SelectResearch: '研究選択', UseAbility: '能力', RestParty: '休養', SkipTurnAction: 'スキップ', ResumeTurnAction: 'スキップ取消', EndTurn: '手番終了', CreateParty: '部隊編成', ReinforceParty: '補充', MergeParties: '合流', SplitParty: '分割' };
+  const names = { StartTurn: '手番開始', SetFormation: '配置変更', SetGuardOrder: '護衛設定', PurchaseTile: '領土購入', RemoveCasualties: '戦闘不能者の離脱', MoveParty: '移動', AttackParty: '攻撃', AttackCity: '攻城', BombardParty: '都市砲撃', CaptureCity: '都市占領', FoundCity: '都市建設', SetCityProduction: '生産設定', PurchaseCityItem: '購入', SelectResearch: '研究選択', UseAbility: '能力', RestParty: '休養', SkipTurnAction: 'スキップ', ResumeTurnAction: 'スキップ取消', EndTurn: '手番終了', CreateParty: '部隊編成', ReinforceParty: '補充', MergeParties: '合流', SplitParty: '分割' };
   for (const command of state.commandLog.slice(-40).reverse()) {
     const li = document.createElement('li'); li.textContent = `T${command.turn} ${state.kingdoms[command.playerId]?.name ?? command.playerId} · ${names[command.type] ?? command.type}`; log.append(li);
   }
