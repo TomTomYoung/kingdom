@@ -1,3 +1,4 @@
+import { rechargeAbilities } from './abilities.js';
 import { applyResearch } from '../systems/research-system.js';
 import { processPartyRest } from '../systems/party-care.js';
 import { hasCityBombardment, hasCityRetaliation } from '../models/city-defense.js';
@@ -51,5 +52,6 @@ export function processTurnStart(state, events) {
     }
     updateDerivedCapabilities(kingdom, state);
   }
+  rechargeAbilities(state);
   state.lastProcessedTurn = state.currentTurn; state.phase = 'PLAYER_ACTION';
 }

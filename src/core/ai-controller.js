@@ -1,3 +1,4 @@
+import { chooseAbilityCommand } from './ai-abilities.js';
 import { chooseExpeditionCommand, isExpansionParty } from './ai-expansion.js';
 import { chooseResearchCommand } from '../systems/research-system.js';
 import { validateCityBombardment } from '../systems/city-bombardment.js';
@@ -86,6 +87,8 @@ export class AIController {
       if (validateRemoveCasualties(state, this.playerId, party.id).ok) return removeCasualties(this.playerId, state.currentTurn, party.id, id);
       if (party.unitIds.some(id => isActiveUnit(state.units[id]) && state.units[id].currentHp / state.units[id].maxHp <= RULESET.partyRecovery.aiRestHpRatio) && previewPartyRest(state, this.playerId, party.id).ok) return restParty(this.playerId, state.currentTurn, party.id, id);
     }
+    const ability = chooseAbilityCommand(state, this.playerId, id);
+    if (ability) return ability;
     const expedition = chooseExpeditionCommand(state, this.playerId, id);
     if (expedition) return expedition;
     const recruits = state.kingdoms[this.playerId].aiPolicy === 'reinforcements';

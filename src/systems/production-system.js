@@ -1,3 +1,4 @@
+import { initializeUnitAbilities } from '../core/abilities.js';
 import { RULESET } from '../core/ruleset.js';
 import { createUnit } from '../models/unit.js';
 
@@ -29,6 +30,7 @@ export function completeItem(state, city, itemId, source, events) {
   if (item.category === 'unit') {
     const id = `unit-${state.nextIds.unit++}`;
     state.units[id] = createUnit(id, city.ownerId, itemId, city.centerHex);
+    initializeUnitAbilities(state, state.units[id]);
     state.kingdoms[city.ownerId].unitIds.push(id);
     events.push({ type: 'ItemCompleted', cityId: city.id, itemId, entityId: id, source });
   } else {

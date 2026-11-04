@@ -1,3 +1,4 @@
+import { resolveAbility } from '../systems/ability-system.js';
 import { resolveSelectResearch, itemResearchError } from '../systems/research-system.js';
 import { resolveCityBombardment } from '../systems/city-bombardment.js';
 import { resolvePartyRest, resolveRemoveCasualties, cancelPartyRest, partyCareSafetyError } from '../systems/party-care.js';
@@ -46,6 +47,9 @@ export class RuleSystem {
     if (command.type === COMMAND_TYPES.START_TURN) {
       if (state.lastProcessedTurn === state.currentTurn) return reject('このターンは開始処理済みです');
       processTurnStart(state, events);
+    } else if (command.type === COMMAND_TYPES.USE_ABILITY) {
+      const result = resolveAbility(state, command.playerId, command.payload, events);
+      if (!result.ok) return reject(result.reason);
     } else if (command.type === COMMAND_TYPES.SELECT_RESEARCH) {
       const reason = resolveSelectResearch(state, command.playerId, command.payload.technologyId, events);
       if (reason) return reject(reason);
