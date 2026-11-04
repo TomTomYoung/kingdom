@@ -89,8 +89,8 @@ try {
   await finishTurn(page); assert.equal(await page.locator('#capture-city').isDisabled(), true); await page.clock.runFor(6000); state = await snap();
   assert.equal(state.currentTurn, 2); assert.equal(state.activePlayerId, 'kingdom-1'); assert.ok(state.cities['city-2'].production.progressByItem.warrior > 0);
   assert.equal(state.kingdoms['kingdom-1'].stockpiles.gold - producing.kingdoms['kingdom-1'].stockpiles.gold, state.cities['city-1'].yieldSummary.gold + state.cities['city-2'].yieldSummary.gold);
-  assert.equal(state.eventLog.filter(e => e.type === 'YieldCollected' && e.cityId === 'city-2' && e.turn === 2).length, 1);
-  checks.push('captured city collects once for its new owner and starts new production at the next full round');
+  assert.equal(state.eventLog.filter(e => e.type === 'YieldCollected' && e.cityId === 'city-2' && e.turn === 1).length, 1);
+  checks.push('captured city collects once for its new owner and starts new production in the completed round settlement');
 
   const guarded = structuredClone(initial); relocate(guarded, 'party-1', '3,-3,0'); relocate(guarded, 'party-2', '4,-4,0');
   await restore(guarded); await click('[data-select-party="party-1"]');

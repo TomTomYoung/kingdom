@@ -1,5 +1,7 @@
 # Kingdom 開発資料
 
+- [手番の未処理行動・個別スキップ・終了精算](TURN_FLOW.md)
+
 確認・更新日: 2026-11-04
 
 目標はCivilization VI型の帝国運営、Party・Formation、Dungeon探索を統合したターン制ストラテジーです。現行はM1都市運営とM2の複数都市・Party・移動・近接／遠隔戦闘の途中です。
