@@ -1,0 +1,191 @@
+{
+  "verifiedAt": "2026-11-04",
+  "sourceCommit": "50a27d240d7d62cbdc909c133981a13af35b5f7b",
+  "workflow": "https://github.com/TomTomYoung/kingdom/actions/runs/41820403049",
+  "nodeTests": 478,
+  "syntaxFiles": 140,
+  "newAreaMagicTests": 22,
+  "browserChecks": 184,
+  "suites": [
+    {
+      "suite": "abilities",
+      "verifiedAt": "2026-11-04T11:23:45.935Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 9,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "ai",
+      "verifiedAt": "2026-11-04T11:24:53.296Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 13,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "ai-expansion",
+      "verifiedAt": "2026-11-04T11:24:02.190Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 8,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "ai-infrastructure",
+      "verifiedAt": "2026-11-04T11:24:05.474Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 9,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "cities",
+      "verifiedAt": "2026-11-04T11:25:00.538Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 12,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "city-bombardment",
+      "verifiedAt": "2026-11-04T11:24:17.783Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 11,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "city-defense",
+      "verifiedAt": "2026-11-04T11:24:35.265Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 10,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "conquest",
+      "verifiedAt": "2026-11-04T11:24:44.597Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 10,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "founding",
+      "verifiedAt": "2026-11-04T11:25:15.257Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 7,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "hud",
+      "verifiedAt": "2026-11-04T11:23:34.589Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 7,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "magic",
+      "verifiedAt": "2026-11-04T11:23:52.434Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 8,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "party-care",
+      "verifiedAt": "2026-11-04T11:24:29.665Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 10,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "production-queue",
+      "verifiedAt": "2026-11-04T11:24:23.179Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 11,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "ranged",
+      "verifiedAt": "2026-11-04T11:25:10.234Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 13,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "reorganization",
+      "verifiedAt": "2026-11-04T11:25:19.125Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 8,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "research",
+      "verifiedAt": "2026-11-04T11:24:11.912Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 12,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "siege",
+      "verifiedAt": "2026-11-04T11:24:39.755Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 10,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "turn-flow",
+      "verifiedAt": "2026-11-04T11:23:39.373Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 8,
+      "pageErrors": [],
+      "httpFailures": []
+    },
+    {
+      "suite": "wave",
+      "verifiedAt": "2026-11-04T11:23:59.124Z",
+      "browser": "141.0.7390.37",
+      "checkCount": 8,
+      "pageErrors": [],
+      "httpFailures": []
+    }
+  ],
+  "waveChecks": [
+    "public ability and task controls select the row spell, show its primary and complete footprint, and preserve saved state and RNG during preview",
+    "keyboard casting combines Guard and direct damage into one recipient event, matches DOM predictions, pays once, preserves bolt charges and never moves the camera",
+    "area history and charges round-trip exactly; handoff and round settlement restore only round uses and replay the same cast",
+    "Intercept combines its own area hit with the redirected primary; changing the anchor changes the protected primary or selects a different row without spreading through empty slots",
+    "shortages and range restrictions disable casting without changing state; HP-zero anchors disappear from target choices and the affected row",
+    "malformed footprint, partial charges and version downgrade are rejected; valid v2 saves retain only the old spell without learning or refilling",
+    "AI uses the area spell through shared commands after handoff, displays its name, keeps the camera fixed and resumes identically from a mid-turn save",
+    "1440x900 and 390x844 keep the map and turn controls fixed while the ability drawer scrolls to the footprint, damage ranges and usable cast button"
+  ],
+  "legacyCompatibility": {
+    "baselineCommit": "bdefb4c97019d8e16d57d4ddb2d687f135cc9867",
+    "snapshots": 260,
+    "continuationCommands": 1040,
+    "v2SpellPreviewsMatch": true,
+    "report": "save-wave-compat-2026-11-04.json"
+  },
+  "publishedFilesVerified": 37,
+  "updatedDocumentLinksVerified": 450,
+  "screenshotsReviewed": [
+    "1440x900 row footprint, Guard prediction and cast button",
+    "390x844 scrollable ability controls and prediction; fixed map and turn controls"
+  ],
+  "limitations": [
+    "prototype name, archer assignment and balance",
+    "AI compares maximum damage and hit chance, not long-term mana budgets",
+    "no charge refill, learning UI, status ability or dedicated spell artwork/audio"
+  ]
+}
