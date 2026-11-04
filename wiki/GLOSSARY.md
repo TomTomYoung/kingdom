@@ -57,7 +57,7 @@
 | 移動力 | Movement Points | [地形へ入るために消費する値](./rules/actions.md) |
 | 攻撃回数 | attacksRemaining | [現在はパーティーの標準1回](./rules/actions.md) |
 | 建設チャージ | buildCharges | [労働者が使う有限回数の予定](./units/builder.md) |
-| 能力・スキル・魔法 | Ability / Skill / Spell | [個別発動や効果の予定](./rules/abilities.md) |
+| 能力・スキル・魔法 | Ability / Skill / Spell | [治癒と個別発動・効果の範囲](./rules/abilities.md) |
 | 護衛・割り込み・挑発・遮蔽 | Guard / Intercept / Taunt / Cover | [被害の配分と照準への影響](./rules/abilities.md) |
 | 狙い撃ち・範囲・貫通 | aimed / precise / row / column / area / pierce | [照準と被害の分配](./rules/combat.md) |
 | 戦闘不能・壊滅・敗北 | downed / shattered / defeated | [HP0とパーティー敗北の状態](./rules/combat.md) |
@@ -85,3 +85,5 @@
 研究選択（SelectResearch）・未配分科学: [研究の規則](rules/research.md)。文字・農業・工学: [技術一覧](technologies/README.md)。図書館・穀物庫・工房: [建物一覧](buildings/README.md)。
 
 - 施設投資AI: 研究で解禁した施設を安全・軍備・予備費・発注上限の条件下で建設する新規対局のAI方針。[詳細](rules/ai-development.md)。
+
+[治癒（heal）](abilities/heal.md): 同部隊の生存負傷者を回復する能動能力。mana・行動費用・有限チャージを使用します。

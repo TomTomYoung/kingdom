@@ -1,0 +1,396 @@
+{
+  "verifiedAt": "2026-11-04T04:29:37.475979+00:00",
+  "sourceCommit": "50674a3979f45314f58c161419d04bda1929db8a",
+  "workflowRun": 41773169931,
+  "workflowUrl": "https://github.com/TomTomYoung/kingdom/actions/runs/41773169931",
+  "browser": "141.0.7390.37",
+  "nodeTests": 415,
+  "syntaxFiles": 124,
+  "browserSuites": 15,
+  "browserChecks": 153,
+  "pageErrors": 0,
+  "httpFailures": 0,
+  "compatibility": {
+    "baseline": "0aebc09bfbc50196c14b7cf23f382b2a468fc12f",
+    "snapshots": 224,
+    "continuedCommands": 896
+  },
+  "visualReview": {
+    "widths": [
+      1440,
+      390
+    ],
+    "images": [
+      "abilities/abilities-wide.png",
+      "abilities/abilities-panel.png",
+      "abilities/abilities-mobile.png"
+    ],
+    "result": "reviewed: controls, counters, costs, prediction and action visible; no horizontal overflow"
+  },
+  "artifacts": {
+    "id": 13295079621,
+    "zipSHA256": "ba91834382e06c616fe075b47b76b0e30a3d32db0eaa49ee86f66a37fd098058"
+  },
+  "suites": [
+    {
+      "name": "abilities",
+      "report": {
+        "verifiedAt": "2026-11-04T04:26:34.909Z",
+        "browser": "141.0.7390.37",
+        "checks": [
+          "new mode exposes caster/target selection and exact prediction; keyboard cast pays all costs once with a visible log",
+          "save/load and player handoff retain charges; only round start replenishes per-round uses and replay is identical",
+          "capped healing matches preview and HP-zero targets cannot be revived",
+          "mana, finite charges, round uses, status, movement and attack shortages show reasons and preserve state",
+          "invalid version and partial or out-of-bounds ability saves are rejected before replacing the live game",
+          "legacy games stay unchanged; newly purchased warriors in enabled games receive their own charges",
+          "AI handoff disables controls, heals under threat using the shared command and resumes identically from a mid-turn save",
+          "game-over locks ability controls without spending resources or changing the finished game",
+          "1440px and 390px render costs, counters, targets and prediction without horizontal overflow; mobile keyboard action works"
+        ],
+        "pageErrors": [],
+        "httpFailures": []
+      }
+    },
+    {
+      "name": "ai",
+      "report": {
+        "date": "2026-11-04T04:27:38.009Z",
+        "browser": "141.0.7390.37",
+        "realBrowser": true,
+        "result": "passed",
+        "checks": [
+          "human turn -> AI move/attack/end -> human; own-city viewpoint and mutation controls stay correct",
+          "mid-AI save resumes identically, including command IDs and RNG",
+          "reset and load cancel old scheduled AI commands",
+          "victory from actual attack; finished-state lock/save/load and forged winner rejection",
+          "AI victory shows human defeat and stops before EndTurn",
+          "round deadline produces and restores a draw without extra income",
+          "390px result screen has no horizontal overflow",
+          "legacy hotseat still switches human viewpoint without auto-playing",
+          "reinforcement mode selects enemy-city production and explains AI actions without changing the human city",
+          "AI clears its city, buys within budget, forms reinforcements and moves/attacks with them",
+          "reinforcement policy and mid-turn progress restore identically; missing policy rejects without replacing state",
+          "turn-start production supplies troops that the AI deploys on a later turn",
+          "390px reinforcement status and activity summary render without overflow"
+        ],
+        "errors": [],
+        "failures": []
+      }
+    },
+    {
+      "name": "ai-expansion",
+      "report": {
+        "verifiedAt": "2026-11-04T04:26:39.428Z",
+        "browser": "141.0.7390.37",
+        "checks": [
+          "new conquest enables expansion and its scheduled AI buys a settler at full cost with a protected reserve",
+          "waiting settler and escort form a single protected formation and spend real movement on an expansion route",
+          "mid-expedition save resumes identical AI decisions, locations, reserves and RNG",
+          "scheduled turns reach a real FoundCity result, consume only the settler and preserve the new city across reload",
+          "poor but safe AI reserves ordinary settler production rather than free purchasing",
+          "nearby enemy pressure preserves emergency wall priority over expansion",
+          "old infrastructure saves retain non-expanding AI and invalid expansion versions reject atomically",
+          "policy and city activity remain readable at 1440px and 390px with no horizontal overflow"
+        ],
+        "pageErrors": [],
+        "httpFailures": []
+      }
+    },
+    {
+      "name": "ai-infrastructure",
+      "report": {
+        "verifiedAt": "2026-11-04T04:26:43.975Z",
+        "browser": "141.0.7390.37",
+        "checks": [
+          "new AI scenario declares the investment policy and a real scheduled AI step buys an unlocked library at full price without immediate income",
+          "reload after the purchase preserves the shared purchase cap and reproduces the next human turn and library income",
+          "poor AI uses idle production with retained partial progress and the reservation replays from a mid-turn save",
+          "existing military queues survive facility purchases and already reserved libraries are not duplicated",
+          "nearby enemy pressure produces a wall order instead of discretionary facility investment",
+          "fewer than five living soldiers trigger ordinary army rebuilding rather than a library",
+          "old research-enabled saves keep the former military policy and do not gain the new version",
+          "unknown investment versions reject loading atomically without replacing the running game",
+          "investment policy and named facility activity remain readable at desktop and 390px without horizontal overflow"
+        ],
+        "pageErrors": [],
+        "httpFailures": []
+      }
+    },
+    {
+      "name": "cities",
+      "report": {
+        "date": "2026-11-04T04:27:44.867Z",
+        "browser": "141.0.7390.37",
+        "realBrowser": true,
+        "errors": [],
+        "failures": [],
+        "result": "passed",
+        "checks": [
+          "two-city setup and disjoint worked tiles",
+          "selection and collection details have no state or RNG effects",
+          "selected-city production and purchase keep separate queues and spawn locations",
+          "territory candidates and cost follow selection; purchase spends shared Gold and assigns the chosen city",
+          "save/load preserves territory, work, economy and scenario",
+          "invalid territory load preserves city selection, camera and game",
+          "malformed collection snapshots reject atomically and retain city and zoom",
+          "historical missing collection details display summary only and return after collection",
+          "culture expands only its earning city; each city contributes once to shared income",
+          "legacy city assignment and 37-cell migration preserve stockpiles, RNG and map size",
+          "hotseat switches to the active kingdom city and purchases for that kingdom",
+          "1440px and 390px city controls, work details and map overlays"
+        ]
+      }
+    },
+    {
+      "name": "city-bombardment",
+      "report": {
+        "verifiedAt": "2026-11-04T04:26:56.493Z",
+        "browser": "141.0.7390.37",
+        "checks": [
+          "new v3 starts without walls; real purchase enables range-two fire and preview is read-only",
+          "fire spends only its city charge, labels damage correctly and cannot be repeated after loading",
+          "human handoff does not refresh fire; the full-round boundary refreshes it once",
+          "destroyed walls, ruined city and out-of-range targets explain refusal and do not mutate state",
+          "intercept forecast matches actual HP, protection log and defender reaction consumption",
+          "lethal fire retains defeated records, clears unavailable targets and does not invent city-control victory",
+          "corrupt charges reject without replacement; v1 and v2 saves retain rules and explain unavailable city fire",
+          "AI fires through BombardParty, resumes the exact pending shot after reload and completes its bounded turn",
+          "changing selected cities switches source and keeps each fire charge independent",
+          "finished games disable city fire while preserving log inspection and saving",
+          "desktop and 390px previews fit without horizontal overflow and keyboard fire works"
+        ],
+        "pageErrors": [],
+        "httpFailures": []
+      }
+    },
+    {
+      "name": "city-defense",
+      "report": {
+        "verifiedAt": "2026-11-04T04:27:16.160Z",
+        "browser": "141.0.7390.37",
+        "checks": [
+          "new conquest explains one city counter per round alongside version-3 bombardment",
+          "melee forecast is read-only; real retaliation shares damage with guard and replays identically after reload",
+          "actual guard controls enable interception before siege activation closes remaining reactions",
+          "ranged siege and a guaranteed breach show no counter and preserve unit HP and city reaction charge",
+          "lethal city counter defeats the attacking party while city-control play and saving remain usable",
+          "spent city reactions survive loading, reset at the full round and reject corrupted saves atomically",
+          "AI buys threatened-city walls with reserve intact, preserves military orders and resumes without duplicate spending",
+          "AI chooses wall production without purchase funds and prioritizes military rebuilding when its army is depleted",
+          "version-1 siege and capture-only historical saves retain their respective rules",
+          "390px counter prediction and detailed loss log render without horizontal overflow"
+        ],
+        "pageErrors": [],
+        "httpFailures": []
+      }
+    },
+    {
+      "name": "conquest",
+      "report": {
+        "verifiedAt": "2026-11-04T04:27:27.990Z",
+        "browser": "141.0.7390.37",
+        "checks": [
+          "explicit conquest mode explains city survival and shows occupation controls",
+          "actual map movement then CaptureCity transfers ownership, selects the city, cancels production and grants no income",
+          "captured-city production and save/load work; partial territory transfer rejects atomically",
+          "captured city collects once for its new owner and starts new production at the next full round",
+          "garrison blocks entry; defeating the last army does not end a city-survival scenario",
+          "last-city capture wins with surviving enemy armies and locks actions across reload",
+          "AI capture produces human cityless defeat; city/map panels, read-only inspection, save/load and forged-result rejection remain usable",
+          "390px capture and cityless panels render without horizontal overflow",
+          "AI path to an unguarded city and mid-move save resume produce identical capture and victory",
+          "existing reinforcement mode retains army-elimination victory and hides capture controls"
+        ],
+        "pageErrors": [],
+        "httpFailures": []
+      }
+    },
+    {
+      "name": "founding",
+      "report": {
+        "verifiedAt": "2026-11-04T04:28:01.214Z",
+        "browser": "141.0.7390.37",
+        "checks": [
+          "scenario, read-only settler selection, movement, city spacing and exhausted-action feedback",
+          "founding consumes one settler, keeps escort, grants no immediate resources and selects the new city",
+          "new city collects once per turn and produces a new settler at its own center",
+          "save/load preserves scenario and city IDs; purchase uses the selected city and full cost",
+          "colliding city ID rejects load without replacing the current game or city selection",
+          "solo settlement removes stale UI selections and remains playable after reload",
+          "1440px and 390px city views render without horizontal overflow"
+        ],
+        "pageErrors": [],
+        "httpFailures": []
+      }
+    },
+    {
+      "name": "party-care",
+      "report": {
+        "verifiedAt": "2026-11-04T04:27:09.091Z",
+        "browser": "141.0.7390.37",
+        "checks": [
+          "new games enable care and explain why an uninjured party cannot rest",
+          "city rest preview is state-free, caps healing, reserves actions without immediate HP gain, and survives reload",
+          "corrupt rest order rejects atomically; hotseat handoff does not heal and the full-round recovery replays identically",
+          "field recovery uses 20 HP and adjacent enemies disable rest and casualty removal with a reason",
+          "real ranged attack interrupts pending rest; cancellation and unrecovered HP appear after returning to the party",
+          "casualty removal retains inspectable records, disables resurrection, and permits purchased reinforcements only on the next round",
+          "removing a fallen leader repairs selection, succession, formation and guards in the actual UI",
+          "AI removes casualties then rests through visible commands and reproduces both decisions from saved boundaries",
+          "historical saves retain their version and show an explanation instead of new care controls",
+          "390px recovery forecast, actions, pending state and logs render without horizontal overflow"
+        ],
+        "pageErrors": [],
+        "httpFailures": []
+      }
+    },
+    {
+      "name": "production-queue",
+      "report": {
+        "verifiedAt": "2026-11-04T04:27:02.115Z",
+        "browser": "141.0.7390.37",
+        "checks": [
+          "draft add, reorder and cancel do not mutate GameState or saved production",
+          "confirm uses one Command and preserves progress, resources, RNG and save round-trip",
+          "quick production buttons retain reservations and promote queued buildings without duplication",
+          "clear requires confirmation, retains work, and resume replays identically after reload",
+          "duplicate and completed buildings are disabled; purchasing one normalizes the displayed queue",
+          "city switching discards a draft and subsequent confirmation targets only the selected city",
+          "turn changes, successful load and new game invalidate unconfirmed drafts",
+          "AI turns disable edits and cannot submit a stale draft",
+          "walls are available in the defense scenario and finished games disable queue editing",
+          "zero-production forecasts are explicit and historical saves remain unchanged when inspected",
+          "keyboard reorder retains focus and the complete editor fits 1440px and 390px viewports"
+        ],
+        "pageErrors": [],
+        "httpFailures": []
+      }
+    },
+    {
+      "name": "ranged",
+      "report": {
+        "date": "2026-11-04T04:27:55.435Z",
+        "browser": "141.0.7390.37",
+        "realBrowser": true,
+        "errors": [],
+        "failures": [],
+        "checks": [
+          "seven attack profiles via UI",
+          "target preview has no state/RNG side effects",
+          "Unit and slot targeting",
+          "invalid empty direct slot",
+          "empty area center",
+          "grid click changes Unit/slot/row/column",
+          "attack footprint and HP forecast",
+          "ranged action exhaustion and no counter",
+          "save/load retains combat and mode",
+          "390px layout",
+          "active-kingdom archer purchase",
+          "ballista production",
+          "legacy melee and invalid ranged"
+        ],
+        "results": [
+          {
+            "profile": "normal",
+            "result": "passed",
+            "forecast": "予測HP損失 · 反撃なし\n\n主対象: 戦士 unit-6\n\n挑発: unit-6。通常攻撃の対象を引きつけます。\n\n敵軍 unit-6: 17〜23\n\n敵軍 unit-7: 16〜22 · 護衛\n\n命中・失敗・護衛を含む範囲です。攻撃回数を1消費し、この部隊の行動を終了します。"
+          },
+          {
+            "profile": "aimed",
+            "result": "passed",
+            "forecast": "予測HP損失 · 反撃なし\n\n狙った対象への命中率 45%\n\n主対象: 弓兵 unit-9\n\n遮蔽: unit-7。前にいるUnitが狙い撃ちに影響します。\n\n挑発: unit-6。指定した対象は変わらず、狙い撃ちの命中率へ影響します。\n\n敵軍 unit-7: 0〜46 · 遮蔽\n\n敵軍 unit-9: 0〜47\n\n命中・失敗・護衛を含む範囲です。攻撃回数を1消費し、この部隊の行動を終了します。"
+          },
+          {
+            "profile": "precise",
+            "result": "passed",
+            "forecast": "予測HP損失 · 反撃なし\n\n狙った対象への命中率 50%\n\n主対象: 弓兵 unit-9\n\n遮蔽: unit-7。前にいるUnitが狙い撃ちに影響します。\n\n挑発: unit-6。指定した対象は変わらず、狙い撃ちの命中率へ影響します。\n\n敵軍 unit-9: 0〜47\n\n命中・失敗・護衛を含む範囲です。攻撃回数を1消費し、この部隊の行動を終了します。"
+          },
+          {
+            "profile": "row",
+            "result": "passed",
+            "forecast": "予測HP損失 · 反撃なし\n\n主対象: 弓兵 unit-9\n\n敵軍 unit-9: 16〜23\n\n敵軍 unit-10: 15〜22\n\n命中・失敗・護衛を含む範囲です。攻撃回数を1消費し、この部隊の行動を終了します。"
+          },
+          {
+            "profile": "column",
+            "result": "passed",
+            "forecast": "予測HP損失 · 反撃なし\n\n主対象: 戦士 unit-6\n\n敵軍 unit-6: 11〜16\n\n敵軍 unit-7: 11〜15 · 護衛\n\n敵軍 unit-8: 25〜34\n\n命中・失敗・護衛を含む範囲です。攻撃回数を1消費し、この部隊の行動を終了します。"
+          },
+          {
+            "profile": "area",
+            "result": "passed",
+            "forecast": "予測HP損失 · 反撃なし\n\n主対象: 弓兵 unit-8\n\n敵軍 unit-6: 18〜25\n\n敵軍 unit-8: 19〜26\n\n命中・失敗・護衛を含む範囲です。攻撃回数を1消費し、この部隊の行動を終了します。"
+          },
+          {
+            "profile": "pierce",
+            "result": "passed",
+            "forecast": "予測HP損失 · 反撃なし\n\n主対象: 戦士 unit-6\n\n敵軍 unit-6: 18〜25\n\n敵軍 unit-7: 18〜25 · 護衛\n\n敵軍 unit-8: 23〜31\n\n命中・失敗・護衛を含む範囲です。攻撃回数を1消費し、この部隊の行動を終了します。"
+          }
+        ]
+      }
+    },
+    {
+      "name": "reorganization",
+      "report": {
+        "verifiedAt": "2026-11-04T04:28:05.877Z",
+        "browser": "141.0.7390.37",
+        "checks": [
+          "purchase -> choose waiting unit without mutation -> reinforce existing party; action and reaction are spent",
+          "split preview focuses adjacent terrain; ended parties reject, then next turn splits and selects the new party",
+          "merge preserves recipient ID, removes donor marker and roster entry, and selects the ended recipient",
+          "successful load clears draft selections; dangling donor references reject without replacing state or selection",
+          "390px controls have no horizontal overflow and can merge in the opposite direction",
+          "hotseat handover clears the prior kingdom draft and exposes only the current kingdom members",
+          "AI uses ReinforceParty, reports the action and resumes identically; human reorganization is locked during AI turns",
+          "AI consolidates small adjacent parties through MergeParties and reports it in the activity summary"
+        ],
+        "pageErrors": [],
+        "httpFailures": []
+      }
+    },
+    {
+      "name": "research",
+      "report": {
+        "verifiedAt": "2026-11-04T04:26:50.247Z",
+        "browser": "141.0.7390.37",
+        "checks": [
+          "new game exposes research, locks only new buildings, and keyboard selection spends no science or actions",
+          "round start allocates science once, displays progress and replays identically after save/load",
+          "switch, pause and resume retain topic-specific work and spend only unassigned science",
+          "completion unlocks library and engineering; paid construction yields its science bonus only on later collection",
+          "production queue enforces research unlocks and purchase removes a reserved building without duplicate completion",
+          "excess science remains banked and subsequent research cannot complete by repeated selection in the same turn",
+          "research is kingdom-wide across city selection and sums multi-city income once",
+          "human hotseat shows only the active kingdom research and allocates at the shared round boundary",
+          "AI selects through the shared Command, locks human controls and resumes deterministically from an AI-turn save",
+          "legacy rules are explicit and unchanged; corrupt research saves are rejected without replacing current play",
+          "zero-income estimate is explicit; game over locks research before the next collection",
+          "research list, prerequisites, unlocks and keyboard controls render at 1440px and 390px without horizontal overflow"
+        ],
+        "pageErrors": [],
+        "httpFailures": []
+      }
+    },
+    {
+      "name": "siege",
+      "report": {
+        "verifiedAt": "2026-11-04T04:27:22.230Z",
+        "browser": "141.0.7390.37",
+        "checks": [
+          "version-1 conquest preserves durability, siege controls and city-defense rules",
+          "wall production and purchase share building rules, remove duplicate orders and round-trip unchanged",
+          "enemy city selection previews wall-first damage without mutation and blocks entry/capture",
+          "actual siege spends activation, damages walls first, records the attack and reloads identically",
+          "repeated real attacks breach the city; next-turn movement and capture win with damaged inherited walls",
+          "invalid durability save rejects without replacing the current game",
+          "AI uses AttackCity and resumes the same seeded siege from a mid-turn save",
+          "historical conquest stays unfortified and explains how to start the new siege mode",
+          "wide and 390px layouts expose durability and siege controls without horizontal overflow",
+          "existing non-conquest modes hide unavailable siege and walls"
+        ],
+        "pageErrors": [],
+        "httpFailures": []
+      }
+    }
+  ]
+}

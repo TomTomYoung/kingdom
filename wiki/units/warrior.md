@@ -53,3 +53,7 @@ HPが0になると戦士は `shattered` となり、通常の戦闘対象・戦�
 関連: [生産](../resources/production.md)・[Gold](../resources/gold.md)・[パーティー](../rules/parties.md)・[戦闘](../rules/combat.md)。
 
 根拠: [費用・能力](../../src/core/ruleset.js)、[初期値](../../src/models/unit.js)、[完成時の配置](../../src/systems/production-system.js)、[戦闘処理](../../src/systems/combat-system.js)。
+
+## 新規対局の治癒
+
+新規「AIとの増援戦」「AIとの都市争奪戦」の初期・生産・購入戦士は[治癒](../abilities/heal.md)を使えます。mana4・移動力1・攻撃1・有限チャージ1で同じ部隊の生存者をHP最大30回復し、行動終了します。初期3チャージは補充されません。これは暫定の兵種割当で、他モード・旧保存には付けません。
