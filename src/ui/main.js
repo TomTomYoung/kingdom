@@ -1,3 +1,4 @@
+import { ABILITIES } from '../core/abilities.js';
 import { HudShell } from './hud-shell.js';
 import { enableTurnFlow, pendingTurnTasks } from '../core/turn-tasks.js';
 import { TurnTasksPanel } from './turn-tasks.js';
@@ -76,7 +77,7 @@ const productionQueue = new ProductionQueuePanel($('#production-queue'), {
   onApply: (cityId, items) => run(controller.setProduction(state, cityId, items[0] ?? null, items.slice(1)), items.length ? '生産キューを確定しました。途中の進捗は保持しています。' : '生産を停止しました。途中の進捗は再選択すると引き継ぎます。'),
 });
 const abilityPanel = new AbilityPanel($('#abilities'), {
-  onUse: p => run(controller.useAbility(state, p.partyId, p.casterUnitId, p.abilityId, p.targetUnitId), '治癒を使いました。回復量と消費を能力の履歴で確認できます。'),
+  onUse: p => run(controller.useAbility(state, p.partyId, p.casterUnitId, p.abilityId, p.targetUnitId), `${ABILITIES[p.abilityId].name}を使いました。結果と消費を能力・戦闘の履歴で確認できます。`),
 });
 const partyCare = new PartyCarePanel($('#party-care'), {
   onRest: partyId => run(controller.restParty(state, partyId), '休養を開始しました。被害や敵接近がなければ全プレイヤーの行動後のターン精算で回復します。'),
@@ -123,7 +124,9 @@ function openTurnTask(task, action) {
   let section = '#map';
   if (task.kind === 'party') {
     selectParty(task.entityId, false);
-    section = action === '治癒' ? '#abilities' : ['休養', '戦闘不能者の離脱'].includes(action) ? '#party-care'
+    const ability = Object.values(ABILITIES).find(d => d.name === action);
+    if (ability) { abilityPanel.selectAbility(state, state.parties[task.entityId], controller.playerId, ability.id); abilityPanel.render(state, state.parties[task.entityId], controller.playerId, canAct()); }
+    section = ability ? '#abilities' : ['休養', '戦闘不能者の離脱'].includes(action) ? '#party-care'
       : ['補充', '合流', '分割'].includes(action) ? '#party-reorganization' : action === '都市建設' ? '#founding-panel'
       : action?.includes('攻城') || action === '都市占領' ? '#capture-panel' : action?.includes('攻撃') ? '#combat-panel' : '#map';
   } else if (task.kind === 'unit') { selectUnit(task.entityId, false); section = '#cell-view'; }
@@ -172,7 +175,7 @@ function scheduleAi() {
 function aiActionMessage(result) {
   if (result.state.gameResult) return '対局が終了しました。結果と戦闘ログを確認できます。';
   const messages = {
-    UseAbility: 'AIが負傷した味方に治癒を使いました。',
+    UseAbility: `AIが${ABILITIES[result.command.payload.abilityId]?.name ?? '能力'}を使いました。`,
     FoundCity: 'AIが開拓者を使って新しい都市を建設しました。',
     SelectResearch: 'AIが研究対象を選択しました。',
     RestParty: 'AIが負傷した部隊の休養を開始しました。', RemoveCasualties: 'AIが戦闘不能者を部隊から離脱させました。',
@@ -188,11 +191,12 @@ function aiActionMessage(result) {
 function renderAiActivity() {
   const commands = state.commandLog.filter(command => state.kingdoms[command.playerId]?.controllerType === 'ai');
   const turn = commands.at(-1)?.turn, recent = commands.filter(command => command.turn === turn);
-  const labels = { UseAbility: '治癒', FoundCity: '都市建設', SelectResearch: '研究選択', BombardParty: '都市砲撃', RestParty: '休養', RemoveCasualties: '戦闘不能者の離脱', AttackCity: '攻城', CaptureCity: '都市占領', SetCityProduction: '生産設定', PurchaseCityItem: '購入', CreateParty: '増援編成', ReinforceParty: '補充', MergeParties: '合流', MoveParty: '移動', AttackParty: '攻撃' };
+  const labels = { FoundCity: '都市建設', SelectResearch: '研究選択', BombardParty: '都市砲撃', RestParty: '休養', RemoveCasualties: '戦闘不能者の離脱', AttackCity: '攻城', CaptureCity: '都市占領', SetCityProduction: '生産設定', PurchaseCityItem: '購入', CreateParty: '増援編成', ReinforceParty: '補充', MergeParties: '合流', MoveParty: '移動', AttackParty: '攻撃' };
   const actions = Object.entries(labels).map(([type, label]) => {
     const count = recent.filter(command => command.type === type).length;
     return count ? `${label} ${count}回` : null;
   }).filter(Boolean);
+  for (const d of Object.values(ABILITIES)) { const count = recent.filter(c => c.type === 'UseAbility' && c.payload.abilityId === d.id).length; if (count) actions.push(`${d.name} ${count}回`); }
   const walls = recent.filter(command => ['SetCityProduction', 'PurchaseCityItem'].includes(command.type) && command.payload.itemId === 'walls').length;
   if (walls) actions.push(`城壁発注 ${walls}回`);
   for (const item of Object.values(RULESET.items).filter(item => item.requiredTechnology || item.itemId === 'settler')) {

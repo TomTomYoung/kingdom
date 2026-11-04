@@ -87,3 +87,7 @@
 - 施設投資AI: 研究で解禁した施設を安全・軍備・予備費・発注上限の条件下で建設する新規対局のAI方針。[詳細](rules/ai-development.md)。
 
 [治癒（heal）](abilities/heal.md): 同部隊の生存負傷者を回復する能動能力。mana・行動費用・有限チャージを使用します。
+
+[魔弾（arcane-bolt）](abilities/arcane-bolt.md): 弓兵が使う射程2の単体魔法。mana6、有限チャージ1を使い、護衛配分後の各Unitの抵抗で軽減します。
+
+[魔法戦闘力（magicStrength）・抵抗（resistance）](../doc/MAGIC_ABILITIES.md): 魔弾の基礎被害と、被害先ごとの魔法軽減に使う値です。

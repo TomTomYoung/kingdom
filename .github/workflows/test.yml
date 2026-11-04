@@ -48,7 +48,7 @@ jobs:
           KINGDOM_QA_MODULES: ${{ runner.temp }}/kingdom-browser/node_modules
         run: |
           failed=0
-          for suite in hud turn-flow abilities ai-expansion ai-infrastructure research city-bombardment production-queue party-care city-defense siege conquest ai cities ranged founding reorganization; do
+          for suite in hud turn-flow abilities magic ai-expansion ai-infrastructure research city-bombardment production-queue party-care city-defense siege conquest ai cities ranged founding reorganization; do
             node "tools/qa/browser-$suite.mjs" "qa-results/$suite" || failed=1
           done
           exit "$failed"

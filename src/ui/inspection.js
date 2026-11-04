@@ -96,7 +96,7 @@ export class InspectionView {
     this.unitRoot.append(facts([
       ['状態', stateLabels[unit.status] ?? unit.status], ['HP', `${unit.currentHp} / ${unit.maxHp}`], ['所属国', state.kingdoms[unit.ownerId]?.name ?? unit.ownerId],
       ['所属部隊', unitParty ? `${partyName(unitParty)}${occupiesMapTile(unitParty) ? '' : ' · 敗北記録（占有なし）'}` : isActiveUnit(unit) ? '未編成・待機中' : '離脱済み・戦闘不能の記録'], ['位置', unit.location], ['配置', slotLabel ?? 'なし'], ['指揮者', unitParty?.leaderUnitId === unit.id ? 'このUnit' : unitParty?.leaderUnitId ?? 'なし'],
-      ['近接 / 遠隔', `${unit.meleeStrength} / ${unit.rangedStrength}`], ['防御 / 装甲', `${unit.defenseStrength} / ${unit.armor}`], ['射程', unit.range], ['護衛容量', `${unit.guardCapacityRemaining} / ${unit.guardCapacityMax}`], ['肩代わり率', `${Math.round(unit.guardRate * 100)}%`],
+      ['近接 / 遠隔', `${unit.meleeStrength} / ${unit.rangedStrength}`], ['防御 / 装甲', `${unit.defenseStrength} / ${unit.armor}`], ['魔法戦闘力 / 抵抗', `${unit.magicStrength} / ${unit.resistance}`], ['射程', unit.range], ['護衛容量', `${unit.guardCapacityRemaining} / ${unit.guardCapacityMax}`], ['肩代わり率', `${Math.round(unit.guardRate * 100)}%`],
       ['命中 / 回避', `${Math.round((unit.accuracy ?? 1) * 100)}% / ${Math.round((unit.evasion ?? 0) * 100)}%`], ['挑発 / 遮蔽', `${Math.round((unit.tauntStrength ?? 0) * 100)}% / ${Math.round((unit.coverPower ?? 0) * 100)}%`],
     ]));
     if (unitParty) {

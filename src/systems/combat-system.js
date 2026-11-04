@@ -1,3 +1,4 @@
+import { physicalDamage } from './damage-mitigation.js';
 import { cancelPartyRest } from './party-care.js';
 import { RULESET } from '../core/ruleset.js';
 import { SeededRng } from '../core/rng.js';
@@ -28,13 +29,13 @@ export function rollDamage(state, attackStrength, defenseStrength) {
   return boundedDamage(attackStrength, defenseStrength, random);
 }
 
-function rollHit(state, chance) {
+export function rollHit(state, chance) {
   const rng = SeededRng.fromJSON(state.rng.combat), hit = rng.next() < chance;
   state.rng.combat = rng.toJSON(); return hit;
 }
 
-function applyDamage(unit, amount) {
-  const mitigated = Math.min(unit.currentHp, Math.max(1, amount - (unit.armor ?? 0)));
+function applyDamage(unit, amount, mitigation) {
+  const mitigated = Math.min(unit.currentHp, mitigation(amount, unit));
   unit.currentHp = Math.max(0, unit.currentHp - mitigated); unit.hp = unit.currentHp;
   if (unit.currentHp === 0) unit.status = unit.scaleClass === 'individual' ? 'downed' : 'shattered';
   return mitigated;
@@ -78,10 +79,11 @@ function strike(state, sourceParty, targetParty, kind, events, counter = false, 
   return applyPartyDamage(state, targetParty, primary, allocations, rawDamage, events, metadata);
 }
 
-export function applyPartyDamage(state, targetParty, primary, allocations, rawDamage, events, metadata) {
+export function applyPartyDamage(state, targetParty, primary, allocations, rawDamage, events, metadata, mitigation = physicalDamage) {
   let total = 0;
   for (const { unit, amount, roles } of allocations.values()) {
-    const damage = applyDamage(unit, amount); total += damage;
+    if (amount <= 0) continue;
+    const damage = applyDamage(unit, amount, mitigation); total += damage;
     const role = roles.has('intercept') ? 'intercept' : roles.has('guard') ? 'guard' : roles.has('primary') ? 'primary' : 'area';
     events.push({ type: 'CombatDamage', ...metadata, targetUnitId: unit.id, primaryTargetUnitId: primary.id, targetSlot: Object.keys(targetParty.formation).find(slot => targetParty.formation[slot] === unit.id), rawDamage, allocatedDamage: amount, damage, role, roles: [...roles], remainingHp: unit.currentHp });
   }
