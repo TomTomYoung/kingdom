@@ -4,7 +4,7 @@ import { RULESET } from '../core/ruleset.js';
 import { SeededRng } from '../core/rng.js';
 import { Hex } from '../world/hex.js';
 import { isActiveUnit as isActive } from '../models/party.js';
-import { allocateSingleDamage } from './damage-grid.js';
+import { allocatePatternDamage } from './damage-grid.js';
 import { attackDefinition, automaticTarget, participatingUnits, resolveTargeting } from './combat-attacks.js';
 
 export function partyCombatStrength(state, party, kind = 'melee', distance = 1, definition) {
@@ -63,19 +63,8 @@ function strike(state, sourceParty, targetParty, kind, events, counter = false, 
     events.push({ type: 'CombatCover', ...metadata, coverUnitId: targeting.cover.id, targetUnitId: targeting.primary.id });
     targets = [{ unit: targeting.cover, slot: Object.keys(targetParty.formation).find(slot => targetParty.formation[slot] === targeting.cover.id) }];
   }
-  // Allocate the complete fixed pattern, then combine direct and Guard damage.
-  // One recipient pays armor once, and a zero allocation never creates damage.
-  const allocations = new Map(), primary = targets[0].unit;
-  for (const [depth, { unit }] of targets.entries()) {
-    const amount = Math.floor(rawDamage * definition.multiplier * (definition.decay ?? 1) ** depth);
-    if (amount <= 0) continue;
-    const parts = depth === 0 ? allocateSingleDamage(state, targetParty, unit, amount, events) : [{ unit, amount, role: 'area' }];
-    for (const part of parts) {
-      if (part.amount <= 0) continue;
-      const accumulated = allocations.get(part.unit.id) ?? { unit: part.unit, amount: 0, roles: new Set() };
-      accumulated.amount += part.amount; accumulated.roles.add(part.role); allocations.set(part.unit.id, accumulated);
-    }
-  }
+  const primary = targets[0].unit;
+  const allocations = allocatePatternDamage(state, targetParty, targets, rawDamage, events, definition);
   return applyPartyDamage(state, targetParty, primary, allocations, rawDamage, events, metadata);
 }
 

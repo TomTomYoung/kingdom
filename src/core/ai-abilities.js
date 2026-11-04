@@ -28,7 +28,7 @@ export function chooseAbilityCommand(state, playerId, commandId) {
         }
       }
     }
-    spells.sort((a, b) => b.score - a.score || a.partyId.localeCompare(b.partyId) || a.targetUnitId.localeCompare(b.targetUnitId) || a.casterUnitId.localeCompare(b.casterUnitId));
+    spells.sort((a, b) => b.score - a.score || a.partyId.localeCompare(b.partyId) || a.targetUnitId.localeCompare(b.targetUnitId) || a.casterUnitId.localeCompare(b.casterUnitId) || a.abilityId.localeCompare(b.abilityId));
     candidates.push(...spells);
   }
   const choice = candidates[0];

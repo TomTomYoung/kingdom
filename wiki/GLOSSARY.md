@@ -91,3 +91,5 @@
 [魔弾（arcane-bolt）](abilities/arcane-bolt.md): 弓兵が使う射程2の単体魔法。mana6、有限チャージ1を使い、護衛配分後の各Unitの抵抗で軽減します。
 
 [魔法戦闘力（magicStrength）・抵抗（resistance）](../doc/MAGIC_ABILITIES.md): 魔弾の基礎被害と、被害先ごとの魔法軽減に使う値です。
+
+[魔力波（arcane-wave）](abilities/arcane-wave.md): 敵Unitを基準に同じ横列へ必中の魔法被害を与えます。mana10、有限チャージ1を使い、直撃と護衛の合計へ抵抗を一度だけ適用します。

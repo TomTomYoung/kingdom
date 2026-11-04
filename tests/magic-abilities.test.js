@@ -16,7 +16,8 @@ const trip = s => restoreGameState(serializeGameState(s));
 const command = (s, p = payload) => h.useAbility(s, p.partyId, p.casterUnitId, p.abilityId, p.targetUnitId);
 const apply = (s, c) => { const r=RuleSystem.execute(s,c); assert.equal(r.ok,true,r.reason); return r.state; };
 function fixture(seed=117) {
-  let s=createAiReinforcementGameState(seed); s.kingdoms['kingdom-2'].controllerType='human';s.scenarioId='magic-test';
+  let s=createAiReinforcementGameState(seed); s.activeAbilityVersion=2;
+  for(const u of Object.values(s.units)){delete u.charges['arcane-wave'];delete u.abilityStates['arcane-wave'];} s.kingdoms['kingdom-2'].controllerType='human';s.scenarioId='magic-test';
   s=apply(s,h.startTurn(s)); s.kingdoms['kingdom-1'].stockpiles.mana=100;
   const enemy=s.parties['party-2'];enemy.location='2,-2,0';enemy.guardOrders={};
   for(const id of enemy.unitIds) { const u=s.units[id];u.location=enemy.location;u.tauntStrength=0;u.coverPower=0;u.evasion=0; }

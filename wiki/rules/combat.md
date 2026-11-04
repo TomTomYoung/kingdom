@@ -65,3 +65,7 @@ IndividualはHP0でdowned、他の分類はshatteredになります。以後の�
 ## 魔弾と抵抗
 
 新規AI増援戦・都市争奪戦の弓兵は[魔弾](../abilities/arcane-bolt.md)を使えます。命中・Cover／Taunt・Guard／Interceptの後に、被害を受けるUnitごとの抵抗で軽減します。装甲・防御戦闘力は魔弾を軽減しません。反撃なしで、命中失敗でも費用を消費します。予測は各被害先のHP損失範囲を示します。[式と処理順](../../doc/MAGIC_ABILITIES.md)。
+
+## 横列の魔力波
+
+新規AI増援戦・都市争奪戦の弓兵は[魔力波](../abilities/arcane-wave.md)を使えます。指定した敵Unitと同じ横列の生存者へ基礎被害の60%を配分します。範囲は被害前に固定し、主対象だけにGuard／Interceptを判定します。同じUnitへの直撃と肩代わりを合算した後、抵抗とHP打ち止めを一度だけ適用します。範囲内必中、反撃なしです。[式と順序](../../doc/AREA_MAGIC.md)。
