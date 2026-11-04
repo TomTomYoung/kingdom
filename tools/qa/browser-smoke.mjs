@@ -1,3 +1,4 @@
+import { finishTurn, prepareTurnFixture } from './turn-flow-helpers.mjs';
 // Optional real Chromium QA. Install Playwright separately, then set
 // KINGDOM_QA_MODULES to its node_modules and KINGDOM_BROWSER to Chromium if needed.
 // node tools/qa/browser-smoke.mjs /tmp/kingdom-browser
@@ -61,7 +62,7 @@ try {
     await page.waitForFunction(() => document.querySelector('#resources img'));
     await page.waitForFunction(() => [...document.images].every((image) => image.complete));
     const save = async () => { await page.click('#save'); return page.evaluate(() => JSON.parse(localStorage.getItem('kingdom-m1-save'))); };
-    const load = async (value) => { await page.evaluate((s) => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await page.click('#load'); };
+    const load = async (value) => { prepareTurnFixture(value); await page.evaluate((s) => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await page.click('#load'); };
     const tileClick = async (tile, button = 'left') => {
       await page.locator('#map').scrollIntoViewIfNeeded();
       const point = await page.locator('#map').evaluate((canvas, tile) => {
@@ -99,7 +100,7 @@ try {
     state = await save(); assert.deepEqual(state.parties['party-2'].unitIds, ['unit-2']);
     await page.click('[data-slot="front-left"]'); await page.click('[data-slot="rear-center"]');
     state = await save(); assert.deepEqual(state.parties['party-2'].formation, { 'rear-center': 'unit-2' });
-    await page.click('#end-turn'); state = await save();
+    await finishTurn(page); state = await save();
     const depart = [...getReachablePartyPaths(state, state.parties['party-2'])][0];
     await page.click('[data-select-party="party-2"]'); await tileClick(state.world.tiles[depart[0]], 'right');
     state = await save(); assert.equal(state.parties['party-2'].location, depart[0]);
@@ -121,7 +122,7 @@ try {
     assert.equal(await page.locator('#unit-content').innerText(), selection);
     assert.equal(await page.locator('#map-zoom').innerText(), '200%');
     assert.deepEqual(await save(), state, 'invalid load keeps current game');
-    await page.click('#end-turn'); assert.equal((await save()).currentTurn, state.currentTurn + 1, 'game remains playable');
+    await finishTurn(page); assert.equal((await save()).currentTurn, state.currentTurn + 1, 'game remains playable');
     const old = createInitialGameState(117, { radius: 3 }); await load(old);
     assert.deepEqual(await save(), old); assert.match(await page.locator('#seed').innerText(), /37セル/);
     await page.click('#reset'); assert.match(await page.locator('#seed').innerText(), /331セル/);
@@ -143,7 +144,7 @@ try {
     assert.equal(await page.locator('#attack-party').isDisabled(), true);
     assert.match(await page.locator('#combat-log').innerText(), /肩代わり/); assert.match(await page.locator('#combat-log').innerText(), /割り込み/);
     await page.locator('#combat-panel').screenshot({ path: path.join(output, missingAudio ? 'battle-fallback.png' : 'battle.png') });
-    await page.click('#end-turn');
+    await finishTurn(page);
     assert.match(await page.locator('#active-kingdom').innerText(), /夕映王国/); assert.equal(await page.locator('#city-name').innerText(), '黄昏都');
     await page.click('[data-buy="warrior"]'); state = await save();
     assert.equal(state.units['unit-7'].ownerId, 'kingdom-2'); assert.equal(state.units['unit-7'].location, '4,-4,0');
@@ -155,7 +156,7 @@ try {
     for (let action = 0; action < 40 && !Object.values(state.parties).some(p => p.status === 'defeated'); action++) {
       const own = Object.values(state.parties).find(p => p.ownerId === state.activePlayerId), enemy = Object.values(state.parties).find(p => p.ownerId !== state.activePlayerId);
       if (own.attacksRemaining > 0 && own.activationState !== 'ended') { await page.selectOption('#combat-target', enemy.id); await page.click('#attack-party'); }
-      else await page.click('#end-turn');
+      else await finishTurn(page);
       state = await save();
     }
     assert.ok(Object.values(state.parties).some(p => p.status === 'defeated'), 'battle reaches defeat through normal attacks');
@@ -165,7 +166,7 @@ try {
     const defeated = Object.values(state.parties).find(p => p.status === 'defeated');
     const winner = Object.values(state.parties).find(p => p.status === 'active');
     for (let turn = 0; turn < 4 && (state.activePlayerId !== winner.ownerId || state.parties[winner.id].movementRemaining === 0 || state.parties[winner.id].activationState === 'ended'); turn++) {
-      await page.click('#end-turn'); state = await save();
+      await finishTurn(page); state = await save();
     }
     assert.equal(state.activePlayerId, winner.ownerId);
     await page.click(`[data-select-party="${winner.id}"]`);

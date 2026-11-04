@@ -13,9 +13,9 @@ export class PartyCarePanel {
     if (root.hidden) return;
     root.append(node('h3', '休養と戦闘不能者の離脱'));
     if (!hasPartyRecovery(state)) { root.append(node('p', 'この旧対局では休養・離脱は使えません。新規開始で利用できます。')); return; }
-    const hint = node('p', `移動・攻撃前に一手番を使います。休養は次の全体ターン開始時にHP +${RULESET.partyRecovery.fieldHp}（自国都市の中心は+${RULESET.partyRecovery.cityHp}）。自国領か未所有地で、敵軍・防御の残る敵都市が隣接していない場所で行います。被害・敵接近で中止。HP0は回復しません。`); hint.className = 'hint'; root.append(hint);
+    const hint = node('p', `移動・攻撃前に一手番を使います。休養は次のターン精算時にHP +${RULESET.partyRecovery.fieldHp}（自国都市の中心は+${RULESET.partyRecovery.cityHp}）。自国領か未所有地で、敵軍・防御の残る敵都市が隣接していない場所で行います。被害・敵接近で中止。HP0は回復しません。`); hint.className = 'hint'; root.append(hint);
     const preview = previewPartyRest(state, playerId, party.id), removal = validateRemoveCasualties(state, playerId, party.id);
-    const status = node('p', party.restOrder ? `休養中: 全体ターン ${party.restOrder.turn + 1} の開始を待っています。途中で被害・敵接近があると回復しません。` : preview.ok ? `回復予定: ${recoveryText(state, preview.recovery)}` : preview.reason);
+    const status = node('p', party.restOrder ? `休養中: ターン ${party.restOrder.turn} の精算を待っています。途中で被害・敵接近があると回復しません。` : preview.ok ? `回復予定: ${recoveryText(state, preview.recovery)}` : preview.reason);
     status.id = 'rest-preview'; status.setAttribute('aria-live', 'polite'); root.append(status);
     const action = (id, label, check, describedBy, callback) => {
       const button = node('button', label); button.id = id; button.type = 'button'; button.disabled = !check.ok || state.kingdoms[playerId].controllerType === 'ai'; button.setAttribute('aria-describedby', describedBy); button.onclick = callback; root.append(button);

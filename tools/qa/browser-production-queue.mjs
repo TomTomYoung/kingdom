@@ -1,3 +1,4 @@
+import { finishTurn, prepareTurnFixture } from './turn-flow-helpers.mjs';
 // Optional real Chromium QA for production queue editing and save continuation.
 // Set KINGDOM_QA_MODULES and KINGDOM_BROWSER, then run:
 // node tools/qa/browser-production-queue.mjs /tmp/kingdom-production-queue-qa
@@ -37,7 +38,7 @@ try {
   await page.clock.install(); await page.clock.pauseAt(new Date());
   const click = selector => page.locator(selector).evaluate(element => element.click());
   const save = async () => { await click('#save'); return page.evaluate(() => JSON.parse(localStorage.getItem('kingdom-m1-save'))); };
-  const load = async value => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); };
+  const load = async value => { prepareTurnFixture(value); await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); };
   const select = async (selector, value) => page.locator(selector).evaluate((el, value) => { el.value = value; el.dispatchEvent(new Event('change', { bubbles: true })); }, value);
   const rows = () => page.locator('[data-queue-item]').evaluateAll(nodes => nodes.map(node => node.dataset.queueItem));
   const add = async id => { await select('#production-queue-item', id); await click('#production-queue-add'); };
@@ -69,7 +70,7 @@ try {
   assert.match(await page.locator('#production-queue-apply').innerText(), /停止/); await click('#production-queue-apply'); const stopped = await save();
   assert.equal(stopped.cities['city-1'].production.currentItemId, null); assert.deepEqual(stopped.cities['city-1'].production.queue, []);
   await load(stopped); await click('[data-produce="warrior"]'); const resumed = await save(); assert.equal(resumed.cities['city-1'].production.progressByItem.warrior, 7);
-  await click('#end-turn'); const continued = await save(); await load(resumed); await click('#end-turn'); assert.deepEqual(await save(), continued);
+  await finishTurn(page); const continued = await save(); await load(resumed); await finishTurn(page); assert.deepEqual(await save(), continued);
   checks.push('clear requires confirmation, retains work, and resume replays identically after reload');
 
   await load(base); await edit(); await add('monument');
@@ -89,12 +90,12 @@ try {
   assert.deepEqual(east.cities['city-1'], two.cities['city-1']); assert.equal(east.cities['city-2'].production.currentItemId, 'archer');
   checks.push('city switching discards a draft and subsequent confirmation targets only the selected city');
 
-  await edit(); await add('monument'); await click('#end-turn'); assert.equal(await page.locator('#production-queue-apply').count(), 0);
+  await edit(); await add('monument'); await finishTurn(page); assert.equal(await page.locator('#production-queue-apply').count(), 0);
   await edit(); await add('monument'); await load(east); assert.equal(await page.locator('#production-queue-apply').count(), 0);
   await edit(); await add('monument'); await click('#reset'); assert.equal(await page.locator('#production-queue-apply').count(), 0);
   checks.push('turn changes, successful load and new game invalidate unconfirmed drafts');
 
-  await select('#game-mode', 'ai-reinforcements'); await click('#reset'); await edit(); await add('warrior'); await click('#end-turn');
+  await select('#game-mode', 'ai-reinforcements'); await click('#reset'); await edit(); await add('warrior'); await finishTurn(page);
   assert.equal(await page.locator('#production-queue-apply').count(), 0); assert.equal(await page.locator('#production-queue-edit').isDisabled(), true);
   const aiPending = await save(); await click('#production-queue-edit'); assert.deepEqual(await save(), aiPending);
   await page.clock.runFor(10000); assert.equal(await page.locator('#production-queue-edit').isEnabled(), true);
@@ -104,7 +105,7 @@ try {
   assert.equal((await save()).cities['city-1'].production.currentItemId, 'walls');
   const finished = structuredClone(siege); finished.currentTurn = finished.scenarioObjective.turnLimit;
   finished.lastProcessedTurn = finished.currentTurn; await load(finished);
-  await click('#end-turn'); await page.clock.runFor(10000); const result = await save();
+  await finishTurn(page); await page.clock.runFor(10000); const result = await save();
   assert.ok(result.gameResult); assert.equal(await page.locator('#production-queue-edit').isDisabled(), true);
   checks.push('walls are available in the defense scenario and finished games disable queue editing');
 

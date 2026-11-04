@@ -1,3 +1,4 @@
+import { finishTurn, prepareTurnFixture } from './turn-flow-helpers.mjs';
 // Optional real Chromium QA for Settler production, movement, founding and restoration.
 // Set KINGDOM_QA_MODULES and KINGDOM_BROWSER, then run:
 // node tools/qa/browser-founding.mjs /tmp/kingdom-founding-qa
@@ -35,7 +36,7 @@ try {
   await page.goto(`http://127.0.0.1:${server.address().port}`);
   await page.waitForFunction(() => document.querySelector('#resources img'));
   const save = async () => { await page.click('#save'); return page.evaluate(() => JSON.parse(localStorage.getItem('kingdom-m1-save'))); };
-  const load = async value => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await page.click('#load'); };
+  const load = async value => { prepareTurnFixture(value); await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await page.click('#load'); };
   const fresh = async () => { await page.selectOption('#game-mode', 'settlement'); await page.click('#reset'); return save(); };
   const tileClick = async tile => {
     await page.locator('#map').scrollIntoViewIfNeeded();
@@ -50,10 +51,10 @@ try {
   assert.equal(await page.locator('#found-city').isDisabled(), true); assert.match(await page.locator('#founding-status').innerText(), /未所有/);
   assert.equal(await page.locator('#founding-settler').inputValue(), 'unit-2');
   const move = async key => { await tileClick(state.world.tiles[key]); await page.click('#map-move'); state = await save(); assert.equal(state.parties['party-1'].location, key); };
-  await move('2,0,-2'); await page.click('#end-turn'); state = await save();
+  await move('2,0,-2'); await finishTurn(page); state = await save();
   assert.equal(await page.locator('#found-city').isDisabled(), true); assert.match(await page.locator('#founding-status').innerText(), /4ヘクス/);
   await move('4,0,-4'); assert.equal(await page.locator('#found-city').isDisabled(), true); assert.match(await page.locator('#founding-status').innerText(), /移動力/);
-  await page.click('#end-turn'); state = await save(); assert.equal(await page.locator('#found-city').isDisabled(), false);
+  await finishTurn(page); state = await save(); assert.equal(await page.locator('#found-city').isDisabled(), false);
   await page.selectOption('#founding-settler', 'unit-2'); assert.deepEqual(await save(), state);
   checks.push('scenario, read-only settler selection, movement, city spacing and exhausted-action feedback');
   await page.locator('#founding-panel').scrollIntoViewIfNeeded(); await page.screenshot({ path: path.join(output, 'before-founding.png') });
@@ -71,16 +72,16 @@ try {
   await page.click('[data-produce="settler"]'); state = await save();
   assert.equal(state.cities['city-2'].production.currentItemId, 'settler'); assert.equal(state.cities['city-1'].production.currentItemId, null);
   const preIncome = state;
-  await page.click('#end-turn'); state = await save();
+  await finishTurn(page); state = await save();
   assert.equal(state.kingdoms['kingdom-1'].stockpiles.gold - preIncome.kingdoms['kingdom-1'].stockpiles.gold, Object.values(state.cities).reduce((sum, city) => sum + city.yieldSummary.gold, 0));
   assert.ok(state.cities['city-2'].production.progressByItem.settler > 0);
-  for (let i = 0; i < 15 && !Object.values(state.units).some(unit => unit.typeId === 'settler'); i++) { await page.click('#end-turn'); state = await save(); }
+  for (let i = 0; i < 15 && !Object.values(state.units).some(unit => unit.typeId === 'settler'); i++) { await finishTurn(page); state = await save(); }
   const produced = Object.values(state.units).find(unit => unit.typeId === 'settler');
   assert.ok(produced); assert.equal(produced.location, '4,0,-4');
   checks.push('new city collects once per turn and produces a new settler at its own center');
   await page.click('#load'); assert.deepEqual(await save(), state); assert.equal(await page.locator('#game-mode').inputValue(), 'settlement');
   await page.selectOption('#city-select', 'city-2');
-  for (let i = 0; i < 12 && state.kingdoms['kingdom-1'].stockpiles.gold < 120; i++) { await page.click('#end-turn'); state = await save(); }
+  for (let i = 0; i < 12 && state.kingdoms['kingdom-1'].stockpiles.gold < 120; i++) { await finishTurn(page); state = await save(); }
   const beforePurchase = state;
   await page.click('[data-buy="settler"]'); state = await save();
   assert.equal(state.kingdoms['kingdom-1'].stockpiles.gold, beforePurchase.kingdoms['kingdom-1'].stockpiles.gold - 120);
@@ -99,7 +100,7 @@ try {
   await load(solo); await page.click('[data-select-party="party-1"]'); await page.click('#found-city'); state = await save();
   assert.deepEqual(state.parties, {}); assert.deepEqual(state.units, {}); assert.equal(await page.locator('#city-select').inputValue(), 'city-2');
   assert.equal(await page.locator('#founding-panel').isVisible(), false); assert.match(await page.locator('#party-status').innerText(), /選択してください/);
-  await page.click('#load'); assert.deepEqual(await save(), state); await page.click('#end-turn');
+  await page.click('#load'); assert.deepEqual(await save(), state); await finishTurn(page);
   assert.equal((await save()).cities['city-2'].population, 1); checks.push('solo settlement removes stale UI selections and remains playable after reload');
   await page.selectOption('#city-select', 'city-2');
   await page.locator('#city-panel').scrollIntoViewIfNeeded(); await page.screenshot({ path: path.join(output, 'founded-city-wide.png') });

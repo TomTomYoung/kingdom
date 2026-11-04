@@ -1,3 +1,4 @@
+import { finishTurn, prepareTurnFixture } from './turn-flow-helpers.mjs';
 // Optional real Chromium QA for city-specific territory, yields and controls.
 // Set KINGDOM_QA_MODULES and KINGDOM_BROWSER, then run:
 // node tools/qa/browser-cities.mjs /tmp/kingdom-cities-qa
@@ -45,7 +46,7 @@ try {
   await page.goto(`http://127.0.0.1:${server.address().port}`);
   await page.waitForFunction(() => document.querySelector('#resources img'));
   const save = async () => { await page.click('#save'); return page.evaluate(() => JSON.parse(localStorage.getItem('kingdom-m1-save'))); };
-  const load = async value => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await page.click('#load'); };
+  const load = async value => { prepareTurnFixture(value); await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await page.click('#load'); };
   const fresh = async () => { await page.selectOption('#game-mode', 'two-cities'); await page.click('#reset'); return save(); };
   const tileClick = async tile => {
     await page.locator('#map').scrollIntoViewIfNeeded();
@@ -74,7 +75,7 @@ try {
   assert.ok(bought); assert.equal(bought.location, '4,-4,0'); assert.equal(bought.ownerId, 'kingdom-1');
   assert.equal(produced.kingdoms['kingdom-1'].stockpiles.gold, state.kingdoms['kingdom-1'].stockpiles.gold - 72);
   await page.selectOption('#city-select', 'city-1'); await page.click('[data-produce="warrior"]');
-  for (let turn = 0; turn < 12 && !produced.cities['city-2'].buildings.includes('monument'); turn++) { await page.click('#end-turn'); produced = await save(); distinctWork(produced); }
+  for (let turn = 0; turn < 12 && !produced.cities['city-2'].buildings.includes('monument'); turn++) { await finishTurn(page); produced = await save(); distinctWork(produced); }
   assert.ok(produced.cities['city-2'].buildings.includes('monument')); assert.ok(!produced.cities['city-1'].buildings.includes('monument'));
   assert.ok(Object.values(produced.units).some(unit => unit.id !== 'unit-1' && unit.typeId === 'warrior' && unit.location === '0,0,0'));
   checks.push('selected-city production and purchase keep separate queues and spawn locations');
@@ -117,7 +118,7 @@ try {
     assert.match(detail, /産出内訳の記録がありません。次の収集後に表示します。/); assert.match(detail, /収集合計/);
     assert.doesNotMatch(detail, /作業タイルなし|産出補正/); assert.equal(await page.locator('[data-worked-tile]').count(), 0);
     assert.deepEqual(await save(), historical, 'missing snapshot display cannot fill data or change RNG');
-    await page.click('#end-turn'); const recovered = await save(); distinctWork(recovered);
+    await finishTurn(page); const recovered = await save(); distinctWork(recovered);
     assert.ok(Array.isArray(recovered.cities['city-2'].lastYieldBreakdown.tiles));
     assert.doesNotMatch(await page.locator('#city-yield-details').innerText(), /産出内訳の記録がありません/);
     assert.equal(await page.locator('[data-worked-tile]').count(), recovered.cities['city-2'].workedTiles.length);
@@ -125,7 +126,7 @@ try {
   checks.push('historical missing collection details display summary only and return after collection');
 
   state = await fresh(); state.cities['city-1'].localCultureProgress = 9; state.cities['city-2'].localCultureProgress = 0;
-  await load(state); await page.click('#end-turn'); const expanded = await save(); distinctWork(expanded);
+  await load(state); await finishTurn(page); const expanded = await save(); distinctWork(expanded);
   const expansions = expanded.eventLog.slice(state.eventLog.length).filter(event => event.type === 'TerritoryExpanded');
   assert.ok(expansions.some(event => event.cityId === 'city-1' && event.source === 'culture'));
   assert.ok(expansions.every(event => event.cityId === 'city-1'));
@@ -142,7 +143,7 @@ try {
   await load(old); const oldLoaded = await save(); assert.equal(Object.keys(oldLoaded.world.tiles).length, 37); assert.deepEqual(oldLoaded.units, {});
   checks.push('legacy city assignment and 37-cell migration preserve stockpiles, RNG and map size');
 
-  await page.selectOption('#game-mode', 'ranged-duel'); await page.click('#reset'); await page.click('#end-turn');
+  await page.selectOption('#game-mode', 'ranged-duel'); await page.click('#reset'); await finishTurn(page);
   assert.equal(await page.locator('#city-select').inputValue(), 'city-2'); assert.equal(await page.locator('#city-select option').count(), 1); assert.equal(await page.locator('#city-name').innerText(), '黄昏都');
   await page.click('[data-buy="archer"]'); const duel = await save();
   assert.equal(duel.units['unit-11'].ownerId, 'kingdom-2'); assert.equal(duel.units['unit-11'].location, '4,-4,0'); checks.push('hotseat switches to the active kingdom city and purchases for that kingdom');

@@ -1,3 +1,4 @@
+import { finishTurn, prepareTurnFixture } from './turn-flow-helpers.mjs';
 // Optional real Chromium QA for ranged targeting. Install Playwright separately.
 // Set KINGDOM_QA_MODULES and KINGDOM_BROWSER, then run:
 // node tools/qa/browser-ranged.mjs /tmp/kingdom-ranged-qa
@@ -82,11 +83,11 @@ try {
   await page.locator('#combat-panel').screenshot({ path: path.join(output, 'targeting-mobile.png') });
   await page.evaluate(() => scrollTo(0, 0)); await page.screenshot({ path: path.join(output, 'mobile.png'), fullPage: true });
   await page.setViewportSize({ width: 1440, height: 1050 });
-  await fresh(); await page.click('#end-turn'); await page.click('[data-buy="archer"]');
+  await fresh(); await finishTurn(page); await page.click('[data-buy="archer"]');
   let economy = await save();
   assert.equal(economy.units['unit-11'].typeId, 'archer'); assert.equal(economy.units['unit-11'].ownerId, 'kingdom-2'); assert.equal(economy.units['unit-11'].location, '4,-4,0');
   await page.click('[data-produce="ballista"]');
-  for (let turn = 0; turn < 24 && Object.values(economy.units).filter(unit => unit.ownerId === 'kingdom-2' && unit.typeId === 'ballista').length < 2; turn++) { await page.click('#end-turn'); economy = await save(); }
+  for (let turn = 0; turn < 24 && Object.values(economy.units).filter(unit => unit.ownerId === 'kingdom-2' && unit.typeId === 'ballista').length < 2; turn++) { await finishTurn(page); economy = await save(); }
   const produced = Object.values(economy.units).find(unit => unit.ownerId === 'kingdom-2' && unit.typeId === 'ballista' && unit.partyId === null);
   assert.ok(produced, 'ballista completed through UI turns'); assert.equal(produced.location, '4,-4,0');
   await page.selectOption('#game-mode', 'duel'); await page.click('#reset'); await page.selectOption('#combat-target', 'party-2'); const legacy = await save();

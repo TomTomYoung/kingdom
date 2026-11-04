@@ -1,3 +1,4 @@
+import { finishTurn, prepareTurnFixture } from './turn-flow-helpers.mjs';
 // Optional real Chromium QA for active ability controls, costs, counters and saved continuation.
 // Set KINGDOM_QA_MODULES and KINGDOM_BROWSER, then run:
 // node tools/qa/browser-abilities.mjs /tmp/kingdom-abilities-qa
@@ -37,7 +38,7 @@ try {
   await page.clock.install(); await page.clock.pauseAt(new Date());
   const click = selector => page.locator(selector).evaluate(element => element.click());
   const save = async () => { await click('#save'); return page.evaluate(() => JSON.parse(localStorage.getItem('kingdom-m1-save'))); };
-  const load = async (value, valid = true) => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); if (valid) { assert.match(await page.locator('#message').innerText(), /セーブをロードしました/); await click('[data-select-party="party-1"]'); } };
+  const load = async (value, valid = true) => { prepareTurnFixture(value); await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); if (valid) { assert.match(await page.locator('#message').innerText(), /セーブをロードしました/); await click('[data-select-party="party-1"]'); } };
   const select = async (selector, value) => page.locator(selector).evaluate((el, value) => { el.value = value; el.dispatchEvent(new Event('change', { bubbles: true })); }, value);
   const oldSingle = await save(); assert.equal(Object.hasOwn(oldSingle, 'activeAbilityVersion'), false);
   assert.match(await page.locator('#abilities').innerText(), /新規/);
@@ -61,10 +62,10 @@ try {
   checks.push('new mode exposes caster/target selection and exact prediction; keyboard cast pays all costs once with a visible log');
 
   await load(used); assert.deepEqual(await save(), used);
-  await click('#end-turn'); const handed = await save(); assert.equal(handed.units['unit-2'].abilityStates.heal.usesRemaining, 0);
-  await click('#end-turn'); const nextRound = await save();
+  await finishTurn(page); const handed = await save(); assert.equal(handed.units['unit-2'].abilityStates.heal.usesRemaining, 0);
+  await finishTurn(page); const nextRound = await save();
   assert.equal(nextRound.units['unit-2'].abilityStates.heal.usesRemaining, 1); assert.equal(nextRound.units['unit-2'].charges.heal, 2);
-  await load(used); await click('#end-turn'); await click('#end-turn'); assert.deepEqual(await save(), nextRound);
+  await load(used); await finishTurn(page); await finishTurn(page); assert.deepEqual(await save(), nextRound);
   checks.push('save/load and player handoff retain charges; only round start replenishes per-round uses and replay is identical');
 
   const capped = structuredClone(fixture); capped.units['unit-3'].hp = capped.units['unit-3'].currentHp = 95;
@@ -99,7 +100,7 @@ try {
   const legacy = structuredClone(fixture); delete legacy.activeAbilityVersion;
   for (const unit of Object.values(legacy.units)) { unit.charges = {}; unit.abilityStates = {}; }
   await load(legacy); assert.equal(await page.locator('#use-ability').count(), 0); assert.deepEqual(await save(), legacy);
-  await click('#end-turn'); await click('#end-turn'); assert.equal(Object.hasOwn(await save(), 'activeAbilityVersion'), false);
+  await finishTurn(page); await finishTurn(page); assert.equal(Object.hasOwn(await save(), 'activeAbilityVersion'), false);
   await load(fixture); await click('[data-buy="warrior"]'); const bought = await save();
   assert.deepEqual(bought.units[`unit-${fixture.nextIds.unit}`].charges, { heal: 3 });
   checks.push('legacy games stay unchanged; newly purchased warriors in enabled games receive their own charges');
@@ -107,7 +108,7 @@ try {
   const aiFixture = structuredClone(fixture); aiFixture.kingdoms['kingdom-2'].controllerType = 'ai';
   aiFixture.parties['party-2'].location = '2,-2,0'; aiFixture.parties['party-2'].unitIds.forEach(id => { aiFixture.units[id].location = '2,-2,0'; });
   aiFixture.kingdoms['kingdom-2'].stockpiles.mana = 20; aiFixture.units['unit-8'].hp = aiFixture.units['unit-8'].currentHp = 30;
-  await load(aiFixture); await click('#end-turn'); const aiStart = await save();
+  await load(aiFixture); await finishTurn(page); const aiStart = await save();
   assert.equal(await page.locator('#use-ability').isDisabled(), true); assert.equal(await page.locator('#ability-caster').isDisabled(), true);
   await page.clock.runFor(10000); const aiAfter = await save();
   assert.ok(aiAfter.commandLog.some(c => c.type === 'UseAbility' && c.playerId === 'kingdom-2'));
@@ -116,7 +117,7 @@ try {
   checks.push('AI handoff disables controls, heals under threat using the shared command and resumes identically from a mid-turn save');
 
   const ending = structuredClone(fixture); ending.currentTurn = ending.scenarioObjective.turnLimit; ending.lastProcessedTurn = ending.currentTurn;
-  await load(ending); await click('#end-turn'); await click('#end-turn'); const ended = await save(); assert.ok(ended.gameResult);
+  await load(ending); await finishTurn(page); await finishTurn(page); const ended = await save(); assert.ok(ended.gameResult);
   assert.equal(await page.locator('#use-ability').isDisabled(), true); await click('#use-ability'); assert.deepEqual(await save(), ended);
   checks.push('game-over locks ability controls without spending resources or changing the finished game');
 
