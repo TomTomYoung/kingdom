@@ -1,5 +1,7 @@
 # Kingdom 現行実装仕様
 
+2026-11-04 範囲魔法: 新規AI増援戦・都市争奪戦をactiveAbilityVersion 3とし、弓兵へ横列攻撃の魔力波を追加しました。mana10・有限チャージ1で、直撃と護衛の肩代わりを合算して抵抗を一度適用します。旧版1・2の治癒・魔弾は維持します。[対象・配分・保存の規則](AREA_MAGIC.md)。
+
 2026-11-04 攻撃魔法: 新規AI増援戦・都市争奪戦をactiveAbilityVersion 2とし、弓兵へ魔弾を追加しました。射程2・mana6・有限チャージ1で、命中・護衛配分後に各被害先の抵抗を適用します。旧版1の治癒と物理攻撃は維持します。[魔法の規則と保存互換](MAGIC_ABILITIES.md)。
 
 2026-11-04 画面改訂: 地図を画面いっぱいに表示し、資源・管理メニューを上端、選択対象の操作を下端、未処理行動とターン終了を右下へ固定しました。各詳細は一つのパネルで切り替え、内部だけをスクロールします。操作場所は[新しい画面構成](UI_LAYOUT.md)を参照してください。
@@ -144,7 +146,7 @@ Productionは都市ローカルです。currentItemId、queue、progressByItem�
 
 ## 8. 人心・派生能力・人的資源
 
-Kingdom.stockpilesはgold、mana、popularSupport、progressはscience、cultureです。宗教Yieldは集計されますが備蓄も進捗もなく、現在の統治力計算へ接続されていません。新規版では[治癒](ACTIVE_ABILITIES.md)・[魔弾](MAGIC_ABILITIES.md)でmanaを消費し、[研究](RESEARCH.md)で施設を解禁します。
+Kingdom.stockpilesはgold、mana、popularSupport、progressはscience、cultureです。宗教Yieldは集計されますが備蓄も進捗もなく、現在の統治力計算へ接続されていません。新規版では[治癒](ACTIVE_ABILITIES.md)・[魔弾](MAGIC_ABILITIES.md)・[魔力波](AREA_MAGIC.md)でmanaを消費し、[研究](RESEARCH.md)で施設を解禁します。
 
 人心は王国の固定supportIncome（初期1）とsupportUpkeep（初期0）だけを処理します。支払額は収入加算前の保有量と維持費の小さい方で、その後に収入を加えて上限100へ制限します。人物別維持費集計、supportDebt、loyalty変化、募集はありません。
 
@@ -176,7 +178,7 @@ SetFormationは9Slotへの全構成Unitの一度ずつの配置を検証しま�
 
 Partyは移動力2、攻撃回数1で初期化されます。最も遅い構成員から移動力を計算する処理はありません。移動コストは平原・草原・霊脈1、森林・丘陵2です。指定経路の全段階で隣接性・非Void・他のactive Party占有・必要移動力を検証し、成功時に所属Unitのlocationも更新します。
 
-UnitのchargesとabilityStatesは新規増援戦・都市争奪戦の治癒・魔弾で使用します。有限チャージと全体ターン使用回数を区別し、保存では補充しません。loyalty・supportUpkeepの本格的な忠誠システムや任意の状態付与は後続です。[能力仕様](ACTIVE_ABILITIES.md)。
+UnitのchargesとabilityStatesは新規増援戦・都市争奪戦の治癒・魔弾・魔力波で使用します。有限チャージと全体ターン使用回数を区別し、保存では補充しません。loyalty・supportUpkeepの本格的な忠誠システムや任意の状態付与は後続です。[能力仕様](ACTIVE_ABILITIES.md)。
 
 ## 10. 戦闘・護衛・照準とUI
 

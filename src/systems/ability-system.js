@@ -41,7 +41,7 @@ export function validateAbility(state, playerId, payload) {
     if (!isActiveUnit(target) || target.ownerId === playerId || !defender || defender.ownerId === playerId || defender.status !== 'active' || !defender.unitIds.includes(targetUnitId)) return fail('対象は敵の活動中の部隊に所属する生存Unitを指定してください');
     if (!(caster.magicStrength > 0)) return fail('発動者の魔法戦闘力が必要です');
     const distance = Hex.fromKey(party.location).distance(Hex.fromKey(defender.location));
-    if (distance < 1 || distance > definition.range) return fail(`魔弾の射程は1〜${definition.range}ヘクスです`);
+    if (distance < 1 || distance > definition.range) return fail(`${definition.name}の射程は1〜${definition.range}ヘクスです`);
   }
   if (!(caster.abilityStates[abilityId].usesRemaining > 0)) return fail('この全体ターンの使用回数を使い切っています');
   if (!(caster.charges?.[abilityId] >= definition.chargeCost)) return fail('有限チャージが不足しています（ターンでは回復しません）');
@@ -125,8 +125,16 @@ export function validateAbilitySave(state) {
         || !count(event.chargesRemaining, d.initialCharges - d.chargeCost)) invalid('eventLog.AbilityUsed');
       if (d.effect === 'heal') {
         if (!Number.isFinite(event.recoveredHp) || event.recoveredHp <= 0 || event.recoveredHp > d.amount || event.remainingHp < event.recoveredHp) invalid('eventLog.AbilityUsed');
-      } else if (typeof event.hit !== 'boolean' || !count(event.rawDamage, RULESET.combat.maximumDamage) || event.rawDamage < 1
-        || !Number.isFinite(event.damage) || event.damage < 0 || event.damage > event.rawDamage + 1 || Object.hasOwn(event, 'recoveredHp')) invalid('eventLog.AbilityUsed');
+      } else {
+        const rowSpell = d.pattern === 'row';
+        if (rowSpell && (event.hit !== true || !['front', 'middle', 'rear'].includes(event.targetRow)
+          || !Array.isArray(event.targetUnitIds) || event.targetUnitIds.length < 1 || event.targetUnitIds.length > 3
+          || !event.targetUnitIds.every(identifier) || new Set(event.targetUnitIds).size !== event.targetUnitIds.length
+          || event.targetUnitIds[0] !== event.targetUnitId)) invalid('eventLog.AbilityUsed: 範囲');
+        const maximum = rowSpell ? Math.floor(event.rawDamage * d.multiplier) * event.targetUnitIds.length : event.rawDamage + 1;
+        if (typeof event.hit !== 'boolean' || !count(event.rawDamage, RULESET.combat.maximumDamage) || event.rawDamage < 1
+          || !Number.isFinite(event.damage) || event.damage < 0 || event.damage > maximum || Object.hasOwn(event, 'recoveredHp')) invalid('eventLog.AbilityUsed');
+      }
       for (const [key, expected] of Object.entries({ movement: d.movementCost, attacks: d.attackCost, mana: d.manaCost, gold: d.goldCost, charges: d.chargeCost })) {
         if (event.costs[key] !== expected) invalid(`eventLog.AbilityUsed.costs.${key}`);
       }

@@ -12,8 +12,14 @@ export const ABILITIES = Object.freeze({
     initialCharges: 3, usesPerRound: 1, endsActivation: true,
     targetRule: 'enemy-party-active-unit', effect: 'magic-damage', range: 2, initialMagicStrength: 18,
   }),
+  'arcane-wave': Object.freeze({
+    id: 'arcane-wave', name: '魔力波', minimumVersion: 3, unitTypes: Object.freeze(['archer']),
+    movementCost: 1, attackCost: 1, manaCost: 10, goldCost: 0, chargeCost: 1,
+    initialCharges: 2, usesPerRound: 1, endsActivation: true,
+    targetRule: 'enemy-party-row', effect: 'magic-damage', pattern: 'row', range: 2, multiplier: 0.6,
+  }),
 });
-export const hasActiveAbilities = state => [1, 2].includes(state.activeAbilityVersion);
+export const hasActiveAbilities = state => [1, 2, 3].includes(state.activeAbilityVersion);
 export const abilityDefinition = id => Object.hasOwn(ABILITIES, id) ? ABILITIES[id] : null;
 export const abilityAvailable = (state, id) => hasActiveAbilities(state) && !!abilityDefinition(id) && state.activeAbilityVersion >= ABILITIES[id].minimumVersion;
 

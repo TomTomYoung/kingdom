@@ -45,7 +45,7 @@ try {
   const oldSingle = await save(); assert.equal(Object.hasOwn(oldSingle, 'activeAbilityVersion'), false);
   assert.match(await page.locator('#abilities').innerText(), /新規/);
   await select('#game-mode', 'ai-reinforcements'); await click('#reset');
-  const fresh = await save(); assert.equal(fresh.activeAbilityVersion, 2);
+  const fresh = await save(); assert.equal(fresh.activeAbilityVersion, 3);
   assert.deepEqual(fresh.units['unit-1'].charges, { heal: 3 });
   assert.equal(await page.locator('#use-ability').isDisabled(), true);
   const fixture = structuredClone(fresh); fixture.scenarioId = 'ability-browser'; fixture.kingdoms['kingdom-2'].controllerType = 'human';
@@ -93,7 +93,7 @@ try {
   checks.push('mana, finite charges, round uses, status, movement and attack shortages show reasons and preserve state');
 
   await load(used);
-  for (const mutate of [s => { s.activeAbilityVersion = 3; }, s => { delete s.units['unit-1'].charges.heal; }, s => { s.units['unit-1'].charges.heal = 4; }]) {
+  for (const mutate of [s => { s.activeAbilityVersion = 4; }, s => { delete s.units['unit-1'].charges.heal; }, s => { s.units['unit-1'].charges.heal = 4; }]) {
     const corrupt = structuredClone(used); mutate(corrupt); await load(corrupt, false);
     assert.match(await page.locator('#message').innerText(), /セーブデータが不正/); assert.deepEqual(await save(), used);
   }

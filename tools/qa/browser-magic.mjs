@@ -48,10 +48,12 @@ try {
     await page.locator('#ability-target').selectOption(target);
   };
   await select('#game-mode', 'ai-reinforcements'); await click('#reset');
-  const fresh = await save(); assert.equal(fresh.activeAbilityVersion, 2);
+  const fresh = await save(); assert.equal(fresh.activeAbilityVersion, 3);
   assert.equal(fresh.units['unit-3'].magicStrength, 18);
-  assert.deepEqual(fresh.units['unit-3'].charges, { 'arcane-bolt': 3 });
+  assert.deepEqual(fresh.units['unit-3'].charges, { 'arcane-bolt': 3, 'arcane-wave': 2 });
   const fixture = structuredClone(fresh); fixture.scenarioId = 'magic-browser'; fixture.kingdoms['kingdom-2'].controllerType = 'human';
+  fixture.activeAbilityVersion = 2;
+  for (const u of Object.values(fixture.units)) { delete u.charges['arcane-wave']; delete u.abilityStates['arcane-wave']; }
   fixture.kingdoms['kingdom-1'].stockpiles.mana = 100;
   fixture.parties['party-2'].location = '2,-2,0'; fixture.parties['party-2'].guardOrders = {};
   for (const id of fixture.parties['party-2'].unitIds) {
@@ -90,6 +92,8 @@ try {
   assert.equal(await page.locator('#use-ability').isDisabled(), true); await click('#use-ability'); assert.deepEqual(await save(), used);
   checks.push('keyboard casting pays once, applies individual resistance after Guard despite high armor, matches visible ranges and leaves the camera fixed');
 
+  const oldMetadata = structuredClone(used); oldMetadata.eventLog.find(e => e.type === 'AbilityUsed').targetRow = 'front';
+  await load(oldMetadata); assert.match(await page.locator('#ability-log').innerText(), /魔弾.*総被害/); assert.deepEqual(await save(), oldMetadata);
   await load(used); assert.deepEqual(await save(), used); await finishTurn(page); await finishTurn(page);
   const round = await save(); assert.equal(round.units['unit-3'].charges['arcane-bolt'], 2);
   assert.equal(round.units['unit-3'].abilityStates['arcane-bolt'].usesRemaining, 1);

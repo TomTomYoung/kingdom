@@ -58,3 +58,20 @@ export function allocateSingleDamage(state, party, primary, incoming, events) {
   events.push({ type: 'CombatGuard', partyId: party.id, guardUnitId: guardId, targetUnitId: primary.id, amount: shared, capacityRemaining: guard.guardCapacityRemaining });
   return [{ unit: primary, amount: incoming - shared, role: 'primary' }, { unit: guard, amount: shared, role: 'guard' }];
 }
+
+// Fix the target list before calling. Allocate the primary's Guard once, then
+// combine direct and redirected damage so each recipient is mitigated once.
+export function allocatePatternDamage(state, party, targets, rawDamage, events, { multiplier = 1, decay = 1 } = {}) {
+  const allocations = new Map();
+  for (const [depth, { unit }] of targets.entries()) {
+    const amount = Math.floor(rawDamage * multiplier * decay ** depth);
+    if (amount <= 0) continue;
+    const parts = depth === 0 ? allocateSingleDamage(state, party, unit, amount, events) : [{ unit, amount, role: 'area' }];
+    for (const part of parts) {
+      if (part.amount <= 0) continue;
+      const accumulated = allocations.get(part.unit.id) ?? { unit: part.unit, amount: 0, roles: new Set() };
+      accumulated.amount += part.amount; accumulated.roles.add(part.role); allocations.set(part.unit.id, accumulated);
+    }
+  }
+  return allocations;
+}
