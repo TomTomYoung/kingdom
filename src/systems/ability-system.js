@@ -6,7 +6,9 @@ import { updateDerivedCapabilities } from '../models/kingdom.js';
 const own = (records, id) => typeof id === 'string' && Object.hasOwn(records, id) ? records[id] : null;
 const fail = reason => ({ ok: false, reason });
 
-export function validateAbility(state, playerId, { partyId, casterUnitId, abilityId, targetUnitId } = {}) {
+export function validateAbility(state, playerId, payload) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return fail('能力の対象と発動者を指定してください');
+  const { partyId, casterUnitId, abilityId, targetUnitId } = payload;
   if (!hasActiveAbilities(state)) return fail('能力は新規の「AIとの増援戦」「AIとの都市争奪戦」で使えます');
   if (state.gameResult || state.phase !== 'PLAYER_ACTION') return fail('能力を使える行動フェーズではありません');
   if (state.activePlayerId !== playerId) return fail('現在の手番ではありません');
@@ -84,4 +86,23 @@ export function validateAbilitySave(state) {
     }
   }
   if (!enabled && (state.commandLog.some(c => c.type === 'UseAbility') || state.eventLog.some(e => e.type === 'AbilityUsed'))) invalid('activeAbilityVersion: 能力の履歴があります');
+  if (enabled) {
+    const identifier = value => typeof value === 'string' && value.trim().length > 0;
+    for (const command of state.commandLog.filter(c => c.type === 'UseAbility')) {
+      const p = command.payload;
+      if (!record(p) || !abilityDefinition(p.abilityId) || Object.keys(p).length !== 4
+        || !['partyId', 'casterUnitId', 'abilityId', 'targetUnitId'].every(key => identifier(p[key]))) invalid('commandLog.UseAbility');
+    }
+    for (const event of state.eventLog.filter(e => e.type === 'AbilityUsed')) {
+      const d = abilityDefinition(event.abilityId);
+      if (!d || !['playerId', 'partyId', 'casterUnitId', 'targetUnitId'].every(key => identifier(event[key]))
+        || !count(event.turn, state.currentTurn) || event.turn === 0 || !record(event.costs)
+        || !Number.isFinite(event.recoveredHp) || event.recoveredHp <= 0 || event.recoveredHp > d.amount
+        || !Number.isFinite(event.remainingHp) || event.remainingHp < event.recoveredHp
+        || !count(event.chargesRemaining, d.initialCharges - d.chargeCost)) invalid('eventLog.AbilityUsed');
+      for (const [key, expected] of Object.entries({ movement: d.movementCost, attacks: d.attackCost, mana: d.manaCost, gold: d.goldCost, charges: d.chargeCost })) {
+        if (event.costs[key] !== expected) invalid(`eventLog.AbilityUsed.costs.${key}`);
+      }
+    }
+  }
 }

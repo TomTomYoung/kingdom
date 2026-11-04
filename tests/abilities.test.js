@@ -210,3 +210,18 @@ test('seeded two-AI reinforcement and conquest games stay bounded and replay eve
     assert.ok(state.gameResult); assert.ok(steps <= 80); assert.deepEqual(trip(state), state);
   }
 });
+
+test('malformed previews and malformed saved ability history cannot crash the UI or acquire caller costs', () => {
+  const state = fixture();
+  for (const payload of [null, undefined, [], 1, 'heal']) assert.equal(previewAbility(state, player, payload).ok, false);
+  const used = apply(state, cast(state));
+  for (const mutate of [
+    e => { delete e.costs; }, e => { e.costs.mana = -4; }, e => { e.recoveredHp = 1000; },
+    e => { e.chargesRemaining = 3; }, e => { e.targetUnitId = null; }, e => { e.abilityId = 'constructor'; },
+  ]) {
+    const bad = structuredClone(used); mutate(bad.eventLog.find(e => e.type === 'AbilityUsed'));
+    assert.throws(() => trip(bad), /eventLog.AbilityUsed/);
+  }
+  const bad = structuredClone(used); bad.commandLog.at(-1).payload.manaCost = 0;
+  assert.throws(() => trip(bad), /commandLog.UseAbility/);
+});
