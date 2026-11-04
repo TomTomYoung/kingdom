@@ -3,6 +3,7 @@ import { COMMAND_TYPES } from './commands.js';
 const record = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 const identifier = (value) => typeof value === 'string' && value.trim().length > 0;
 const fields = {
+  UseAbility: ['partyId', 'casterUnitId', 'abilityId', 'targetUnitId'],
   SelectResearch: [],
   RestParty: ['partyId'], RemoveCasualties: ['partyId'],
   BombardParty: ['cityId', 'defenderPartyId'],
@@ -32,6 +33,7 @@ export function validateCommand(state, command) {
   } else if (state.phase !== 'PLAYER_ACTION') return '行動フェーズではありません';
   const payload = command.payload;
   if (!record(payload)) return 'payloadが必要です';
+  if (command.type === COMMAND_TYPES.USE_ABILITY && Object.keys(payload).some(key => !fields.UseAbility.includes(key))) return '能力の対象と発動者だけを指定してください';
   for (const field of fields[command.type]) {
     if (!Object.hasOwn(payload, field) || !identifier(payload[field])) return `${field}が必要です`;
   }

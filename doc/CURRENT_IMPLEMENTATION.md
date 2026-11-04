@@ -1,6 +1,6 @@
 # Kingdom 現行実装仕様
 
-確認・更新日: 2026-11-01
+確認・更新日: 2026-11-04
 
 開始基準: main / 78cd40667526181b4de51c194458a952667926c5（PR #6マージ後）。戦術AI、「AIとの遭遇戦」、勝敗と40ターン期限、終了状態の保存・操作制御を追加しました。PR #7の0820eaeから、兵の生産・購入・編成を行う「AIとの増援戦」を追加しています。現行規則と制約は[AI_SCENARIOS.md](AI_SCENARIOS.md)、検証範囲は[STATUS.md](STATUS.md)に記載しています。 PR #7の97285c1から、待機兵の補充・隣接部隊の合流・分割と増援AIの補充・合流判断を追加しました。[部隊再編の規則](PARTY_MANAGEMENT.md)を参照してください。 PR #7のfa0c260から都市占領と「AIとの都市争奪戦」を追加しました。[占領・都市支配の規則](CITY_CONQUEST.md)を参照してください。 PR #7の624be34から、新規都市争奪戦の都市耐久・城壁・攻城・自然修復・AI攻城を追加しました。[攻城規則と保存互換](CITY_SIEGE.md)を参照してください。 PR #7の7ce65acから新規都市争奪戦に近接攻城への都市反撃と脅威に応じた城壁建設AIを追加しました。[反撃・建設AIの規則](CITY_RETALIATION.md)を参照してください。 PR #7の54934b2から、新規対局の休養・HP回復・戦闘不能者の離脱とAI判断を追加しました。[休養・離脱の規則](PARTY_RECOVERY.md)を参照してください。
 
@@ -14,7 +14,7 @@
 
 ## 2. 実行環境と構成
 
-エントリーは [index.html](../index.html) です。標準Canvas 2DとDOMを使い、PhaserやCDNを読み込みません。外部npm依存、ビルド工程、バックエンドはありません。
+エントリーは [index.html](../index.html) です。標準Canvas 2DとDOMを使い、PhaserやCDNを読み込みません。ゲーム実行時の外部npm依存、ビルド工程、バックエンドはありません。検証専用CIでは固定版PlaywrightとChromiumを一時導入し、ゲーム配信物へ含めません。
 
 assets/には画像17点、SE13点、BGM2曲の32点があり、すべてUIへ接続済みです。既存30点に命中・護衛のSE2点を追加し、戦闘BGMを接続しました。AssetStoreがmanifestの採用パスから画像を取得し、読み込めなければ地形色・城文字・部隊記号で継続します。画像は整数倍・等方拡大、音声はWeb Audioでユーザー操作後に開始します。弓兵・弩砲・開拓者は専用画像が未制作のため「弓」「弩」「拓」バッジで識別します。専用射撃SEはありません。初期ミュート、主音量・設定保存、非表示停止、連打制限、BGM切替時の遅延読込取消があります。WAV/OggのHTTP失敗・デコード失敗・8秒タイムアウト時は、src/audioに同梱した採用音符15件と固定版AIMusicからPCMを合成します。Workerが使えなければ同じ合成器で処理します。全15件の再合成WAVは制作時のWAVのSHA-256と一致します。音声設定の再読み込みでキャッシュを消して再試行できます。tools/assets/は制作専用でゲーム実行時の依存ではありません。[ASSET_AUDIT.md](ASSET_AUDIT.md) が最新台帳です。
 
@@ -138,7 +138,7 @@ Productionは都市ローカルです。currentItemId、queue、progressByItem�
 
 ## 8. 人心・派生能力・人的資源
 
-Kingdom.stockpilesはgold、mana、popularSupport、progressはscience、cultureです。宗教Yieldは集計されますが備蓄も進捗もなく、現在の統治力計算へ接続されていません。manaの消費先や技術の解禁処理もありません。
+Kingdom.stockpilesはgold、mana、popularSupport、progressはscience、cultureです。宗教Yieldは集計されますが備蓄も進捗もなく、現在の統治力計算へ接続されていません。新規版では[治癒](ACTIVE_ABILITIES.md)でmanaを消費し、[研究](RESEARCH.md)で施設を解禁します。
 
 人心は王国の固定supportIncome（初期1）とsupportUpkeep（初期0）だけを処理します。支払額は収入加算前の保有量と維持費の小さい方で、その後に収入を加えて上限100へ制限します。人物別維持費集計、supportDebt、loyalty変化、募集はありません。
 
@@ -170,7 +170,7 @@ SetFormationは9Slotへの全構成Unitの一度ずつの配置を検証しま�
 
 Partyは移動力2、攻撃回数1で初期化されます。最も遅い構成員から移動力を計算する処理はありません。移動コストは平原・草原・霊脈1、森林・丘陵2です。指定経路の全段階で隣接性・非Void・他のactive Party占有・必要移動力を検証し、成功時に所属Unitのlocationも更新します。
 
-Unitにはcharges、abilityStates、loyalty、supportUpkeep、statusEffects等の保存欄がありますが、対応するAbilityや忠誠システムが使えるわけではありません。
+UnitのchargesとabilityStatesは新規増援戦・都市争奪戦の治癒で使用します。有限チャージと全体ターン使用回数を区別し、保存では補充しません。loyalty・supportUpkeepの本格的な忠誠システムや任意の状態付与は後続です。[能力仕様](ACTIVE_ABILITIES.md)。
 
 ## 10. 戦闘・護衛・照準とUI
 
@@ -220,3 +220,7 @@ serializeGameState／restoreGameStateでJSON化・復元します。nextIds.city
 ## 2026-11-01 都市拡張AI
 
 新規増援戦・都市争奪戦に、開拓者の確保・護衛・安全な経路・都市建設を追加しました。旧版なし保存のAIは変更しません。6生存兵、購入後Gold72以上、同時開拓者1体、暫定3都市までの方針です。[条件・操作・制約・検証](AI_EXPANSION.md)。
+
+## 2026-11-04 能動能力
+
+新規activeAbilityVersion 1の戦士へ治癒を付与し、共通UseAbility・検証・予測・UI・AI・保存へ接続しました。定義と初期化はcore/abilities.js、実行はsystems/ability-system.js、AI判断はcore/ai-abilities.js、表示はui/abilities.jsです。mana4・移動1・攻撃1・有限チャージ1で同じ部隊のHPを最大30回復し行動終了します。反応とGuardは保持します。有限チャージ3は補充せず、全体ターン回数だけ1へ回復します。旧版なしの状態・AI・費用は維持します。[詳細と残る範囲](ACTIVE_ABILITIES.md)。

@@ -98,3 +98,8 @@ select:focus-visible{outline:2px solid #fff1be;outline-offset:3px}
 .research-list { list-style: none; padding: 0; display: grid; gap: 12px; }
 .research-list li { display: grid; gap: 4px; overflow-wrap: anywhere; }
 .research-list .hint { margin: 0; }
+
+.ability-panel { border-top: 1px solid #434b59; margin-top: 12px; padding-top: 8px; overflow-wrap: anywhere; }
+.ability-panel label { display: block; margin-top: 8px; }
+.ability-panel select { width: 100%; max-width: 100%; min-width: 0; }
+.ability-panel ol { padding-left: 20px; }

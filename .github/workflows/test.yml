@@ -31,3 +31,28 @@ jobs:
           name: kingdom-test-source
           path: kingdom-test-source.tar.gz
           retention-days: 3
+  browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned browser test runtime
+        run: |
+          npm install --prefix "$RUNNER_TEMP/kingdom-browser" --no-save --package-lock=false playwright@1.56.1
+          "$RUNNER_TEMP/kingdom-browser/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Browser regressions
+        env:
+          KINGDOM_QA_MODULES: ${{ runner.temp }}/kingdom-browser/node_modules
+        run: |
+          for suite in abilities ai-expansion ai-infrastructure research city-bombardment production-queue party-care city-defense siege conquest ai cities ranged founding reorganization; do
+            node "tools/qa/browser-$suite.mjs" "qa-results/$suite"
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kingdom-browser-qa
+          path: qa-results
+          retention-days: 7

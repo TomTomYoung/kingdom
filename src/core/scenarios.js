@@ -1,3 +1,4 @@
+import { initializeUnitAbilities } from './abilities.js';
 import { initializeCityDefense } from '../models/city-defense.js';
 import { addCity, addKingdom, createInitialGameState } from './game-state.js';
 import { createUnit } from '../models/unit.js';
@@ -44,6 +45,8 @@ export function createAiReinforcementGameState(seed = 117) {
   state.kingdoms['kingdom-2'].aiPolicy = 'reinforcements';
   state.aiInfrastructureVersion = 1;
   state.aiExpansionVersion = 1;
+  state.activeAbilityVersion = 1;
+  Object.values(state.units).forEach(unit => initializeUnitAbilities(state, unit));
   return state;
 }
 

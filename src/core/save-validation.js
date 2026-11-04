@@ -1,3 +1,4 @@
+import { validateAbilitySave } from '../systems/ability-system.js';
 import { validateResearchSave } from '../systems/research-system.js';
 import { partyCareSafetyError } from '../systems/party-care.js';
 import { validateScenarioSave } from '../systems/scenario-system.js';
@@ -265,6 +266,7 @@ export function migrateAndValidateSave(state) {
     }
   }
   for (const party of Object.values(state.parties)) if (party.restOrder) check(!partyCareSafetyError(state, party), `parties.${party.id}.restOrder.safety`);
+  validateAbilitySave(state);
   if (legacyTerritory) {
     // Validate the whole historical save before repairing its known K-05
     // snapshots. Never collect income, progress production, or consume RNG.
