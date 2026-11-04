@@ -1,3 +1,4 @@
+import { finishTurn, prepareTurnFixture } from './turn-flow-helpers.mjs';
 // Optional real Chromium QA for research selection, allocation, unlocks and saved continuation.
 // Set KINGDOM_QA_MODULES and KINGDOM_BROWSER, then run:
 // node tools/qa/browser-research.mjs /tmp/kingdom-research-qa
@@ -37,7 +38,7 @@ try {
   await page.clock.install(); await page.clock.pauseAt(new Date());
   const click = selector => page.locator(selector).evaluate(element => element.click());
   const save = async () => { await click('#save'); return page.evaluate(() => JSON.parse(localStorage.getItem('kingdom-m1-save'))); };
-  const load = async (value, valid = true) => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); if (valid) assert.match(await page.locator('#message').innerText(), /セーブをロードしました/); };
+  const load = async (value, valid = true) => { prepareTurnFixture(value); await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); if (valid) assert.match(await page.locator('#message').innerText(), /セーブをロードしました/); };
   const select = async (selector, value) => page.locator(selector).evaluate((el, value) => { el.value = value; el.dispatchEvent(new Event('change', { bubbles: true })); }, value);
   const choose = async id => { await select('#research-target', id); await click('#research-select'); };
   const initial = await save(); assert.equal(initial.researchVersion, 1);
@@ -52,24 +53,24 @@ try {
   assert.deepEqual(chosen.kingdoms['kingdom-1'].research.progressByTechnology, {});
   checks.push('new game exposes research, locks only new buildings, and keyboard selection spends no science or actions');
 
-  await click('#end-turn'); const progressed = await save(); const k = progressed.kingdoms['kingdom-1'];
+  await finishTurn(page); const progressed = await save(); const k = progressed.kingdoms['kingdom-1'];
   assert.equal(k.research.progressByTechnology.writing, k.progress.science); assert.match(await page.locator('#research-status').innerText(), /文字/);
   await load(progressed); assert.deepEqual(await save(), progressed);
-  await click('#end-turn'); const continuation = await save(); await load(progressed); await click('#end-turn'); assert.deepEqual(await save(), continuation);
+  await finishTurn(page); const continuation = await save(); await load(progressed); await finishTurn(page); assert.deepEqual(await save(), continuation);
   checks.push('round start allocates science once, displays progress and replays identically after save/load');
 
-  await load(progressed); await choose('agriculture'); await click('#end-turn'); const switched = await save();
+  await load(progressed); await choose('agriculture'); await finishTurn(page); const switched = await save();
   assert.equal(switched.kingdoms['kingdom-1'].research.progressByTechnology.writing, k.research.progressByTechnology.writing);
   assert.ok(switched.kingdoms['kingdom-1'].research.progressByTechnology.agriculture > 0);
-  await click('#research-pause'); const paused = await save(); await click('#end-turn'); const banked = await save();
+  await click('#research-pause'); const paused = await save(); await finishTurn(page); const banked = await save();
   assert.deepEqual(banked.kingdoms['kingdom-1'].research, paused.kingdoms['kingdom-1'].research);
   assert.ok(banked.kingdoms['kingdom-1'].progress.science > paused.kingdoms['kingdom-1'].progress.science);
-  await choose('writing'); await click('#end-turn'); const resumed = await save(); const r = resumed.kingdoms['kingdom-1'];
+  await choose('writing'); await finishTurn(page); const resumed = await save(); const r = resumed.kingdoms['kingdom-1'];
   assert.equal(r.research.progressByTechnology.writing + r.research.progressByTechnology.agriculture, r.progress.science);
   checks.push('switch, pause and resume retain topic-specific work and spend only unassigned science');
 
   const near = structuredClone(chosen); near.kingdoms['kingdom-1'].progress.science = 11; near.kingdoms['kingdom-1'].stockpiles.gold = 200;
-  await load(near); await click('#end-turn');
+  await load(near); await finishTurn(page);
   assert.match(await page.locator('#message').innerText(), /研究完了.*文字/);
   const unlocked = await save();
   assert.deepEqual(unlocked.kingdoms['kingdom-1'].research.completedTechnologyIds, ['writing']);
@@ -80,7 +81,7 @@ try {
   await click('[data-buy="library"]'); const bought = await save();
   assert.equal(bought.kingdoms['kingdom-1'].stockpiles.gold, unlocked.kingdoms['kingdom-1'].stockpiles.gold - 80);
   assert.equal(bought.kingdoms['kingdom-1'].progress.science, science); assert.deepEqual(bought.cities['city-1'].yieldSummary, unlocked.cities['city-1'].yieldSummary);
-  await click('#end-turn'); const income = await save();
+  await finishTurn(page); const income = await save();
   assert.equal(income.cities['city-1'].lastYieldBreakdown.buildings.find(b => b.buildingId === 'library').yields.science, 2);
   assert.match(await page.locator('#buildings').innerText(), /図書館建設済み/);
   checks.push('completion unlocks library and engineering; paid construction yields its science bonus only on later collection');
@@ -94,26 +95,26 @@ try {
   checks.push('production queue enforces research unlocks and purchase removes a reserved building without duplicate completion');
 
   const overflow = structuredClone(chosen); overflow.kingdoms['kingdom-1'].progress.science = 50;
-  await load(overflow); await click('#end-turn'); const first = await save();
+  await load(overflow); await finishTurn(page); const first = await save();
   assert.deepEqual(first.kingdoms['kingdom-1'].research.completedTechnologyIds, ['writing']);
   await choose('engineering'); const beforeSecond = await save(); assert.deepEqual(beforeSecond.kingdoms['kingdom-1'].research.completedTechnologyIds, ['writing']);
-  await click('#end-turn'); const second = await save(); assert.deepEqual(second.kingdoms['kingdom-1'].research.completedTechnologyIds, ['writing', 'engineering']);
+  await finishTurn(page); const second = await save(); assert.deepEqual(second.kingdoms['kingdom-1'].research.completedTechnologyIds, ['writing', 'engineering']);
   assert.ok(second.kingdoms['kingdom-1'].progress.science > 50); assert.equal(await page.locator('[data-buy="workshop"]').isEnabled(), true);
   checks.push('excess science remains banked and subsequent research cannot complete by repeated selection in the same turn');
 
   await select('#game-mode', 'two-cities'); await click('#reset'); await choose('agriculture'); const two = await save();
   await select('#city-select', 'city-2'); assert.deepEqual(await save(), two); assert.match(await page.locator('#research-status').innerText(), /農業/);
-  await click('#end-turn'); const both = await save(); assert.equal(both.kingdoms['kingdom-1'].research.progressByTechnology.agriculture, both.kingdoms['kingdom-1'].progress.science);
+  await finishTurn(page); const both = await save(); assert.equal(both.kingdoms['kingdom-1'].research.progressByTechnology.agriculture, both.kingdoms['kingdom-1'].progress.science);
   checks.push('research is kingdom-wide across city selection and sums multi-city income once');
 
-  await select('#game-mode', 'duel'); await click('#reset'); await choose('writing'); await click('#end-turn');
-  assert.match(await page.locator('#research-status').innerText(), /研究対象なし/); await choose('agriculture'); await click('#end-turn');
+  await select('#game-mode', 'duel'); await click('#reset'); await choose('writing'); await finishTurn(page);
+  assert.match(await page.locator('#research-status').innerText(), /研究対象なし/); await choose('agriculture'); await finishTurn(page);
   const hotseat = await save(); assert.match(await page.locator('#research-status').innerText(), /文字/);
   assert.ok(hotseat.kingdoms['kingdom-1'].research.progressByTechnology.writing > 0);
   assert.ok(hotseat.kingdoms['kingdom-2'].research.progressByTechnology.agriculture > 0);
   checks.push('human hotseat shows only the active kingdom research and allocates at the shared round boundary');
 
-  await select('#game-mode', 'ai-skirmish'); await click('#reset'); await click('#end-turn'); const aiPending = await save();
+  await select('#game-mode', 'ai-skirmish'); await click('#reset'); await finishTurn(page); const aiPending = await save();
   assert.equal(await page.locator('#research-select').isDisabled(), true); assert.equal(await page.locator('#research-target').isDisabled(), true);
   await click('#research-select'); assert.deepEqual(await save(), aiPending);
   await page.clock.runFor(10000); const aiDone = await save();
@@ -132,7 +133,7 @@ try {
   await load(zero); assert.match(await page.locator('#research-status').innerText(), /科学産出0/);
   await select('#game-mode', 'ai-conquest'); await click('#reset'); const final = await save();
   final.currentTurn = final.scenarioObjective.turnLimit; final.lastProcessedTurn = final.currentTurn; final.kingdoms['kingdom-1'].progress.science = 100;
-  final.kingdoms['kingdom-1'].research.currentTechnologyId = 'writing'; await load(final); await click('#end-turn'); await page.clock.runFor(10000);
+  final.kingdoms['kingdom-1'].research.currentTechnologyId = 'writing'; await load(final); await finishTurn(page); await page.clock.runFor(10000);
   assert.ok((await save()).gameResult); assert.equal(await page.locator('#research-select').isDisabled(), true);
   assert.equal((await save()).kingdoms['kingdom-1'].research.completedTechnologyIds.length, 0);
   checks.push('zero-income estimate is explicit; game over locks research before the next collection');

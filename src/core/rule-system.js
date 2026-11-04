@@ -1,3 +1,4 @@
+import { pendingTurnTasks, resolveTurnTask, resetTurnTasks, reopenActedTasks } from './turn-tasks.js';
 import { resolveAbility } from '../systems/ability-system.js';
 import { resolveSelectResearch, itemResearchError } from '../systems/research-system.js';
 import { resolveCityBombardment } from '../systems/city-bombardment.js';
@@ -7,7 +8,7 @@ import { resolveCityAttack } from '../systems/city-siege.js';
 import { cloneGameState } from './game-state.js';
 import { COMMAND_TYPES } from './commands.js';
 import { RULESET } from './ruleset.js';
-import { processTurnStart } from './turn-engine.js';
+import { processTurnStart, processTurnEnd } from './turn-engine.js';
 import { completeItem, validateProductionSelection } from '../systems/production-system.js';
 import { getTerritoryCandidates, tilePurchaseCost } from '../systems/territory-system.js';
 import { claimTileForCity } from '../systems/city-territory.js';
@@ -47,6 +48,9 @@ export class RuleSystem {
     if (command.type === COMMAND_TYPES.START_TURN) {
       if (state.lastProcessedTurn === state.currentTurn) return reject('このターンは開始処理済みです');
       processTurnStart(state, events);
+    } else if ([COMMAND_TYPES.SKIP_TURN_ACTION, COMMAND_TYPES.RESUME_TURN_ACTION].includes(command.type)) {
+      const reason = resolveTurnTask(state, command.playerId, command.payload.taskId, command.type === COMMAND_TYPES.SKIP_TURN_ACTION, events);
+      if (reason) return reject(reason);
     } else if (command.type === COMMAND_TYPES.USE_ABILITY) {
       const result = resolveAbility(state, command.playerId, command.payload, events);
       if (!result.ok) return reject(result.reason);
@@ -156,12 +160,15 @@ export class RuleSystem {
       if (!combat.ok) return reject(combat.reason);
     } else if (command.type === COMMAND_TYPES.END_TURN) {
       if (state.phase !== 'PLAYER_ACTION') return reject('行動フェーズではありません');
+      const pending = pendingTurnTasks(state, command.playerId);
+      if (pending.length) return reject(`未処理の行動が${pending.length}件あります。実行するか、項目ごとにスキップしてください`);
       events.push({ type: 'PlayerTurnEnded', turn: command.turn, playerId: command.playerId });
       const roundComplete = state.activePlayerIndex === state.turnOrder.length - 1;
       resolveScenario(state, events, { roundComplete });
       if (!state.gameResult) {
         state.activePlayerIndex = (state.activePlayerIndex + 1) % state.turnOrder.length; state.activePlayerId = state.turnOrder[state.activePlayerIndex];
-        if (roundComplete) { state.phase = 'TURN_END'; state.currentTurn += 1; events.push({ type: 'TurnEnded', turn: command.turn }); processTurnStart(state, events); }
+        if (roundComplete) { state.phase = 'TURN_END'; state.currentTurn += 1; events.push({ type: 'TurnEnded', turn: command.turn }); processTurnEnd(state, events, command.turn); processTurnStart(state, events); }
+        resetTurnTasks(state);
       }
     } else return reject('不明なCommandです');
 
@@ -172,6 +179,8 @@ export class RuleSystem {
       for (const kingdom of Object.values(state.kingdoms)) updateDerivedCapabilities(kingdom, state);
     }
     resolveScenario(state, events);
+    reopenActedTasks(state, command);
+    if (state.gameResult && state.turnTasks) state.turnTasks.skipped = [];
     state.commandLog.push(structuredClone(command)); state.eventLog.push(...events.map((event) => ({ turn: state.currentTurn, ...event })));
     return { ok: true, state, events };
   }

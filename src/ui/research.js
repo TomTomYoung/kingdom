@@ -25,8 +25,8 @@ export class ResearchPanel {
     const budget = node('p', `科学累計 ${kingdom.progress.science} · 未配分 ${unassignedScience(kingdom)}`, 'research-budget'); budget.id = 'research-budget';
     const status = node('p', '', 'research-status'); status.id = 'research-status'; status.setAttribute('role', 'status');
     const forecast = researchForecast(kingdom, state);
-    status.textContent = tech ? `${tech.name}: ${forecast.progress} / ${forecast.cost} · ${forecast.turns === null ? '科学産出0のため完了見込みなし' : `全体ターン開始 ${forecast.turns}回後が目安`}` : '研究対象なし。途中進捗と未配分の科学は保持しています。';
-    this.root.append(budget, status, node('p', '研究は王国共通です。科学は次の全体ターン開始に配分します。完了目安は現在の産出が続く場合です。', 'hint'));
+    status.textContent = tech ? `${tech.name}: ${forecast.progress} / ${forecast.cost} · ${forecast.turns === null ? '科学産出0のため完了見込みなし' : `ターン精算 ${forecast.turns}回後が目安`}` : '研究対象なし。途中進捗と未配分の科学は保持しています。';
+    this.root.append(budget, status, node('p', '研究は王国共通です。科学は次のターン精算に配分します。完了目安は現在の産出が続く場合です。', 'hint'));
     const label = node('label', '研究対象'); label.htmlFor = 'research-target';
     const select = node('select'); select.id = 'research-target'; select.disabled = !canAct;
     for (const t of Object.values(RULESET.technologies)) {

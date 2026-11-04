@@ -1,3 +1,4 @@
+import { finishTurn, prepareTurnFixture } from './turn-flow-helpers.mjs';
 // Optional real Chromium QA for city retaliation, shared guard damage, wall AI and save continuation.
 // Set KINGDOM_QA_MODULES and KINGDOM_BROWSER, then run:
 // node tools/qa/browser-city-defense.mjs /tmp/kingdom-city-defense-qa
@@ -37,7 +38,7 @@ try {
   await page.clock.install(); await page.clock.pauseAt(new Date());
   const click = selector => page.locator(selector).evaluate(element => element.click());
   const save = async () => { await click('#save'); return page.evaluate(() => JSON.parse(localStorage.getItem('kingdom-m1-save'))); };
-  const load = async value => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); };
+  const load = async value => { prepareTurnFixture(value); await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); };
   const select = async (selector, value) => page.locator(selector).evaluate((el, value) => { el.value = value; el.dispatchEvent(new Event('change', { bubbles: true })); }, value);
   const target = async (type = 'melee') => { await click('[data-select-party="party-1"]'); await select('#siege-city', 'city-2'); await select('#siege-type', type); };
   const relocate = (s, id, location) => { const p = s.parties[id]; p.location = location; p.unitIds.forEach(id => { s.units[id].location = location; }); s.world.tiles[location].terrainId = 'plains'; };
@@ -69,26 +70,26 @@ try {
 
   const weak = structuredClone(base); weak.parties['party-1'].guardOrders = {};
   weak.parties['party-1'].unitIds.forEach((id, i) => Object.assign(weak.units[id], { hp: i ? 0 : 1, currentHp: i ? 0 : 1, status: i ? 'shattered' : 'active' }));
-  await load(weak); await target(); await click('#attack-city'); const defeated = await save(); assert.equal(defeated.parties['party-1'].status, 'defeated'); assert.equal(defeated.gameResult, null); assert.match(await page.locator('#siege-log').innerText(), /部隊敗北/); assert.equal(await page.locator('#end-turn').isEnabled(), true); await load(defeated); assert.deepEqual(await save(), defeated);
+  await load(weak); await target(); await click('#attack-city'); const defeated = await save(); assert.equal(defeated.parties['party-1'].status, 'defeated'); assert.equal(defeated.gameResult, null); assert.match(await page.locator('#siege-log').innerText(), /部隊敗北/); assert.equal(await page.locator('#end-turn').isDisabled(), true); assert.ok(await page.locator('[data-skip-task]').count()); await load(defeated); assert.deepEqual(await save(), defeated);
   checks.push('lethal city counter defeats the attacking party while city-control play and saving remain usable');
 
   const spent = structuredClone(base); spent.cities['city-2'].defense.counterattacksRemaining = 0; await load(spent); await target(); assert.match(await page.locator('#siege-counter-preview').innerText(), /都市反撃: なし/);
-  await click('#end-turn'); await page.clock.runFor(6000); const reset = await save(); assert.equal(reset.currentTurn, 2); assert.equal(reset.cities['city-2'].defense.counterattacksRemaining, 1);
+  await finishTurn(page); await page.clock.runFor(6000); const reset = await save(); assert.equal(reset.currentTurn, 2); assert.equal(reset.cities['city-2'].defense.counterattacksRemaining, 1);
   const invalid = structuredClone(reset); invalid.cities['city-1'].defense.counterattacksRemaining = 2; await load(invalid); assert.match(await page.locator('#message').innerText(), /セーブデータが不正/); assert.deepEqual(await save(), reset);
   checks.push('spent city reactions survive loading, reset at the full round and reject corrupted saves atomically');
 
   const wallBase = structuredClone(base); Object.assign(wallBase.parties['party-2'], { movementRemaining: 0, attacksRemaining: 0, activationState: 'ended' }); wallBase.kingdoms['kingdom-2'].stockpiles.gold = 144;
   wallBase.cities['city-2'].production = { currentItemId: 'archer', queue: ['warrior'], progressByItem: { archer: 10 } };
-  await load(wallBase); await click('#end-turn'); const beforeAI = await save(); await page.clock.runFor(180); const wallBuilt = await save();
+  await load(wallBase); await finishTurn(page); const beforeAI = await save(); await page.clock.runFor(180); const wallBuilt = await save();
   assert.equal(wallBuilt.commandLog.at(-1).payload.itemId, 'walls'); assert.equal(wallBuilt.commandLog.at(-1).type, 'PurchaseCityItem'); assert.equal(wallBuilt.kingdoms['kingdom-2'].stockpiles.gold, 24); assert.equal(wallBuilt.cities['city-2'].defense.wallHp, 60); assert.deepEqual(wallBuilt.cities['city-2'].production, wallBase.cities['city-2'].production);
   assert.match(await page.locator('#ai-activity').innerText(), /城壁発注 1回/); await load(beforeAI); await page.clock.runFor(180); assert.deepEqual(await save(), wallBuilt);
   await page.clock.runFor(6000); const end = await save(); assert.equal(end.currentTurn, 2); assert.equal(end.commandLog.filter(c => c.turn === 1 && c.playerId === 'kingdom-2' && c.type === 'PurchaseCityItem').length, 1);
   checks.push('AI buys threatened-city walls with reserve intact, preserves military orders and resumes without duplicate spending');
 
   const producing = structuredClone(wallBase); producing.kingdoms['kingdom-2'].stockpiles.gold = 0; producing.cities['city-2'].production = { currentItemId: null, queue: [], progressByItem: {} };
-  await load(producing); await click('#end-turn'); await page.clock.runFor(180); const queued = await save(); assert.equal(queued.cities['city-2'].production.currentItemId, 'walls'); assert.equal(queued.commandLog.at(-1).type, 'SetCityProduction');
+  await load(producing); await finishTurn(page); await page.clock.runFor(180); const queued = await save(); assert.equal(queued.cities['city-2'].production.currentItemId, 'walls'); assert.equal(queued.commandLog.at(-1).type, 'SetCityProduction');
   const rebuilding = structuredClone(producing); rebuilding.parties['party-2'].unitIds.slice(1).forEach(id => Object.assign(rebuilding.units[id], { hp: 0, currentHp: 0, status: 'shattered' }));
-  await load(rebuilding); await click('#end-turn'); await page.clock.runFor(180); const rebuilt = await save(); assert.notEqual(rebuilt.cities['city-2'].production.currentItemId, 'walls'); assert.equal(rebuilt.commandLog.at(-1).type, 'SetCityProduction');
+  await load(rebuilding); await finishTurn(page); await page.clock.runFor(180); const rebuilt = await save(); assert.notEqual(rebuilt.cities['city-2'].production.currentItemId, 'walls'); assert.equal(rebuilt.commandLog.at(-1).type, 'SetCityProduction');
   checks.push('AI chooses wall production without purchase funds and prioritizes military rebuilding when its army is depleted');
 
   const legacy = structuredClone(base); legacy.cityDefenseVersion = 1; Object.values(legacy.cities).forEach(city => { delete city.defense.counterattacksRemaining; delete city.defense.bombardmentsRemaining; }); await load(legacy); await target();

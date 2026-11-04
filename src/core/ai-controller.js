@@ -1,3 +1,4 @@
+import { pendingTurnTasks } from './turn-tasks.js';
 import { chooseAbilityCommand } from './ai-abilities.js';
 import { chooseExpeditionCommand, isExpansionParty } from './ai-expansion.js';
 import { chooseResearchCommand } from '../systems/research-system.js';
@@ -6,7 +7,7 @@ import { previewPartyRest, validateRemoveCasualties } from '../systems/party-car
 import { RULESET } from './ruleset.js';
 import { hasCityRetaliation, hasCityDefense, isCityDefended, cityEntryError } from '../models/city-defense.js';
 import { previewCityAttack, validateCityAttack } from '../systems/city-siege.js';
-import { bombardParty, restParty, removeCasualties, attackCity, captureCity, attackParty, moveParty, endTurn } from './commands.js';
+import { skipTurnAction, bombardParty, restParty, removeCasualties, attackCity, captureCity, attackParty, moveParty, endTurn } from './commands.js';
 import { chooseCityExitCommand, chooseDeploymentCommand, chooseSupplyCommand, chooseReinforcementCommand, chooseMergeCommand } from './ai-economy.js';
 import { RuleSystem } from './rule-system.js';
 import { validatePartyAttack } from '../systems/combat-system.js';
@@ -68,7 +69,10 @@ export class AIController {
   nextCommand(state, { forceEnd = false } = {}) {
     if (state.gameResult || state.phase !== 'PLAYER_ACTION' || state.activePlayerId !== this.playerId || state.kingdoms[this.playerId]?.controllerType !== 'ai') return null;
     const id = `ai-${this.playerId}-${state.currentTurn}-${state.commandLog.length + 1}`;
-    const finish = () => endTurn(this.playerId, state.currentTurn, id);
+    const finish = () => {
+      const task = pendingTurnTasks(state, this.playerId)[0];
+      return task ? skipTurnAction(this.playerId, state.currentTurn, task.id, id) : endTurn(this.playerId, state.currentTurn, id);
+    };
     if (forceEnd) return finish();
     const conquest = hasCityObjective(state);
     const enemyCities = conquest ? ordered(state.cities).filter(city => city.ownerId !== this.playerId) : [];

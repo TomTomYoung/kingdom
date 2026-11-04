@@ -1,4 +1,4 @@
-import { useAbility, selectResearch, bombardParty, restParty, removeCasualties, attackCity, captureCity, reinforceParty, mergeParties, splitParty, attackParty, createParty, endTurn, foundCity, moveParty, purchaseCityItem, purchaseTile, setCityProduction, setFormation, setGuardOrder, startTurn } from './commands.js';
+import { skipTurnAction, resumeTurnAction, useAbility, selectResearch, bombardParty, restParty, removeCasualties, attackCity, captureCity, reinforceParty, mergeParties, splitParty, attackParty, createParty, endTurn, foundCity, moveParty, purchaseCityItem, purchaseTile, setCityProduction, setFormation, setGuardOrder, startTurn } from './commands.js';
 export class HumanController {
   constructor(playerId) { this.playerId = playerId; }
   nextId(state) { return `${this.playerId}-${state.currentTurn}-${state.commandLog.length + 1}`; }
@@ -22,5 +22,7 @@ export class HumanController {
   removeCasualties(state, partyId) { return removeCasualties(this.playerId, state.currentTurn, partyId, this.nextId(state)); }
   selectResearch(state, technologyId) { return selectResearch(this.playerId, state.currentTurn, technologyId, this.nextId(state)); }
   useAbility(state, partyId, casterUnitId, abilityId, targetUnitId) { return useAbility(this.playerId, state.currentTurn, partyId, casterUnitId, abilityId, targetUnitId, this.nextId(state)); }
+  skipTurnAction(state, taskId) { return skipTurnAction(this.playerId, state.currentTurn, taskId, this.nextId(state)); }
+  resumeTurnAction(state, taskId) { return resumeTurnAction(this.playerId, state.currentTurn, taskId, this.nextId(state)); }
   endTurn(state) { return endTurn(this.playerId, state.currentTurn, this.nextId(state)); }
 }

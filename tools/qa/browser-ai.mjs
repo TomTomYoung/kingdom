@@ -1,3 +1,4 @@
+import { finishTurn, prepareTurnFixture } from './turn-flow-helpers.mjs';
 // Optional real Chromium QA for AI turns, cancellation, scenario results and restoration.
 // Set KINGDOM_QA_MODULES and KINGDOM_BROWSER, then run:
 // node tools/qa/browser-ai.mjs /tmp/kingdom-ai-qa
@@ -38,7 +39,7 @@ try {
   await page.clock.install(); await page.clock.pauseAt(new Date());
   const click = selector => page.locator(selector).evaluate(button => button.click());
   const snapshot = async () => { await click('#save'); return page.evaluate(() => JSON.parse(localStorage.getItem('kingdom-m1-save'))); };
-  const restore = async value => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); };
+  const restore = async value => { prepareTurnFixture(value); await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); };
   const fresh = async () => { await page.selectOption('#game-mode', 'ai-skirmish'); await click('#reset'); return snapshot(); };
   const relocate = (state, id, location) => { const p = state.parties[id]; p.location = location; p.unitIds.forEach(id => { state.units[id].location = location; }); state.world.tiles[location].terrainId = 'plains'; };
   const weaken = (state, id) => { const p = state.parties[id]; p.guardOrders = {}; p.unitIds.forEach((id, i) => Object.assign(state.units[id], { hp: i ? 0 : 1, currentHp: i ? 0 : 1, status: i ? 'shattered' : 'active' })); };
@@ -53,15 +54,15 @@ try {
   let state = await fresh();
   assert.equal(state.scenarioId, 'ai-skirmish'); assert.equal(await page.locator('#scenario-title').innerText(), 'AIとの遭遇戦');
   assert.equal(await page.locator('#city-name').innerText(), '暁都');
-  await click('#end-turn'); const midAi = await snapshot();
+  await finishTurn(page); const midAi = await snapshot();
   assert.equal(midAi.activePlayerId, 'kingdom-2'); assert.equal(await page.locator('#scenario-title').innerText(), 'AIが行動中');
   assert.equal(await page.locator('#city-name').innerText(), '暁都'); await assertLocked();
   // Inspect the enemy without changing viewpoint or enabling commands.
   await page.selectOption('#combat-target', 'party-2'); await assertLocked();
   await page.clock.runFor(1000); state = await snapshot();
   assert.equal(state.activePlayerId, 'kingdom-1'); assert.equal(state.currentTurn, 2);
-  assert.deepEqual(state.commandLog.slice(-4).map(c => c.type), ['MoveParty', 'AttackParty', 'SelectResearch', 'EndTurn']);
-  assert.equal(await page.locator('#end-turn').isEnabled(), true);
+  assert.deepEqual(state.commandLog.filter(c => c.type !== 'SkipTurnAction').slice(-4).map(c => c.type), ['MoveParty', 'AttackParty', 'SelectResearch', 'EndTurn']);
+  assert.equal(await page.locator('#end-turn').isDisabled(), true); assert.ok(await page.locator('[data-skip-task]').count());
   assert.match(await page.locator('#combat-log').innerText(), /HP/);
   checks.push('human turn -> AI move/attack/end -> human; own-city viewpoint and mutation controls stay correct');
   await restore(midAi); assert.equal(await page.locator('#game-mode').inputValue(), 'ai-skirmish'); await assertLocked();
@@ -86,7 +87,7 @@ try {
   checks.push('victory from actual attack; finished-state lock/save/load and forged winner rejection');
 
   state = await fresh(); relocate(state, 'party-2', '2,-2,0'); weaken(state, 'party-1');
-  await restore(state); await click('#end-turn'); await page.clock.runFor(1000);
+  await restore(state); await finishTurn(page); await page.clock.runFor(1000);
   const defeat = await snapshot(); assert.equal(defeat.gameResult.winnerId, 'kingdom-2');
   assert.equal(await page.locator('#scenario-title').innerText(), '敗北'); await assertLocked();
   assert.equal(defeat.commandLog.at(-1).type, 'AttackParty'); assert.equal(defeat.currentTurn, 1);
@@ -94,7 +95,7 @@ try {
   checks.push('AI victory shows human defeat and stops before EndTurn');
 
   state = await fresh(); state.scenarioObjective.turnLimit = 1;
-  await restore(state); await click('#end-turn'); await page.clock.runFor(1000); state = await snapshot();
+  await restore(state); await finishTurn(page); await page.clock.runFor(1000); state = await snapshot();
   assert.equal(state.gameResult.outcome, 'draw'); assert.equal(state.gameResult.reason, 'turn-limit');
   assert.equal(state.currentTurn, 1); assert.equal(await page.locator('#scenario-title').innerText(), '引き分け'); await assertLocked();
   await restore(state); assert.equal(await page.locator('#scenario-title').innerText(), '引き分け');
@@ -104,21 +105,21 @@ try {
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   checks.push('390px result screen has no horizontal overflow');
 
-  await page.selectOption('#game-mode', 'duel'); await click('#reset'); await click('#end-turn'); state = await snapshot();
+  await page.selectOption('#game-mode', 'duel'); await click('#reset'); await finishTurn(page); state = await snapshot();
   assert.equal(state.activePlayerId, 'kingdom-2'); assert.equal(await page.locator('#city-name').innerText(), '黄昏都');
-  assert.equal(await page.locator('#end-turn').isEnabled(), true); await page.clock.runFor(1000); assert.deepEqual(await snapshot(), state);
+  assert.equal(await page.locator('#end-turn').isDisabled(), true); assert.ok(await page.locator('[data-skip-task]').count()); await page.clock.runFor(1000); assert.deepEqual(await snapshot(), state);
   checks.push('legacy hotseat still switches human viewpoint without auto-playing');
   await page.setViewportSize({ width: 1440, height: 1050 });
   const freshReinforcements = async () => { await page.selectOption('#game-mode', 'ai-reinforcements'); await click('#reset'); return snapshot(); };
   state = await freshReinforcements();
   assert.equal(state.kingdoms['kingdom-2'].aiPolicy, 'reinforcements');
   assert.equal(await page.locator('#scenario-title').innerText(), 'AIとの増援戦');
-  await click('#end-turn'); await assertLocked(); await page.clock.runFor(2000); state = await snapshot();
+  await finishTurn(page); await assertLocked(); await page.clock.runFor(2000); state = await snapshot();
   assert.equal(state.cities['city-2'].production.currentItemId, 'warrior');
   assert.equal(state.cities['city-1'].production.currentItemId, null);
   assert.match(await page.locator('#ai-activity').innerText(), /生産設定 1回/);
   checks.push('reinforcement mode selects enemy-city production and explains AI actions without changing the human city');
-  await click('#end-turn'); await page.clock.runFor(2000); state = await snapshot();
+  await finishTurn(page); await page.clock.runFor(2000); state = await snapshot();
   const purchase = state.commandLog.find(c => c.playerId === 'kingdom-2' && c.type === 'PurchaseCityItem');
   const creation = state.commandLog.find(c => c.playerId === 'kingdom-2' && c.type === 'CreateParty');
   assert.ok(purchase); assert.ok(creation); assert.equal(purchase.payload.cityId, 'city-2');
@@ -131,7 +132,7 @@ try {
   assert.equal(await page.locator(`#combat-target option[value="${newParty}"]`).count(), 1);
   checks.push('AI clears its city, buys within budget, forms reinforcements and moves/attacks with them');
   const checkpoint = state;
-  await click('#end-turn'); await page.clock.runFor(180); const inProgress = await snapshot();
+  await finishTurn(page); await page.clock.runFor(180); const inProgress = await snapshot();
   await page.clock.runFor(2000); const resumed = await snapshot();
   await restore(inProgress); assert.equal(await page.locator('#game-mode').inputValue(), 'ai-reinforcements');
   await page.clock.runFor(2000); assert.deepEqual(await snapshot(), resumed);
@@ -143,7 +144,7 @@ try {
     state = await snapshot();
     productionDeployed = state.eventLog.some(e => e.type === 'ItemCompleted' && e.cityId === 'city-2' && e.source === 'production' && state.units[e.entityId].partyId);
     if (productionDeployed || state.gameResult) break;
-    await click('#end-turn'); await page.clock.runFor(3000);
+    await finishTurn(page); await page.clock.runFor(3000);
   }
   assert.equal(productionDeployed, true);
   checks.push('turn-start production supplies troops that the AI deploys on a later turn');

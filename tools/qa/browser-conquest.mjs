@@ -1,3 +1,4 @@
+import { finishTurn, prepareTurnFixture } from './turn-flow-helpers.mjs';
 // Optional real Chromium QA for city capture, ownership, AI, conquest outcomes and cityless restoration.
 // Set KINGDOM_QA_MODULES and KINGDOM_BROWSER, then run:
 // node tools/qa/browser-conquest.mjs /tmp/kingdom-conquest-qa
@@ -35,7 +36,7 @@ try {
   await page.goto(`http://127.0.0.1:${server.address().port}`);
   await page.waitForFunction(() => document.querySelector('#resources img'));
   const save = async () => { await page.click('#save'); return page.evaluate(() => JSON.parse(localStorage.getItem('kingdom-m1-save'))); };
-  const load = async value => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await page.click('#load'); };
+  const load = async value => { prepareTurnFixture(value); await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await page.click('#load'); };
   // This regression suite exercises historical conquest; browser-siege covers new games.
   const fresh = async () => { await page.selectOption('#game-mode', 'ai-conquest'); await page.click('#reset'); const value = await save(); delete value.cityDefenseVersion; Object.values(value.cities).forEach(city => { delete city.defense; }); await load(value); return save(); };
   const tileClick = async tile => {
@@ -84,12 +85,12 @@ try {
   await page.clock.install(); await page.clock.pauseAt(new Date());
   const click = selector => page.locator(selector).evaluate(element => element.click());
   const snap = async () => { await click('#save'); return page.evaluate(() => JSON.parse(localStorage.getItem('kingdom-m1-save'))); };
-  const restore = async value => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); };
-  await click('#end-turn'); assert.equal(await page.locator('#capture-city').isDisabled(), true); await page.clock.runFor(6000); state = await snap();
+  const restore = async value => { prepareTurnFixture(value); await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); };
+  await finishTurn(page); assert.equal(await page.locator('#capture-city').isDisabled(), true); await page.clock.runFor(6000); state = await snap();
   assert.equal(state.currentTurn, 2); assert.equal(state.activePlayerId, 'kingdom-1'); assert.ok(state.cities['city-2'].production.progressByItem.warrior > 0);
   assert.equal(state.kingdoms['kingdom-1'].stockpiles.gold - producing.kingdoms['kingdom-1'].stockpiles.gold, state.cities['city-1'].yieldSummary.gold + state.cities['city-2'].yieldSummary.gold);
-  assert.equal(state.eventLog.filter(e => e.type === 'YieldCollected' && e.cityId === 'city-2' && e.turn === 2).length, 1);
-  checks.push('captured city collects once for its new owner and starts new production at the next full round');
+  assert.equal(state.eventLog.filter(e => e.type === 'YieldCollected' && e.cityId === 'city-2' && e.turn === 1).length, 1);
+  checks.push('captured city collects once for its new owner and starts new production in the completed round settlement');
 
   const guarded = structuredClone(initial); relocate(guarded, 'party-1', '3,-3,0'); relocate(guarded, 'party-2', '4,-4,0');
   await restore(guarded); await click('[data-select-party="party-1"]');
@@ -98,7 +99,7 @@ try {
   const weak = structuredClone(guarded); weak.parties['party-2'].guardOrders = {};
   weak.parties['party-2'].unitIds.forEach((id, i) => Object.assign(weak.units[id], { hp: i ? 0 : 1, currentHp: i ? 0 : 1, status: i ? 'shattered' : 'active' }));
   await restore(weak); await click('[data-select-party="party-1"]'); await page.selectOption('#combat-target', 'party-2'); await page.selectOption('#attack-type', 'ranged'); await click('#attack-party');
-  state = await snap(); assert.equal(state.parties['party-2'].status, 'defeated'); assert.equal(state.gameResult, null); assert.equal(await page.locator('#end-turn').isEnabled(), true);
+  state = await snap(); assert.equal(state.parties['party-2'].status, 'defeated'); assert.equal(state.gameResult, null); assert.equal(await page.locator('#end-turn').isDisabled(), true); assert.ok(await page.locator('[data-skip-task]').count());
   checks.push('garrison blocks entry; defeating the last army does not end a city-survival scenario');
 
   const winning = structuredClone(initial); relocate(winning, 'party-1', '4,-4,0'); await restore(winning); await click('[data-select-party="party-1"]'); await click('#capture-city');
@@ -107,7 +108,7 @@ try {
   await restore(victory); assert.deepEqual(await snap(), victory); await page.clock.runFor(1000); assert.deepEqual(await snap(), victory);
   checks.push('last-city capture wins with surviving enemy armies and locks actions across reload');
 
-  const losing = structuredClone(initial); relocate(losing, 'party-2', '0,0,0'); await restore(losing); await click('#end-turn'); await page.clock.runFor(180);
+  const losing = structuredClone(initial); relocate(losing, 'party-2', '0,0,0'); await restore(losing); await finishTurn(page); await page.clock.runFor(180);
   const defeat = await snap(); assert.equal(defeat.gameResult.winnerId, 'kingdom-2'); assert.equal(await page.locator('#scenario-title').innerText(), '敗北');
   assert.equal(await page.locator('#city-name').innerText(), '所有都市なし'); assert.equal(await page.locator('#city-select option').count(), 0);
   assert.equal(await page.locator('#focus-city').isDisabled(), true); assert.equal(await page.locator('[data-buy="warrior"]').isDisabled(), true);
@@ -123,7 +124,7 @@ try {
   checks.push('390px capture and cityless panels render without horizontal overflow');
 
   const approaching = structuredClone(initial); relocate(approaching, 'party-1', '-6,6,0'); relocate(approaching, 'party-2', '2,-2,0'); approaching.world.tiles['0,0,0'].terrainId = 'plains';
-  await restore(approaching); await click('#end-turn'); await page.clock.runFor(180); const mid = await snap(); assert.equal(mid.commandLog.at(-1).type, 'MoveParty');
+  await restore(approaching); await finishTurn(page); await page.clock.runFor(180); const mid = await snap(); assert.equal(mid.commandLog.at(-1).type, 'MoveParty');
   await page.clock.runFor(180); const continued = await snap(); assert.equal(continued.commandLog.at(-1).type, 'CaptureCity');
   await restore(mid); await page.clock.runFor(180); assert.deepEqual(await snap(), continued);
   checks.push('AI path to an unguarded city and mid-move save resume produce identical capture and victory');

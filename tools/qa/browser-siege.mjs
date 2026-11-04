@@ -1,3 +1,4 @@
+import { finishTurn, prepareTurnFixture } from './turn-flow-helpers.mjs';
 // Optional real Chromium QA for city durability, wall construction, siege preview, breach and AI continuation.
 // Set KINGDOM_QA_MODULES and KINGDOM_BROWSER, then run:
 // node tools/qa/browser-siege.mjs /tmp/kingdom-siege-qa
@@ -37,7 +38,7 @@ try {
   await page.clock.install(); await page.clock.pauseAt(new Date());
   const click = selector => page.locator(selector).evaluate(element => element.click());
   const save = async () => { await click('#save'); return page.evaluate(() => JSON.parse(localStorage.getItem('kingdom-m1-save'))); };
-  const load = async value => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); };
+  const load = async value => { prepareTurnFixture(value); await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); };
   const select = async (selector, value) => page.locator(selector).evaluate((el, value) => { el.value = value; el.dispatchEvent(new Event('change', { bubbles: true })); }, value);
   const target = async () => { await click('[data-select-party="party-1"]'); await select('#siege-city', 'city-2'); };
   const relocate = (s, id, location) => { const p = s.parties[id]; p.location = location; p.unitIds.forEach(id => { s.units[id].location = location; }); s.world.tiles[location].terrainId = 'plains'; };
@@ -75,12 +76,12 @@ try {
   checks.push('actual siege spends activation, damages walls first, records the attack and reloads identically');
 
   for (let i = 0; i < 10 && hit.cities['city-2'].defense.hp > 0; i++) {
-    await click('#end-turn'); await page.clock.runFor(6000); const next = await save(); assert.equal(next.activePlayerId, 'kingdom-1'); assert.equal(next.gameResult, null);
+    await finishTurn(page); await page.clock.runFor(6000); const next = await save(); assert.equal(next.activePlayerId, 'kingdom-1'); assert.equal(next.gameResult, null);
     await target(); await click('#attack-city'); hit = await save();
   }
   assert.equal(hit.cities['city-2'].defense.hp, 0); assert.equal(hit.cities['city-2'].defense.wallHp, 0); assert.equal(hit.cities['city-2'].ownerId, 'kingdom-2'); assert.equal(hit.gameResult, null);
   assert.match(await page.locator('#siege-log').innerText(), /防御崩壊/); assert.equal(await page.locator('#map-move').isDisabled(), true);
-  await click('#end-turn'); await page.clock.runFor(6000); await target(); assert.equal(await page.locator('#map-move').isEnabled(), true);
+  await finishTurn(page); await page.clock.runFor(6000); await target(); assert.equal(await page.locator('#map-move').isEnabled(), true);
   await click('#map-move'); assert.equal(await page.locator('#capture-city').isEnabled(), true); await click('#capture-city'); const victory = await save();
   assert.equal(victory.gameResult.winnerId, 'kingdom-1'); assert.equal(victory.cities['city-2'].defense.hp, 25); assert.equal(victory.cities['city-2'].defense.wallHp, 0);
   assert.equal(await page.locator('#scenario-title').innerText(), '勝利'); assert.equal(await page.locator('#attack-city').isDisabled(), true); await load(victory); assert.deepEqual(await save(), victory);
@@ -90,7 +91,7 @@ try {
   checks.push('invalid durability save rejects without replacing the current game');
 
   s = structuredClone(initial); relocate(s, 'party-1', '-6,6,0'); relocate(s, 'party-2', '2,-2,0'); s.world.tiles['0,0,0'].terrainId = 'plains';
-  await load(s); await click('#end-turn'); const beforeAi = await save(); await page.clock.runFor(180); const afterAi = await save();
+  await load(s); await finishTurn(page); const beforeAi = await save(); await page.clock.runFor(180); const afterAi = await save();
   assert.equal(afterAi.commandLog.at(-1).type, 'AttackCity'); assert.ok(afterAi.cities['city-1'].defense.hp < 100); assert.match(await page.locator('#ai-activity').innerText(), /攻城 1回/);
   assert.equal(await page.locator('#attack-city').isDisabled(), true); await load(beforeAi); await page.clock.runFor(180); assert.deepEqual(await save(), afterAi);
   checks.push('AI uses AttackCity and resumes the same seeded siege from a mid-turn save');

@@ -1,3 +1,4 @@
+import { validateTurnFlowSave } from './turn-tasks.js';
 import { validateAbilitySave } from '../systems/ability-system.js';
 import { validateResearchSave } from '../systems/research-system.js';
 import { partyCareSafetyError } from '../systems/party-care.js';
@@ -288,5 +289,6 @@ export function migrateAndValidateSave(state) {
   if (['ai-reinforcements', 'ai-conquest'].includes(state.scenarioId)) check(Object.values(state.kingdoms).some(kingdom => kingdom.controllerType === 'ai' && kingdom.aiPolicy === 'reinforcements'), 'scenario.aiPolicy');
   validateResearchSave(state);
   validateScenarioSave(state);
+  validateTurnFlowSave(state);
   return state;
 }

@@ -1,3 +1,4 @@
+import { finishTurn, prepareTurnFixture } from './turn-flow-helpers.mjs';
 // Optional real Chromium QA for escorted AI expansion, founding and saved continuation.
 // Set KINGDOM_QA_MODULES and KINGDOM_BROWSER, then run:
 // node tools/qa/browser-ai-expansion.mjs /tmp/kingdom-ai-expansion-qa
@@ -60,7 +61,7 @@ try {
   await page.clock.install(); await page.clock.pauseAt(new Date());
   const click = selector => page.locator(selector).evaluate(element => element.click());
   const save = async () => { await click('#save'); return page.evaluate(() => JSON.parse(localStorage.getItem('kingdom-m1-save'))); };
-  const load = async (value, valid = true) => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); if (valid) assert.match(await page.locator('#message').innerText(), /セーブをロードしました/); };
+  const load = async (value, valid = true) => { prepareTurnFixture(value); await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); if (valid) assert.match(await page.locator('#message').innerText(), /セーブをロードしました/); };
   const select = async (selector, value) => page.locator(selector).evaluate((el, value) => { el.value = value; el.dispatchEvent(new Event('change', { bubbles: true })); }, value);
   const choose = async id => { await select('#research-target', id); await click('#research-select'); };
 
@@ -86,7 +87,7 @@ try {
   checks.push('mid-expedition save resumes identical AI decisions, locations, reserves and RNG');
   let completed=continued;
   for(let rounds=0;rounds<10&&completed.kingdoms['kingdom-2'].cityIds.length<2;rounds++){
-    assert.equal(completed.activePlayerId,'kingdom-1');await click('#end-turn');await finish();completed=await save();
+    assert.equal(completed.activePlayerId,'kingdom-1');await finishTurn(page);await finish();completed=await save();
   }
   assert.ok(completed.kingdoms['kingdom-2'].cityIds.length>=2);assert.ok(completed.eventLog.some(e=>e.type==='CityFounded'&&e.ownerId==='kingdom-2'));
   const founded=completed.eventLog.find(e=>e.type==='CityFounded'&&e.ownerId==='kingdom-2');

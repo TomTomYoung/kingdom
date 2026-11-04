@@ -1,3 +1,4 @@
+import { finishTurn, prepareTurnFixture } from './turn-flow-helpers.mjs';
 // Optional real Chromium QA for active city fire, protection, AI and saved charges.
 // Set KINGDOM_QA_MODULES and KINGDOM_BROWSER, then run:
 // node tools/qa/browser-city-bombardment.mjs /tmp/kingdom-city-bombardment-qa
@@ -37,7 +38,7 @@ try {
   await page.clock.install(); await page.clock.pauseAt(new Date());
   const click = selector => page.locator(selector).evaluate(element => element.click());
   const save = async () => { await click('#save'); return page.evaluate(() => JSON.parse(localStorage.getItem('kingdom-m1-save'))); };
-  const load = async (value, valid = true) => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); if (valid) assert.match(await page.locator('#message').innerText(), /セーブをロードしました/); };
+  const load = async (value, valid = true) => { prepareTurnFixture(value); await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); if (valid) assert.match(await page.locator('#message').innerText(), /セーブをロードしました/); };
   const select = async (selector, value) => page.locator(selector).evaluate((el, value) => { el.value = value; el.dispatchEvent(new Event('change', { bubbles: true })); }, value);
   const relocate = (value, id, location) => { const p = value.parties[id]; p.location = location; p.unitIds.forEach(id => { value.units[id].location = location; }); value.world.tiles[location].terrainId = 'plains'; };
   const target = () => select('#bombard-target', 'party-2');
@@ -60,8 +61,8 @@ try {
   assert.deepEqual(await save(), fired);
   checks.push('fire spends only its city charge, labels damage correctly and cannot be repeated after loading');
 
-  await click('#end-turn'); let handoff = await save(); assert.equal(handoff.currentTurn, fired.currentTurn); assert.equal(handoff.cities['city-1'].defense.bombardmentsRemaining, 0);
-  await click('#end-turn'); let renewed = await save(); assert.equal(renewed.currentTurn, fired.currentTurn + 1); assert.equal(renewed.cities['city-1'].defense.bombardmentsRemaining, 1);
+  await finishTurn(page); let handoff = await save(); assert.equal(handoff.currentTurn, fired.currentTurn); assert.equal(handoff.cities['city-1'].defense.bombardmentsRemaining, 0);
+  await finishTurn(page); let renewed = await save(); assert.equal(renewed.currentTurn, fired.currentTurn + 1); assert.equal(renewed.cities['city-1'].defense.bombardmentsRemaining, 1);
   await target(); assert.equal(await page.locator('#bombard-party').isEnabled(), true);
   checks.push('human handoff does not refresh fire; the full-round boundary refreshes it once');
 
@@ -97,7 +98,7 @@ try {
   const ai = structuredClone(armed); ai.scenarioId = 'ai-conquest'; ai.kingdoms['kingdom-2'].controllerType = 'ai';
   ai.cities['city-2'].buildings.push('walls'); ai.cities['city-2'].defense.wallHp = 60;
   relocate(ai, 'party-1', '3,-3,0'); relocate(ai, 'party-2', '6,-6,0');
-  await load(ai); await click('#end-turn'); const aiPending = await save();
+  await load(ai); await finishTurn(page); const aiPending = await save();
   assert.equal(await page.locator('#bombard-party').isDisabled(), true);
   await page.clock.runFor(180); const aiShot = await save(); assert.equal(aiShot.commandLog.at(-1).type, 'BombardParty');
   assert.match(await page.locator('#ai-activity').innerText(), /都市砲撃/);
@@ -118,7 +119,7 @@ try {
   checks.push('changing selected cities switches source and keeps each fire charge independent');
 
   const finalRound = structuredClone(armed); finalRound.currentTurn = finalRound.scenarioObjective.turnLimit; finalRound.lastProcessedTurn = finalRound.currentTurn;
-  await load(finalRound); await click('#end-turn'); await click('#end-turn'); const ended = await save(); assert.ok(ended.gameResult);
+  await load(finalRound); await finishTurn(page); await finishTurn(page); const ended = await save(); assert.ok(ended.gameResult);
   assert.equal(await page.locator('#bombard-party').isDisabled(), true); assert.match(await page.locator('#bombard-status').innerText(), /現在は/);
   await click('#bombard-party'); assert.deepEqual(await save(), ended);
   checks.push('finished games disable city fire while preserving log inspection and saving');

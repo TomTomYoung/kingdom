@@ -103,3 +103,10 @@ select:focus-visible{outline:2px solid #fff1be;outline-offset:3px}
 .ability-panel label { display: block; margin-top: 8px; }
 .ability-panel select { width: 100%; max-width: 100%; min-width: 0; }
 .ability-panel ol { padding-left: 20px; }
+
+.turn-task-list { list-style: none; padding: 0; display: grid; gap: 12px; }
+.turn-task-list li { border-top: 1px solid #506152; padding-top: 10px; display: grid; gap: 8px; overflow-wrap: anywhere; }
+.turn-task-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.turn-task-actions button { width: auto; flex: 1 1 auto; }
+#turn-task-status { line-height: 1.6; }
+#turn-tasks button { white-space: normal; }

@@ -73,7 +73,7 @@ export class ProductionQueuePanel {
       const item = RULESET.items[entry.itemId], row = node('li', undefined, 'production-plan-row');
       row.dataset.queueItem = entry.itemId; row.dataset.queueIndex = String(entry.index);
       row.append(node('strong', `${entry.index === 0 ? '生産対象' : `予約 ${entry.index}`} · ${item.name}`),
-        node('span', `${entry.progress} / ${entry.cost} · ${entry.turns === null ? '生産量0のため完了見込みなし' : `全体ターン開始 ${entry.turns}回後が目安`}`, 'hint'));
+        node('span', `${entry.progress} / ${entry.cost} · ${entry.turns === null ? '生産量0のため完了見込みなし' : `ターン精算 ${entry.turns}回後が目安`}`, 'hint'));
       if (editing) {
         const controls = node('div', undefined, 'production-queue-actions');
         for (const [name, text, offset] of [['up', '前へ', -1], ['down', '後へ', 1], ['remove', '削除', 0]]) {

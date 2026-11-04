@@ -1,3 +1,4 @@
+import { finishTurn, prepareTurnFixture } from './turn-flow-helpers.mjs';
 // Optional real Chromium QA for party reinforcement, splitting, merging, restoration and AI.
 // Set KINGDOM_QA_MODULES and KINGDOM_BROWSER, then run:
 // node tools/qa/browser-reorganization.mjs /tmp/kingdom-reorganization-qa
@@ -35,7 +36,7 @@ try {
   await page.goto(`http://127.0.0.1:${server.address().port}`);
   await page.waitForFunction(() => document.querySelector('#resources img'));
   const save = async () => { await page.click('#save'); return page.evaluate(() => JSON.parse(localStorage.getItem('kingdom-m1-save'))); };
-  const load = async value => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await page.click('#load'); };
+  const load = async value => { prepareTurnFixture(value); await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await page.click('#load'); };
   const fresh = async () => { await page.selectOption('#game-mode', 'single'); await page.click('#reset'); return save(); };
   let state = await fresh();
   assert.equal(await page.locator('#party-reorganization').isVisible(), true);
@@ -53,7 +54,7 @@ try {
   const destination = Object.values(state.world.tiles).filter(tile => Math.max(Math.abs(tile.q), Math.abs(tile.r), Math.abs(tile.s)) === 1 && tile.terrainId !== 'void')[0];
   const key = `${destination.q},${destination.r},${destination.s}`;
   await page.selectOption('#split-destination', key); assert.equal(await page.locator('#split-party').isDisabled(), true);
-  await page.click('#end-turn'); state = await save(); assert.equal(await page.locator('#split-party').isEnabled(), true);
+  await finishTurn(page); state = await save(); assert.equal(await page.locator('#split-party').isEnabled(), true);
   assert.equal(await page.locator('#merge-parties').isDisabled(), true);
   await page.locator('#party-reorganization').scrollIntoViewIfNeeded(); await page.screenshot({ path: path.join(output, 'reorganization-wide.png') });
   await page.click('#split-party'); const split = await save(), childId = `party-${state.nextIds.party}`;
@@ -63,7 +64,7 @@ try {
   assert.deepEqual(split.rng, state.rng); assert.equal(split.units[waiting.id].currentHp, state.units[waiting.id].currentHp);
   checks.push('split preview focuses adjacent terrain; ended parties reject, then next turn splits and selects the new party');
   await page.selectOption('#merge-target', 'party-1'); assert.equal(await page.locator('#merge-parties').isDisabled(), true);
-  await page.click('#end-turn'); assert.equal(await page.locator('#merge-parties').isEnabled(), true);
+  await finishTurn(page); assert.equal(await page.locator('#merge-parties').isEnabled(), true);
   await page.click('#merge-parties'); const merged = await save();
   assert.equal(merged.parties[childId], undefined); assert.equal(merged.parties['party-1'].unitIds.length, 2);
   assert.equal(merged.units[waiting.id].location, '0,0,0'); assert.equal(merged.parties['party-1'].activationState, 'ended');
@@ -77,7 +78,7 @@ try {
   assert.equal(await page.locator('[data-select-party="party-1"]').getAttribute('aria-pressed'), 'true');
   checks.push('successful load clears draft selections; dangling donor references reject without replacing state or selection');
 
-  await load(split); await page.click('[data-select-party="party-1"]'); await page.click('#end-turn');
+  await load(split); await page.click('[data-select-party="party-1"]'); await finishTurn(page);
   await page.selectOption('#merge-target', childId); await page.setViewportSize({ width: 390, height: 844 });
   await page.locator('#party-reorganization').scrollIntoViewIfNeeded();
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
@@ -89,7 +90,7 @@ try {
   await page.selectOption('#game-mode', 'duel'); await page.click('#reset');
   await page.check('[data-split-unit="unit-1"]'); await page.selectOption('#split-destination', '0,0,0');
   assert.equal(await page.locator('#split-party').isEnabled(), true); await page.click('#split-party');
-  await page.click('#end-turn'); assert.match(await page.locator('#active-kingdom').innerText(), /夕映/);
+  await finishTurn(page); assert.match(await page.locator('#active-kingdom').innerText(), /夕映/);
   assert.equal(await page.locator('[data-split-unit="unit-1"]').count(), 0);
   checks.push('hotseat handover clears the prior kingdom draft and exposes only the current kingdom members');
 
@@ -97,7 +98,7 @@ try {
   await page.clock.install(); await page.clock.pauseAt(new Date());
   const click = selector => page.locator(selector).evaluate(element => element.click());
   const snap = async () => { await click('#save'); return page.evaluate(() => JSON.parse(localStorage.getItem('kingdom-m1-save'))); };
-  const restore = async value => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); };
+  const restore = async value => { prepareTurnFixture(value); await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); };
   const aiFixture = await page.evaluate(async () => {
     const { createAiReinforcementGameState } = await import('./src/core/scenarios.js');
     const { HumanController } = await import('./src/core/human-controller.js'); const { RuleSystem } = await import('./src/core/rule-system.js');
@@ -109,7 +110,7 @@ try {
     return state;
   });
   await restore(aiFixture); await click('[data-select-party="party-1"]');
-  await click('#end-turn'); const mid = await snap();
+  await finishTurn(page); const mid = await snap();
   for (const id of ['reinforce-party', 'split-party', 'merge-parties']) assert.equal(await page.locator(`#${id}`).isDisabled(), true);
   await page.clock.runFor(180); const afterReinforce = await snap();
   assert.equal(afterReinforce.commandLog.at(-1).type, 'ReinforceParty'); assert.equal(afterReinforce.parties['party-2'].unitIds.length, 5);
@@ -131,7 +132,7 @@ try {
     }
     return s;
   });
-  await restore(mergeFixture); await click('#end-turn'); await page.clock.runFor(180); const afterMerge = await snap();
+  await restore(mergeFixture); await finishTurn(page); await page.clock.runFor(180); const afterMerge = await snap();
   assert.equal(afterMerge.commandLog.at(-1).type, 'MergeParties'); assert.equal(afterMerge.parties['party-3'], undefined);
   assert.match(await page.locator('#ai-activity').innerText(), /合流 1回/);
   checks.push('AI consolidates small adjacent parties through MergeParties and reports it in the activity summary');
