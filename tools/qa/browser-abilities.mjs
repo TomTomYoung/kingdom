@@ -37,7 +37,7 @@ try {
   await page.clock.install(); await page.clock.pauseAt(new Date());
   const click = selector => page.locator(selector).evaluate(element => element.click());
   const save = async () => { await click('#save'); return page.evaluate(() => JSON.parse(localStorage.getItem('kingdom-m1-save'))); };
-  const load = async (value, valid = true) => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); if (valid) assert.match(await page.locator('#message').innerText(), /セーブをロードしました/); };
+  const load = async (value, valid = true) => { await page.evaluate(s => localStorage.setItem('kingdom-m1-save', JSON.stringify(s)), value); await click('#load'); if (valid) { assert.match(await page.locator('#message').innerText(), /セーブをロードしました/); await click('[data-select-party="party-1"]'); } };
   const select = async (selector, value) => page.locator(selector).evaluate((el, value) => { el.value = value; el.dispatchEvent(new Event('change', { bubbles: true })); }, value);
   const oldSingle = await save(); assert.equal(Object.hasOwn(oldSingle, 'activeAbilityVersion'), false);
   assert.match(await page.locator('#abilities').innerText(), /新規/);
