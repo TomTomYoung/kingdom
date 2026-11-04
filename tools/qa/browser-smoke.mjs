@@ -1,3 +1,4 @@
+import { installHudNavigation } from './hud-navigation.mjs';
 import { finishTurn, prepareTurnFixture } from './turn-flow-helpers.mjs';
 // Optional real Chromium QA. Install Playwright separately, then set
 // KINGDOM_QA_MODULES to its node_modules and KINGDOM_BROWSER to Chromium if needed.
@@ -37,6 +38,7 @@ try {
   for (const missingAudio of [false, true]) {
     const context = await browser.newContext({ viewport: { width: 1440, height: 1050 } });
     const page = await context.newPage(), errors = [], failedRequests = [];
+    installHudNavigation(page);
     page.on('pageerror', (error) => errors.push(error.message));
     page.on('response', (response) => { if (response.status() >= 400 && !response.url().endsWith('favicon.ico')) failedRequests.push(response.url()); });
     if (missingAudio) await page.route(/\.(wav|ogg)$/, (route) => route.fulfill({ status: 404, body: '' }));

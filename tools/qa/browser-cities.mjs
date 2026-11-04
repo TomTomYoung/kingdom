@@ -1,3 +1,4 @@
+import { installHudNavigation } from './hud-navigation.mjs';
 import { finishTurn, prepareTurnFixture } from './turn-flow-helpers.mjs';
 // Optional real Chromium QA for city-specific territory, yields and controls.
 // Set KINGDOM_QA_MODULES and KINGDOM_BROWSER, then run:
@@ -41,6 +42,7 @@ function distinctWork(state) {
 try {
   browser = await chromium.launch({ headless: true, ...(process.env.KINGDOM_BROWSER ? { executablePath: process.env.KINGDOM_BROWSER } : {}) });
   const context = await browser.newContext({ viewport: { width: 1440, height: 1050 } }), page = await context.newPage();
+  installHudNavigation(page);
   page.on('pageerror', error => errors.push(error.message));
   page.on('response', response => { if (response.status() >= 400 && !response.url().endsWith('favicon.ico')) failures.push(response.url()); });
   await page.goto(`http://127.0.0.1:${server.address().port}`);
@@ -151,11 +153,11 @@ try {
   await fresh(); await page.selectOption('#city-select', 'city-2');
   if (!(await page.locator('#city-work-panel').evaluate(element => element.open))) await page.locator('#city-work-panel summary').click();
   await page.locator('#city-panel').screenshot({ path: path.join(output, 'city-desktop.png') });
-  await page.locator('.map-panel').screenshot({ path: path.join(output, 'map-desktop.png') });
+  await page.locator('.hud-stage').screenshot({ path: path.join(output, 'map-desktop.png') });
   await page.setViewportSize({ width: 390, height: 844 });
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
   await page.locator('#city-panel').screenshot({ path: path.join(output, 'city-mobile.png') });
-  await page.locator('.map-panel').screenshot({ path: path.join(output, 'map-mobile.png') });
+  await page.locator('.hud-stage').screenshot({ path: path.join(output, 'map-mobile.png') });
   checks.push('1440px and 390px city controls, work details and map overlays');
   assert.deepEqual(errors, []); assert.deepEqual(failures, []);
   const report = { date: new Date().toISOString(), browser: await browser.version(), realBrowser: true, errors, failures, result: 'passed', checks };
