@@ -33,6 +33,7 @@ try {
   page.on('response', response => { if (response.status() >= 400 && !response.url().endsWith('favicon.ico')) failures.push(response.url()); });
   await page.goto(`http://127.0.0.1:${server.address().port}`);
   await page.waitForFunction(() => document.querySelector('#resources img'));
+  await page.clock.install();
   
   const open = async view => {
     if (!await page.locator('#hud-drawer').isVisible()) await page.locator('.hud-nav [data-hud-open="menu"]').click();
@@ -122,7 +123,7 @@ try {
   for (let i=0;i<3;i++) await page.click('#skip-current-action');
   await page.click('#end-turn'); assert.equal((await save()).currentTurn,2); await checkFrame(550);
   checks.push('mobile bottom controls can individually skip all decisions and finish the turn without page scrolling');
-  await page.clock.install(); await page.clock.pauseAt(new Date()); await fresh('ai-skirmish');
+  await page.clock.pauseAt(new Date()); await fresh('ai-skirmish');
   let remaining=0;
   while (await page.locator('#skip-current-action').isVisible()) {
     assert.ok(++remaining < 32, 'the finite initial AI-scenario decisions should converge');
